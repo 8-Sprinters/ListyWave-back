@@ -1,0 +1,18 @@
+#!/bin/sh
+
+COMMIT_MESSAGE_FILE_PATH=$1
+MESSAGE=$(cat "$COMMIT_MESSAGE_FILE_PATH")
+
+if [[ $(head -1 "$COMMIT_MESSAGE_FILE_PATH") == '' ]]; then
+  exit 0
+fi
+
+if [[ $MESSAGE != *:* ]]; then
+  PREFIX="$(git branch | grep '\*' | sed 's/\* //' | sed 's/\([^/]*\).*/\1/'):"
+fi
+
+if [[ $MESSAGE != *#* ]]; then
+  POSTFIX="(#$(git branch | grep '\*' | sed 's/* //' | sed 's/^.*\///' | sed 's/^\([^-]*-[^-]*\).*/\1/'))"
+fi
+
+printf "%s %s %s" "$PREFIX" "$MESSAGE" "$POSTFIX" > "$COMMIT_MESSAGE_FILE_PATH"
