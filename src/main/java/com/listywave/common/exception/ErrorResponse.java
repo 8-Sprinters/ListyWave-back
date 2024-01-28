@@ -3,7 +3,6 @@ package com.listywave.common.exception;
 import lombok.Builder;
 import org.springframework.http.ResponseEntity;
 
-@Builder
 public record ErrorResponse(
 
     int status,
@@ -18,13 +17,13 @@ public record ErrorResponse(
         return ResponseEntity
                 .status(errorCode.getStatus())
                 .body(
-                    ErrorResponse.builder()
-                            .status(errorCode.getStatus().value())
-                            .error(errorCode.getStatus().name())
-                            .code(errorCode.name())
-                            .detail(errorCode.getDetail())
-                            .message(e.getMessage())
-                            .build()
+                        new ErrorResponse(
+                                errorCode.getStatus().value(),
+                                errorCode.getStatus().name(),
+                                errorCode.name(),
+                                errorCode.getDetail(),
+                                e.getMessage()
+                        )
                 );
     }
 }
