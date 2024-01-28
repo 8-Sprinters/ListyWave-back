@@ -32,7 +32,7 @@ public class Nickname {
         if (value.length() >= LENGTH_LIMIT) {
             throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "닉네임은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
-        if (value.matches("[\\x{10000}-\\x{10FFFF}]|[\\p{Punct}]")) {
+        if (!value.matches("[가-힣a-zA-Z0-9]+")) {
             throw new CustomException(ErrorCode.NICKNAME_CONTAINS_SPECIAL_CHARACTERS, "닉네임에는 이모티콘 및 특수문자가 포함될 수 없습니다.");
         }
     }

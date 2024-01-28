@@ -30,4 +30,5 @@ public class Comment extends BaseEntity {
 
     @Embedded
     private Content content;
+
 }
