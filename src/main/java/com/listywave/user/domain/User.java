@@ -1,7 +1,9 @@
 package com.listywave.user.domain;
 
 import com.listywave.common.BaseEntity;
+import com.listywave.user.vo.Nickname;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -26,8 +28,8 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String email;
 
-    @Column(unique = true)
-    private String nickname;
+    @Embedded
+    private Nickname nickname;
 
     @Column(nullable = false, length = 2048)
     private String backgroundImageUrl;
@@ -35,7 +37,7 @@ public class User extends BaseEntity {
     @Column(nullable = false, length = 2048)
     private String profileImageUrl;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String description;
 
     @Column(nullable = false)
