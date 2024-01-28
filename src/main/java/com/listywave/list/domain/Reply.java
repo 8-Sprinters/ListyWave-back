@@ -21,6 +21,6 @@ public class Reply extends BaseEntity {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 500)
     private String content;
 }

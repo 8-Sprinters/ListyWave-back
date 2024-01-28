@@ -35,13 +35,13 @@ public class List {
     @OneToOne(fetch = FetchType.LAZY)
     private Category category;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String labels;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String description;
 
     @Column(nullable = false)
