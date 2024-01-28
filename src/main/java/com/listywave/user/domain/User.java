@@ -1,7 +1,10 @@
 package com.listywave.user.domain;
 
 import com.listywave.common.BaseEntity;
+import com.listywave.user.vo.BackgroundImageUrl;
+import com.listywave.user.vo.Description;
 import com.listywave.user.vo.Nickname;
+import com.listywave.user.vo.ProfileImageUrl;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -31,14 +34,14 @@ public class User extends BaseEntity {
     @Embedded
     private Nickname nickname;
 
-    @Column(nullable = false, length = 2048)
-    private String backgroundImageUrl;
+    @Embedded
+    private BackgroundImageUrl backgroundImageUrl;
 
-    @Column(nullable = false, length = 2048)
-    private String profileImageUrl;
+    @Embedded
+    private ProfileImageUrl profileImageUrl;
 
-    @Column(nullable = false, length = 200)
-    private String description;
+    @Embedded
+    private Description description;
 
     @Column(nullable = false)
     private int followingCount = 0;

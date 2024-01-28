@@ -30,7 +30,7 @@ public class Nickname {
             throw new CustomException(ErrorCode.NICKNAME_CONTAINS_WHITESPACE, "닉네임의 처음과 마지막에 공백이 존재할 수 없습니다.");
         }
         if (value.length() >= LENGTH_LIMIT) {
-            throw new CustomException(ErrorCode.NICKNAME_LENGTH_EXCEEDED, "닉네임은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
+            throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "닉네임은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
         if (value.matches("[\\x{10000}-\\x{10FFFF}]|[\\p{Punct}]")) {
             throw new CustomException(ErrorCode.NICKNAME_CONTAINS_SPECIAL_CHARACTERS, "닉네임에는 이모티콘 및 특수문자가 포함될 수 없습니다.");

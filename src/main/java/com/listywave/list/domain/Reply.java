@@ -1,7 +1,9 @@
 package com.listywave.list.domain;
 
 import com.listywave.common.BaseEntity;
+import com.listywave.list.vo.Content;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -21,6 +23,6 @@ public class Reply extends BaseEntity {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
-    @Column(nullable = false, length = 500)
-    private String content;
+    @Embedded
+    private Content content;
 }

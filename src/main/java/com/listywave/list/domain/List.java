@@ -1,7 +1,11 @@
 package com.listywave.list.domain;
 
+import com.listywave.list.vo.Labels;
+import com.listywave.list.vo.ListDescription;
+import com.listywave.list.vo.ListTitle;
 import com.listywave.user.domain.User;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -35,14 +39,14 @@ public class List {
     @OneToOne(fetch = FetchType.LAZY)
     private Category category;
 
-    @Column(nullable = false, length = 100)
-    private String labels;
+    @Embedded
+    private Labels labels;
 
-    @Column(nullable = false, length = 100)
-    private String title;
+    @Embedded
+    private ListTitle title;
 
-    @Column(nullable = false, length = 200)
-    private String description;
+    @Embedded
+    private ListDescription description;
 
     @Column(nullable = false)
     private boolean isPublic;

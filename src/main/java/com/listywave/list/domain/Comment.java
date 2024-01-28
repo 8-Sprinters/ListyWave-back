@@ -1,8 +1,10 @@
 package com.listywave.list.domain;
 
 import com.listywave.common.BaseEntity;
+import com.listywave.list.vo.Content;
 import com.listywave.user.domain.User;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -26,6 +28,6 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @Column(nullable = false, length = 500)
-    private String content;
+    @Embedded
+    private Content content;
 }

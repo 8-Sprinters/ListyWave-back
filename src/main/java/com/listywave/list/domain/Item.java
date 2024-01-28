@@ -1,7 +1,12 @@
 package com.listywave.list.domain;
 
 import com.listywave.common.BaseEntity;
+import com.listywave.list.vo.ItemComment;
+import com.listywave.list.vo.ItemImageUrl;
+import com.listywave.list.vo.ItemLink;
+import com.listywave.list.vo.ItemTitle;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -24,15 +29,15 @@ public class Item extends BaseEntity {
     @Column(nullable = false)
     private int rank;
 
-    @Column(nullable = false, length = 100)
-    private String title;
+    @Embedded
+    private ItemTitle title;
 
-    @Column(nullable = false, length = 100)
-    private String comment;
+    @Embedded
+    private ItemComment comment;
 
-    @Column(nullable = false, length = 2048)
-    private String link;
+    @Embedded
+    private ItemLink link;
 
-    @Column(nullable = false, length = 2048)
-    private String imageUrl;
+    @Embedded
+    private ItemImageUrl imageUrl;
 }
