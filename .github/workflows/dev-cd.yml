@@ -1,0 +1,12 @@
+name: deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main", "dev" ]
+    
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - run: ./listywave.sh start

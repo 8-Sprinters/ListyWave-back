@@ -32,7 +32,7 @@ class NicknameTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"닉네임👍", "닉네임!", "!@#!@$@!$%@$^%$&*(&^*%&^$"})
+    @ValueSource(strings = {"닉네임👍", "닉네임!", "*(&^*%&^$"})
     void 이모티콘_및_특수문자가_포함될_수_없다(String value) {
         // expect
         assertThatThrownBy(() -> new Nickname(value))

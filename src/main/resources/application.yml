@@ -1,7 +1,6 @@
 spring:
   profiles:
     group:
-      test: "test"
       local: "local"
       dev: "dev, datasource"
     include:
