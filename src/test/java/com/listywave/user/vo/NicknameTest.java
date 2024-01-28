@@ -2,6 +2,7 @@ package com.listywave.user.vo;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.listywave.common.exception.CustomException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -18,7 +19,7 @@ class NicknameTest {
     void 처음과_마지막에_공백이_들어갈_수_없다(String value) {
         // expect
         assertThatThrownBy(() -> new Nickname(value))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -28,7 +29,7 @@ class NicknameTest {
 
         // expect
         assertThatThrownBy(() -> new Nickname(value))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(CustomException.class);
     }
 
     @ParameterizedTest
@@ -36,6 +37,6 @@ class NicknameTest {
     void 이모티콘_및_특수문자가_포함될_수_없다(String value) {
         // expect
         assertThatThrownBy(() -> new Nickname(value))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(CustomException.class);
     }
 }
