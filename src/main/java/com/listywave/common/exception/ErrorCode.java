@@ -17,8 +17,8 @@ public enum ErrorCode {
 
     // Validation
     NICKNAME_CONTAINS_WHITESPACE(HttpStatus.BAD_REQUEST, "닉네임의 처음과 마지막에 공백이 존재할 수 없습니다."),
-    NICKNAME_LENGTH_EXCEEDED(HttpStatus.BAD_REQUEST, "최대 글자 길이를 초과하였습니다."),
     NICKNAME_CONTAINS_SPECIAL_CHARACTERS(HttpStatus.BAD_REQUEST, "이모티콘 및 특수문자가 포함될 수 없습니다."),
+    LENGTH_EXCEEDED(HttpStatus.BAD_REQUEST, "최대 글자 길이를 초과하였습니다."),
     ;
 
     private final HttpStatus status;
