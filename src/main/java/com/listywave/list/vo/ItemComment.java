@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class ItemComment {
 
-    private static final int LENGTH_LIMIT = 101;
+    private static final int LENGTH_LIMIT = 100;
 
-    @Column(name = "comment", nullable = false, length = 100)
+    @Column(name = "comment", nullable = false, length = LENGTH_LIMIT)
     private final String value;
 
     public ItemComment(String value) {
@@ -26,7 +26,7 @@ public class ItemComment {
     }
 
     private void validate(String value) {
-        if (value.length() >= LENGTH_LIMIT) {
+        if (value.length() > LENGTH_LIMIT) {
             throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "아이템 comment는 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }

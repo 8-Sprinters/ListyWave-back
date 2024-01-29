@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class Content {
 
-    private static final int LENGTH_LIMIT = 501;
+    private static final int LENGTH_LIMIT = 500;
 
-    @Column(name = "content", nullable = false, length = 500)
+    @Column(name = "content", nullable = false, length = LENGTH_LIMIT)
     private final String value;
 
     public Content(String value) {
@@ -26,7 +26,7 @@ public class Content {
     }
 
     private void validate(String value) {
-        if (value.length() >= LENGTH_LIMIT) {
+        if (value.length() > LENGTH_LIMIT) {
             throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "댓글은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }

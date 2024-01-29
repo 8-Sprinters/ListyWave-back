@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class Labels {
 
-    private static final int LENGTH_LIMIT = 11;
+    private static final int LENGTH_LIMIT = 10;
 
-    @Column(name = "labels", nullable = false, length = 10)
+    @Column(name = "labels", nullable = false, length = LENGTH_LIMIT)
     private final String value;
 
     public Labels(String value) {
@@ -26,7 +26,7 @@ public class Labels {
     }
 
     private void validate(String value) {
-        if (value.length() >= LENGTH_LIMIT) {
+        if (value.length() > LENGTH_LIMIT) {
             throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "라벨명은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }

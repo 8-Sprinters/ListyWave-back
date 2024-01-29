@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class ItemLink {
 
-    private static final int LENGTH_LIMIT = 2049;
+    private static final int LENGTH_LIMIT = 2048;
 
-    @Column(name = "link", nullable = false, length = 2048)
+    @Column(name = "link", nullable = false, length = LENGTH_LIMIT)
     private final String value;
 
     public ItemLink(String value) {
@@ -26,7 +26,7 @@ public class ItemLink {
     }
 
     private void validate(String value) {
-        if (value.length() >= LENGTH_LIMIT) {
+        if (value.length() > LENGTH_LIMIT) {
             throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "첨부 link 길이는 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }

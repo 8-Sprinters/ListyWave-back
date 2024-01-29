@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class ItemImageUrl {
 
-    private static final int LENGTH_LIMIT = 2049;
+    private static final int LENGTH_LIMIT = 2048;
 
-    @Column(name = "image_url", nullable = false, length = 2048)
+    @Column(name = "image_url", nullable = false, length = LENGTH_LIMIT)
     private final String value;
 
     public ItemImageUrl(String value) {
@@ -26,7 +26,7 @@ public class ItemImageUrl {
     }
 
     private void validate(String value) {
-        if (value.length() >= LENGTH_LIMIT) {
+        if (value.length() > LENGTH_LIMIT) {
             throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "아이템의 이미지 URL은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
