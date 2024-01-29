@@ -28,3 +28,4 @@ logging:
   level:
     org.springframework.orm.jpa: DEBUG
     org.springframework.orm.transaction: DEBUG
+    org.apache.coyote.http11: debug
