@@ -28,7 +28,7 @@ public class ItemComment {
     }
 
     private void validate(String value) {
-        if (value.length() > LENGTH_LIMIT) {
+        if (value != null && value.length() > LENGTH_LIMIT) {
             throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "아이템 comment는 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
