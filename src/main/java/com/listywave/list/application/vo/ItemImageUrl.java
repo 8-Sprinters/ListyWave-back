@@ -19,7 +19,7 @@ public class ItemImageUrl {
 
     private static final int LENGTH_LIMIT = 2048;
 
-    @Column(name = "image_url", nullable = false, length = LENGTH_LIMIT)
+    @Column(name = "image_url", length = LENGTH_LIMIT)
     private final String value;
 
     public ItemImageUrl(String value) {

@@ -19,7 +19,7 @@ public class ItemLink {
 
     private static final int LENGTH_LIMIT = 2048;
 
-    @Column(name = "link", nullable = false, length = LENGTH_LIMIT)
+    @Column(name = "link", length = LENGTH_LIMIT)
     private final String value;
 
     public ItemLink(String value) {

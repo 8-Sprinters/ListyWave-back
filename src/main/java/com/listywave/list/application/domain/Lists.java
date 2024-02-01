@@ -1,26 +1,19 @@
 package com.listywave.list.application.domain;
 
-import com.listywave.list.application.vo.Labels;
 import com.listywave.list.application.vo.ListDescription;
 import com.listywave.list.application.vo.ListTitle;
 import com.listywave.user.application.domain.User;
-
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
-
 import com.listywave.list.application.vo.ItemComment;
 import com.listywave.list.application.vo.ItemImageUrl;
 import com.listywave.list.application.vo.ItemLink;
 import com.listywave.list.application.vo.ItemTitle;
 import com.listywave.list.application.vo.LabelName;
-import com.listywave.list.application.vo.ListDescription;
-import com.listywave.list.application.vo.ListTitle;
 import com.listywave.list.application.dto.ListCreateCommand;
-import com.listywave.user.application.domain.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Convert;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
