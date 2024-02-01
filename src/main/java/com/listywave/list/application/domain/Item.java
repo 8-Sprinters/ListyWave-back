@@ -27,7 +27,7 @@ public class Item extends BaseEntity {
     private List list;
 
     @Column(nullable = false)
-    private int rank;
+    private int ranking;
 
     @Embedded
     private ItemTitle title;
