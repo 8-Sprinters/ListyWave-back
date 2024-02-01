@@ -1,6 +1,7 @@
 package com.listywave.common.exception;
 
 
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -18,20 +19,28 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RequiredArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    /**  CustomException 예외 처리  */
+    /**
+     * CustomException 예외 처리
+     */
     @ExceptionHandler
     protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
+        log.error(e.getMessage());
         return ErrorResponse.toResponseEntity(e);
     }
 
-    /** 500번대 에러 처리 */
+    /**
+     * 500번대 에러 처리
+     */
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponse> handleException(Exception e) {
+        log.error(e.getMessage());
         CustomException ex = new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
         return ErrorResponse.toResponseEntity(ex);
     }
 
-    /** 지원하지 않은 HTTP method 호출 할 경우 발생 */
+    /**
+     * 지원하지 않은 HTTP method 호출 할 경우 발생
+     */
     @Override
     protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
             HttpRequestMethodNotSupportedException e,
@@ -39,6 +48,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatusCode status,
             WebRequest request
     ) {
+        log.error(e.getMessage());
         CustomException ex = new CustomException(ErrorCode.METHOD_NOT_ALLOWED);
         ErrorCode errorCode = ex.getErrorCode();
         return ResponseEntity
@@ -54,9 +64,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 );
     }
 
-    /** PathVariable, RequestParam, RequestHeader, RequestBody 에서 타입이 일치하지 않을 경우 발생 */
+    /**
+     * PathVariable, RequestParam, RequestHeader, RequestBody 에서 타입이 일치하지 않을 경우 발생
+     */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+        log.error(e.getMessage());
         CustomException ex = new CustomException(ErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH);
         return ErrorResponse.toResponseEntity(ex);
     }
