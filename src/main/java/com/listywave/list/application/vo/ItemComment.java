@@ -19,7 +19,7 @@ public class ItemComment {
 
     private static final int LENGTH_LIMIT = 100;
 
-    @Column(name = "comment", nullable = false, length = LENGTH_LIMIT)
+    @Column(name = "comment", length = LENGTH_LIMIT)
     private final String value;
 
     public ItemComment(String value) {

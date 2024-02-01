@@ -19,7 +19,7 @@ public class ListDescription {
 
     private static final int LENGTH_LIMIT = 200;
 
-    @Column(name = "description", nullable = false, length = LENGTH_LIMIT)
+    @Column(name = "description", length = LENGTH_LIMIT)
     private final String value;
 
     public ListDescription(String value) {
