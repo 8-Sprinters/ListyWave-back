@@ -10,7 +10,7 @@ import com.listywave.list.application.domain.Lists;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.response.ListCreateResponse;
 import com.listywave.list.repository.ListRepository;
-import com.listywave.user.domain.User;
+import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
