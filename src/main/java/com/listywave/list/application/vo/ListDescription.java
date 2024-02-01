@@ -28,7 +28,7 @@ public class ListDescription {
     }
 
     private void validate(String value) {
-        if (value.length() > LENGTH_LIMIT) {
+        if (value != null && value.length() > LENGTH_LIMIT) {
             throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "리스트 설명은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }

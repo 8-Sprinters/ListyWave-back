@@ -28,7 +28,7 @@ public class ItemLink {
     }
 
     private void validate(String value) {
-        if (value.length() > LENGTH_LIMIT) {
+        if (value != null && value.length() > LENGTH_LIMIT) {
             throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "첨부 link 길이는 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
