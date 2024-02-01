@@ -1,4 +1,4 @@
-package com.listywave.image.domain;
+package com.listywave.image.application.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

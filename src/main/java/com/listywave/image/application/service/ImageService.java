@@ -8,22 +8,22 @@ import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import com.listywave.common.util.UserUtil;
+import com.listywave.image.application.domain.ImageFileExtension;
+import com.listywave.image.application.domain.ImageType;
 import com.listywave.image.application.dto.ExtensionRanks;
-import com.listywave.image.domain.ImageFileExtension;
-import com.listywave.image.domain.ImageType;
 import com.listywave.image.presentation.dto.response.PresignedUrlResponse;
 import com.listywave.list.application.domain.Item;
 import com.listywave.list.application.domain.Lists;
 import com.listywave.list.repository.ItemRepository;
 import com.listywave.list.repository.ListRepository;
-import com.listywave.user.domain.User;
-import jakarta.transaction.Transactional;
+import com.listywave.user.application.domain.User;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -67,8 +67,8 @@ public class ImageService {
                             updateImageKey(listId, extensionRank, imageKey);
 
                             return PresignedUrlResponse.of(
-                                            extensionRank.rank(),
-                                            amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString());
+                                    extensionRank.rank(),
+                                    amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString());
                         }
                 )
                 .toList();
@@ -83,16 +83,16 @@ public class ImageService {
 
         extensionRanks.forEach(
                 extensionRank -> {
-                        Item item = findItem(listId, extensionRank.rank());
-                        String imageUrl = createReadImageUrl(
-                                ImageType.LISTS_ITEM,
-                                listId,
-                                item.getImageKey(),
-                                extensionRank.extension()
-                        );
-                        item.updateItemImageUrl(imageUrl);
-                    }
-                );
+                    Item item = findItem(listId, extensionRank.rank());
+                    String imageUrl = createReadImageUrl(
+                            ImageType.LISTS_ITEM,
+                            listId,
+                            item.getImageKey(),
+                            extensionRank.extension()
+                    );
+                    item.updateItemImageUrl(imageUrl);
+                }
+        );
 
     }
 
