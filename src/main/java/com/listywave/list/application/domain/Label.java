@@ -1,5 +1,6 @@
 package com.listywave.list.application.domain;
 
+import com.listywave.list.vo.LabelName;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,11 +10,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Label {
@@ -26,4 +29,16 @@ public class Label {
     @JoinColumn(name = "list_Id")
     private Lists list;
 
+    @Embedded
+    private LabelName labelName;
+
+    public static Label createLabel(String labels){
+        return Label.builder()
+                .labelName(
+                        LabelName.builder()
+                                .value(labels)
+                                .build()
+                )
+                .build();
+    }
 }
