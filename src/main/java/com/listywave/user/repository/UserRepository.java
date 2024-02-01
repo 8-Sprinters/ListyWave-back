@@ -1,6 +1,6 @@
 package com.listywave.user.repository;
 
-import com.listywave.user.domain.User;
+import com.listywave.user.application.domain.User;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

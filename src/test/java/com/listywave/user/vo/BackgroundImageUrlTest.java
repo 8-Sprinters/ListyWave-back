@@ -1,9 +1,9 @@
 package com.listywave.user.vo;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.listywave.common.exception.CustomException;
+import com.listywave.user.application.vo.BackgroundImageUrl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;

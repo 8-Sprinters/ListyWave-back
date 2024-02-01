@@ -1,10 +1,10 @@
-package com.listywave.collaborator.domain;
+package com.listywave.list.application.domain;
 
-import com.listywave.list.application.domain.List;
-import com.listywave.user.application.domain.User;
+import com.listywave.common.BaseEntity;
+import com.listywave.list.application.vo.Content;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
@@ -12,19 +12,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Getter
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Collaborator {
+public class Reply extends BaseEntity {
 
-    @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "comment_id")
+    private Comment comment;
 
-    @Id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "list_id")
-    private List list;
+    @Embedded
+    private Content content;
 }

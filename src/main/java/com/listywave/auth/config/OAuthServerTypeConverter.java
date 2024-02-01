@@ -1,6 +1,6 @@
 package com.listywave.auth.config;
 
-import com.listywave.auth.domain.OauthServerType;
+import com.listywave.auth.application.domain.OauthServerType;
 import org.springframework.core.convert.converter.Converter;
 
 public class OAuthServerTypeConverter implements Converter<String, OauthServerType> {
