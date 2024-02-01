@@ -8,8 +8,6 @@ import com.listywave.user.vo.ProfileImageUrl;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -26,10 +24,10 @@ import lombok.NoArgsConstructor;
 public class User extends BaseEntity {
 
     @Column(nullable = false)
-    private String name;
+    private Long oauthId;
 
     @Column(nullable = false)
-    private String email;
+    private String oauthEmail;
 
     @Embedded
     private Nickname nickname;
@@ -44,11 +42,21 @@ public class User extends BaseEntity {
     private Description description;
 
     @Column(nullable = false)
-    private int followingCount = 0;
+    private int followingCount;
 
     @Column(nullable = false)
-    private int followerCount = 0;
+    private int followerCount;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    public static User initialCreate(Long oauthId, String oauthEmail) {
+        return new User(
+                oauthId,
+                oauthEmail,
+                Nickname.initialCreate(String.valueOf(oauthId)),
+                new BackgroundImageUrl(""),
+                new ProfileImageUrl(""),
+                new Description(""),
+                0,
+                0
+        );
+    }
 }

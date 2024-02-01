@@ -1,9 +1,0 @@
-spring:
-  config:
-    activate:
-      on-profile: "datasource"
-  #  datasource:
-  #    url:
-  #    username:
-  #    password:
-  #    driver-class-name: com.mysql.cj.jdbc.Driver

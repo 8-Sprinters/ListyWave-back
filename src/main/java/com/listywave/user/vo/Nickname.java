@@ -25,6 +25,13 @@ public class Nickname {
         this.value = value;
     }
 
+    public static Nickname initialCreate(String oauthId) {
+        if (oauthId.length() > LENGTH_LIMIT) {
+            return new Nickname(oauthId.substring(LENGTH_LIMIT));
+        }
+        return new Nickname(oauthId);
+    }
+
     private void validate(String value) {
         if (value.startsWith(" ") || value.endsWith(" ")) {
             throw new CustomException(ErrorCode.NICKNAME_CONTAINS_WHITESPACE, "닉네임의 처음과 마지막에 공백이 존재할 수 없습니다.");
