@@ -24,3 +24,12 @@ logging:
   level:
     org.springframework.orm.jpa: DEBUG
     org.springframework.orm.transaction: DEBUG
+
+oauth:
+  kakao:
+    client_id: ""
+    client_secret: ""
+    redirect_uri: ""
+
+cors:
+  allowedOrigins:
