@@ -23,6 +23,9 @@ public enum ErrorCode {
     LENGTH_EXCEEDED(HttpStatus.BAD_REQUEST, "최대 글자 길이를 초과하였습니다."),
 
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 AccessToken 입니다. 다시 로그인해주세요."),
+
+    // User
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원을 찾을 수 없습니다."),
     ;
 
     private final HttpStatus status;

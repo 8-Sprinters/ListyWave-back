@@ -1,6 +1,5 @@
 package com.listywave.common.exception;
 
-
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

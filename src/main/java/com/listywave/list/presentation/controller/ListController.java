@@ -1,0 +1,35 @@
+package com.listywave.list.presentation.controller;
+
+import com.listywave.list.application.dto.ListCreateCommand;
+import com.listywave.list.application.service.ListService;
+import com.listywave.list.presentation.dto.request.ListCreateRequest;
+import com.listywave.list.presentation.dto.response.ListCreateResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/lists")
+public class ListController {
+
+    private final ListService listService;
+
+    @PostMapping
+    public ResponseEntity<ListCreateResponse> listCreate(@RequestBody ListCreateRequest listCreateRequest){
+        ListCreateCommand listCreateCommand = listCreateRequest.of(listCreateRequest);
+
+        ListCreateResponse listCreateResponse = listService.listCreate(
+                listCreateCommand,
+                listCreateRequest.collaboratorIds(),
+                listCreateRequest.items()
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(listCreateResponse);
+    }
+}
