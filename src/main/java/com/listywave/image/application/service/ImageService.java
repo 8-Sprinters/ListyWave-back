@@ -141,7 +141,7 @@ public class ImageService {
 
     private Item findItem(Long listId, int rank) {
         return itemRepository
-                .findByListIdAndRank(listId, rank)
+                .findByListIdAndRanking(listId, rank)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "해당 아이템이 존재하지 않습니다."));
     }
 
