@@ -15,21 +15,21 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
-public class ItemLink {
+public class LabelName {
 
-    private static final int LENGTH_LIMIT = 2048;
+    private static final int LENGTH_LIMIT = 10;
 
-    @Column(name = "link", nullable = false, length = LENGTH_LIMIT)
+    @Column(name = "labels", nullable = false, length = LENGTH_LIMIT)
     private final String value;
 
-    public ItemLink(String value) {
+    public LabelName(String value) {
         validate(value);
         this.value = value;
     }
 
     private void validate(String value) {
         if (value.length() > LENGTH_LIMIT) {
-            throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "첨부 link 길이는 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
+            throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "라벨명은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
 }

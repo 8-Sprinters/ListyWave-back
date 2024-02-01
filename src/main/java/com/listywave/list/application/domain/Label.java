@@ -1,9 +1,8 @@
-package com.listywave.collaborator.domain;
+package com.listywave.list.application.domain;
 
-import com.listywave.list.application.domain.Lists;
-import com.listywave.user.application.domain.User;
+import com.listywave.list.application.vo.LabelName;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,29 +14,31 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Getter
+@Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Collaborator {
+public class Label {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "list_id")
+    @ManyToOne
+    @JoinColumn(name = "list_Id")
     private Lists list;
 
-    public static Collaborator createCollaborator(User user, Lists list){
-        return Collaborator.builder()
-                .user(user)
-                .list(list)
+    @Embedded
+    private LabelName labelName;
+
+    public static Label createLabel(String labels){
+        return Label.builder()
+                .labelName(
+                        LabelName.builder()
+                                .value(labels)
+                                .build()
+                )
                 .build();
     }
 }
