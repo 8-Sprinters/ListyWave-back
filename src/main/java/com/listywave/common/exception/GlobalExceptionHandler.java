@@ -23,7 +23,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler
     protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
-        log.error(e.getMessage());
+        log.error("handleCustomException : {}", e.getMessage(), e);
         return ErrorResponse.toResponseEntity(e);
     }
 
@@ -47,7 +47,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatusCode status,
             WebRequest request
     ) {
-        log.error(e.getMessage());
+        log.error("handleHttpRequestMethodNotSupported : {}", e.getMessage(), e);
         CustomException ex = new CustomException(ErrorCode.METHOD_NOT_ALLOWED);
         ErrorCode errorCode = ex.getErrorCode();
         return ResponseEntity
@@ -68,7 +68,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
-        log.error(e.getMessage());
+        log.error("handleMethodArgumentTypeMismatchException : {}", e.getMessage(), e);
         CustomException ex = new CustomException(ErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH);
         return ErrorResponse.toResponseEntity(ex);
     }

@@ -8,8 +8,6 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
 
-    SAMPLE_ERROR(HttpStatus.BAD_REQUEST, "Sample Error Message"),
-
     // Common
     METHOD_ARGUMENT_TYPE_MISMATCH(HttpStatus.BAD_REQUEST, "요청 한 값 타입이 잘못되어 binding에 실패하였습니다."),
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "지원하지 않는 HTTP method 입니다."),
@@ -21,11 +19,13 @@ public enum ErrorCode {
     NICKNAME_CONTAINS_WHITESPACE(HttpStatus.BAD_REQUEST, "닉네임의 처음과 마지막에 공백이 존재할 수 없습니다."),
     NICKNAME_CONTAINS_SPECIAL_CHARACTERS(HttpStatus.BAD_REQUEST, "이모티콘 및 특수문자가 포함될 수 없습니다."),
     LENGTH_EXCEEDED(HttpStatus.BAD_REQUEST, "최대 글자 길이를 초과하였습니다."),
+    INVALID_COUNT(HttpStatus.BAD_REQUEST, "선택한 아이템 및 라벨의 개수가 올바르지 않습니다."),
+    NOT_FOUND(HttpStatus.BAD_REQUEST, "대상이 존재하지 않습니다."),
 
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 AccessToken 입니다. 다시 로그인해주세요."),
 
-    // User
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원을 찾을 수 없습니다."),
+    // list
+    USER_MISMATCH(HttpStatus.FORBIDDEN, "접근 권한이 존재하지 않습니다.")
     ;
 
     private final HttpStatus status;
