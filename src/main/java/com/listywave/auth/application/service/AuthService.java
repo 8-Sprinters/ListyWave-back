@@ -26,7 +26,7 @@ public class AuthService {
         return kakaoRedirectUriProvider.provide();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public LoginResponse login(String authCode) {
         KakaoTokenResponse kakaoTokenResponse = kakaoOauthClient.requestToken(authCode);
         KakaoMember kakaoMember = kakaoOauthClient.fetchMember(kakaoTokenResponse.accessToken());
