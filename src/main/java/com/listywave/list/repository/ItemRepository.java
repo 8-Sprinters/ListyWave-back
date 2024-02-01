@@ -1,7 +1,9 @@
 package com.listywave.list.repository;
 
-import com.listywave.list.domain.Item;
+import com.listywave.list.application.domain.Item;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
+    Optional<Item> findByListIdAndRank(Long listId, int rank);
 }

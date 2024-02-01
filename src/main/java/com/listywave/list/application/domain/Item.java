@@ -7,7 +7,6 @@ import com.listywave.list.application.vo.ItemLink;
 import com.listywave.list.application.vo.ItemTitle;
 import com.listywave.list.application.dto.ListCreateCommand;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
-import com.listywave.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -47,14 +46,42 @@ public class Item extends BaseEntity {
     @Embedded
     private ItemImageUrl imageUrl;
 
-    public static Item createItem(ItemCreateRequest items, Lists lists){
+    private String imageKey;
+
+    public static Item createItem(ItemCreateRequest items, Lists lists) {
         return Item.builder()
                 .list(lists)
                 .ranking(items.rank())
-                .title(items.title())
-                .comment(items.comment())
-                .link(items.link())
-                .imageUrl(items.imageUrl())
+                .title(
+                        ItemTitle.builder()
+                                .value(items.title())
+                                .build()
+                        )
+                .comment(
+                        ItemComment.builder()
+                                .value(items.comment())
+                                .build()
+                )
+                .link(
+                        ItemLink.builder()
+                                .value(items.link())
+                                .build()
+                )
+                .imageUrl(
+                        ItemImageUrl.builder()
+                                .value(items.imageUrl())
+                                .build()
+                )
                 .build();
+    }
+
+    public void updateItemImageKey(String imageKey) {
+        this.imageKey = imageKey;
+    }
+
+    public void updateItemImageUrl(String imageUrl) {
+        this.imageUrl = ItemImageUrl.builder()
+                                .value(imageUrl)
+                                .build();
     }
 }

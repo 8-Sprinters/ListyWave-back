@@ -20,16 +20,14 @@ public class ListController {
     private final ListService listService;
 
     @PostMapping
-    public ResponseEntity<ListCreateResponse> listCreate(@RequestBody ListCreateRequest listCreateRequest){
-        ListCreateCommand listCreateCommand = listCreateRequest.of(listCreateRequest);
-
-        ListCreateResponse listCreateResponse = listService.listCreate(
-                listCreateCommand,
-                listCreateRequest.collaboratorIds(),
-                listCreateRequest.items()
-        );
-
+    public ResponseEntity<ListCreateResponse> listCreate(@RequestBody ListCreateRequest request) {
+        ListCreateCommand listCreateCommand = request.toCommand();
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(listCreateResponse);
+                .body(listService.listCreate(
+                        listCreateCommand,
+                        request.labels(),
+                        request.collaboratorIds(),
+                        request.items()
+                ));
     }
 }

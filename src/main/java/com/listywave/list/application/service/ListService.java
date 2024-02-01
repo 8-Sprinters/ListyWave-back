@@ -4,12 +4,11 @@ import com.listywave.collaborator.domain.Collaborator;
 import com.listywave.collaborator.domain.repository.CollaboratorRepository;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
+import com.listywave.common.util.UserUtil;
 import com.listywave.list.application.dto.ListCreateCommand;
-import com.listywave.list.domain.Item;
-import com.listywave.list.domain.Lists;
+import com.listywave.list.application.domain.Lists;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.response.ListCreateResponse;
-import com.listywave.list.repository.ItemRepository;
 import com.listywave.list.repository.ListRepository;
 import com.listywave.user.domain.User;
 import com.listywave.user.repository.UserRepository;
@@ -26,37 +25,78 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ListService {
 
+    private final UserUtil userUtil;
     private final ListRepository listRepository;
     private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
     private final CollaboratorRepository collaboratorRepository;
+
     public ListCreateResponse listCreate(
             ListCreateCommand listCreateCommand,
+            List<String> labels,
             List<Long> collaboratorIds,
             List<ItemCreateRequest> items
     ) {
         //TODO: 글쓰는 회원이 실제 존재하는지 검증 (security 이용해서 해야함)
-        User user = userRepository.findById(listCreateCommand.ownerId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, "회원이 존재하지 않습니다."));
+        final User user = userUtil.getUserByUserid(listCreateCommand.ownerId());
 
-        //TODO: 글자 길이 검증
+        Boolean isLabels = isLabelCountValid(labels);
+        validateItemsCount(items);
+        Boolean hasCollaboratorId = hascollaboratorExistence(collaboratorIds);
 
-        //TODO: 만약 hasCollaboration이 true면 colaboratorIds가 실제 있는 회원인지 검증
+        Lists list = Lists.createList(
+                user,
+                listCreateCommand,
+                labels,
+                items,
+                isLabels,
+                hasCollaboratorId
+        );
+        listRepository.save(list);
 
-        //TODO: 리스트 저장
-        Lists list = listRepository.save(Lists.createList(user, listCreateCommand, items));
+       if(hasCollaboratorId){
+           List<User> users = findExistingCollaborators(collaboratorIds);
 
-        List<Item> itemCollect = items.stream()
-                .map(v -> Item.createItem(v, list))
-                .collect(Collectors.toList());
-
-        List<User> users = userRepository.findAllById(collaboratorIds);
-        List<Collaborator> collaborators = users.stream()
-                .map(v -> Collaborator.createCollaborator(v, list))
-                .collect(Collectors.toList());
-
-        itemRepository.saveAll(itemCollect);
-        collaboratorRepository.saveAll(collaborators);
+            List<Collaborator> collaborators = users.stream()
+                    .map(u -> Collaborator.createCollaborator(u, list))
+                    .collect(Collectors.toList());
+            collaboratorRepository.saveAll(collaborators);
+       }
         return ListCreateResponse.of(list.getId());
+    }
+
+    private List<User> findExistingCollaborators(List<Long> collaboratorIds) {
+        List<User> existingCollaborators = userRepository.findAllById(collaboratorIds);
+
+        List<Long> nonExistingIds = collaboratorIds.stream()
+                .filter(
+                        id -> existingCollaborators.stream()
+                                            .noneMatch(user -> user.getId().equals(id))
+                )
+                .toList();
+
+        if (!nonExistingIds.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_FOUND, "콜라보레이터로 등록한 회원이 존재하지 않습니다.");
+        }
+        return existingCollaborators;
+    }
+
+    private Boolean hascollaboratorExistence(List<Long> collaboratorIds) {
+        return collaboratorIds != null && !collaboratorIds.isEmpty();
+    }
+
+    private void validateItemsCount(List<ItemCreateRequest> items) {
+        if(items.size() < 3 || items.size() > 10){
+            throw new CustomException(ErrorCode.INVALID_COUNT, "아이템의 개수는 3개에서 10개까지 가능합니다.");
+        }
+    }
+
+    private Boolean isLabelCountValid(List<String> labels) {
+        if(labels == null || labels.isEmpty()){
+            return false;
+        }
+        if(labels.size() > 3){
+            throw new CustomException(ErrorCode.INVALID_COUNT, "라벨의 개수는 최대 3개까지 작성 가능합니다.");
+        }
+        return true;
     }
 }

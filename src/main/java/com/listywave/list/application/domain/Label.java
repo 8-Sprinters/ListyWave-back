@@ -1,6 +1,6 @@
 package com.listywave.list.application.domain;
 
-import com.listywave.list.vo.LabelName;
+import com.listywave.list.application.vo.LabelName;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
