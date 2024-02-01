@@ -31,12 +31,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     /**
      * 500번대 에러 처리
      */
-    @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ErrorResponse> handleException(Exception e) {
-        log.error(e.getMessage());
-        CustomException ex = new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
-        return ErrorResponse.toResponseEntity(ex);
-    }
+//    @ExceptionHandler(Exception.class)
+//    protected ResponseEntity<ErrorResponse> handleException(Exception e) {
+//        log.error(e.getMessage());
+//        CustomException ex = new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+//        return ErrorResponse.toResponseEntity(ex);
+//    }
 
     /**
      * 지원하지 않은 HTTP method 호출 할 경우 발생
