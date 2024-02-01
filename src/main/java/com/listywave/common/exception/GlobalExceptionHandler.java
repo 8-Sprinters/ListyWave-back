@@ -60,4 +60,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         CustomException ex = new CustomException(ErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH);
         return ErrorResponse.toResponseEntity(ex);
     }
+
+    /**
+     * JWT 서명 확인에 실패했을 경우 발생
+     */
+    @ExceptionHandler(SignatureException.class)
+    ResponseEntity<ErrorResponse> handleSignatureException(SignatureException e) {
+        log.error(e.getMessage());
+        CustomException customException = new CustomException(ErrorCode.INVALID_ACCESS_TOKEN);
+        return ErrorResponse.toResponseEntity(customException);
+    }
 }
