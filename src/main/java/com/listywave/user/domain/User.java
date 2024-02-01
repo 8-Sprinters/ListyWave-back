@@ -45,8 +45,4 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private int followerCount = 0;
-
-    @Enumerated(EnumType.STRING)
-    private Role role;
-
 }
