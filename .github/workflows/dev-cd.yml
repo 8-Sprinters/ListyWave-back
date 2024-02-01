@@ -8,8 +8,10 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
-    env:
-      working-directory: /home/ubuntu
     steps:
-      - run: pwd
-      - run: ./listywave.sh deploy
+      - name: check current position
+        working-directory: /home/ubuntu
+        run: pwd
+      - name: run deploy script
+        working-directory: /home/ubuntu
+        run: ./listywave.sh deploy
