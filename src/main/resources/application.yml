@@ -5,7 +5,7 @@ spring:
     driver-class-name: org.h2.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     properties:
       hibernate:
         format_sql: true
@@ -28,3 +28,13 @@ logging:
     org.springframework.orm.jpa: DEBUG
     org.springframework.orm.transaction: DEBUG
     org.apache.coyote.http11: debug
+
+cloud:
+  aws:
+    credentials:
+      access-key:
+      secret-key:
+    region:
+  s3:
+    endpoint:
+    bucket:

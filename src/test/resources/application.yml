@@ -33,3 +33,13 @@ oauth:
 
 cors:
   allowedOrigins:
+
+cloud:
+  aws:
+    credentials:
+      access-key:
+      secret-key:
+    region:
+  s3:
+    endpoint:
+    bucket:
