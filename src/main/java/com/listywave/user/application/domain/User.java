@@ -46,6 +46,9 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private int followerCount;
+    
+    @Column(nullable = false, length = 5)
+    private Boolean allPrivate;
 
     public static User initialCreate(Long oauthId, String oauthEmail) {
         return new User(
@@ -56,7 +59,8 @@ public class User extends BaseEntity {
                 new ProfileImageUrl(""),
                 new Description(""),
                 0,
-                0
+                0,
+                false
         );
     }
 }
