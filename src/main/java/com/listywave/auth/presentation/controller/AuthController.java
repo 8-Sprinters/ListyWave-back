@@ -28,7 +28,7 @@ public class AuthController {
 
     @GetMapping("/auth/redirect/kakao")
     ResponseEntity<LoginResponse> login(
-            @RequestParam(name = "code") String authCode,
+            @RequestParam(value = "code") String authCode,
             HttpServletResponse response
     ) {
         LoginResponse loginResponse = authService.login(authCode);
