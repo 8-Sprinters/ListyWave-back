@@ -1,5 +1,6 @@
 package com.listywave.user.presentation;
 
+import com.listywave.user.application.dto.AllUserResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -22,5 +23,11 @@ public class UserController {
     ) {
         UserInfoResponse userInfoResponse = userService.getUserInfo(userId, accessToken);
         return ResponseEntity.ok(userInfoResponse);
+    }
+
+    @GetMapping("/users")
+    ResponseEntity<AllUserResponse> getAllUser() {
+        AllUserResponse allUserResponse = userService.getAllUser();
+        return ResponseEntity.ok(allUserResponse);
     }
 }

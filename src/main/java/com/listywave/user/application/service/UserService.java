@@ -5,8 +5,10 @@ import static com.listywave.common.exception.ErrorCode.NOT_FOUND;
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.common.exception.CustomException;
 import com.listywave.user.application.domain.User;
+import com.listywave.user.application.dto.AllUserResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.repository.UserRepository;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,5 +39,11 @@ public class UserService {
 
     private static boolean isSignedIn(String accessToken) {
         return accessToken.isBlank();
+    }
+
+    @Transactional(readOnly = true)
+    public AllUserResponse getAllUser() {
+        List<User> allUser = userRepository.findAll();
+        return AllUserResponse.of(allUser);
     }
 }
