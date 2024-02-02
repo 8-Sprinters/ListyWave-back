@@ -8,8 +8,7 @@ public record AllUserResponse(
         List<UserInfo> userInfos
 ) {
 
-    public
-    static AllUserResponse of(List<User> users) {
+    public static AllUserResponse of(List<User> users) {
         List<UserInfo> userInfos = users.stream()
                 .map(UserInfo::of)
                 .toList();
