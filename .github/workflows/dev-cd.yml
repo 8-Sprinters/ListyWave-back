@@ -15,4 +15,4 @@ jobs:
       steps:
         - name: Run Deploy script
           working-directory: /home/ubuntu
-          run: ./listywave.sh deploy
+          run: sudo ./listywave.sh deploy
