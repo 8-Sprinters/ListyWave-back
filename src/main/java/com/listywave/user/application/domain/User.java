@@ -46,7 +46,7 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private int followerCount;
-    
+
     @Column(nullable = false, length = 5)
     private Boolean allPrivate;
 
@@ -62,5 +62,25 @@ public class User extends BaseEntity {
                 0,
                 false
         );
+    }
+
+    public boolean isSame(Long id) {
+        return this.id.equals(id);
+    }
+
+    public String getNickname() {
+        return nickname.getValue();
+    }
+
+    public String getBackgroundImageUrl() {
+        return backgroundImageUrl.getValue();
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl.getValue();
+    }
+
+    public String getDescription() {
+        return description.getValue();
     }
 }

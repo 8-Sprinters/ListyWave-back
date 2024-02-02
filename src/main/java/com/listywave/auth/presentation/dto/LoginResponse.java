@@ -16,10 +16,10 @@ public record LoginResponse(
     public static LoginResponse of(User user, boolean isFirst) {
         return new LoginResponse(
                 user.getId(),
-                user.getProfileImageUrl().getValue(),
-                user.getBackgroundImageUrl().getValue(),
-                user.getNickname().getValue(),
-                user.getDescription().getValue(),
+                user.getProfileImageUrl(),
+                user.getBackgroundImageUrl(),
+                user.getNickname(),
+                user.getDescription(),
                 user.getFollowingCount(),
                 user.getFollowerCount(),
                 isFirst

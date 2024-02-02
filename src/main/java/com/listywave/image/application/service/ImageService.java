@@ -173,8 +173,8 @@ public class ImageService {
     }
 
     private void validateListUserMismatch(Lists lists, User user) {
-        if(!lists.getUser().getId().equals(user.getId())){
-            throw new CustomException(ErrorCode.USER_MISMATCH, "리스트를 생성한 유저와 로그인한 계정이 일치하지 않습니다.");
+        if (!lists.getUser().getId().equals(user.getId())) {
+            throw new CustomException(ErrorCode.INVALID_ACCESS, "리스트를 생성한 유저와 로그인한 계정이 일치하지 않습니다.");
         }
     }
 
