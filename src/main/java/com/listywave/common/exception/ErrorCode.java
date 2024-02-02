@@ -25,8 +25,7 @@ public enum ErrorCode {
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 AccessToken 입니다. 다시 로그인해주세요."),
 
     // list
-    USER_MISMATCH(HttpStatus.FORBIDDEN, "접근 권한이 존재하지 않습니다.")
-    ;
+    INVALID_ACCESS(HttpStatus.FORBIDDEN, "접근 권한이 존재하지 않습니다.");
 
     private final HttpStatus status;
     private final String detail;
