@@ -14,7 +14,7 @@ public record FeedListsResponse(
     public static FeedListsResponse of(Lists lists) {
         return new FeedListsResponse(
                 lists.getId(),
-                lists.getTitle().getValue(),
+                lists.getTitle(),
                 lists.isPublic(),
                 lists.getItems().stream()
                         .map(ListItemsResponse::of)
@@ -33,9 +33,8 @@ record ListItemsResponse(
         return new ListItemsResponse(
                 item.getId(),
                 item.getRanking(),
-                item.getTitle().getValue(),
-                item.getImageUrl().getValue()
+                item.getTitle(),
+                item.getImageUrl()
         );
     }
-
 }

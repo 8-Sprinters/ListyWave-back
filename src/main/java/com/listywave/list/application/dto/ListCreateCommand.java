@@ -1,9 +1,9 @@
 package com.listywave.list.application.dto;
 
 import com.listywave.list.application.domain.CategoryType;
-import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.list.application.vo.ListDescription;
 import com.listywave.list.application.vo.ListTitle;
+import com.listywave.list.presentation.dto.request.ListCreateRequest;
 
 public record ListCreateCommand(
         Long ownerId,
@@ -14,7 +14,7 @@ public record ListCreateCommand(
         String backgroundColor
 ) {
 
-    public static ListCreateCommand of(ListCreateRequest listCreateRequest){
+    public static ListCreateCommand of(ListCreateRequest listCreateRequest) {
         return new ListCreateCommand(
                 listCreateRequest.ownerId(),
                 listCreateRequest.category(),
