@@ -4,7 +4,9 @@ import com.listywave.list.application.domain.Item;
 import com.listywave.list.application.domain.Lists;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Builder;
 
+@Builder
 public record FeedListsResponse(
         Long id,
         String title,
@@ -12,17 +14,17 @@ public record FeedListsResponse(
         List<ListItemsResponse> listItems
 ) {
     public static FeedListsResponse of(Lists lists) {
-        return new FeedListsResponse(
-                lists.getId(),
-                lists.getTitle(),
-                lists.isPublic(),
-                lists.getItems().stream()
-                        .map(ListItemsResponse::of)
-                        .collect(Collectors.toList())
-        );
+        return FeedListsResponse.builder()
+                .id(lists.getId())
+                .title(lists.getTitle())
+                .isPublic(lists.isPublic())
+                .listItems(ListItemsResponse.toList(lists))
+                .build();
+
     }
 }
 
+@Builder
 record ListItemsResponse(
         Long id,
         int ranking,
@@ -30,11 +32,17 @@ record ListItemsResponse(
         String imageUrl
 ) {
     public static ListItemsResponse of(Item item) {
-        return new ListItemsResponse(
-                item.getId(),
-                item.getRanking(),
-                item.getTitle(),
-                item.getImageUrl()
-        );
+        return ListItemsResponse.builder()
+                .id(item.getId())
+                .ranking(item.getRanking())
+                .title(item.getTitle())
+                .imageUrl(item.getImageUrl())
+                .build();
+    }
+
+    public static List<ListItemsResponse> toList(Lists lists) {
+        return lists.getItems().stream()
+                .map(ListItemsResponse::of)
+                .collect(Collectors.toList());
     }
 }

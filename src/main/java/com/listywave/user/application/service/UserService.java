@@ -42,15 +42,20 @@ public class UserService {
         return UserInfoResponse.of(foundUser, false, false);
     }
 
+
+    private boolean isSignedIn(String accessToken) {
+        return accessToken.isBlank();
+    }
+
     @Transactional(readOnly = true)
-    public AllUserListsResponse getAllUserLists(
+    public AllUserListsResponse getAllListOfUser(
             Long userId,
             String type,
             CategoryType category,
             Long cursorId,
             int size
     ) {
-        User user = userUtil.getUserByUserid(userId);
+        userUtil.getUserByUserid(userId);
 
         List<Lists> feedList = userRepository.findFeedLists(userId, type, category, cursorId, size);
 
@@ -63,10 +68,6 @@ public class UserService {
             cursorId = feedList.get(feedList.size() - 1).getId();
         }
         return AllUserListsResponse.of(hasNext, cursorId, feedList);
-    }
-
-    private boolean isSignedIn(String accessToken) {
-        return accessToken.isBlank();
     }
 
     @Transactional(readOnly = true)

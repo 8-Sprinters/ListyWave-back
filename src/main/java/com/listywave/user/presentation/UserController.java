@@ -42,7 +42,7 @@ public class UserController {
             @RequestParam(name = "cursorId", required = false) Long cursorId,
             @RequestParam(name = "size") int size
     ) {
-        AllUserListsResponse allUserListsResponse = userService.getAllUserLists(userId, type, category, cursorId, size);
+        AllUserListsResponse allUserListsResponse = userService.getAllListOfUser(userId, type, category, cursorId, size);
         return ResponseEntity.ok(allUserListsResponse);
     }
 }
