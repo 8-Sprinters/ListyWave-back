@@ -11,7 +11,7 @@ public record CategoryTypeResponse(
     public static CategoryTypeResponse fromEnum(CategoryType categoryType) {
         return new CategoryTypeResponse(
             categoryType.getCodeValue(),
-            categoryType.getNameValue(),
+            categoryType.name().toLowerCase(),
             categoryType.getKorNameValue()
         );
     }
