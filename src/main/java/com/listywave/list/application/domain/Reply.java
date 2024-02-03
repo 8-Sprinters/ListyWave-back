@@ -30,7 +30,23 @@ public class Reply extends BaseEntity {
     @Embedded
     private Content content;
 
+    public Long getCommentId() {
+        return comment.getId();
+    }
+
     public String getContent() {
         return content.getValue();
+    }
+
+    public Long getUserId() {
+        return user.getId();
+    }
+
+    public String getUserNickname() {
+        return user.getNickname();
+    }
+
+    public String getUserProfileImageUrl() {
+        return user.getProfileImageUrl();
     }
 }

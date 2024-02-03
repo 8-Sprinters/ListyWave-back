@@ -49,4 +49,16 @@ public class Comment extends BaseEntity {
     public boolean isDeleted() {
         return this.isDeleted;
     }
+
+    public Long getUserId() {
+        return user.getId();
+    }
+
+    public String getUserNickname() {
+        return user.getNickname();
+    }
+
+    public String getUserProfileImageUrl() {
+        return user.getProfileImageUrl();
+    }
 }
