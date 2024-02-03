@@ -47,6 +47,9 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private int followerCount;
 
+    @Column(nullable = false, length = 5)
+    private Boolean allPrivate;
+
     public static User initialCreate(Long oauthId, String oauthEmail) {
         return new User(
                 oauthId,
@@ -56,7 +59,28 @@ public class User extends BaseEntity {
                 new ProfileImageUrl(""),
                 new Description(""),
                 0,
-                0
+                0,
+                false
         );
+    }
+
+    public boolean isSame(Long id) {
+        return this.id.equals(id);
+    }
+
+    public String getNickname() {
+        return nickname.getValue();
+    }
+
+    public String getBackgroundImageUrl() {
+        return backgroundImageUrl.getValue();
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl.getValue();
+    }
+
+    public String getDescription() {
+        return description.getValue();
     }
 }

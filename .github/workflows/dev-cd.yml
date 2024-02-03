@@ -1,17 +1,18 @@
-name: deploy
+name: Deploy to DEV
 
 on:
   workflow_dispatch:
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "dev" ]
+
+permissions:
+  contents: read
     
 jobs:
   deploy:
-    runs-on: self-hosted
-    steps:
-      - name: check current position
-        working-directory: /home/ubuntu
-        run: pwd
-      - name: run deploy script
-        working-directory: /home/ubuntu
-        run: ./listywave.sh deploy
+      runs-on: self-hosted
+
+      steps:
+        - name: Run Deploy script
+          working-directory: /home/ubuntu
+          run: sudo ./listywave.sh deploy

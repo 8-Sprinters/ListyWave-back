@@ -34,10 +34,18 @@ public class Collaborator {
     @JoinColumn(name = "list_id")
     private Lists list;
 
-    public static Collaborator createCollaborator(User user, Lists list){
+    public static Collaborator createCollaborator(User user, Lists list) {
         return Collaborator.builder()
                 .user(user)
                 .list(list)
                 .build();
+    }
+
+    public String getUserNickname() {
+        return user.getNickname();
+    }
+
+    public String getUserProfileImageUrl() {
+        return user.getProfileImageUrl();
     }
 }

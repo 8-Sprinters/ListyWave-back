@@ -5,8 +5,9 @@ import com.listywave.collaborator.domain.repository.CollaboratorRepository;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import com.listywave.common.util.UserUtil;
-import com.listywave.list.application.dto.ListCreateCommand;
 import com.listywave.list.application.domain.Lists;
+import com.listywave.list.application.dto.ListCreateCommand;
+import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.response.ListCreateResponse;
 import com.listywave.list.repository.ListRepository;
@@ -16,10 +17,8 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -41,7 +40,7 @@ public class ListService {
 
         Boolean isLabels = isLabelCountValid(labels);
         validateItemsCount(items);
-        Boolean hasCollaboratorId = hascollaboratorExistence(collaboratorIds);
+        Boolean hasCollaboratorId = isExistCollaborator(collaboratorIds);
 
         Lists list = Lists.createList(
                 user,
@@ -53,14 +52,14 @@ public class ListService {
         );
         listRepository.save(list);
 
-       if(hasCollaboratorId){
-           List<User> users = findExistingCollaborators(collaboratorIds);
+        if (hasCollaboratorId) {
+            List<User> users = findExistingCollaborators(collaboratorIds);
 
             List<Collaborator> collaborators = users.stream()
                     .map(u -> Collaborator.createCollaborator(u, list))
                     .collect(Collectors.toList());
             collaboratorRepository.saveAll(collaborators);
-       }
+        }
         return ListCreateResponse.of(list.getId());
     }
 
@@ -70,7 +69,7 @@ public class ListService {
         List<Long> nonExistingIds = collaboratorIds.stream()
                 .filter(
                         id -> existingCollaborators.stream()
-                                            .noneMatch(user -> user.getId().equals(id))
+                                .noneMatch(user -> user.getId().equals(id))
                 )
                 .toList();
 
@@ -80,23 +79,36 @@ public class ListService {
         return existingCollaborators;
     }
 
-    private Boolean hascollaboratorExistence(List<Long> collaboratorIds) {
+    private Boolean isExistCollaborator(List<Long> collaboratorIds) {
+        if (collaboratorIds != null && collaboratorIds.size() > 20) {
+            throw new CustomException(ErrorCode.INVALID_COUNT, "콜라보레이터는 최대 20명까지 가능합니다.");
+        }
         return collaboratorIds != null && !collaboratorIds.isEmpty();
     }
 
     private void validateItemsCount(List<ItemCreateRequest> items) {
-        if(items.size() < 3 || items.size() > 10){
+        if (items.size() < 3 || items.size() > 10) {
             throw new CustomException(ErrorCode.INVALID_COUNT, "아이템의 개수는 3개에서 10개까지 가능합니다.");
         }
     }
 
     private Boolean isLabelCountValid(List<String> labels) {
-        if(labels == null || labels.isEmpty()){
+        if (labels == null || labels.isEmpty()) {
             return false;
         }
-        if(labels.size() > 3){
+        if (labels.size() > 3) {
             throw new CustomException(ErrorCode.INVALID_COUNT, "라벨의 개수는 최대 3개까지 작성 가능합니다.");
         }
         return true;
+    }
+
+    public ListDetailResponse getListDetail(Long listId, String accessToken) {
+        Lists list = listRepository.getById(listId);
+        List<Collaborator> collaborators = collaboratorRepository.findAllByListId(listId);
+
+        if (accessToken.isBlank()) {
+            return ListDetailResponse.of(list, list.getUser(), false, collaborators);
+        }
+        return ListDetailResponse.of(list, list.getUser(), true, collaborators);
     }
 }
