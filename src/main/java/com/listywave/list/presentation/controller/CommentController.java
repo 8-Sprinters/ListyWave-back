@@ -7,6 +7,7 @@ import com.listywave.list.application.service.CommentService;
 import com.listywave.list.presentation.dto.request.comment.CommentCreateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,12 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/lists/{listId}")
+@RequestMapping("/lists/{listId}/comments")
 public class CommentController {
 
     private final CommentService commentService;
 
-    @PostMapping("/comments")
+    @PostMapping
     ResponseEntity<CommentCreateResponse> create(
             @PathVariable(value = "listId") Long listId,
             @RequestHeader(value = "Authorization", defaultValue = "") String accessToken,
@@ -29,5 +30,15 @@ public class CommentController {
     ) {
         CommentCreateResponse response = commentService.create(listId, accessToken, commentCreateRequest.content());
         return ResponseEntity.status(CREATED).body(response);
+    }
+
+    @DeleteMapping("/{commentId}")
+    ResponseEntity<Void> delete(
+            @PathVariable(value = "listId") Long listId,
+            @RequestHeader(value = "Authorization", defaultValue = "") String accessToken,
+            @PathVariable(value = "commentId") Long commentId
+    ) {
+        commentService.delete(listId, accessToken, commentId);
+        return ResponseEntity.noContent().build();
     }
 }
