@@ -42,8 +42,12 @@ public class ReplyService {
         Long writerId = jwtManager.read(command.accessToken());
         userRepository.getById(writerId);
         listRepository.getById(command.listId());
-        commentRepository.getById(command.commentId());
+        Comment comment = commentRepository.getById(command.commentId());
 
         replyRepository.deleteById(command.replyId());
+
+        if (!replyRepository.existsByComment(comment) && comment.isDeleted()) {
+            commentRepository.delete(comment);
+        }
     }
 }

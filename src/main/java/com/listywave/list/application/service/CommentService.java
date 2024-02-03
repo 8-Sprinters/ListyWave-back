@@ -41,7 +41,7 @@ public class CommentService {
         listRepository.getById(listId);
 
         Comment comment = commentRepository.getById(commentId);
-        if (replyRepository.existsByCommentId(commentId)) {
+        if (replyRepository.existsByComment(comment)) {
             comment.softDelete();
             return;
         }

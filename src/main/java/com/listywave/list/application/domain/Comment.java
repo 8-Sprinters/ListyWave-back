@@ -45,4 +45,8 @@ public class Comment extends BaseEntity {
     public String getContent() {
         return content.getValue();
     }
+
+    public boolean isDeleted() {
+        return this.isDeleted;
+    }
 }
