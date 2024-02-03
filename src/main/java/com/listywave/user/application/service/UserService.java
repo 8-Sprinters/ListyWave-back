@@ -9,7 +9,6 @@ import com.listywave.list.application.domain.CategoryType;
 import com.listywave.list.application.domain.Lists;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.AllUserResponse;
-import com.listywave.user.application.dto.FeedListsDto;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.presentation.dto.response.AllUserListsResponse;
 import com.listywave.user.repository.UserRepository;
@@ -58,21 +57,15 @@ public class UserService {
         boolean hasNext = false;
         cursorId = null;
 
-        if(feedList.size() == size + 1){
+        if (feedList.size() == size + 1) {
             feedList.remove(size);
             hasNext = true;
             cursorId = feedList.get(feedList.size() - 1).getId();
         }
-
-        List<FeedListsDto> collect = feedList.stream()
-                .map(FeedListsDto::of)
-                .toList();
-
-        return AllUserListsResponse.of(hasNext, cursorId, collect);
-
+        return AllUserListsResponse.of(hasNext, cursorId, feedList);
     }
 
-    private static boolean isSignedIn(String accessToken) {
+    private boolean isSignedIn(String accessToken) {
         return accessToken.isBlank();
     }
 
