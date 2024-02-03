@@ -40,7 +40,7 @@ public class ListService {
 
         Boolean isLabels = isLabelCountValid(labels);
         validateItemsCount(items);
-        Boolean hasCollaboratorId = hascollaboratorExistence(collaboratorIds);
+        Boolean hasCollaboratorId = isExistCollaborator(collaboratorIds);
 
         Lists list = Lists.createList(
                 user,
@@ -79,7 +79,10 @@ public class ListService {
         return existingCollaborators;
     }
 
-    private Boolean hascollaboratorExistence(List<Long> collaboratorIds) {
+    private Boolean isExistCollaborator(List<Long> collaboratorIds) {
+        if (collaboratorIds != null && collaboratorIds.size() > 20) {
+            throw new CustomException(ErrorCode.INVALID_COUNT, "콜라보레이터는 최대 20명까지 가능합니다.");
+        }
         return collaboratorIds != null && !collaboratorIds.isEmpty();
     }
 
