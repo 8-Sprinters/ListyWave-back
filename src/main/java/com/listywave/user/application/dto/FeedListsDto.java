@@ -11,10 +11,10 @@ public record FeedListsDto(
         Boolean isPublic,
         List<ListItemsDto> listItems
 ) {
-    public static FeedListsDto of(Lists lists){
+    public static FeedListsDto of(Lists lists) {
         return new FeedListsDto(
                 lists.getId(),
-                lists.getTitle().getValue(),
+                lists.getTitle(),
                 lists.isPublic(),
                 lists.getItems().stream()
                         .map(ListItemsDto::of)
@@ -28,13 +28,13 @@ record ListItemsDto(
         int ranking,
         String title,
         String imageUrl
-){
-    public static ListItemsDto of(Item item){
+) {
+    public static ListItemsDto of(Item item) {
         return new ListItemsDto(
                 item.getId(),
                 item.getRanking(),
-                item.getTitle().getValue(),
-                item.getImageUrl().getValue()
+                item.getTitle(),
+                item.getImageUrl()
         );
     }
 
