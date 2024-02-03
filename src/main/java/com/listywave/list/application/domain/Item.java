@@ -5,7 +5,6 @@ import com.listywave.list.application.vo.ItemComment;
 import com.listywave.list.application.vo.ItemImageUrl;
 import com.listywave.list.application.vo.ItemLink;
 import com.listywave.list.application.vo.ItemTitle;
-import com.listywave.list.application.dto.ListCreateCommand;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -13,7 +12,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,7 +54,7 @@ public class Item extends BaseEntity {
                         ItemTitle.builder()
                                 .value(items.title())
                                 .build()
-                        )
+                )
                 .comment(
                         ItemComment.builder()
                                 .value(items.comment())
@@ -81,7 +79,23 @@ public class Item extends BaseEntity {
 
     public void updateItemImageUrl(String imageUrl) {
         this.imageUrl = ItemImageUrl.builder()
-                                .value(imageUrl)
-                                .build();
+                .value(imageUrl)
+                .build();
+    }
+
+    public String getTitle() {
+        return title.getValue();
+    }
+
+    public String getComment() {
+        return comment.getValue();
+    }
+
+    public String getLink() {
+        return link.getValue();
+    }
+
+    public String getImageUrl() {
+        return imageUrl.getValue();
     }
 }

@@ -32,7 +32,7 @@ public class Label {
     @Embedded
     private LabelName labelName;
 
-    public static Label createLabel(String labels){
+    public static Label createLabel(String labels) {
         return Label.builder()
                 .labelName(
                         LabelName.builder()
@@ -40,5 +40,9 @@ public class Label {
                                 .build()
                 )
                 .build();
+    }
+
+    public String getLabelName() {
+        return labelName.getValue();
     }
 }
