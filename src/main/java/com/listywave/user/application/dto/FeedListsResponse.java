@@ -20,7 +20,6 @@ public record FeedListsResponse(
                 .isPublic(lists.isPublic())
                 .listItems(ListItemsResponse.toList(lists))
                 .build();
-
     }
 }
 
