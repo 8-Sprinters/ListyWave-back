@@ -17,10 +17,12 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
     public List<Comment> getComments(Long listId, int size, Long cursorId) {
         return queryFactory.selectFrom(comment)
                 .join(comment.list, lists)
-                .where(comment.list.id.eq(listId))
+                .where(
+                        comment.list.id.eq(listId),
+                        comment.id.gt(cursorId)
+                )
                 .orderBy(comment.id.asc())
-                .limit(size)
-                .offset(cursorId + 1)
+                .limit(size + 1)
                 .fetch();
     }
 }

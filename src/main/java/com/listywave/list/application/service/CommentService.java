@@ -46,8 +46,16 @@ public class CommentService {
     public CommentFindResponse getComments(Long listId, int size, Long cursorId) {
         Lists list = listRepository.getById(listId);
         Long totalCount = commentRepository.countByList(list);
-
+        
         List<Comment> comments = commentRepository.getComments(listId, size, cursorId);
+
+        boolean hasNext = false;
+        if (comments.size() > size) {
+            hasNext = true;
+            comments.remove(comments.size() - 1);
+        }
+        Long cursorIdOfResult = comments.get(comments.size() - 1).getId();
+
         Map<Comment, List<Reply>> result = comments.stream()
                 .collect(toMap(
                         identity(),
@@ -55,10 +63,6 @@ public class CommentService {
                         (exists, newValue) -> exists,
                         LinkedHashMap::new
                 ));
-        
-        Long cursorIdOfResult = comments.get(comments.size() - 1).getId();
-        boolean hasNext = comments.size() >= size;
-
         return CommentFindResponse.from(totalCount, cursorIdOfResult, hasNext, result);
     }
 
