@@ -1,7 +1,7 @@
 package com.listywave.list.presentation.dto.request;
 
-import com.listywave.list.application.dto.ListCreateCommand;
 import com.listywave.list.application.domain.CategoryType;
+import com.listywave.list.application.dto.ListCreateCommand;
 import com.listywave.list.application.vo.ListDescription;
 import com.listywave.list.application.vo.ListTitle;
 import java.util.List;
