@@ -5,6 +5,8 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.listywave.common.config.SpringEnvironmentUtil;
+import com.listywave.common.constants.UrlConstants;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import com.listywave.common.util.UserUtil;
@@ -32,9 +34,7 @@ public class ImageService {
 
     @Value("${cloud.s3.bucket}")
     private String bucket;
-    //TODO: endPoint는 cloudFron 적용하면 지우기
-    @Value("${cloud.s3.endpoint}")
-    private String endPoint;
+    private final SpringEnvironmentUtil springEnvironmentUtil;
     private final AmazonS3 amazonS3;
     private final UserUtil userUtil;
     private final ItemRepository itemRepository;
@@ -93,7 +93,6 @@ public class ImageService {
                     item.updateItemImageUrl(imageUrl);
                 }
         );
-
     }
 
     private String createReadImageUrl(
@@ -102,10 +101,9 @@ public class ImageService {
             String imageKey,
             ImageFileExtension imageFileExtension
     ) {
-        //TODO: CloudFront 적용되면 endpoint를 UrlConstants.IMAGE_DOMAIN_URL.getValue()로 교체;
-        return endPoint
+        return UrlConstants.IMAGE_DOMAIN_URL.getValue()
                 + "/"
-                + "local"
+                + springEnvironmentUtil.getCurrentProfile()
                 + "/"
                 + imageType.getValue()
                 + "/"
@@ -122,8 +120,7 @@ public class ImageService {
             String imageKey,
             ImageFileExtension imageFileExtension
     ) {
-        //TODO: 맨앞에 prefix는 현제 작업 환경의 profile 이름 가져오는 Util 별도 제작
-        return "local"
+        return springEnvironmentUtil.getCurrentProfile()
                 + "/"
                 + imageType.getValue()
                 + "/"

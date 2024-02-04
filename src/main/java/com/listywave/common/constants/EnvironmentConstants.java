@@ -5,10 +5,11 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum UrlConstants {
+public enum EnvironmentConstants {
 
-    IMAGE_DOMAIN_URL("https://image.listywave.com"),
+    LOCAL("local"),
+    DEV("dev"),
     ;
 
-    private String value;
+    private final String value;
 }
