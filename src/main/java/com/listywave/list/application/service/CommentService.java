@@ -15,6 +15,7 @@ import com.listywave.list.repository.ReplyRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -50,9 +51,11 @@ public class CommentService {
         Map<Comment, List<Reply>> result = comments.stream()
                 .collect(toMap(
                         identity(),
-                        replyRepository::getAllByComment
+                        replyRepository::getAllByComment,
+                        (exists, newValue) -> exists,
+                        LinkedHashMap::new
                 ));
-
+        
         Long cursorIdOfResult = comments.get(comments.size() - 1).getId();
         boolean hasNext = comments.size() >= size;
 
