@@ -1,7 +1,9 @@
 package com.listywave.auth.application.domain;
 
+import static com.listywave.common.exception.ErrorCode.REQUIRED_ACCESS_TOKEN;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
+import com.listywave.common.exception.CustomException;
 import io.jsonwebtoken.Jwts;
 import java.time.Instant;
 import java.util.Date;
@@ -28,6 +30,10 @@ public class JwtManager {
     }
 
     public Long read(String token) {
+        if (token.isBlank()) {
+            throw new CustomException(REQUIRED_ACCESS_TOKEN);
+        }
+
         String subject = Jwts.parser()
                 .verifyWith(key)
                 .build()

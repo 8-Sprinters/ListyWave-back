@@ -2,6 +2,7 @@ package com.listywave.list.application.domain;
 
 import com.listywave.common.BaseEntity;
 import com.listywave.list.application.vo.Content;
+import com.listywave.user.application.domain.User;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,6 +23,30 @@ public class Reply extends BaseEntity {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @Embedded
     private Content content;
+
+    public Long getCommentId() {
+        return comment.getId();
+    }
+
+    public String getContent() {
+        return content.getValue();
+    }
+
+    public Long getUserId() {
+        return user.getId();
+    }
+
+    public String getUserNickname() {
+        return user.getNickname();
+    }
+
+    public String getUserProfileImageUrl() {
+        return user.getProfileImageUrl();
+    }
 }

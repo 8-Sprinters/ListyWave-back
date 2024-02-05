@@ -22,6 +22,7 @@ public enum ErrorCode {
     INVALID_COUNT(HttpStatus.BAD_REQUEST, "선택한 아이템 및 라벨의 개수가 올바르지 않습니다."),
     NOT_FOUND(HttpStatus.BAD_REQUEST, "대상이 존재하지 않습니다."),
 
+    REQUIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "인증 정보가 필요합니다."),
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 AccessToken 입니다. 다시 로그인해주세요."),
 
     // list
