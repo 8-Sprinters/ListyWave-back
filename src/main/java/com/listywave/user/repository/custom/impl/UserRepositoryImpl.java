@@ -26,7 +26,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                         userIdEq(userId),
                         typeEq(type),
                         categoryEq(category),
-                        listIdGt(cursorId)
+                        listIdLt(cursorId)
                 )
                 .distinct()
                 .limit(size + 1)
@@ -35,7 +35,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
         return fetch;
     }
 
-    private BooleanExpression listIdGt(Long cursorId) {
+    private BooleanExpression listIdLt(Long cursorId) {
         return cursorId == null ? null : lists.id.lt(cursorId);
     }
 

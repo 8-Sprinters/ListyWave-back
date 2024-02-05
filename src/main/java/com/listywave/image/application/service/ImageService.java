@@ -17,11 +17,13 @@ import com.listywave.list.application.domain.Lists;
 import com.listywave.list.repository.ItemRepository;
 import com.listywave.list.repository.ListRepository;
 import com.listywave.user.application.domain.User;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,11 +32,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ImageService {
 
+    private static final String IMAGE_DOMAIN_URL = "https://image.listywave.com";
+    private static final String LOCAL = "local";
+    private static final String DEV = "dev";
+
     @Value("${cloud.s3.bucket}")
     private String bucket;
-    //TODO: endPoint는 cloudFron 적용하면 지우기
-    @Value("${cloud.s3.endpoint}")
-    private String endPoint;
+    private final Environment environment;
     private final AmazonS3 amazonS3;
     private final UserUtil userUtil;
     private final ItemRepository itemRepository;
@@ -93,7 +97,6 @@ public class ImageService {
                     item.updateItemImageUrl(imageUrl);
                 }
         );
-
     }
 
     private String createReadImageUrl(
@@ -102,10 +105,9 @@ public class ImageService {
             String imageKey,
             ImageFileExtension imageFileExtension
     ) {
-        //TODO: CloudFront 적용되면 endpoint를 UrlConstants.IMAGE_DOMAIN_URL.getValue()로 교체;
-        return endPoint
+        return IMAGE_DOMAIN_URL
                 + "/"
-                + "local"
+                + getCurrentProfile()
                 + "/"
                 + imageType.getValue()
                 + "/"
@@ -122,8 +124,7 @@ public class ImageService {
             String imageKey,
             ImageFileExtension imageFileExtension
     ) {
-        //TODO: 맨앞에 prefix는 현제 작업 환경의 profile 이름 가져오는 Util 별도 제작
-        return "local"
+        return getCurrentProfile()
                 + "/"
                 + imageType.getValue()
                 + "/"
@@ -182,5 +183,16 @@ public class ImageService {
         return listRepository
                 .findById(listId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "존재하지 않는 리스트입니다."));
+    }
+
+    public String getCurrentProfile() {
+        return Arrays.stream(environment.getActiveProfiles())
+                .filter(this::isActivateDev)
+                .findFirst()
+                .orElse(LOCAL);
+    }
+
+    private boolean isActivateDev(String profile) {
+        return profile.equals(DEV);
     }
 }
