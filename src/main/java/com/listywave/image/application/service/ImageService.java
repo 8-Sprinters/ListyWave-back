@@ -5,8 +5,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.listywave.common.config.SpringEnvironmentUtil;
-import com.listywave.common.constants.UrlConstants;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import com.listywave.common.util.UserUtil;
@@ -19,11 +17,13 @@ import com.listywave.list.application.domain.Lists;
 import com.listywave.list.repository.ItemRepository;
 import com.listywave.list.repository.ListRepository;
 import com.listywave.user.application.domain.User;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,9 +32,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ImageService {
 
+    private static final String IMAGE_DOMAIN_URL = "https://image.listywave.com";
+    private static final String LOCAL = "local";
+    private static final String DEV = "dev";
+
     @Value("${cloud.s3.bucket}")
     private String bucket;
-    private final SpringEnvironmentUtil springEnvironmentUtil;
+    private final Environment environment;
     private final AmazonS3 amazonS3;
     private final UserUtil userUtil;
     private final ItemRepository itemRepository;
@@ -101,9 +105,9 @@ public class ImageService {
             String imageKey,
             ImageFileExtension imageFileExtension
     ) {
-        return UrlConstants.IMAGE_DOMAIN_URL.getValue()
+        return IMAGE_DOMAIN_URL
                 + "/"
-                + springEnvironmentUtil.getCurrentProfile()
+                + getCurrentProfile()
                 + "/"
                 + imageType.getValue()
                 + "/"
@@ -120,7 +124,7 @@ public class ImageService {
             String imageKey,
             ImageFileExtension imageFileExtension
     ) {
-        return springEnvironmentUtil.getCurrentProfile()
+        return getCurrentProfile()
                 + "/"
                 + imageType.getValue()
                 + "/"
@@ -179,5 +183,16 @@ public class ImageService {
         return listRepository
                 .findById(listId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "존재하지 않는 리스트입니다."));
+    }
+
+    public String getCurrentProfile() {
+        return Arrays.stream(environment.getActiveProfiles())
+                .filter(this::isActivateDev)
+                .findFirst()
+                .orElse(LOCAL);
+    }
+
+    private boolean isActivateDev(String profile) {
+        return profile.equals(DEV);
     }
 }
