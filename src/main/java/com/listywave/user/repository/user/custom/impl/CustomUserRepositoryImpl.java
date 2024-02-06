@@ -1,18 +1,18 @@
-package com.listywave.user.repository.custom.impl;
+package com.listywave.user.repository.user.custom.impl;
 
 import static com.listywave.list.application.domain.QItem.item;
 import static com.listywave.list.application.domain.QLists.lists;
 
 import com.listywave.list.application.domain.CategoryType;
 import com.listywave.list.application.domain.Lists;
-import com.listywave.user.repository.custom.UserRepositoryCustom;
+import com.listywave.user.repository.user.custom.CustomUserRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class UserRepositoryImpl implements UserRepositoryCustom {
+public class CustomUserRepositoryImpl implements CustomUserRepository {
 
     private final JPAQueryFactory queryFactory;
 

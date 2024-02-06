@@ -12,7 +12,7 @@ import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.response.ListCreateResponse;
 import com.listywave.list.repository.ListRepository;
 import com.listywave.user.application.domain.User;
-import com.listywave.user.repository.UserRepository;
+import com.listywave.user.repository.user.UserRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;

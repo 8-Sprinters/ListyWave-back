@@ -13,7 +13,7 @@ import com.listywave.list.repository.CommentRepository;
 import com.listywave.list.repository.ListRepository;
 import com.listywave.list.repository.ReplyRepository;
 import com.listywave.user.application.domain.User;
-import com.listywave.user.repository.UserRepository;
+import com.listywave.user.repository.user.UserRepository;
 import jakarta.transaction.Transactional;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -46,7 +46,7 @@ public class CommentService {
     public CommentFindResponse getComments(Long listId, int size, Long cursorId) {
         Lists list = listRepository.getById(listId);
         Long totalCount = commentRepository.countByList(list);
-        
+
         List<Comment> comments = commentRepository.getComments(listId, size, cursorId);
 
         boolean hasNext = false;

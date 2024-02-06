@@ -25,8 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final JwtManager jwtManager;
     private final UserUtil userUtil;
+    private final JwtManager jwtManager;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
 

@@ -7,7 +7,7 @@ import com.listywave.auth.infra.kakao.response.KakaoMember;
 import com.listywave.auth.infra.kakao.response.KakaoTokenResponse;
 import com.listywave.auth.presentation.dto.LoginResponse;
 import com.listywave.user.application.domain.User;
-import com.listywave.user.repository.UserRepository;
+import com.listywave.user.repository.user.UserRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
