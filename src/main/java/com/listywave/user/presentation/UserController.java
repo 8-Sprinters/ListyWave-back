@@ -1,10 +1,13 @@
 package com.listywave.user.presentation;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 import com.listywave.list.application.domain.CategoryType;
+import com.listywave.user.application.dto.AllUserListsResponse;
 import com.listywave.user.application.dto.AllUserResponse;
+import com.listywave.user.application.dto.FollowingsResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.service.UserService;
-import com.listywave.user.presentation.dto.response.AllUserListsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +25,7 @@ public class UserController {
     @GetMapping("/users/{userId}")
     ResponseEntity<UserInfoResponse> getUserInfo(
             @PathVariable(value = "userId") Long userId,
-            @RequestHeader(value = "Authorization", defaultValue = "") String accessToken
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
     ) {
         UserInfoResponse userInfoResponse = userService.getUserInfo(userId, accessToken);
         return ResponseEntity.ok(userInfoResponse);
@@ -44,5 +47,11 @@ public class UserController {
     ) {
         AllUserListsResponse allUserListsResponse = userService.getAllListOfUser(userId, type, category, cursorId, size);
         return ResponseEntity.ok(allUserListsResponse);
+    }
+
+    @GetMapping("/followings")
+    ResponseEntity<FollowingsResponse> getFollowings(@RequestHeader(value = AUTHORIZATION) String accessToken) {
+        FollowingsResponse response = userService.getFollowings(accessToken);
+        return ResponseEntity.ok(response);
     }
 }

@@ -10,7 +10,7 @@ import com.listywave.list.repository.CommentRepository;
 import com.listywave.list.repository.ListRepository;
 import com.listywave.list.repository.ReplyRepository;
 import com.listywave.user.application.domain.User;
-import com.listywave.user.repository.UserRepository;
+import com.listywave.user.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

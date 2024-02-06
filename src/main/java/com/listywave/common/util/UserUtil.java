@@ -3,7 +3,7 @@ package com.listywave.common.util;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import com.listywave.user.application.domain.User;
-import com.listywave.user.repository.UserRepository;
+import com.listywave.user.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
