@@ -47,4 +47,10 @@ public class AuthService {
     public String createToken(Long userId) {
         return jwtManager.createToken(userId);
     }
+
+    public void logout(String accessToken) {
+        Long userId = jwtManager.read(accessToken);
+        User user = userRepository.getById(userId);
+        kakaoOauthClient.logout(user.getKakaoAccessToken());
+    }
 }

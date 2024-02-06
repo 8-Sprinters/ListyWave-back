@@ -1,6 +1,7 @@
 package com.listywave.auth.application.domain.kakao;
 
 import com.listywave.auth.infra.kakao.KakaoOauthApiClient;
+import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
 import com.listywave.auth.infra.kakao.response.KakaoMember;
 import com.listywave.auth.infra.kakao.response.KakaoTokenResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +30,10 @@ public class KakaoOauthClient {
 
     public KakaoMember fetchMember(String accessToken) {
         return apiClient.fetchKakaoMember("Bearer " + accessToken);
+    }
+
+    public Long logout(String oauthAccessToken) {
+        KakaoLogoutResponse response = apiClient.logout(oauthAccessToken);
+        return response.id();
     }
 }
