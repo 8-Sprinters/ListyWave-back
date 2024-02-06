@@ -11,6 +11,7 @@ public record FeedListsResponse(
         Long id,
         String title,
         Boolean isPublic,
+        String backgroundColor,
         List<ListItemsResponse> listItems
 ) {
     public static FeedListsResponse of(Lists lists) {
@@ -18,6 +19,7 @@ public record FeedListsResponse(
                 .id(lists.getId())
                 .title(lists.getTitle())
                 .isPublic(lists.isPublic())
+                .backgroundColor(lists.getBackgroundColor())
                 .listItems(ListItemsResponse.toList(lists))
                 .build();
     }
