@@ -24,7 +24,7 @@ public class CustomListRepositoryImpl implements CustomListRepository {
                 .leftJoin(lists.items, item)
                 .distinct()
                 .limit(10)
-                .orderBy(lists.viewCount.desc(), lists.collectCount.desc())
+                .orderBy(lists.collectCount.desc(), lists.viewCount.desc())
                 .fetch();
 
         fetch.forEach(
