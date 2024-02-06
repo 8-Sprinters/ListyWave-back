@@ -33,7 +33,11 @@ public class AuthService {
 
         Optional<User> foundUser = userRepository.findByOauthId(kakaoMember.id());
         if (foundUser.isEmpty()) {
-            User user = User.initialCreate(kakaoMember.id(), kakaoMember.kakaoAccount().email());
+            User user = User.initialCreate(
+                    kakaoMember.id(),
+                    kakaoMember.kakaoAccount().email(),
+                    kakaoTokenResponse.accessToken()
+            );
             User createdUser = userRepository.save(user);
             return LoginResponse.of(createdUser, true);
         }
