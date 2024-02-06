@@ -10,10 +10,11 @@ public record LoginResponse(
         String description,
         int followingCount,
         int followerCount,
-        boolean isFirst
+        boolean isFirst,
+        String accessToken
 ) {
 
-    public static LoginResponse of(User user, boolean isFirst) {
+    public static LoginResponse of(User user, boolean isFirst, String accessToken) {
         return new LoginResponse(
                 user.getId(),
                 user.getProfileImageUrl(),
@@ -22,7 +23,8 @@ public record LoginResponse(
                 user.getDescription(),
                 user.getFollowingCount(),
                 user.getFollowerCount(),
-                isFirst
+                isFirst,
+                accessToken
         );
     }
 }
