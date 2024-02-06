@@ -1,7 +1,6 @@
-package com.listywave.user.presentation.dto.response;
+package com.listywave.user.application.dto;
 
 import com.listywave.list.application.domain.Lists;
-import com.listywave.user.application.dto.FeedListsResponse;
 import java.util.List;
 
 public record AllUserListsResponse(

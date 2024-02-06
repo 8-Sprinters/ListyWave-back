@@ -1,10 +1,10 @@
 package com.listywave.user.presentation;
 
 import com.listywave.list.application.domain.CategoryType;
+import com.listywave.user.application.dto.AllUserListsResponse;
 import com.listywave.user.application.dto.AllUserResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.service.UserService;
-import com.listywave.user.presentation.dto.response.AllUserListsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
