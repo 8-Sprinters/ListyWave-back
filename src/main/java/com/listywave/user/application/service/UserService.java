@@ -7,11 +7,14 @@ import com.listywave.common.exception.CustomException;
 import com.listywave.common.util.UserUtil;
 import com.listywave.list.application.domain.CategoryType;
 import com.listywave.list.application.domain.Lists;
+import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.AllUserListsResponse;
 import com.listywave.user.application.dto.AllUserResponse;
+import com.listywave.user.application.dto.FollowingsResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
-import com.listywave.user.repository.UserRepository;
+import com.listywave.user.repository.follow.FollowRepository;
+import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ public class UserService {
     private final JwtManager jwtManager;
     private final UserUtil userUtil;
     private final UserRepository userRepository;
+    private final FollowRepository followRepository;
 
     @Transactional(readOnly = true)
     public UserInfoResponse getUserInfo(Long userId, String accessToken) {
@@ -41,7 +45,6 @@ public class UserService {
         }
         return UserInfoResponse.of(foundUser, false, false);
     }
-
 
     private boolean isSignedIn(String accessToken) {
         return accessToken.isBlank();
@@ -74,5 +77,16 @@ public class UserService {
     public AllUserResponse getAllUser() {
         List<User> allUser = userRepository.findAll();
         return AllUserResponse.of(allUser);
+    }
+
+    public FollowingsResponse getFollowings(String accessToken) {
+        Long loginUserId = jwtManager.read(accessToken);
+        User user = userRepository.getById(loginUserId);
+        List<Follow> follows = followRepository.getAllByFollowerUser(user);
+
+        List<User> followingUsers = follows.stream()
+                .map(Follow::getFollowingUser)
+                .toList();
+        return FollowingsResponse.of(followingUsers);
     }
 }
