@@ -1,7 +1,7 @@
-package com.listywave.auth.presentation.controller;
+package com.listywave.auth.presentation;
 
+import com.listywave.auth.application.dto.LoginResponse;
 import com.listywave.auth.application.service.AuthService;
-import com.listywave.auth.presentation.dto.LoginResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
