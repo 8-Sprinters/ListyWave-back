@@ -49,6 +49,10 @@ public class CommentService {
 
         List<Comment> comments = commentRepository.getComments(listId, size, cursorId);
 
+        if (comments.isEmpty()) {
+            return CommentFindResponse.emptyResponse();
+        }
+
         boolean hasNext = false;
         if (comments.size() > size) {
             hasNext = true;

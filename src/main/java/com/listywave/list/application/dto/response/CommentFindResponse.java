@@ -1,5 +1,7 @@
 package com.listywave.list.application.dto.response;
 
+import static java.util.Collections.emptyList;
+
 import com.listywave.list.application.domain.Comment;
 import com.listywave.list.application.domain.Reply;
 import java.time.LocalDateTime;
@@ -14,6 +16,15 @@ public record CommentFindResponse(
         boolean hasNext,
         List<CommentResponse> comments
 ) {
+
+    public static CommentFindResponse emptyResponse() {
+        return CommentFindResponse.builder()
+                .totalCount(0L)
+                .cursorId(0L)
+                .hasNext(false)
+                .comments(emptyList())
+                .build();
+    }
 
     public static CommentFindResponse from(
             Long totalCount,
