@@ -12,6 +12,7 @@ import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.AllUserListsResponse;
 import com.listywave.user.application.dto.AllUserResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
+import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
@@ -88,5 +89,13 @@ public class UserService {
                 .map(Follow::getFollowingUser)
                 .toList();
         return FollowingsResponse.of(followingUsers);
+    }
+
+    @Transactional(readOnly = true)
+    public List<RecommendUsersResponse> getRecommendUsers() {
+        List<User> recommendUsers = userRepository.getRecommendUsers();
+        return recommendUsers.stream()
+                .map(RecommendUsersResponse::of)
+                .toList();
     }
 }
