@@ -1,8 +1,6 @@
-package com.listywave.list.presentation.dto.response;
+package com.listywave.list.application.dto.response;
 
-import com.listywave.list.application.domain.Item;
 import com.listywave.list.application.domain.Lists;
-import java.util.List;
 import lombok.Builder;
 
 @Builder
@@ -14,22 +12,14 @@ public record ListTrandingResponse(
         String itemImageUrl,
         String backgroundColor
 ) {
-    public static ListTrandingResponse of(Lists list) {
+    public static ListTrandingResponse of(Lists list, String imageUrlTopRankItem) {
         return ListTrandingResponse.builder()
                 .id(list.getId())
                 .ownerId(list.getUser().getId())
                 .title(list.getTitle())
                 .description(list.getDescription())
-                .itemImageUrl(getImageUrlTopRankItem(list.getItems()))
+                .itemImageUrl(imageUrlTopRankItem)
                 .backgroundColor(list.getBackgroundColor())
                 .build();
-    }
-
-    public static String getImageUrlTopRankItem(List<Item> items) {
-        return items.stream()
-                .map(item -> item.getImageUrl())
-                .filter(url -> !url.isEmpty())
-                .findFirst()
-                .orElse("");
     }
 }

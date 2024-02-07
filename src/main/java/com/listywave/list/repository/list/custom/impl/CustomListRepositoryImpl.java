@@ -20,7 +20,6 @@ public class CustomListRepositoryImpl implements CustomListRepository {
     public List<Lists> findTrandingLists() {
         List<Lists> fetch = queryFactory
                 .selectFrom(lists)
-                .from(lists)
                 .leftJoin(lists.items, item)
                 .distinct()
                 .limit(10)

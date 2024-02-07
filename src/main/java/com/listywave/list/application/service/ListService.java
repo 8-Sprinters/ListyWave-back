@@ -5,12 +5,13 @@ import com.listywave.collaborator.domain.repository.CollaboratorRepository;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import com.listywave.common.util.UserUtil;
+import com.listywave.list.application.domain.Item;
 import com.listywave.list.application.domain.Lists;
 import com.listywave.list.application.dto.ListCreateCommand;
+import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse;
+import com.listywave.list.application.dto.response.ListTrandingResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
-import com.listywave.list.presentation.dto.response.ListCreateResponse;
-import com.listywave.list.presentation.dto.response.ListTrandingResponse;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
@@ -64,13 +65,6 @@ public class ListService {
         return ListCreateResponse.of(list.getId());
     }
 
-    @Transactional(readOnly = true)
-    public List<ListTrandingResponse> getTrandingList() {
-        List<Lists> lists = listRepository.findTrandingLists();
-        return lists.stream()
-                .map(ListTrandingResponse::of)
-                .toList();
-    }
 
     private List<User> findExistingCollaborators(List<Long> collaboratorIds) {
         List<User> existingCollaborators = userRepository.findAllById(collaboratorIds);
@@ -120,4 +114,22 @@ public class ListService {
         }
         return ListDetailResponse.of(list, list.getUser(), true, collaborators);
     }
+
+    @Transactional(readOnly = true)
+    public List<ListTrandingResponse> getTrandingList() {
+        List<Lists> lists = listRepository.findTrandingLists();
+        lists.forEach(Lists::sortItems); // <-- 추가 !
+        return lists.stream()
+                .map(list -> ListTrandingResponse.of(list, getImageUrlTopRankItem(list.getItems())))
+                .toList();
+    }
+
+    private String getImageUrlTopRankItem(List<Item> items) {
+        return items.stream()
+                .map(Item::getImageUrl)
+                .filter(url -> !url.isEmpty())
+                .findFirst()
+                .orElse("");
+    }
+
 }
