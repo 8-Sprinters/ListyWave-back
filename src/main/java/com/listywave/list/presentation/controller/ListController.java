@@ -1,10 +1,12 @@
 package com.listywave.list.presentation.controller;
 
 import com.listywave.list.application.dto.ListCreateCommand;
+import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse;
+import com.listywave.list.application.dto.response.ListTrandingResponse;
 import com.listywave.list.application.service.ListService;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
-import com.listywave.list.presentation.dto.response.ListCreateResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,5 +44,11 @@ public class ListController {
     ) {
         ListDetailResponse listDetailResponse = listService.getListDetail(listId, accessToken);
         return ResponseEntity.ok(listDetailResponse);
+    }
+
+    @GetMapping("/explore")
+    ResponseEntity<List<ListTrandingResponse>> getTrandingList() {
+        List<ListTrandingResponse> trandingList = listService.getTrandingList();
+        return ResponseEntity.ok().body(trandingList);
     }
 }

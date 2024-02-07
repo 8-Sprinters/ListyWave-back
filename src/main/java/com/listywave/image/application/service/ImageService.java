@@ -15,7 +15,7 @@ import com.listywave.image.presentation.dto.response.PresignedUrlResponse;
 import com.listywave.list.application.domain.Item;
 import com.listywave.list.application.domain.Lists;
 import com.listywave.list.repository.ItemRepository;
-import com.listywave.list.repository.ListRepository;
+import com.listywave.list.repository.list.ListRepository;
 import com.listywave.user.application.domain.User;
 import java.util.Arrays;
 import java.util.Date;

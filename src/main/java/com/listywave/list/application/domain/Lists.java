@@ -26,6 +26,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -160,6 +161,10 @@ public class Lists {
         }
         addItemToList(lists, items);
         return lists;
+    }
+
+    public void sortItems() {
+        this.getItems().sort(Comparator.comparing(Item::getRanking));
     }
 
     public String getCategoryName() {
