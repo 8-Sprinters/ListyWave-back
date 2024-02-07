@@ -6,7 +6,7 @@ public class CategoryTypeConverter implements AttributeConverter<CategoryType, S
 
     @Override
     public String convertToDatabaseColumn(CategoryType attribute) {
-        if(attribute == null){
+        if (attribute == null) {
             return null;
         }
         return attribute.getCodeValue();
@@ -14,7 +14,7 @@ public class CategoryTypeConverter implements AttributeConverter<CategoryType, S
 
     @Override
     public CategoryType convertToEntityAttribute(String dbData) {
-        if(dbData == null){
+        if (dbData == null) {
             return null;
         }
         return CategoryType.enumOf(dbData);
