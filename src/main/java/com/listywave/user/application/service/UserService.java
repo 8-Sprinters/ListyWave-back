@@ -84,4 +84,13 @@ public class UserService {
                 .toList();
         return FollowingsResponse.of(followingUsers);
     }
+
+    public void unfollow(Long followingUserId, String accessToken) {
+        User followingUser = userRepository.getById(followingUserId);
+
+        Long loginUserId = jwtManager.read(accessToken);
+        User followerUser = userRepository.getById(loginUserId);
+
+        followRepository.deleteByFollowingUserAndFollowerUser(followingUser, followerUser);
+    }
 }
