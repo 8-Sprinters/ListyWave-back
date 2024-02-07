@@ -8,6 +8,7 @@ public record AllUserListsResponse(
         Boolean hasNext,
         List<FeedListsResponse> feedLists
 ) {
+
     public static AllUserListsResponse of(boolean hasNext, Long cursorId, List<Lists> feedLists) {
         return new AllUserListsResponse(
                 cursorId,

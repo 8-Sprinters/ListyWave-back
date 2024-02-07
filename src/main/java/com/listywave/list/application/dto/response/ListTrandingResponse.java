@@ -12,6 +12,7 @@ public record ListTrandingResponse(
         String itemImageUrl,
         String backgroundColor
 ) {
+
     public static ListTrandingResponse of(Lists list, String imageUrlTopRankItem) {
         return ListTrandingResponse.builder()
                 .id(list.getId())

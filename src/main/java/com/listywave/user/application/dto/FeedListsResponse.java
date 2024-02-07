@@ -14,6 +14,7 @@ public record FeedListsResponse(
         String backgroundColor,
         List<ListItemsResponse> listItems
 ) {
+
     public static FeedListsResponse of(Lists lists) {
         return FeedListsResponse.builder()
                 .id(lists.getId())
@@ -32,6 +33,7 @@ record ListItemsResponse(
         String title,
         String imageUrl
 ) {
+
     public static ListItemsResponse of(Item item) {
         return ListItemsResponse.builder()
                 .id(item.getId())
