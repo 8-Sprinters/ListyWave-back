@@ -58,10 +58,10 @@ public class UserController {
 
     @DeleteMapping("/follow/{userId}")
     ResponseEntity<Void> unfollow(
-            @PathVariable(value = "userId") Long targetUserId,
-            @RequestHeader(value = AUTHORIZATION) String accessToken
+            @PathVariable(value = "userId") Long followingUserId,
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
     ) {
-        userService.unfollow(targetUserId, accessToken);
+        userService.unfollow(followingUserId, accessToken);
         return ResponseEntity.noContent().build();
     }
 }
