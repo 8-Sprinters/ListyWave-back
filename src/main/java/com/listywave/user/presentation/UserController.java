@@ -53,9 +53,9 @@ public class UserController {
         return ResponseEntity.ok(allUserListsResponse);
     }
 
-    @GetMapping("/followings")
-    ResponseEntity<FollowingsResponse> getFollowings(@RequestHeader(value = AUTHORIZATION) String accessToken) {
-        FollowingsResponse response = userService.getFollowings(accessToken);
+    @GetMapping("/users/{userId}/followings")
+    ResponseEntity<FollowingsResponse> getFollowings(@PathVariable(name = "userId") Long userId) {
+        FollowingsResponse response = userService.getFollowings(userId);
         return ResponseEntity.ok(response);
     }
 
