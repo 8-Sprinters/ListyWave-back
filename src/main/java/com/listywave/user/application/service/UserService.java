@@ -1,9 +1,6 @@
 package com.listywave.user.application.service;
 
-import static com.listywave.common.exception.ErrorCode.NOT_FOUND;
-
 import com.listywave.auth.application.domain.JwtManager;
-import com.listywave.common.exception.CustomException;
 import com.listywave.common.util.UserUtil;
 import com.listywave.list.application.domain.CategoryType;
 import com.listywave.list.application.domain.Lists;
@@ -17,7 +14,6 @@ import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,18 +29,17 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserInfoResponse getUserInfo(Long userId, String accessToken) {
-        Optional<User> found = userRepository.findById(userId);
-        User foundUser = found.orElseThrow(() -> new CustomException(NOT_FOUND));
+        User user = userRepository.getById(userId);
 
         if (isSignedIn(accessToken)) {
-            return UserInfoResponse.of(foundUser, false, false);
+            return UserInfoResponse.of(user, false, false);
         }
 
         Long loginUserId = jwtManager.read(accessToken);
-        if (foundUser.isSame(loginUserId)) {
-            return UserInfoResponse.of(foundUser, false, true);
+        if (user.isSame(loginUserId)) {
+            return UserInfoResponse.of(user, false, true);
         }
-        return UserInfoResponse.of(foundUser, false, false);
+        return UserInfoResponse.of(user, false, false);
     }
 
     private boolean isSignedIn(String accessToken) {
@@ -91,11 +86,30 @@ public class UserService {
         return FollowingsResponse.of(followingUsers);
     }
 
-    @Transactional(readOnly = true)
-    public List<RecommendUsersResponse> getRecommendUsers() {
-        List<User> recommendUsers = userRepository.getRecommendUsers();
-        return recommendUsers.stream()
+    public void follow(Long followingUserId, String accessToken) {
+        User followingUser = userRepository.getById(followingUserId);
+
+        Long followerUserId = jwtManager.read(accessToken);
+        User followerUser = userRepository.getById(followerUserId);
+
+        Follow follow = new Follow(followingUser, followerUser);
+        followRepository.save(follow);
+    }
+
+    public void unfollow(Long followingUserId, String accessToken) {
+        User followingUser = userRepository.getById(followingUserId);
+
+        Long loginUserId = jwtManager.read(accessToken);
+        User followerUser = userRepository.getById(loginUserId);
+
+        followRepository.deleteByFollowingUserAndFollowerUser(followingUser, followerUser);
+    }
+  
+     @Transactional(readOnly = true)
+     public List<RecommendUsersResponse> getRecommendUsers() {
+         List<User> recommendUsers = userRepository.getRecommendUsers();
+         return recommendUsers.stream()
                 .map(RecommendUsersResponse::of)
                 .toList();
-    }
+     }
 }

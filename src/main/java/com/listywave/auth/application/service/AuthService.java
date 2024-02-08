@@ -3,9 +3,9 @@ package com.listywave.auth.application.service;
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.auth.application.domain.kakao.KakaoOauthClient;
 import com.listywave.auth.application.domain.kakao.KakaoRedirectUriProvider;
+import com.listywave.auth.application.dto.LoginResponse;
 import com.listywave.auth.infra.kakao.response.KakaoMember;
 import com.listywave.auth.infra.kakao.response.KakaoTokenResponse;
-import com.listywave.auth.presentation.dto.LoginResponse;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.Optional;
@@ -33,14 +33,24 @@ public class AuthService {
 
         Optional<User> foundUser = userRepository.findByOauthId(kakaoMember.id());
         if (foundUser.isEmpty()) {
-            User user = User.initialCreate(kakaoMember.id(), kakaoMember.kakaoAccount().email());
+            User user = User.initialCreate(
+                    kakaoMember.id(),
+                    kakaoMember.kakaoAccount().email(),
+                    kakaoTokenResponse.accessToken()
+            );
             User createdUser = userRepository.save(user);
-            return LoginResponse.of(createdUser, true);
+            return LoginResponse.of(createdUser, true, createTokenBy(createdUser.getId()));
         }
-        return LoginResponse.of(foundUser.get(), false);
+        return LoginResponse.of(foundUser.get(), false, createTokenBy(foundUser.get().getId()));
     }
 
-    public String createToken(Long userId) {
+    private String createTokenBy(Long userId) {
         return jwtManager.createToken(userId);
+    }
+
+    public void logout(String accessToken) {
+        Long userId = jwtManager.read(accessToken);
+        User user = userRepository.getById(userId);
+        kakaoOauthClient.logout(user.getKakaoAccessToken());
     }
 }

@@ -32,9 +32,10 @@ public class CommentService {
     private final ReplyRepository replyRepository;
     private final CommentRepository commentRepository;
 
-    public CommentCreateResponse create(Long listId, String accessToken, String content) {
-        Long userId = jwtManager.read(accessToken);
-        User user = userRepository.getById(userId);
+    public CommentCreateResponse create(Long listId, String content) {
+        // TODO: 프론트 단에서 댓글 생성 테스트 끝나면 원래대로 복구
+//        Long userId = jwtManager.read(accessToken);
+        User user = userRepository.getById(1L);
         Lists list = listRepository.getById(listId);
 
         Comment comment = Comment.create(list, user, content);
@@ -70,10 +71,10 @@ public class CommentService {
         return CommentFindResponse.from(totalCount, cursorIdOfResult, hasNext, result);
     }
 
-    public void delete(Long listId, String accessToken, Long commentId) {
-
-        Long userId = jwtManager.read(accessToken);
-        userRepository.getById(userId);
+    public void delete(Long listId, Long commentId) {
+        // TODO: 프론트 단에서 댓글 생성 테스트 끝나면 원래대로 복구
+//        Long userId = jwtManager.read(accessToken);
+//        userRepository.getById(userId);
         listRepository.getById(listId);
 
         Comment comment = commentRepository.getById(commentId);
