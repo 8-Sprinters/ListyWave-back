@@ -63,7 +63,7 @@ public class UserController {
     @GetMapping("/users/{userId}/followers")
     ResponseEntity<FollowersResponse> getFollowers(
             @PathVariable(name = "userId") Long userId,
-            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam(name = "size", defaultValue = "20") int size,
             @RequestParam(name = "cursorId", defaultValue = "0") int cursorId
     ) {
         FollowersResponse response = userService.getFollowers(userId, size, cursorId);
