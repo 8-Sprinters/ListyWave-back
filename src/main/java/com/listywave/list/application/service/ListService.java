@@ -1,5 +1,6 @@
 package com.listywave.list.application.service;
 
+import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.collaborator.domain.Collaborator;
 import com.listywave.collaborator.domain.repository.CollaboratorRepository;
 import com.listywave.common.exception.CustomException;
@@ -10,10 +11,13 @@ import com.listywave.list.application.domain.Lists;
 import com.listywave.list.application.dto.ListCreateCommand;
 import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse;
+import com.listywave.list.application.dto.response.ListRecentResponse;
 import com.listywave.list.application.dto.response.ListTrandingResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.repository.list.ListRepository;
+import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
+import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,9 +31,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class ListService {
 
     private final UserUtil userUtil;
+    private final JwtManager jwtManager;
     private final ListRepository listRepository;
     private final UserRepository userRepository;
     private final CollaboratorRepository collaboratorRepository;
+    private final FollowRepository followRepository;
 
     public ListCreateResponse listCreate(
             ListCreateCommand listCreateCommand,
@@ -132,4 +138,25 @@ public class ListService {
                 .orElse("");
     }
 
+    @Transactional(readOnly = true)
+    public ListRecentResponse getRecentLists(String accessToken) {
+        if (isSignedIn(accessToken)) {
+            Long loginUserId = jwtManager.read(accessToken);
+            User user = userRepository.getById(loginUserId);
+            List<Follow> follows = followRepository.getAllByFollowerUser(user);
+
+            List<User> followingUsers = follows.stream()
+                    .map(Follow::getFollowingUser)
+                    .toList();
+            List<Lists> recentListsByFollowing = listRepository.getRecentListsByFollowing(followingUsers);
+            return ListRecentResponse.of(recentListsByFollowing);
+        }
+        List<Lists> recentLists = listRepository.getRecentLists();
+        return ListRecentResponse.of(recentLists);
+
+    }
+
+    private boolean isSignedIn(String accessToken) {
+        return !accessToken.isBlank();
+    }
 }
