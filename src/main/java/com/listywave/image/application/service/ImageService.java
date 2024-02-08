@@ -1,10 +1,16 @@
 package com.listywave.image.application.service;
 
+import static com.listywave.common.exception.ErrorCode.S3_DELETE_OBJECTS_EXCEPTION;
+
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.ListObjectsV2Result;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import com.listywave.common.util.UserUtil;
@@ -24,6 +30,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -194,5 +201,25 @@ public class ImageService {
 
     private boolean isActivateDev(String profile) {
         return profile.equals(DEV);
+    }
+
+    @Async
+    public void deleteAllOfListImages(Long listId) {
+        String path = "/" + getCurrentProfile() + "/lists_item/" + listId + "/";
+
+        ListObjectsV2Result listObjects;
+        do {
+            listObjects = amazonS3.listObjectsV2(bucket, path);
+            for (S3ObjectSummary object : listObjects.getObjectSummaries()) {
+                amazonS3.deleteObject(new DeleteObjectRequest(bucket, object.getKey()));
+            }
+            listObjects.setContinuationToken(listObjects.getNextContinuationToken());
+        } while (listObjects.isTruncated());
+
+        try {
+            amazonS3.deleteObject(bucket, path);
+        } catch (AmazonServiceException e) {
+            throw new CustomException(S3_DELETE_OBJECTS_EXCEPTION);
+        }
     }
 }
