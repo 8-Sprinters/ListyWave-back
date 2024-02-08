@@ -75,9 +75,8 @@ public class UserService {
         return AllUserResponse.of(allUser);
     }
 
-    public FollowingsResponse getFollowings(String accessToken) {
-        Long loginUserId = jwtManager.read(accessToken);
-        User user = userRepository.getById(loginUserId);
+    public FollowingsResponse getFollowings(Long userId) {
+        User user = userRepository.getById(userId);
         List<Follow> follows = followRepository.getAllByFollowerUser(user);
 
         List<User> followingUsers = follows.stream()
