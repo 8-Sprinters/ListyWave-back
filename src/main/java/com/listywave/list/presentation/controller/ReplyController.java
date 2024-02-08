@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,10 +26,10 @@ public class ReplyController {
     ResponseEntity<ReplyCreateResponse> create(
             @PathVariable(value = "listId") Long listId,
             @PathVariable(value = "commentId") Long commentId,
-            @RequestHeader(value = "Authorization", defaultValue = "") String accessToken,
+//            @RequestHeader(value = "Authorization", defaultValue = "") String accessToken,
             @RequestBody ReplyCreateRequest request
     ) {
-        ReplyCreateResponse response = replyService.createReply(listId, commentId, accessToken, request.content());
+        ReplyCreateResponse response = replyService.createReply(listId, commentId, request.content());
         return ResponseEntity.status(CREATED).body(response);
     }
 
@@ -38,10 +37,10 @@ public class ReplyController {
     ResponseEntity<Void> deleteReply(
             @PathVariable(value = "listId") Long listId,
             @PathVariable(value = "commentId") Long commentId,
-            @PathVariable(value = "replyId") Long replyId,
-            @RequestHeader(value = "Authorization", defaultValue = "") String accessToken
+            @PathVariable(value = "replyId") Long replyId
+//            @RequestHeader(value = "Authorization", defaultValue = "") String accessToken
     ) {
-        ReplyDeleteCommand replyDeleteCommand = new ReplyDeleteCommand(listId, commentId, replyId, accessToken);
+        ReplyDeleteCommand replyDeleteCommand = new ReplyDeleteCommand(listId, commentId, replyId);
         replyService.delete(replyDeleteCommand);
         return ResponseEntity.noContent().build();
     }
