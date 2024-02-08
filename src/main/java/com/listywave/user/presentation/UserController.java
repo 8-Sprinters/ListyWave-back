@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,6 +55,15 @@ public class UserController {
     ResponseEntity<FollowingsResponse> getFollowings(@RequestHeader(value = AUTHORIZATION) String accessToken) {
         FollowingsResponse response = userService.getFollowings(accessToken);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/follow/{userId}")
+    ResponseEntity<Void> follow(
+            @PathVariable(value = "userId") Long followingUserId,
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+    ) {
+        userService.follow(followingUserId, accessToken);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/follow/{userId}")

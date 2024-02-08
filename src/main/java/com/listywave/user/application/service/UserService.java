@@ -85,6 +85,16 @@ public class UserService {
         return FollowingsResponse.of(followingUsers);
     }
 
+    public void follow(Long followingUserId, String accessToken) {
+        User followingUser = userRepository.getById(followingUserId);
+
+        Long followerUserId = jwtManager.read(accessToken);
+        User followerUser = userRepository.getById(followerUserId);
+
+        Follow follow = new Follow(followingUser, followerUser);
+        followRepository.save(follow);
+    }
+
     public void unfollow(Long followingUserId, String accessToken) {
         User followingUser = userRepository.getById(followingUserId);
 
