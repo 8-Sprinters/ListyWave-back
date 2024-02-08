@@ -140,11 +140,7 @@ public class ListService {
 
     @Transactional(readOnly = true)
     public ListRecentResponse getRecentLists(String accessToken) {
-
         if (isSignedIn(accessToken)) {
-            List<Lists> recentLists = listRepository.getRecentLists();
-            return ListRecentResponse.of(recentLists);
-        } else {
             Long loginUserId = jwtManager.read(accessToken);
             User user = userRepository.getById(loginUserId);
             List<Follow> follows = followRepository.getAllByFollowerUser(user);
@@ -155,9 +151,12 @@ public class ListService {
             List<Lists> recentListsByFollowing = listRepository.getRecentListsByFollowing(followingUsers);
             return ListRecentResponse.of(recentListsByFollowing);
         }
+        List<Lists> recentLists = listRepository.getRecentLists();
+        return ListRecentResponse.of(recentLists);
+
     }
 
     private boolean isSignedIn(String accessToken) {
-        return accessToken.isBlank();
+        return !accessToken.isBlank();
     }
 }

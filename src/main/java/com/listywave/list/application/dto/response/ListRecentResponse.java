@@ -32,6 +32,12 @@ record ListResponse(
         List<ItemsResponse> items
 ) {
 
+    public static List<ListResponse> toList(List<Lists> lists) {
+        return lists.stream()
+                .map(ListResponse::of)
+                .toList();
+    }
+
     public static ListResponse of(Lists lists) {
         return ListResponse.builder()
                 .id(lists.getId())
@@ -46,12 +52,6 @@ record ListResponse(
                 .items(ItemsResponse.toList(lists.getItems()))
                 .build();
     }
-
-    public static List<ListResponse> toList(List<Lists> lists) {
-        return lists.stream()
-                .map(ListResponse::of)
-                .toList();
-    }
 }
 
 @Builder
@@ -60,17 +60,17 @@ record LabelsResponse(
         String name
 ) {
 
+    public static List<LabelsResponse> toList(List<Label> labels) {
+        return labels.stream()
+                .map(LabelsResponse::of)
+                .toList();
+    }
+
     public static LabelsResponse of(Label label) {
         return LabelsResponse.builder()
                 .id(label.getId())
                 .name(label.getLabelName())
                 .build();
-    }
-
-    public static List<LabelsResponse> toList(List<Label> labels) {
-        return labels.stream()
-                .map(LabelsResponse::of)
-                .toList();
     }
 }
 
@@ -82,6 +82,14 @@ record ItemsResponse(
         String imageUrl
 ) {
 
+    public static List<ItemsResponse> toList(List<Item> items) {
+        return items.stream()
+                .sorted(Comparator.comparing(Item::getRanking))
+                .map(ItemsResponse::of)
+                .limit(3)
+                .toList();
+    }
+
     public static ItemsResponse of(Item item) {
         return ItemsResponse.builder()
                 .id(item.getId())
@@ -89,13 +97,5 @@ record ItemsResponse(
                 .title(item.getTitle())
                 .imageUrl(item.getImageUrl())
                 .build();
-    }
-
-    public static List<ItemsResponse> toList(List<Item> items) {
-        return items.stream()
-                .sorted(Comparator.comparing(Item::getRanking))
-                .map(ItemsResponse::of)
-                .limit(3)
-                .toList();
     }
 }
