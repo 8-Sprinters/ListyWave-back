@@ -1,7 +1,9 @@
-package com.listywave.auth.presentation.controller;
+package com.listywave.auth.presentation;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
+import com.listywave.auth.application.dto.LoginResponse;
 import com.listywave.auth.application.service.AuthService;
-import com.listywave.auth.presentation.dto.LoginResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,5 +41,11 @@ public class AuthController {
 
         response.setHeader(HttpHeaders.SET_COOKIE, accessToken);
         return ResponseEntity.ok(loginResponse);
+    }
+
+    @PatchMapping("/auth/kakao")
+    ResponseEntity<Void> logout(@RequestHeader(value = AUTHORIZATION) String accessToken) {
+        authService.logout(accessToken);
+        return ResponseEntity.noContent().build();
     }
 }

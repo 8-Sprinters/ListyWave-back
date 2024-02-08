@@ -2,6 +2,7 @@ package com.listywave.auth.infra.kakao;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
 import com.listywave.auth.infra.kakao.response.KakaoMember;
 import com.listywave.auth.infra.kakao.response.KakaoTokenResponse;
 import org.springframework.util.MultiValueMap;
@@ -22,4 +23,7 @@ public interface KakaoOauthApiClient {
             contentType = "application/x-www-form-urlencoded;charset=utf-8"
     )
     KakaoMember fetchKakaoMember(@RequestHeader(name = AUTHORIZATION) String accessToken);
+
+    @PostExchange(url = "https://kapi.kakao.com/v1/user/logout")
+    KakaoLogoutResponse logout(@RequestHeader(value = AUTHORIZATION) String accessToken);
 }
