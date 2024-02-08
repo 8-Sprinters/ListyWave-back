@@ -10,6 +10,7 @@ import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -53,5 +54,14 @@ public class UserController {
     ResponseEntity<FollowingsResponse> getFollowings(@RequestHeader(value = AUTHORIZATION) String accessToken) {
         FollowingsResponse response = userService.getFollowings(accessToken);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/follow/{userId}")
+    ResponseEntity<Void> unfollow(
+            @PathVariable(value = "userId") Long followingUserId,
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+    ) {
+        userService.unfollow(followingUserId, accessToken);
+        return ResponseEntity.noContent().build();
     }
 }
