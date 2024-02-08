@@ -6,6 +6,8 @@ import com.listywave.collaborator.domain.repository.CollaboratorRepository;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import com.listywave.common.util.UserUtil;
+import com.listywave.image.application.service.ImageService;
+import com.listywave.list.application.domain.Comment;
 import com.listywave.list.application.domain.Item;
 import com.listywave.list.application.domain.Lists;
 import com.listywave.list.application.dto.ListCreateCommand;
@@ -14,6 +16,8 @@ import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListRecentResponse;
 import com.listywave.list.application.dto.response.ListTrandingResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
+import com.listywave.list.repository.CommentRepository;
+import com.listywave.list.repository.ReplyRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
@@ -32,8 +36,11 @@ public class ListService {
 
     private final UserUtil userUtil;
     private final JwtManager jwtManager;
+    private final ImageService imageService;
     private final ListRepository listRepository;
     private final UserRepository userRepository;
+    private final ReplyRepository replyRepository;
+    private final CommentRepository commentRepository;
     private final CollaboratorRepository collaboratorRepository;
     private final FollowRepository followRepository;
 
@@ -124,7 +131,7 @@ public class ListService {
     @Transactional(readOnly = true)
     public List<ListTrandingResponse> getTrandingList() {
         List<Lists> lists = listRepository.findTrandingLists();
-        lists.forEach(Lists::sortItems); // <-- 추가 !
+        lists.forEach(Lists::sortItems);
         return lists.stream()
                 .map(list -> ListTrandingResponse.of(list, getImageUrlTopRankItem(list.getItems())))
                 .toList();
@@ -138,6 +145,18 @@ public class ListService {
                 .orElse("");
     }
 
+    public void deleteList(Long listId) {
+        imageService.deleteAllOfListImages(listId);
+
+        Lists list = listRepository.getById(listId);
+
+        collaboratorRepository.deleteAllByList(list);
+        List<Comment> comments = commentRepository.findAllByList(list);
+        replyRepository.deleteAllByCommentIn(comments);
+        commentRepository.deleteAllInBatch(comments);
+
+        listRepository.deleteById(listId);
+    }
     @Transactional(readOnly = true)
     public ListRecentResponse getRecentLists(String accessToken) {
         if (isSignedIn(accessToken)) {

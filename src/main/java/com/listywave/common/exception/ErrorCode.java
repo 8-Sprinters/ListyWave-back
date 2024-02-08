@@ -26,7 +26,11 @@ public enum ErrorCode {
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 AccessToken 입니다. 다시 로그인해주세요."),
 
     // list
-    INVALID_ACCESS(HttpStatus.FORBIDDEN, "접근 권한이 존재하지 않습니다.");
+    INVALID_ACCESS(HttpStatus.FORBIDDEN, "접근 권한이 존재하지 않습니다."),
+
+    // S3
+    S3_DELETE_OBJECTS_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류, 관리자에게 문의하세요"),
+    ;
 
     private final HttpStatus status;
     private final String detail;
