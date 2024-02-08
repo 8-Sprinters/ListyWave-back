@@ -5,6 +5,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import com.listywave.list.application.domain.CategoryType;
 import com.listywave.user.application.dto.AllUserListsResponse;
 import com.listywave.user.application.dto.AllUserResponse;
+import com.listywave.user.application.dto.FollowersResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
 import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
@@ -56,6 +57,16 @@ public class UserController {
     @GetMapping("/users/{userId}/followings")
     ResponseEntity<FollowingsResponse> getFollowings(@PathVariable(name = "userId") Long userId) {
         FollowingsResponse response = userService.getFollowings(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/users/{userId}/followers")
+    ResponseEntity<FollowersResponse> getFollowers(
+            @PathVariable(name = "userId") Long userId,
+            @RequestParam(name = "size", defaultValue = "20") int size,
+            @RequestParam(name = "cursorId", defaultValue = "0") int cursorId
+    ) {
+        FollowersResponse response = userService.getFollowers(userId, size, cursorId);
         return ResponseEntity.ok(response);
     }
 
