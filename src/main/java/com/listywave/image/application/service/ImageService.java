@@ -205,19 +205,16 @@ public class ImageService {
 
     @Async
     public void deleteAllOfListImages(Long listId) {
-        String path = "/" + getCurrentProfile() + "/lists_item/" + listId + "/";
-
-        ListObjectsV2Result listObjects;
-        do {
-            listObjects = amazonS3.listObjectsV2(bucket, path);
-            for (S3ObjectSummary object : listObjects.getObjectSummaries()) {
-                amazonS3.deleteObject(new DeleteObjectRequest(bucket, object.getKey()));
-            }
-            listObjects.setContinuationToken(listObjects.getNextContinuationToken());
-        } while (listObjects.isTruncated());
-
+        String path = getCurrentProfile() + "/lists_item/" + listId + "/";
         try {
-            amazonS3.deleteObject(bucket, path);
+            ListObjectsV2Result listObjects;
+            do {
+                listObjects = amazonS3.listObjectsV2(bucket, path);
+                for (S3ObjectSummary object : listObjects.getObjectSummaries()) {
+                    amazonS3.deleteObject(new DeleteObjectRequest(bucket, object.getKey()));
+                }
+                listObjects.setContinuationToken(listObjects.getNextContinuationToken());
+            } while (listObjects.isTruncated());
         } catch (AmazonServiceException e) {
             throw new CustomException(S3_DELETE_OBJECTS_EXCEPTION);
         }
