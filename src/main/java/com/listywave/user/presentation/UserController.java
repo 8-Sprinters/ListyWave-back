@@ -57,7 +57,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/users/explore")
+    @GetMapping("/users/recommend")
     ResponseEntity<List<RecommendUsersResponse>> getRecommendUsers() {
         List<RecommendUsersResponse> recommendUsers = userService.getRecommendUsers();
         return ResponseEntity.ok(recommendUsers);
