@@ -14,7 +14,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, CustomC
         return findById(id).orElseThrow(() -> new CustomException(NOT_FOUND));
     }
 
-    Long countByList(Lists list);
-
     List<Comment> findAllByList(Lists list);
 }
