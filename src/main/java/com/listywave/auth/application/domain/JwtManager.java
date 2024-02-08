@@ -1,7 +1,7 @@
 package com.listywave.auth.application.domain;
 
 import static com.listywave.common.exception.ErrorCode.REQUIRED_ACCESS_TOKEN;
-import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.HOURS;
 
 import com.listywave.common.exception.CustomException;
 import io.jsonwebtoken.Jwts;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class JwtManager {
 
     private static final SecretKey key = Jwts.SIG.HS256.key().build();
-    private static final Long ACCESS_TOKEN_VALID_MILLISECOND = MINUTES.toMillis(30);
+    private static final Long ACCESS_TOKEN_VALID_MILLISECOND = HOURS.toMillis(8);
 
     public String createToken(Long userId) {
         Date now = new Date();

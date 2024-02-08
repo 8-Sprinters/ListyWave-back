@@ -39,12 +39,12 @@ public class AuthService {
                     kakaoTokenResponse.accessToken()
             );
             User createdUser = userRepository.save(user);
-            return LoginResponse.of(createdUser, true);
+            return LoginResponse.of(createdUser, true, createTokenBy(createdUser.getId()));
         }
-        return LoginResponse.of(foundUser.get(), false);
+        return LoginResponse.of(foundUser.get(), false, createTokenBy(foundUser.get().getId()));
     }
 
-    public String createToken(Long userId) {
+    private String createTokenBy(Long userId) {
         return jwtManager.createToken(userId);
     }
 
