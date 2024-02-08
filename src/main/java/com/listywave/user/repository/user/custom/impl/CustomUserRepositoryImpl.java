@@ -2,9 +2,11 @@ package com.listywave.user.repository.user.custom.impl;
 
 import static com.listywave.list.application.domain.QItem.item;
 import static com.listywave.list.application.domain.QLists.lists;
+import static com.listywave.user.application.domain.QUser.user;
 
 import com.listywave.list.application.domain.CategoryType;
 import com.listywave.list.application.domain.Lists;
+import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.custom.CustomUserRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -55,5 +57,18 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
 
     private BooleanExpression userIdEq(Long userId) {
         return userId == null ? null : lists.user.id.eq(userId);
+    }
+
+    @Override
+    public List<User> getRecommendUsers() {
+        List<User> fetch = queryFactory
+                .select(user)
+                .from(lists)
+                .rightJoin(lists.user, user)
+                .groupBy(user)
+                .orderBy(lists.updatedDate.max().desc())
+                .limit(10)
+                .fetch();
+        return fetch;
     }
 }

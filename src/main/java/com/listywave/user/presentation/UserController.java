@@ -6,8 +6,10 @@ import com.listywave.list.application.domain.CategoryType;
 import com.listywave.user.application.dto.AllUserListsResponse;
 import com.listywave.user.application.dto.AllUserResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
+import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.service.UserService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -73,5 +75,11 @@ public class UserController {
     ) {
         userService.unfollow(followingUserId, accessToken);
         return ResponseEntity.noContent().build();
+    }
+  
+    @GetMapping("/users/recommend")
+    ResponseEntity<List<RecommendUsersResponse>> getRecommendUsers() {
+        List<RecommendUsersResponse> recommendUsers = userService.getRecommendUsers();
+        return ResponseEntity.ok(recommendUsers);
     }
 }
