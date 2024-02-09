@@ -12,6 +12,7 @@ import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.service.UserService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -87,10 +88,18 @@ public class UserController {
         userService.unfollow(followingUserId, accessToken);
         return ResponseEntity.noContent().build();
     }
-  
+
     @GetMapping("/users/recommend")
     ResponseEntity<List<RecommendUsersResponse>> getRecommendUsers() {
         List<RecommendUsersResponse> recommendUsers = userService.getRecommendUsers();
         return ResponseEntity.ok(recommendUsers);
+    }
+
+    @GetMapping("/users/{nickname}/exists")
+    ResponseEntity<Boolean> checkNicknameDuplicate(
+            @PathVariable("nickname") String nickname,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, defaultValue = "") String accessToken
+    ) {
+        return ResponseEntity.ok(userService.checkNicknameDuplicate(nickname, accessToken));
     }
 }

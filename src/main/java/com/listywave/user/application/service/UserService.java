@@ -124,11 +124,18 @@ public class UserService {
         return FollowersResponse.of(followerUsers, totalCount, false);
     }
 
-     @Transactional(readOnly = true)
-     public List<RecommendUsersResponse> getRecommendUsers() {
-         List<User> recommendUsers = userRepository.getRecommendUsers();
-         return recommendUsers.stream()
+    @Transactional(readOnly = true)
+    public List<RecommendUsersResponse> getRecommendUsers() {
+        List<User> recommendUsers = userRepository.getRecommendUsers();
+        return recommendUsers.stream()
                 .map(RecommendUsersResponse::of)
                 .toList();
-     }
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean checkNicknameDuplicate(String nickname, String accessToken) {
+        Long loginUserId = jwtManager.read(accessToken);
+        userRepository.getById(loginUserId);
+        return userRepository.existsByNicknameValue(nickname);
+    }
 }
