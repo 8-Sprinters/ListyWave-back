@@ -1,6 +1,7 @@
 package com.listywave.user.application.domain;
 
 import com.listywave.common.BaseEntity;
+import com.listywave.user.application.dto.UserProflieUpdateCommand;
 import com.listywave.user.application.vo.BackgroundImageUrl;
 import com.listywave.user.application.vo.Description;
 import com.listywave.user.application.vo.Nickname;
@@ -66,6 +67,13 @@ public class User extends BaseEntity {
                 false,
                 kakaoAccessToken
         );
+    }
+
+    public void updateUserProfile(UserProflieUpdateCommand profile) {
+        this.nickname = new Nickname(profile.nickname());
+        this.description = new Description(profile.description());
+        this.profileImageUrl = new ProfileImageUrl(profile.profileImageUrl());
+        this.backgroundImageUrl = new BackgroundImageUrl(profile.backgroundImageUrl());
     }
 
     public boolean isSame(Long id) {
