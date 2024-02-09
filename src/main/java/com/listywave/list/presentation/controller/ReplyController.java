@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/lists/{listId}/{commentId}/replies")
+@RequestMapping("/lists/{listId}/comments/{commentId}/replies")
 public class ReplyController {
 
     private final ReplyService replyService;
