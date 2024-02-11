@@ -11,6 +11,7 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import com.listywave.common.util.UserUtil;
@@ -50,6 +51,7 @@ public class ImageService {
     private final Environment environment;
     private final AmazonS3 amazonS3;
     private final UserUtil userUtil;
+    private final JwtManager jwtManager;
     private final ItemRepository itemRepository;
     private final ListRepository listRepository;
     private final UserRepository userRepository;
@@ -109,6 +111,7 @@ public class ImageService {
             ImageFileExtension backgroundExtension,
             String accessToken
     ) {
+        jwtManager.read(accessToken);
         User user = userRepository.getById(ownerId);
 
         if (isExistProfileExtension(profileExtension, backgroundExtension)) {
