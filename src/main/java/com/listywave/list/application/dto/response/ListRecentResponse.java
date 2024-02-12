@@ -77,7 +77,7 @@ record LabelsResponse(
 @Builder
 record ItemsResponse(
         Long id,
-        int ranking,
+        int rank,
         String title,
         String imageUrl
 ) {
@@ -93,7 +93,7 @@ record ItemsResponse(
     public static ItemsResponse of(Item item) {
         return ItemsResponse.builder()
                 .id(item.getId())
-                .ranking(item.getRanking())
+                .rank(item.getRanking())
                 .title(item.getTitle())
                 .imageUrl(item.getImageUrl())
                 .build();
