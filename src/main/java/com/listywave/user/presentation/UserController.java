@@ -95,9 +95,9 @@ public class UserController {
         return ResponseEntity.ok(recommendUsers);
     }
 
-    @GetMapping("/users/{nickname}/exists")
+    @GetMapping("/users/exists")
     ResponseEntity<Boolean> checkNicknameDuplicate(
-            @PathVariable("nickname") String nickname,
+            @RequestParam(name = "nickname") String nickname,
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, defaultValue = "") String accessToken
     ) {
         return ResponseEntity.ok(userService.checkNicknameDuplicate(nickname, accessToken));
