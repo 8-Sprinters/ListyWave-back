@@ -26,11 +26,11 @@ public class ReplyService {
     private final ReplyRepository replyRepository;
     private final CommentRepository commentRepository;
 
-    public ReplyCreateResponse createReply(Long listId, Long commentId, String accessToken, String content) {
+    public ReplyCreateResponse createReply(Long listId, Long commentId, String content) {
         listRepository.getById(listId);
-        Long writerId = jwtManager.read(accessToken);
-        User user = userRepository.getById(writerId);
-        Comment comment = commentRepository.getReferenceById(commentId);
+//        Long writerId = jwtManager.read(accessToken); 개발 안정화까지 임의 주석 처리
+        User user = userRepository.getById(3L);
+        Comment comment = commentRepository.getById(commentId);
 
         Reply reply = new Reply(comment, user, new Content(content));
         Reply saved = replyRepository.save(reply);
@@ -39,8 +39,8 @@ public class ReplyService {
     }
 
     public void delete(ReplyDeleteCommand command) {
-        Long writerId = jwtManager.read(command.accessToken());
-        userRepository.getById(writerId);
+//        Long writerId = jwtManager.read(command.accessToken()); 개발 안정화까지 임의 주석 처리
+//        userRepository.getById(writerId);
         listRepository.getById(command.listId());
         Comment comment = commentRepository.getById(command.commentId());
 

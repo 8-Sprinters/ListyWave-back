@@ -10,4 +10,6 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
     boolean existsByComment(Comment comment);
 
     List<Reply> getAllByComment(Comment comment);
+
+    void deleteAllByCommentIn(List<Comment> comments);
 }

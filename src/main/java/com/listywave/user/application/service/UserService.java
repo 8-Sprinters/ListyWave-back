@@ -8,6 +8,7 @@ import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.AllUserListsResponse;
 import com.listywave.user.application.dto.AllUserResponse;
+import com.listywave.user.application.dto.FollowersResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
 import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
@@ -102,6 +103,25 @@ public class UserService {
         User followerUser = userRepository.getById(loginUserId);
 
         followRepository.deleteByFollowingUserAndFollowerUser(followingUser, followerUser);
+    }
+
+    public FollowersResponse getFollowers(Long userId, int size, int cursorId) {
+        User followingUser = userRepository.getById(userId);
+
+        List<Follow> follows = followRepository.findAllByFollowingUser(followingUser, size, cursorId);
+        List<User> followerUsers = follows.stream()
+                .map(Follow::getFollowerUser)
+                .toList();
+
+        if (followerUsers.isEmpty()) {
+            return FollowersResponse.empty();
+        }
+
+        int totalCount = followRepository.countByFollowingUser(followingUser);
+        if (followerUsers.size() > size) {
+            return FollowersResponse.of(followerUsers.subList(0, size), totalCount, true);
+        }
+        return FollowersResponse.of(followerUsers, totalCount, false);
     }
 
     @Transactional(readOnly = true)
