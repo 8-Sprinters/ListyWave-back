@@ -144,4 +144,11 @@ public class UserService {
                 profile.backgroundImageUrl()
         );
     }
+  
+    @Transactional(readOnly = true)
+    public Boolean checkNicknameDuplicate(String nickname, String accessToken) {
+        Long loginUserId = jwtManager.read(accessToken);
+        userRepository.getById(loginUserId);
+        return userRepository.existsByNicknameValue(nickname);
+    }
 }

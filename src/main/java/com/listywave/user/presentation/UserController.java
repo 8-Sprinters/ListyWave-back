@@ -13,6 +13,7 @@ import com.listywave.user.application.service.UserService;
 import com.listywave.user.presentation.dto.UserProfileUpdateRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -97,6 +98,7 @@ public class UserController {
         return ResponseEntity.ok(recommendUsers);
     }
 
+
     @PatchMapping("/users/{userId}")
     ResponseEntity<Void> updateUserProfile(
             @PathVariable(value = "userId") Long userId,
@@ -105,5 +107,13 @@ public class UserController {
     ) {
         userService.updateUserProfile(userId, accessToken, request.toCommand());
         return ResponseEntity.noContent().build();
+    }
+  
+    @GetMapping("/users/exists")
+    ResponseEntity<Boolean> checkNicknameDuplicate(
+            @RequestParam(name = "nickname") String nickname,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, defaultValue = "") String accessToken
+    ) {
+        return ResponseEntity.ok(userService.checkNicknameDuplicate(nickname, accessToken));
     }
 }
