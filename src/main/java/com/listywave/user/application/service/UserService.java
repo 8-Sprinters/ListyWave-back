@@ -137,6 +137,11 @@ public class UserService {
     public void updateUserProfile(Long userId, String accessToken, UserProflieUpdateCommand profile) {
         jwtManager.read(accessToken);
         User user = userRepository.getById(userId);
-        user.updateUserProfile(profile);
+        user.updateUserProfile(
+                profile.nickname(),
+                profile.description(),
+                profile.profileImageUrl(),
+                profile.backgroundImageUrl()
+        );
     }
 }

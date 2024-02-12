@@ -1,7 +1,6 @@
 package com.listywave.user.application.domain;
 
 import com.listywave.common.BaseEntity;
-import com.listywave.user.application.dto.UserProflieUpdateCommand;
 import com.listywave.user.application.vo.BackgroundImageUrl;
 import com.listywave.user.application.vo.Description;
 import com.listywave.user.application.vo.Nickname;
@@ -69,11 +68,16 @@ public class User extends BaseEntity {
         );
     }
 
-    public void updateUserProfile(UserProflieUpdateCommand profile) {
-        this.nickname = new Nickname(profile.nickname());
-        this.description = new Description(profile.description());
-        this.profileImageUrl = new ProfileImageUrl(profile.profileImageUrl());
-        this.backgroundImageUrl = new BackgroundImageUrl(profile.backgroundImageUrl());
+    public void updateUserProfile(
+            String nickname,
+            String description,
+            String profileImageUrl,
+            String backgroundImageUrl
+    ) {
+        this.nickname = new Nickname(nickname);
+        this.description = new Description(description);
+        this.profileImageUrl = new ProfileImageUrl(profileImageUrl);
+        this.backgroundImageUrl = new BackgroundImageUrl(backgroundImageUrl);
     }
 
     public boolean isSame(Long id) {
