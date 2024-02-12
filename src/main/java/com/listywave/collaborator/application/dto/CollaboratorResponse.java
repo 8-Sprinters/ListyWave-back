@@ -1,4 +1,4 @@
-package com.listywave.user.application.dto;
+package com.listywave.collaborator.application.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

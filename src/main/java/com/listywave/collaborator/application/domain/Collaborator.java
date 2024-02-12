@@ -1,4 +1,4 @@
-package com.listywave.collaborator.domain;
+package com.listywave.collaborator.application.domain;
 
 import com.listywave.list.application.domain.Lists;
 import com.listywave.user.application.domain.User;

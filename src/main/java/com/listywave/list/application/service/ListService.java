@@ -1,8 +1,8 @@
 package com.listywave.list.application.service;
 
 import com.listywave.auth.application.domain.JwtManager;
-import com.listywave.collaborator.domain.Collaborator;
-import com.listywave.collaborator.domain.repository.CollaboratorRepository;
+import com.listywave.collaborator.application.domain.Collaborator;
+import com.listywave.collaborator.repository.CollaboratorRepository;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import com.listywave.common.util.UserUtil;

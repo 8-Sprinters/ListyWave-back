@@ -8,8 +8,6 @@ import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.AllUserListsResponse;
 import com.listywave.user.application.dto.AllUserResponse;
-import com.listywave.user.application.dto.CollaboratorResponse;
-import com.listywave.user.application.dto.CollaboratorSearchResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
 import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
@@ -17,8 +15,6 @@ import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -114,15 +110,5 @@ public class UserService {
         return recommendUsers.stream()
                 .map(RecommendUsersResponse::of)
                 .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public CollaboratorSearchResponse getCollaborators(String accessToken, String search, Pageable pageable) {
-        Long loginUserId = jwtManager.read(accessToken);
-        User user = userRepository.getById(loginUserId);
-
-        Long count = userRepository.getCollaboratorCount(search, user);
-        Slice<CollaboratorResponse> collaborators = userRepository.getCollaborators(search, pageable, user);
-        return CollaboratorSearchResponse.of(collaborators.getContent(), count, collaborators.hasNext());
     }
 }

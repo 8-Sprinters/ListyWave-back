@@ -4,10 +4,10 @@ import static com.listywave.list.application.domain.QItem.item;
 import static com.listywave.list.application.domain.QLists.lists;
 import static com.listywave.user.application.domain.QUser.user;
 
+import com.listywave.collaborator.application.dto.CollaboratorResponse;
 import com.listywave.list.application.domain.CategoryType;
 import com.listywave.list.application.domain.Lists;
 import com.listywave.user.application.domain.User;
-import com.listywave.user.application.dto.CollaboratorResponse;
 import com.listywave.user.repository.user.custom.CustomUserRepository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;

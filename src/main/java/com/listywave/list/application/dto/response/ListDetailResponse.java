@@ -1,6 +1,6 @@
 package com.listywave.list.application.dto.response;
 
-import com.listywave.collaborator.domain.Collaborator;
+import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.list.application.domain.Item;
 import com.listywave.list.application.domain.Label;
 import com.listywave.list.application.domain.Lists;
