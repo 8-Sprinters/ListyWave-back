@@ -34,7 +34,7 @@ public class UserService {
     public UserInfoResponse getUserInfo(Long userId, String accessToken) {
         User user = userRepository.getById(userId);
 
-        if (isSignedIn(accessToken)) {
+        if (isGuest(accessToken)) {
             return UserInfoResponse.of(user, false, false);
         }
 
@@ -42,10 +42,12 @@ public class UserService {
         if (user.isSame(loginUserId)) {
             return UserInfoResponse.of(user, false, true);
         }
-        return UserInfoResponse.of(user, false, false);
+        User loginUser = userRepository.getById(loginUserId);
+        boolean isFollowed = followRepository.existsByFollowerUserAndFollowingUser(loginUser, user);
+        return UserInfoResponse.of(user, isFollowed, false);
     }
 
-    private boolean isSignedIn(String accessToken) {
+    private boolean isGuest(String accessToken) {
         return accessToken.isBlank();
     }
 
@@ -144,7 +146,7 @@ public class UserService {
                 profile.backgroundImageUrl()
         );
     }
-  
+
     @Transactional(readOnly = true)
     public Boolean checkNicknameDuplicate(String nickname, String accessToken) {
         Long loginUserId = jwtManager.read(accessToken);
