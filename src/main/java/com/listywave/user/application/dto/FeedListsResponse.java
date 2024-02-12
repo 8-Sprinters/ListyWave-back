@@ -29,7 +29,7 @@ public record FeedListsResponse(
 @Builder
 record ListItemsResponse(
         Long id,
-        int ranking,
+        int rank,
         String title,
         String imageUrl
 ) {
@@ -37,7 +37,7 @@ record ListItemsResponse(
     public static ListItemsResponse of(Item item) {
         return ListItemsResponse.builder()
                 .id(item.getId())
-                .ranking(item.getRanking())
+                .rank(item.getRanking())
                 .title(item.getTitle())
                 .imageUrl(item.getImageUrl())
                 .build();

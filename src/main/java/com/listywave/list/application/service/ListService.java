@@ -1,8 +1,8 @@
 package com.listywave.list.application.service;
 
 import com.listywave.auth.application.domain.JwtManager;
-import com.listywave.collaborator.domain.Collaborator;
-import com.listywave.collaborator.domain.repository.CollaboratorRepository;
+import com.listywave.collaborator.application.domain.Collaborator;
+import com.listywave.collaborator.repository.CollaboratorRepository;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import com.listywave.common.util.UserUtil;
@@ -23,7 +23,9 @@ import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -56,6 +58,7 @@ public class ListService {
         Boolean isLabels = isLabelCountValid(labels);
         validateItemsCount(items);
         Boolean hasCollaboratorId = isExistCollaborator(collaboratorIds);
+        validateDuplicateCollaborators(collaboratorIds);
 
         Lists list = Lists.createList(
                 user,
@@ -78,6 +81,16 @@ public class ListService {
         return ListCreateResponse.of(list.getId());
     }
 
+    private void validateDuplicateCollaborators(List<Long> collaboratorIds) {
+        Set<Long> uniqueIds = new HashSet<>();
+        Set<Long> duplicateIds = collaboratorIds.stream()
+                .filter(id -> !uniqueIds.add(id)) // 중복된 ID 필터링
+                .collect(Collectors.toSet());
+
+        if (!duplicateIds.isEmpty()) {
+            throw new CustomException(ErrorCode.DUPLICATE_USER, "중복된 콜라보레이터를 선택할 수 없습니다.");
+        }
+    }
 
     private List<User> findExistingCollaborators(List<Long> collaboratorIds) {
         List<User> existingCollaborators = userRepository.findAllById(collaboratorIds);
