@@ -67,6 +67,18 @@ public class User extends BaseEntity {
                 kakaoAccessToken
         );
     }
+  
+    public void updateUserProfile(
+            String nickname,
+            String description,
+            String profileImageUrl,
+            String backgroundImageUrl
+    ) {
+        this.nickname = new Nickname(nickname);
+        this.description = new Description(description);
+        this.profileImageUrl = new ProfileImageUrl(profileImageUrl);
+        this.backgroundImageUrl = new BackgroundImageUrl(backgroundImageUrl);
+    }
 
     public void updateUserImageUrl(String profileImage, String backgroundImage) {
         if (!profileImage.isEmpty() && backgroundImage.isEmpty()) {

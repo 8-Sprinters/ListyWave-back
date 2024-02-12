@@ -15,4 +15,6 @@ public interface UserRepository extends JpaRepository<User, Long>, CustomUserRep
     default User getById(Long id) {
         return findById(id).orElseThrow(() -> new CustomException(NOT_FOUND));
     }
+
+    Boolean existsByNicknameValue(String nickname);
 }
