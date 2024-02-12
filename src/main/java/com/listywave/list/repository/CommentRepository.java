@@ -15,4 +15,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, CustomC
     }
 
     List<Comment> findAllByList(Lists list);
+
+    Long countByList(Lists list);
 }

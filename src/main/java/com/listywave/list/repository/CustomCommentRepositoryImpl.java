@@ -17,9 +17,9 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
     @Override
     public List<Comment> getComments(Lists list, int size, Long cursorId) {
         return queryFactory.selectFrom(comment)
-                .join(comment.list, lists).fetchJoin()
+                .join(lists).fetchJoin()
+                .on(lists.id.eq(comment.list.id))
                 .where(
-                        comment.list.id.eq(list.getId()),
                         comment.id.gt(cursorId)
                 )
                 .orderBy(comment.id.asc())
