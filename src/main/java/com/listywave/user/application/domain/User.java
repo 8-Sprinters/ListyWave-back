@@ -67,7 +67,7 @@ public class User extends BaseEntity {
                 kakaoAccessToken
         );
     }
-
+  
     public void updateUserProfile(
             String nickname,
             String description,
@@ -78,6 +78,19 @@ public class User extends BaseEntity {
         this.description = new Description(description);
         this.profileImageUrl = new ProfileImageUrl(profileImageUrl);
         this.backgroundImageUrl = new BackgroundImageUrl(backgroundImageUrl);
+    }
+
+    public void updateUserImageUrl(String profileImage, String backgroundImage) {
+        if (!profileImage.isEmpty() && backgroundImage.isEmpty()) {
+            this.profileImageUrl = new ProfileImageUrl(profileImage);
+        }
+        if (!backgroundImage.isEmpty() && profileImage.isEmpty()) {
+            this.backgroundImageUrl = new BackgroundImageUrl(backgroundImage);
+        }
+        if (!backgroundImage.isEmpty() && !profileImage.isEmpty()) {
+            this.profileImageUrl = new ProfileImageUrl(profileImage);
+            this.backgroundImageUrl = new BackgroundImageUrl(backgroundImage);
+        }
     }
 
     public boolean isSame(Long id) {
