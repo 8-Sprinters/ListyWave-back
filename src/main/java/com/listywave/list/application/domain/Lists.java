@@ -1,5 +1,7 @@
 package com.listywave.list.application.domain;
 
+import static com.listywave.common.util.StringUtils.match;
+
 import com.listywave.list.application.dto.ListCreateCommand;
 import com.listywave.list.application.vo.ItemComment;
 import com.listywave.list.application.vo.ItemImageUrl;
@@ -161,6 +163,32 @@ public class Lists {
         }
         addItemToList(lists, items);
         return lists;
+    }
+
+    public boolean isRelatedWith(String keyword) {
+        if (keyword.isBlank()) {
+            return true;
+        }
+        if (match(title.getValue(), keyword)) {
+            return true;
+        }
+        if (labels.stream().anyMatch(label -> match(label.getLabelName(), keyword))) {
+            return true;
+        }
+        if (items.stream().anyMatch(item -> match(item.getTitle(), keyword) || match(item.getComment(), keyword))) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isIncluded(CategoryType category) {
+        if (category.equals(CategoryType.ENTIRE)) {
+            return true;
+        }
+        if (this.category.equals(category)) {
+            return true;
+        }
+        return false;
     }
 
     public void sortItems() {
