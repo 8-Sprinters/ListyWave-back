@@ -17,8 +17,8 @@ import com.listywave.list.application.dto.response.ListRecentResponse;
 import com.listywave.list.application.dto.response.ListTrandingResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.repository.CommentRepository;
-import com.listywave.list.repository.ReplyRepository;
 import com.listywave.list.repository.list.ListRepository;
+import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.follow.FollowRepository;
@@ -157,6 +157,7 @@ public class ListService {
 
         listRepository.deleteById(listId);
     }
+
     @Transactional(readOnly = true)
     public ListRecentResponse getRecentLists(String accessToken) {
         if (isSignedIn(accessToken)) {

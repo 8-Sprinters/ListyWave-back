@@ -10,8 +10,8 @@ import com.listywave.list.application.domain.Reply;
 import com.listywave.list.application.dto.response.CommentCreateResponse;
 import com.listywave.list.application.dto.response.CommentFindResponse;
 import com.listywave.list.repository.CommentRepository;
-import com.listywave.list.repository.ReplyRepository;
 import com.listywave.list.repository.list.ListRepository;
+import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -66,9 +66,7 @@ public class CommentService {
                         (exists, newValue) -> exists,
                         LinkedHashMap::new
                 ));
-        Long totalCount = result.keySet().stream()
-                .mapToLong(comment -> result.get(comment).size() + 1L)
-                .sum();
+        Long totalCount = commentRepository.countByList(list) + replyRepository.countByList(list);
         return CommentFindResponse.from(totalCount, newCursorId, hasNext, result);
     }
 
