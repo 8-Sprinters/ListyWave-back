@@ -68,6 +68,18 @@ public class User extends BaseEntity {
         );
     }
 
+    public void updateUserProfile(
+            String nickname,
+            String description,
+            String profileImageUrl,
+            String backgroundImageUrl
+    ) {
+        this.nickname = new Nickname(nickname);
+        this.description = new Description(description);
+        this.profileImageUrl = new ProfileImageUrl(profileImageUrl);
+        this.backgroundImageUrl = new BackgroundImageUrl(backgroundImageUrl);
+    }
+
     public boolean isSame(Long id) {
         return this.id.equals(id);
     }

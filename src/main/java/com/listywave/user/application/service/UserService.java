@@ -12,6 +12,7 @@ import com.listywave.user.application.dto.FollowersResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
 import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
+import com.listywave.user.application.dto.UserProflieUpdateCommand;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserService {
 
@@ -132,6 +134,17 @@ public class UserService {
                 .toList();
     }
 
+    public void updateUserProfile(Long userId, String accessToken, UserProflieUpdateCommand profile) {
+        jwtManager.read(accessToken);
+        User user = userRepository.getById(userId);
+        user.updateUserProfile(
+                profile.nickname(),
+                profile.description(),
+                profile.profileImageUrl(),
+                profile.backgroundImageUrl()
+        );
+    }
+  
     @Transactional(readOnly = true)
     public Boolean checkNicknameDuplicate(String nickname, String accessToken) {
         Long loginUserId = jwtManager.read(accessToken);
