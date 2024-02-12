@@ -131,4 +131,11 @@ public class UserService {
                 .map(RecommendUsersResponse::of)
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public Boolean checkNicknameDuplicate(String nickname, String accessToken) {
+        Long loginUserId = jwtManager.read(accessToken);
+        userRepository.getById(loginUserId);
+        return userRepository.existsByNicknameValue(nickname);
+    }
 }
