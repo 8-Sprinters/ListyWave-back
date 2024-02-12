@@ -41,12 +41,6 @@ public class User extends BaseEntity {
     @Embedded
     private Description description;
 
-    @Column(nullable = false)
-    private int followingCount;
-
-    @Column(nullable = false)
-    private int followerCount;
-
     @Column(nullable = false, length = 5)
     private Boolean allPrivate;
 
@@ -61,13 +55,11 @@ public class User extends BaseEntity {
                 new BackgroundImageUrl(""),
                 new ProfileImageUrl(""),
                 new Description(""),
-                0,
-                0,
                 false,
                 kakaoAccessToken
         );
     }
-  
+
     public void updateUserProfile(
             String nickname,
             String description,
