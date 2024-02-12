@@ -87,7 +87,7 @@ public class UserController {
         userService.unfollow(followingUserId, accessToken);
         return ResponseEntity.noContent().build();
     }
-  
+
     @GetMapping("/users/recommend")
     ResponseEntity<List<RecommendUsersResponse>> getRecommendUsers() {
         List<RecommendUsersResponse> recommendUsers = userService.getRecommendUsers();

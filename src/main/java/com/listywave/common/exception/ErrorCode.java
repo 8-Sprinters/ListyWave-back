@@ -25,6 +25,8 @@ public enum ErrorCode {
     REQUIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "인증 정보가 필요합니다."),
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 AccessToken 입니다. 다시 로그인해주세요."),
 
+    DUPLICATE_USER(HttpStatus.BAD_REQUEST, "중복된 사용자를 선택할 수 없습니다."),
+
     // list
     INVALID_ACCESS(HttpStatus.FORBIDDEN, "접근 권한이 존재하지 않습니다."),
 
