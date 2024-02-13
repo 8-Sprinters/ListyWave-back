@@ -67,7 +67,7 @@ public class User extends BaseEntity {
                 kakaoAccessToken
         );
     }
-  
+
     public void updateUserProfile(
             String nickname,
             String description,
@@ -95,6 +95,16 @@ public class User extends BaseEntity {
 
     public boolean isSame(Long id) {
         return this.id.equals(id);
+    }
+
+    public void follow(User followingUser) {
+        this.followingCount++;
+        followingUser.followerCount++;
+    }
+
+    public void unfollow(User followingUser) {
+        this.followingCount--;
+        followingUser.followerCount--;
     }
 
     public String getNickname() {
