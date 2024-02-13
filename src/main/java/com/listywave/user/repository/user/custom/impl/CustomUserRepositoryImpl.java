@@ -46,12 +46,11 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
 
     private BooleanExpression collaboEq(List<Collaborator> collaborators, String type) {
         if (type.equals("collabo") && collaborators != null) {
-            BooleanExpression in = lists.id.in(
+            return lists.id.in(
                     collaborators.stream()
                             .map(collaborator -> collaborator.getList().getId())
                             .toList()
             );
-            return in;
         }
         return null;
     }
