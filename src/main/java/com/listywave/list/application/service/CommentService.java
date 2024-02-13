@@ -5,7 +5,7 @@ import static java.util.stream.Collectors.toMap;
 
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.list.application.domain.Comment;
-import com.listywave.list.application.domain.Lists;
+import com.listywave.list.application.domain.ListEntity;
 import com.listywave.list.application.domain.Reply;
 import com.listywave.list.application.dto.response.CommentCreateResponse;
 import com.listywave.list.application.dto.response.CommentFindResponse;
@@ -36,7 +36,7 @@ public class CommentService {
         // TODO: 프론트 단에서 댓글 생성 테스트 끝나면 원래대로 복구
 //        Long userId = jwtManager.read(accessToken);
         User user = userRepository.getById(1L);
-        Lists list = listRepository.getById(listId);
+        ListEntity list = listRepository.getById(listId);
 
         Comment comment = Comment.create(list, user, content);
         Comment saved = commentRepository.save(comment);
@@ -45,7 +45,7 @@ public class CommentService {
     }
 
     public CommentFindResponse getComments(Long listId, int size, Long cursorId) {
-        Lists list = listRepository.getById(listId);
+        ListEntity list = listRepository.getById(listId);
 
         List<Comment> comments = commentRepository.getComments(list, size, cursorId);
         if (comments.isEmpty()) {

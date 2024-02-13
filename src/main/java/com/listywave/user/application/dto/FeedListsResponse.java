@@ -1,7 +1,7 @@
 package com.listywave.user.application.dto;
 
 import com.listywave.list.application.domain.Item;
-import com.listywave.list.application.domain.Lists;
+import com.listywave.list.application.domain.ListEntity;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Builder;
@@ -15,13 +15,13 @@ public record FeedListsResponse(
         List<ListItemsResponse> listItems
 ) {
 
-    public static FeedListsResponse of(Lists lists) {
+    public static FeedListsResponse of(ListEntity list) {
         return FeedListsResponse.builder()
-                .id(lists.getId())
-                .title(lists.getTitle())
-                .isPublic(lists.isPublic())
-                .backgroundColor(lists.getBackgroundColor())
-                .listItems(ListItemsResponse.toList(lists))
+                .id(list.getId())
+                .title(list.getTitle())
+                .isPublic(list.isPublic())
+                .backgroundColor(list.getBackgroundColor())
+                .listItems(ListItemsResponse.toList(list))
                 .build();
     }
 }
@@ -43,8 +43,8 @@ record ListItemsResponse(
                 .build();
     }
 
-    public static List<ListItemsResponse> toList(Lists lists) {
-        return lists.getItems().stream()
+    public static List<ListItemsResponse> toList(ListEntity list) {
+        return list.getItems().stream()
                 .map(ListItemsResponse::of)
                 .collect(Collectors.toList());
     }

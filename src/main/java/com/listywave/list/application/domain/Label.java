@@ -27,7 +27,7 @@ public class Label {
 
     @ManyToOne
     @JoinColumn(name = "list_Id")
-    private Lists list;
+    private ListEntity list;
 
     @Embedded
     private LabelName labelName;
