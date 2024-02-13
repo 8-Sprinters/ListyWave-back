@@ -68,9 +68,9 @@ record LabelResponse(
 
 @Builder
 record CollaboratorResponse(
-        Long userId,
-        String userNickname,
-        String userProfileImageUrl
+        Long id,
+        String nickname,
+        String profileImageUrl
 ) {
 
     public static List<CollaboratorResponse> toList(List<Collaborator> collaborators) {
@@ -81,9 +81,9 @@ record CollaboratorResponse(
 
     public static CollaboratorResponse of(Collaborator collaborator) {
         return CollaboratorResponse.builder()
-                .userId(collaborator.getId())
-                .userNickname(collaborator.getUserNickname())
-                .userProfileImageUrl(collaborator.getUserProfileImageUrl())
+                .id(collaborator.getId())
+                .nickname(collaborator.getUserNickname())
+                .profileImageUrl(collaborator.getUserProfileImageUrl())
                 .build();
     }
 }
