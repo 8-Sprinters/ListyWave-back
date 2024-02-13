@@ -1,6 +1,6 @@
 package com.listywave.user.application.dto;
 
-import com.listywave.list.application.domain.Lists;
+import com.listywave.list.application.domain.ListEntity;
 import java.util.List;
 
 public record AllUserListsResponse(
@@ -9,7 +9,7 @@ public record AllUserListsResponse(
         List<FeedListsResponse> feedLists
 ) {
 
-    public static AllUserListsResponse of(boolean hasNext, Long cursorId, List<Lists> feedLists) {
+    public static AllUserListsResponse of(boolean hasNext, Long cursorId, List<ListEntity> feedLists) {
         return new AllUserListsResponse(
                 cursorId,
                 hasNext,
@@ -17,7 +17,7 @@ public record AllUserListsResponse(
         );
     }
 
-    public static List<FeedListsResponse> toList(List<Lists> feedLists) {
+    public static List<FeedListsResponse> toList(List<ListEntity> feedLists) {
         return feedLists.stream()
                 .map(FeedListsResponse::of)
                 .toList();

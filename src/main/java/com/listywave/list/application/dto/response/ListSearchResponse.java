@@ -1,7 +1,7 @@
 package com.listywave.list.application.dto.response;
 
 import com.listywave.list.application.domain.Item;
-import com.listywave.list.application.domain.Lists;
+import com.listywave.list.application.domain.ListEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
@@ -14,7 +14,7 @@ public record ListSearchResponse(
         boolean hasNext
 ) {
 
-    public static ListSearchResponse of(java.util.List<Lists> lists, Long totalCount, Long cursorId, boolean hasNext) {
+    public static ListSearchResponse of(List<ListEntity> lists, Long totalCount, Long cursorId, boolean hasNext) {
         return ListSearchResponse.builder()
                 .resultLists(ListInfo.toList(lists))
                 .totalCount(totalCount)
@@ -37,23 +37,23 @@ record ListInfo(
         String ownerProfileImageUrl
 ) {
 
-    public static List<ListInfo> toList(java.util.List<Lists> lists) {
+    public static List<ListInfo> toList(List<ListEntity> lists) {
         return lists.stream()
                 .map(ListInfo::of)
                 .toList();
     }
 
-    private static ListInfo of(Lists lists) {
+    private static ListInfo of(ListEntity list) {
         return ListInfo.builder()
-                .id(lists.getId())
-                .title(lists.getTitle())
-                .items(ItemInfo.toList(lists.getItems()))
-                .isPublic(lists.isPublic())
-                .backgroundColor(lists.getBackgroundColor())
-                .updatedDate(lists.getUpdatedDate())
-                .ownerId(lists.getUser().getId())
-                .ownerNickname(lists.getUser().getNickname())
-                .ownerProfileImageUrl(lists.getUser().getProfileImageUrl())
+                .id(list.getId())
+                .title(list.getTitle())
+                .items(ItemInfo.toList(list.getItems()))
+                .isPublic(list.isPublic())
+                .backgroundColor(list.getBackgroundColor())
+                .updatedDate(list.getUpdatedDate())
+                .ownerId(list.getUser().getId())
+                .ownerNickname(list.getUser().getNickname())
+                .ownerProfileImageUrl(list.getUser().getProfileImageUrl())
                 .build();
     }
 }

@@ -27,7 +27,7 @@ public class Item extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "list_id")
-    private Lists list;
+    private ListEntity list;
 
     @Column(nullable = false)
     private int ranking;
@@ -46,9 +46,9 @@ public class Item extends BaseEntity {
 
     private String imageKey;
 
-    public static Item createItem(ItemCreateRequest items, Lists lists) {
+    public static Item createItem(ItemCreateRequest items, ListEntity list) {
         return Item.builder()
-                .list(lists)
+                .list(list)
                 .ranking(items.rank())
                 .title(
                         ItemTitle.builder()
