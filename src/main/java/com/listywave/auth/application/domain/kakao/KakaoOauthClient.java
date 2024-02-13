@@ -33,7 +33,8 @@ public class KakaoOauthClient {
     }
 
     public Long logout(String oauthAccessToken) {
-        KakaoLogoutResponse response = apiClient.logout(oauthAccessToken);
+        String accessToken = "Bearer " + oauthAccessToken;
+        KakaoLogoutResponse response = apiClient.logout(accessToken);
         return response.id();
     }
 }
