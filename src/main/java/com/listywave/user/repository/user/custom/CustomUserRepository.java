@@ -1,5 +1,6 @@
 package com.listywave.user.repository.user.custom;
 
+import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.application.dto.CollaboratorResponse;
 import com.listywave.list.application.domain.CategoryType;
 import com.listywave.list.application.domain.Lists;
@@ -10,7 +11,7 @@ import org.springframework.data.domain.Slice;
 
 public interface CustomUserRepository {
 
-    List<Lists> findFeedLists(Long userId, String type, CategoryType category, Long cursorId, int size);
+    List<Lists> findFeedLists(List<Collaborator> listBycollabo, Long userId, String type, CategoryType category, Long cursorId, int size);
 
     List<User> getRecommendUsers();
 

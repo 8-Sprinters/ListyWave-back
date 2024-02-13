@@ -1,6 +1,8 @@
 package com.listywave.user.application.service;
 
 import com.listywave.auth.application.domain.JwtManager;
+import com.listywave.collaborator.application.domain.Collaborator;
+import com.listywave.collaborator.repository.CollaboratorRepository;
 import com.listywave.common.util.UserUtil;
 import com.listywave.list.application.domain.CategoryType;
 import com.listywave.list.application.domain.Lists;
@@ -29,6 +31,7 @@ public class UserService {
     private final JwtManager jwtManager;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
+    private final CollaboratorRepository collaboratorRepository;
 
     @Transactional(readOnly = true)
     public UserInfoResponse getUserInfo(Long userId, String accessToken) {
@@ -58,8 +61,8 @@ public class UserService {
             int size
     ) {
         userUtil.getUserByUserid(userId);
-
-        List<Lists> feedList = userRepository.findFeedLists(userId, type, category, cursorId, size);
+        List<Collaborator> collaboList = collaboratorRepository.findAllByUserId(userId);
+        List<Lists> feedList = userRepository.findFeedLists(collaboList, userId, type, category, cursorId, size);
 
         boolean hasNext = false;
         cursorId = null;
@@ -144,7 +147,7 @@ public class UserService {
                 profile.backgroundImageUrl()
         );
     }
-  
+
     @Transactional(readOnly = true)
     public Boolean checkNicknameDuplicate(String nickname, String accessToken) {
         Long loginUserId = jwtManager.read(accessToken);

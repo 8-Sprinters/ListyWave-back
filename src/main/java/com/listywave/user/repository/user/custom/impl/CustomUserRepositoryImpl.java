@@ -4,6 +4,7 @@ import static com.listywave.list.application.domain.QItem.item;
 import static com.listywave.list.application.domain.QLists.lists;
 import static com.listywave.user.application.domain.QUser.user;
 
+import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.application.dto.CollaboratorResponse;
 import com.listywave.list.application.domain.CategoryType;
 import com.listywave.list.application.domain.Lists;
@@ -25,13 +26,14 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Lists> findFeedLists(Long userId, String type, CategoryType category, Long cursorId, int size) {
+    public List<Lists> findFeedLists(List<Collaborator> collaborators, Long userId, String type, CategoryType category, Long cursorId, int size) {
         return queryFactory
                 .select(lists)
                 .from(lists)
                 .leftJoin(lists.items, item)
                 .where(
-                        userIdEq(userId),
+                        collaboEq(collaborators, type),
+                        userIdEq(userId, type),
                         typeEq(type),
                         categoryEq(category),
                         listIdLt(cursorId)
@@ -40,6 +42,18 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .limit(size + 1)
                 .orderBy(lists.updatedDate.desc())
                 .fetch();
+    }
+
+    private BooleanExpression collaboEq(List<Collaborator> collaborators, String type) {
+        if (type.equals("collabo") && collaborators != null) {
+            BooleanExpression in = lists.id.in(
+                    collaborators.stream()
+                            .map(collaborator -> collaborator.getList().getId())
+                            .toList()
+            );
+            return in;
+        }
+        return null;
     }
 
     private BooleanExpression listIdLt(Long cursorId) {
@@ -60,8 +74,11 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
         return lists.hasCollaboration.eq(true);
     }
 
-    private BooleanExpression userIdEq(Long userId) {
-        return userId == null ? null : lists.user.id.eq(userId);
+    private BooleanExpression userIdEq(Long userId, String type) {
+        if (type.equals("my")) {
+            return userId == null ? null : lists.user.id.eq(userId);
+        }
+        return null;
     }
 
     @Override
