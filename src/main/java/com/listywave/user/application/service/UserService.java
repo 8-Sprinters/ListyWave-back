@@ -98,6 +98,8 @@ public class UserService {
 
         Follow follow = new Follow(followingUser, followerUser);
         followRepository.save(follow);
+
+        followerUser.follow(followingUser);
     }
 
     public void unfollow(Long followingUserId, String accessToken) {
@@ -107,6 +109,8 @@ public class UserService {
         User followerUser = userRepository.getById(loginUserId);
 
         followRepository.deleteByFollowingUserAndFollowerUser(followingUser, followerUser);
+
+        followerUser.unfollow(followingUser);
     }
 
     public FollowersResponse getFollowers(Long userId, int size, int cursorId) {

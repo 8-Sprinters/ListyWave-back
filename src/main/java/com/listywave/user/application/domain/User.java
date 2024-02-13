@@ -97,6 +97,16 @@ public class User extends BaseEntity {
         return this.id.equals(id);
     }
 
+    public void follow(User followingUser) {
+        this.followingCount++;
+        followingUser.followerCount++;
+    }
+
+    public void unfollow(User followingUser) {
+        this.followingCount--;
+        followingUser.followerCount--;
+    }
+
     public String getNickname() {
         return nickname.getValue();
     }
