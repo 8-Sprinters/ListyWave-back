@@ -82,6 +82,7 @@ public class ListService {
             List<Collaborator> collaborators = users.stream()
                     .map(u -> Collaborator.createCollaborator(u, list))
                     .collect(Collectors.toList());
+            collaborators.add(Collaborator.createCollaborator(user, list));
             collaboratorRepository.saveAll(collaborators);
         }
         return ListCreateResponse.of(list.getId());
