@@ -1,6 +1,6 @@
 package com.listywave.collaborator.application.domain;
 
-import com.listywave.list.application.domain.Lists;
+import com.listywave.list.application.domain.ListEntity;
 import com.listywave.user.application.domain.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,9 +32,9 @@ public class Collaborator {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "list_id")
-    private Lists list;
+    private ListEntity list;
 
-    public static Collaborator createCollaborator(User user, Lists list) {
+    public static Collaborator createCollaborator(User user, ListEntity list) {
         return Collaborator.builder()
                 .user(user)
                 .list(list)

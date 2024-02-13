@@ -2,7 +2,7 @@ package com.listywave.list.application.dto.response;
 
 import com.listywave.list.application.domain.Item;
 import com.listywave.list.application.domain.Label;
-import com.listywave.list.application.domain.Lists;
+import com.listywave.list.application.domain.ListEntity;
 import java.util.Comparator;
 import java.util.List;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import lombok.Builder;
 public record ListRecentResponse(
         List<ListResponse> lists
 ) {
-    public static ListRecentResponse of(List<Lists> lists) {
+    public static ListRecentResponse of(List<ListEntity> lists) {
         return ListRecentResponse.builder()
                 .lists(ListResponse.toList(lists))
                 .build();
@@ -32,24 +32,24 @@ record ListResponse(
         List<ItemsResponse> items
 ) {
 
-    public static List<ListResponse> toList(List<Lists> lists) {
+    public static List<ListResponse> toList(List<ListEntity> lists) {
         return lists.stream()
                 .map(ListResponse::of)
                 .toList();
     }
 
-    public static ListResponse of(Lists lists) {
+    public static ListResponse of(ListEntity list) {
         return ListResponse.builder()
-                .id(lists.getId())
-                .category(lists.getCategory().getKorNameValue())
-                .backgroundColor(lists.getBackgroundColor())
-                .ownerId(lists.getUser().getId())
-                .ownerNickname(lists.getUser().getNickname())
-                .ownerProfileImage(lists.getUser().getProfileImageUrl())
-                .labels(LabelsResponse.toList(lists.getLabels()))
-                .title(lists.getTitle())
-                .description(lists.getDescription())
-                .items(ItemsResponse.toList(lists.getItems()))
+                .id(list.getId())
+                .category(list.getCategory().getKorNameValue())
+                .backgroundColor(list.getBackgroundColor())
+                .ownerId(list.getUser().getId())
+                .ownerNickname(list.getUser().getNickname())
+                .ownerProfileImage(list.getUser().getProfileImageUrl())
+                .labels(LabelsResponse.toList(list.getLabels()))
+                .title(list.getTitle())
+                .description(list.getDescription())
+                .items(ItemsResponse.toList(list.getItems()))
                 .build();
     }
 }

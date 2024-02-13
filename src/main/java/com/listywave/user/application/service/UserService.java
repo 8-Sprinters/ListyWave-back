@@ -3,7 +3,7 @@ package com.listywave.user.application.service;
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.common.util.UserUtil;
 import com.listywave.list.application.domain.CategoryType;
-import com.listywave.list.application.domain.Lists;
+import com.listywave.list.application.domain.ListEntity;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.AllUserListsResponse;
@@ -61,7 +61,7 @@ public class UserService {
     ) {
         userUtil.getUserByUserid(userId);
 
-        List<Lists> feedList = userRepository.findFeedLists(userId, type, category, cursorId, size);
+        List<ListEntity> feedList = userRepository.findFeedLists(userId, type, category, cursorId, size);
 
         boolean hasNext = false;
         cursorId = null;
