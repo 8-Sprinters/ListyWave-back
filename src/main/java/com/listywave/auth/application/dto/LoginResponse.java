@@ -8,6 +8,8 @@ public record LoginResponse(
         String backgroundImageUrl,
         String nickname,
         String description,
+        int followingCount,
+        int followerCount,
         boolean isFirst,
         String accessToken
 ) {
@@ -19,6 +21,8 @@ public record LoginResponse(
                 user.getBackgroundImageUrl(),
                 user.getNickname(),
                 user.getDescription(),
+                user.getFollowingCount(),
+                user.getFollowerCount(),
                 isFirst,
                 accessToken
         );

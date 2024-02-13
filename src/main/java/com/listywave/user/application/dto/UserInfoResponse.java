@@ -10,6 +10,8 @@ public record UserInfoResponse(
         String profileImageUrl,
         String nickname,
         String description,
+        int followingCount,
+        int followerCount,
         boolean isFollowed,
         boolean isOwner
 ) {
@@ -21,6 +23,8 @@ public record UserInfoResponse(
                 .profileImageUrl(user.getProfileImageUrl())
                 .nickname(user.getNickname())
                 .description(user.getDescription())
+                .followingCount(user.getFollowingCount())
+                .followerCount(user.getFollowerCount())
                 .isFollowed(isFollowed)
                 .isOwner(isOwner)
                 .build();
