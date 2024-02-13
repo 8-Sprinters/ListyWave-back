@@ -1,5 +1,8 @@
 package com.listywave.list.application.service;
 
+import static com.listywave.list.application.domain.SortType.COLLECTED;
+import static com.listywave.list.application.domain.SortType.OLD;
+
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.repository.CollaboratorRepository;
@@ -7,13 +10,16 @@ import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import com.listywave.common.util.UserUtil;
 import com.listywave.image.application.service.ImageService;
+import com.listywave.list.application.domain.CategoryType;
 import com.listywave.list.application.domain.Comment;
 import com.listywave.list.application.domain.Item;
 import com.listywave.list.application.domain.Lists;
+import com.listywave.list.application.domain.SortType;
 import com.listywave.list.application.dto.ListCreateCommand;
 import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListRecentResponse;
+import com.listywave.list.application.dto.response.ListSearchResponse;
 import com.listywave.list.application.dto.response.ListTrandingResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.repository.CommentRepository;
@@ -191,5 +197,53 @@ public class ListService {
 
     private boolean isSignedIn(String accessToken) {
         return !accessToken.isBlank();
+    }
+
+    // TODO: 관련도 순 추가 (List 일급 컬렉션 만들어서 Scoring 하는 방식)
+    // TODO: 리팩터링
+    public ListSearchResponse search(String keyword, SortType sortType, CategoryType category, int size, Long cursorId) {
+        List<Lists> all = listRepository.findAll();
+
+        List<Lists> filtered = all.stream()
+                .filter(list -> list.isIncluded(category))
+                .filter(list -> list.isRelatedWith(keyword))
+                .sorted((list, other) -> {
+                    if (sortType.equals(OLD)) {
+                        return list.getUpdatedDate().compareTo(other.getUpdatedDate());
+                    }
+                    if (sortType.equals(COLLECTED)) {
+                        return -(list.getCollectCount() - other.getCollectCount());
+                    }
+                    return -(list.getUpdatedDate().compareTo(other.getUpdatedDate()));
+                })
+                .toList();
+
+        List<Lists> result;
+        if (cursorId == 0L) {
+            if (filtered.size() >= size) {
+                return ListSearchResponse.of(filtered.subList(0, size), (long) filtered.size(), filtered.get(size - 1).getId(), true);
+            }
+            return ListSearchResponse.of(filtered, (long) filtered.size(), filtered.get(filtered.size() - 1).getId(), false);
+        } else {
+            Lists cursorList = listRepository.getById(cursorId);
+
+            int cursorIndex = filtered.indexOf(cursorList);
+            int startIndex = cursorIndex + 1;
+            int endIndex = cursorIndex + 1 + size;
+
+            if (endIndex >= filtered.size()) {
+                endIndex = filtered.size() - 1;
+            }
+
+            result = filtered.subList(startIndex, endIndex + 1);
+        }
+
+        int totalCount = filtered.size();
+        if (result.size() < size) {
+            return ListSearchResponse.of(result, (long) totalCount, result.get(result.size() - 1).getId(), false);
+        }
+        boolean hasNext = result.size() > size;
+        result = result.subList(0, size);
+        return ListSearchResponse.of(result, (long) totalCount, result.get(result.size() - 1).getId(), hasNext);
     }
 }
