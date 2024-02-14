@@ -38,6 +38,10 @@ public class Comment extends BaseEntity {
         return new Comment(list, user, new Content(content), false);
     }
 
+    public boolean canDeleteBy(User user) {
+        return this.user.equals(user);
+    }
+
     public void softDelete() {
         this.isDeleted = true;
     }

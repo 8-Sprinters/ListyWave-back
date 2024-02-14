@@ -1,9 +1,11 @@
 package com.listywave.list.application.service;
 
+import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 import com.listywave.auth.application.domain.JwtManager;
+import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.Comment;
 import com.listywave.list.application.domain.ListEntity;
 import com.listywave.list.application.domain.Reply;
@@ -32,10 +34,9 @@ public class CommentService {
     private final ReplyRepository replyRepository;
     private final CommentRepository commentRepository;
 
-    public CommentCreateResponse create(Long listId, String content) {
-        // TODO: 프론트 단에서 댓글 생성 테스트 끝나면 원래대로 복구
-//        Long userId = jwtManager.read(accessToken);
-        User user = userRepository.getById(1L);
+    public CommentCreateResponse create(Long listId, String content, String accessToken) {
+        Long userId = jwtManager.read(accessToken);
+        User user = userRepository.getById(userId);
         ListEntity list = listRepository.getById(listId);
 
         Comment comment = Comment.create(list, user, content);
@@ -70,13 +71,16 @@ public class CommentService {
         return CommentFindResponse.from(totalCount, newCursorId, hasNext, result);
     }
 
-    public void delete(Long listId, Long commentId) {
-        // TODO: 프론트 단에서 댓글 생성 테스트 끝나면 원래대로 복구
-//        Long userId = jwtManager.read(accessToken);
-//        userRepository.getById(userId);
+    public void delete(Long listId, Long commentId, String accessToken) {
         listRepository.getById(listId);
-
+        Long userId = jwtManager.read(accessToken);
+        User user = userRepository.getById(userId);
         Comment comment = commentRepository.getById(commentId);
+
+        if (!comment.canDeleteBy(user)) {
+            throw new CustomException(INVALID_ACCESS, "댓글은 작성자만 지울 수 있습니다.");
+        }
+        
         if (replyRepository.existsByComment(comment)) {
             comment.softDelete();
             return;

@@ -1,6 +1,8 @@
 package com.listywave.list.application.service;
 
 import com.listywave.auth.application.domain.JwtManager;
+import com.listywave.common.exception.CustomException;
+import com.listywave.common.exception.ErrorCode;
 import com.listywave.list.application.domain.Comment;
 import com.listywave.list.application.domain.Reply;
 import com.listywave.list.application.dto.ReplyDeleteCommand;
@@ -26,10 +28,10 @@ public class ReplyService {
     private final ReplyRepository replyRepository;
     private final CommentRepository commentRepository;
 
-    public ReplyCreateResponse createReply(Long listId, Long commentId, String content) {
+    public ReplyCreateResponse createReply(Long listId, Long commentId, String content, String accessToken) {
         listRepository.getById(listId);
-//        Long writerId = jwtManager.read(accessToken); 개발 안정화까지 임의 주석 처리
-        User user = userRepository.getById(3L);
+        Long userId = jwtManager.read(accessToken);
+        User user = userRepository.getById(userId);
         Comment comment = commentRepository.getById(commentId);
 
         Reply reply = new Reply(comment, user, new Content(content));
@@ -38,14 +40,18 @@ public class ReplyService {
         return ReplyCreateResponse.of(saved, comment, user);
     }
 
-    public void delete(ReplyDeleteCommand command) {
-//        Long writerId = jwtManager.read(command.accessToken()); 개발 안정화까지 임의 주석 처리
-//        userRepository.getById(writerId);
+    public void delete(ReplyDeleteCommand command, String accessToken) {
         listRepository.getById(command.listId());
+        Long userId = jwtManager.read(accessToken);
+        User user = userRepository.getById(userId);
         Comment comment = commentRepository.getById(command.commentId());
+        Reply reply = replyRepository.getById(command.replyId());
 
+        if (!reply.canDeleteBy(user)) {
+            throw new CustomException(ErrorCode.INVALID_ACCESS, "답글은 작성자만 삭제할 수 있습니다.");
+        }
+        
         replyRepository.deleteById(command.replyId());
-
         if (!replyRepository.existsByComment(comment) && comment.isDeleted()) {
             commentRepository.delete(comment);
         }
