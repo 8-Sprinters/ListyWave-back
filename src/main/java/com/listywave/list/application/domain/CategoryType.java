@@ -29,7 +29,7 @@ public enum CategoryType {
         return Arrays.stream(CategoryType.values())
                 .filter(t -> t.getCodeValue().equals(codeValue))
                 .findAny()
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "해당 카테고리코드는 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "해당 카테고리코드는 존재하지 않습니다."));
     }
 
     @JsonCreator
@@ -37,6 +37,6 @@ public enum CategoryType {
         return Arrays.stream(CategoryType.values())
                 .filter(categoryType -> categoryType.name().equalsIgnoreCase(key))
                 .findFirst()
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "해당 카테고리는 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "해당 카테고리는 존재하지 않습니다."));
     }
 }

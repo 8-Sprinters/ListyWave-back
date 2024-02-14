@@ -23,6 +23,6 @@ public enum ImageFileExtension {
         return Arrays.stream(ImageFileExtension.values())
                 .filter(extensionType -> extensionType.name().equalsIgnoreCase(key))
                 .findFirst()
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "해당 이미지 확장자가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "해당 이미지 확장자가 존재하지 않습니다."));
     }
 }

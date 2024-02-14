@@ -1,15 +1,15 @@
 package com.listywave.common.exception;
 
+import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS_TOKEN;
+import static com.listywave.common.exception.ErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -18,68 +18,29 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RequiredArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    /**
-     * CustomException 예외 처리
-     */
     @ExceptionHandler
-    protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
-        log.error("handleCustomException : {}", e.getMessage(), e);
+    ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
+        log.error("[CustomException] : {}", e.getMessage(), e);
         return ErrorResponse.toResponseEntity(e);
     }
 
-    /**
-     * 500번대 에러 처리
-     */
-//    @ExceptionHandler(Exception.class)
-//    protected ResponseEntity<ErrorResponse> handleException(Exception e) {
-//        log.error(e.getMessage());
-//        CustomException ex = new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
-//        return ErrorResponse.toResponseEntity(ex);
-//    }
-
-    /**
-     * 지원하지 않은 HTTP method 호출 할 경우 발생
-     */
-    @Override
-    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
-            HttpRequestMethodNotSupportedException e,
-            HttpHeaders headers,
-            HttpStatusCode status,
-            WebRequest request
-    ) {
-        log.error("handleHttpRequestMethodNotSupported : {}", e.getMessage(), e);
-        CustomException ex = new CustomException(ErrorCode.METHOD_NOT_ALLOWED);
-        ErrorCode errorCode = ex.getErrorCode();
-        return ResponseEntity
-                .status(errorCode.getStatus())
-                .body(
-                        new ErrorResponse(
-                                errorCode.getStatus().value(),
-                                errorCode.getStatus().name(),
-                                errorCode.name(),
-                                errorCode.getDetail(),
-                                e.getMessage()
-                        )
-                );
+    @ExceptionHandler(Exception.class)
+    protected ResponseEntity<Void> handleException(Exception e) {
+        log.error("[InternalServerError] : {}", e.getMessage(), e);
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR).build();
     }
 
-    /**
-     * PathVariable, RequestParam, RequestHeader, RequestBody 에서 타입이 일치하지 않을 경우 발생
-     */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    protected ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
-        log.error("handleMethodArgumentTypeMismatchException : {}", e.getMessage(), e);
-        CustomException ex = new CustomException(ErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH);
-        return ErrorResponse.toResponseEntity(ex);
+    ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+        log.error("[MethodArgumentTypeMismatchException] : {}", e.getMessage(), e);
+        CustomException customException = new CustomException(METHOD_ARGUMENT_TYPE_MISMATCH);
+        return ErrorResponse.toResponseEntity(customException);
     }
 
-    /**
-     * JWT 서명 확인에 실패했을 경우 발생
-     */
     @ExceptionHandler(SignatureException.class)
     ResponseEntity<ErrorResponse> handleSignatureException(SignatureException e) {
-        log.error(e.getMessage());
-        CustomException customException = new CustomException(ErrorCode.INVALID_ACCESS_TOKEN);
+        log.error("[SignatureException] : {}", e.getMessage(), e);
+        CustomException customException = new CustomException(INVALID_ACCESS_TOKEN);
         return ErrorResponse.toResponseEntity(customException);
     }
 }

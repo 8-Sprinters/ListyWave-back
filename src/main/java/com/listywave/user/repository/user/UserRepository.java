@@ -1,6 +1,6 @@
 package com.listywave.user.repository.user;
 
-import static com.listywave.common.exception.ErrorCode.NOT_FOUND;
+import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 
 import com.listywave.common.exception.CustomException;
 import com.listywave.user.application.domain.User;
@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long>, CustomUserRep
     Optional<User> findByOauthId(Long oauthId);
 
     default User getById(Long id) {
-        return findById(id).orElseThrow(() -> new CustomException(NOT_FOUND));
+        return findById(id).orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND));
     }
 
     Boolean existsByNicknameValue(String nickname);

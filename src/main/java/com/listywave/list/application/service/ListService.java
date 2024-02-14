@@ -109,7 +109,7 @@ public class ListService {
                 .toList();
 
         if (!nonExistingIds.isEmpty()) {
-            throw new CustomException(ErrorCode.NOT_FOUND, "콜라보레이터로 등록한 회원이 존재하지 않습니다.");
+            throw new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "콜라보레이터로 등록한 회원이 존재하지 않습니다.");
         }
         return existingCollaborators;
     }

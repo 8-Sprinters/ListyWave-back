@@ -387,7 +387,7 @@ public class ImageService {
     private Item findItem(Long listId, int rank) {
         return itemRepository
                 .findByListIdAndRanking(listId, rank)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "해당 아이템이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "해당 아이템이 존재하지 않습니다."));
     }
 
     private GeneratePresignedUrlRequest createGeneratePreSignedUrlRequest(
@@ -426,7 +426,7 @@ public class ImageService {
     private ListEntity findListById(Long listId) {
         return listRepository
                 .findById(listId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "존재하지 않는 리스트입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "존재하지 않는 리스트입니다."));
     }
 
     public String getCurrentProfile() {
