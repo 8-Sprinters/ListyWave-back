@@ -1,5 +1,7 @@
 package com.listywave.list.presentation.controller;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 import com.listywave.list.application.domain.CategoryType;
 import com.listywave.list.application.domain.SortType;
 import com.listywave.list.application.dto.ListCreateCommand;
@@ -59,8 +61,11 @@ public class ListController {
     }
 
     @DeleteMapping("/{listId}")
-    ResponseEntity<Void> deleteList(@PathVariable(value = "listId") Long listId) {
-        listService.deleteList(listId);
+    ResponseEntity<Void> deleteList(
+            @PathVariable(value = "listId") Long listId,
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+    ) {
+        listService.deleteList(listId, accessToken);
         return ResponseEntity.noContent().build();
     }
 

@@ -1,5 +1,6 @@
 package com.listywave.list.application.service;
 
+import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 import static com.listywave.list.application.domain.SortType.COLLECTED;
 import static com.listywave.list.application.domain.SortType.OLD;
 
@@ -164,16 +165,20 @@ public class ListService {
                 .orElse("");
     }
 
-    public void deleteList(Long listId) {
-        imageService.deleteAllOfListImages(listId);
-
+    public void deleteList(Long listId, String accessToken) {
         ListEntity list = listRepository.getById(listId);
+        Long loginUserId = jwtManager.read(accessToken);
+        User loginUser = userRepository.getById(loginUserId);
 
+        if (!list.canDeleteBy(loginUser)) {
+            throw new CustomException(INVALID_ACCESS, "리스트는 작성자만 삭제 가능합니다.");
+        }
+
+        imageService.deleteAllOfListImages(listId);
         collaboratorRepository.deleteAllByList(list);
         List<Comment> comments = commentRepository.findAllByList(list);
         replyRepository.deleteAllByCommentIn(comments);
         commentRepository.deleteAllInBatch(comments);
-
         listRepository.deleteById(listId);
     }
 

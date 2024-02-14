@@ -1,5 +1,6 @@
 package com.listywave.list.presentation.controller;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.CREATED;
 
 import com.listywave.list.application.dto.response.CommentCreateResponse;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,10 +29,10 @@ public class CommentController {
     @PostMapping
     ResponseEntity<CommentCreateResponse> create(
             @PathVariable(value = "listId") Long listId,
-//            @RequestHeader(value = "Authorization", defaultValue = "") String accessToken,
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken,
             @RequestBody CommentCreateRequest commentCreateRequest
     ) {
-        CommentCreateResponse response = commentService.create(listId, commentCreateRequest.content());
+        CommentCreateResponse response = commentService.create(listId, commentCreateRequest.content(), accessToken);
         return ResponseEntity.status(CREATED).body(response);
     }
 
@@ -47,10 +49,10 @@ public class CommentController {
     @DeleteMapping("/{commentId}")
     ResponseEntity<Void> delete(
             @PathVariable(value = "listId") Long listId,
-//            @RequestHeader(value = "Authorization", defaultValue = "") String accessToken,
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken,
             @PathVariable(value = "commentId") Long commentId
     ) {
-        commentService.delete(listId, commentId);
+        commentService.delete(listId, commentId, accessToken);
         return ResponseEntity.noContent().build();
     }
 }

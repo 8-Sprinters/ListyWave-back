@@ -196,6 +196,10 @@ public class ListEntity {
         this.getItems().sort(Comparator.comparing(Item::getRanking));
     }
 
+    public boolean canDeleteBy(User user) {
+        return this.user.equals(user);
+    }
+
     public String getCategoryName() {
         return category.name();
     }
