@@ -30,10 +30,18 @@ public class CollectionService {
         User user = userRepository.getById(tokenUserId);
         ListEntity list = findListById(listId);
 
+        cannotCollectByOwner(user.getId(), list.getUser().getId());
+
         if (isCollected(list, user.getId())) {
             cancelCollect(list, user.getId());
         } else {
             addCollect(list, user.getId());
+        }
+    }
+
+    private void cannotCollectByOwner(Long userId, Long ownerId) {
+        if (userId.equals(ownerId)) {
+            throw new CustomException(ErrorCode.CANNOT_COLLECT_OWN_LIST);
         }
     }
 
