@@ -1,6 +1,6 @@
 package com.listywave.list.application.dto.response;
 
-import com.listywave.list.application.domain.Lists;
+import com.listywave.list.application.domain.ListEntity;
 import lombok.Builder;
 
 @Builder
@@ -13,7 +13,7 @@ public record ListTrandingResponse(
         String backgroundColor
 ) {
 
-    public static ListTrandingResponse of(Lists list, String imageUrlTopRankItem) {
+    public static ListTrandingResponse of(ListEntity list, String imageUrlTopRankItem) {
         return ListTrandingResponse.builder()
                 .id(list.getId())
                 .ownerId(list.getUser().getId())

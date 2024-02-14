@@ -5,7 +5,7 @@ import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.repository.CollaboratorRepository;
 import com.listywave.common.util.UserUtil;
 import com.listywave.list.application.domain.CategoryType;
-import com.listywave.list.application.domain.Lists;
+import com.listywave.list.application.domain.ListEntity;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.AllUserListsResponse;
@@ -37,7 +37,7 @@ public class UserService {
     public UserInfoResponse getUserInfo(Long userId, String accessToken) {
         User user = userRepository.getById(userId);
 
-        if (isSignedIn(accessToken)) {
+        if (isGuest(accessToken)) {
             return UserInfoResponse.of(user, false, false);
         }
 
@@ -45,10 +45,12 @@ public class UserService {
         if (user.isSame(loginUserId)) {
             return UserInfoResponse.of(user, false, true);
         }
-        return UserInfoResponse.of(user, false, false);
+        User loginUser = userRepository.getById(loginUserId);
+        boolean isFollowed = followRepository.existsByFollowerUserAndFollowingUser(loginUser, user);
+        return UserInfoResponse.of(user, isFollowed, false);
     }
 
-    private boolean isSignedIn(String accessToken) {
+    private boolean isGuest(String accessToken) {
         return accessToken.isBlank();
     }
 
@@ -61,8 +63,9 @@ public class UserService {
             int size
     ) {
         userUtil.getUserByUserid(userId);
+
         List<Collaborator> collaboList = collaboratorRepository.findAllByUserId(userId);
-        List<Lists> feedList = userRepository.findFeedLists(collaboList, userId, type, category, cursorId, size);
+        List<ListEntity> feedList = userRepository.findFeedLists(collaboList, userId, type, category, cursorId, size);
 
         boolean hasNext = false;
         cursorId = null;
@@ -99,6 +102,8 @@ public class UserService {
 
         Follow follow = new Follow(followingUser, followerUser);
         followRepository.save(follow);
+
+        followerUser.follow(followingUser);
     }
 
     public void unfollow(Long followingUserId, String accessToken) {
@@ -108,6 +113,8 @@ public class UserService {
         User followerUser = userRepository.getById(loginUserId);
 
         followRepository.deleteByFollowingUserAndFollowerUser(followingUser, followerUser);
+
+        followerUser.unfollow(followingUser);
     }
 
     public FollowersResponse getFollowers(Long userId, int size, int cursorId) {

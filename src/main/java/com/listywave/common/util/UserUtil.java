@@ -23,6 +23,6 @@ public class UserUtil {
     public User getUserByUserid(Long userId) {
         return userRepository
                 .findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "해당 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "해당 회원을 찾을 수 없습니다."));
     }
 }

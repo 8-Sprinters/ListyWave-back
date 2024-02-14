@@ -43,10 +43,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Builder
 @AllArgsConstructor
-@Table(name = "LIST")
+@Table(name = "list")
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Lists {
+public class ListEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -95,7 +95,7 @@ public class Lists {
     @LastModifiedDate
     private LocalDateTime updatedDate;
 
-    public static void addLabelToList(Lists list, List<String> labels) {
+    public static void addLabelToList(ListEntity list, List<String> labels) {
         for (String label : labels) {
             list.getLabels().add(
                     Label.builder()
@@ -110,7 +110,7 @@ public class Lists {
         }
     }
 
-    private static void addItemToList(Lists list, List<ItemCreateRequest> items) {
+    private static void addItemToList(ListEntity list, List<ItemCreateRequest> items) {
         for (ItemCreateRequest item : items) {
             list.getItems().add(
                     Item.builder()
@@ -141,28 +141,29 @@ public class Lists {
         }
     }
 
-    public static Lists createList(
+    public static ListEntity createList(
             User user,
-            ListCreateCommand list,
+            ListCreateCommand command,
             List<String> labels,
             List<ItemCreateRequest> items,
             Boolean isLabels,
-            Boolean hasCollaboratorId) {
-        Lists lists = Lists.builder()
+            Boolean hasCollaboratorId
+    ) {
+        ListEntity list = ListEntity.builder()
                 .user(user)
-                .category(list.category())
+                .category(command.category())
                 .hasCollaboration(hasCollaboratorId)
-                .title(list.title())
-                .isPublic(list.isPublic())
-                .backgroundColor(list.backgroundColor())
-                .description(list.description())
+                .title(command.title())
+                .isPublic(command.isPublic())
+                .backgroundColor(command.backgroundColor())
+                .description(command.description())
                 .build();
 
         if (isLabels) {
-            addLabelToList(lists, labels);
+            addLabelToList(list, labels);
         }
-        addItemToList(lists, items);
-        return lists;
+        addItemToList(list, items);
+        return list;
     }
 
     public boolean isRelatedWith(String keyword) {
@@ -193,6 +194,10 @@ public class Lists {
 
     public void sortItems() {
         this.getItems().sort(Comparator.comparing(Item::getRanking));
+    }
+
+    public boolean canDeleteBy(User user) {
+        return this.user.equals(user);
     }
 
     public String getCategoryName() {

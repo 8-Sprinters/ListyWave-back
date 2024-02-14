@@ -22,7 +22,7 @@ public class Comment extends BaseEntity {
 
     @JoinColumn(name = "list_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private Lists list;
+    private ListEntity list;
 
     @JoinColumn(name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,8 +34,12 @@ public class Comment extends BaseEntity {
     @Column(nullable = false, length = 5)
     private Boolean isDeleted;
 
-    public static Comment create(Lists list, User user, String content) {
+    public static Comment create(ListEntity list, User user, String content) {
         return new Comment(list, user, new Content(content), false);
+    }
+
+    public boolean canDeleteBy(User user) {
+        return this.user.equals(user);
     }
 
     public void softDelete() {

@@ -30,6 +30,10 @@ public class Reply extends BaseEntity {
     @Embedded
     private Content content;
 
+    public boolean canDeleteBy(User user) {
+        return this.user.equals(user);
+    }
+
     public Long getCommentId() {
         return comment.getId();
     }

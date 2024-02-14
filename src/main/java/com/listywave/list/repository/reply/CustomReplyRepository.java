@@ -1,8 +1,8 @@
 package com.listywave.list.repository.reply;
 
-import com.listywave.list.application.domain.Lists;
+import com.listywave.list.application.domain.ListEntity;
 
 public interface CustomReplyRepository {
 
-    Long countByList(Lists list);
+    Long countByList(ListEntity list);
 }

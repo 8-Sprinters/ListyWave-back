@@ -1,5 +1,6 @@
 package com.listywave.list.application.service;
 
+import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 import static com.listywave.list.application.domain.SortType.COLLECTED;
 import static com.listywave.list.application.domain.SortType.OLD;
 
@@ -13,7 +14,7 @@ import com.listywave.image.application.service.ImageService;
 import com.listywave.list.application.domain.CategoryType;
 import com.listywave.list.application.domain.Comment;
 import com.listywave.list.application.domain.Item;
-import com.listywave.list.application.domain.Lists;
+import com.listywave.list.application.domain.ListEntity;
 import com.listywave.list.application.domain.SortType;
 import com.listywave.list.application.dto.ListCreateCommand;
 import com.listywave.list.application.dto.response.ListCreateResponse;
@@ -66,7 +67,7 @@ public class ListService {
         Boolean hasCollaboratorId = isExistCollaborator(collaboratorIds);
         validateDuplicateCollaborators(collaboratorIds);
 
-        Lists list = Lists.createList(
+        ListEntity list = ListEntity.createList(
                 user,
                 listCreateCommand,
                 labels,
@@ -110,7 +111,7 @@ public class ListService {
                 .toList();
 
         if (!nonExistingIds.isEmpty()) {
-            throw new CustomException(ErrorCode.NOT_FOUND, "콜라보레이터로 등록한 회원이 존재하지 않습니다.");
+            throw new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "콜라보레이터로 등록한 회원이 존재하지 않습니다.");
         }
         return existingCollaborators;
     }
@@ -139,7 +140,7 @@ public class ListService {
     }
 
     public ListDetailResponse getListDetail(Long listId, String accessToken) {
-        Lists list = listRepository.getById(listId);
+        ListEntity list = listRepository.getById(listId);
         List<Collaborator> collaborators = collaboratorRepository.findAllByListId(listId);
 
         if (accessToken.isBlank()) {
@@ -150,8 +151,8 @@ public class ListService {
 
     @Transactional(readOnly = true)
     public List<ListTrandingResponse> getTrandingList() {
-        List<Lists> lists = listRepository.findTrandingLists();
-        lists.forEach(Lists::sortItems);
+        List<ListEntity> lists = listRepository.findTrandingLists();
+        lists.forEach(ListEntity::sortItems);
         return lists.stream()
                 .map(list -> ListTrandingResponse.of(list, getImageUrlTopRankItem(list.getItems())))
                 .toList();
@@ -165,16 +166,20 @@ public class ListService {
                 .orElse("");
     }
 
-    public void deleteList(Long listId) {
+    public void deleteList(Long listId, String accessToken) {
+        ListEntity list = listRepository.getById(listId);
+        Long loginUserId = jwtManager.read(accessToken);
+        User loginUser = userRepository.getById(loginUserId);
+
+        if (!list.canDeleteBy(loginUser)) {
+            throw new CustomException(INVALID_ACCESS, "리스트는 작성자만 삭제 가능합니다.");
+        }
+
         imageService.deleteAllOfListImages(listId);
-
-        Lists list = listRepository.getById(listId);
-
         collaboratorRepository.deleteAllByList(list);
         List<Comment> comments = commentRepository.findAllByList(list);
         replyRepository.deleteAllByCommentIn(comments);
         commentRepository.deleteAllInBatch(comments);
-
         listRepository.deleteById(listId);
     }
 
@@ -188,10 +193,10 @@ public class ListService {
             List<User> followingUsers = follows.stream()
                     .map(Follow::getFollowingUser)
                     .toList();
-            List<Lists> recentListsByFollowing = listRepository.getRecentListsByFollowing(followingUsers);
-            return ListRecentResponse.of(recentListsByFollowing);
+            List<ListEntity> recentListByFollowing = listRepository.getRecentListsByFollowing(followingUsers);
+            return ListRecentResponse.of(recentListByFollowing);
         }
-        List<Lists> recentLists = listRepository.getRecentLists();
+        List<ListEntity> recentLists = listRepository.getRecentLists();
         return ListRecentResponse.of(recentLists);
 
     }
@@ -203,9 +208,9 @@ public class ListService {
     // TODO: 관련도 순 추가 (List 일급 컬렉션 만들어서 Scoring 하는 방식)
     // TODO: 리팩터링
     public ListSearchResponse search(String keyword, SortType sortType, CategoryType category, int size, Long cursorId) {
-        List<Lists> all = listRepository.findAll();
+        List<ListEntity> all = listRepository.findAll();
 
-        List<Lists> filtered = all.stream()
+        List<ListEntity> filtered = all.stream()
                 .filter(list -> list.isIncluded(category))
                 .filter(list -> list.isRelatedWith(keyword))
                 .sorted((list, other) -> {
@@ -219,14 +224,14 @@ public class ListService {
                 })
                 .toList();
 
-        List<Lists> result;
+        List<ListEntity> result;
         if (cursorId == 0L) {
             if (filtered.size() >= size) {
                 return ListSearchResponse.of(filtered.subList(0, size), (long) filtered.size(), filtered.get(size - 1).getId(), true);
             }
             return ListSearchResponse.of(filtered, (long) filtered.size(), filtered.get(filtered.size() - 1).getId(), false);
         } else {
-            Lists cursorList = listRepository.getById(cursorId);
+            ListEntity cursorList = listRepository.getById(cursorId);
 
             int cursorIndex = filtered.indexOf(cursorList);
             int startIndex = cursorIndex + 1;

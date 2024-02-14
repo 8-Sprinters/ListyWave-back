@@ -3,7 +3,7 @@ package com.listywave.list.application.dto.response;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.list.application.domain.Item;
 import com.listywave.list.application.domain.Label;
-import com.listywave.list.application.domain.Lists;
+import com.listywave.list.application.domain.ListEntity;
 import com.listywave.user.application.domain.User;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,7 +29,7 @@ public record ListDetailResponse(
         int viewCount
 ) {
 
-    public static ListDetailResponse of(Lists list, User user, boolean isCollected, List<Collaborator> collaborators) {
+    public static ListDetailResponse of(ListEntity list, User user, boolean isCollected, List<Collaborator> collaborators) {
         return ListDetailResponse.builder()
                 .category(list.getCategoryName())
                 .labels(LabelResponse.toList(list.getLabels()))

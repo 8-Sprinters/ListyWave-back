@@ -30,9 +30,10 @@ public class JwtManager {
     }
 
     public Long read(String token) {
-        if (token.isBlank()) {
+        if (token.isBlank() || !token.startsWith("Bearer ")) {
             throw new CustomException(REQUIRED_ACCESS_TOKEN);
         }
+        token = token.substring(7);
 
         String subject = Jwts.parser()
                 .verifyWith(key)

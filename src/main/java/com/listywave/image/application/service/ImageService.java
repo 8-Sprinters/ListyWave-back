@@ -21,7 +21,7 @@ import com.listywave.image.application.dto.ExtensionRanks;
 import com.listywave.image.application.dto.response.ItemPresignedUrlResponse;
 import com.listywave.image.application.dto.response.UserPresignedUrlResponse;
 import com.listywave.list.application.domain.Item;
-import com.listywave.list.application.domain.Lists;
+import com.listywave.list.application.domain.ListEntity;
 import com.listywave.list.repository.ItemRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.user.application.domain.User;
@@ -61,8 +61,8 @@ public class ImageService {
         //TODO: 회원이 존재하는지 않하는지 검증 (security)
         final User user = userUtil.getUserByUserid(ownerId);
 
-        Lists lists = findListById(listId);
-        validateListUserMismatch(lists, user);
+        ListEntity list = findListById(listId);
+        validateListUserMismatch(list, user);
 
         return extensionRanks.stream()
                 .map((extensionRank) -> {
@@ -88,8 +88,8 @@ public class ImageService {
         //TODO: 보내는 회원이 존재하는지 검증 (security)
         final User user = userUtil.getUserByUserid(ownerId);
 
-        Lists lists = findListById(listId);
-        validateListUserMismatch(lists, user);
+        ListEntity list = findListById(listId);
+        validateListUserMismatch(list, user);
 
         extensionRanks.forEach(
                 extensionRank -> {
@@ -387,7 +387,7 @@ public class ImageService {
     private Item findItem(Long listId, int rank) {
         return itemRepository
                 .findByListIdAndRanking(listId, rank)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "해당 아이템이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "해당 아이템이 존재하지 않습니다."));
     }
 
     private GeneratePresignedUrlRequest createGeneratePreSignedUrlRequest(
@@ -417,16 +417,16 @@ public class ImageService {
         return UUID.randomUUID().toString();
     }
 
-    private void validateListUserMismatch(Lists lists, User user) {
-        if (!lists.getUser().getId().equals(user.getId())) {
+    private void validateListUserMismatch(ListEntity list, User user) {
+        if (!list.getUser().getId().equals(user.getId())) {
             throw new CustomException(ErrorCode.INVALID_ACCESS, "리스트를 생성한 유저와 로그인한 계정이 일치하지 않습니다.");
         }
     }
 
-    private Lists findListById(Long listId) {
+    private ListEntity findListById(Long listId) {
         return listRepository
                 .findById(listId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "존재하지 않는 리스트입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "존재하지 않는 리스트입니다."));
     }
 
     public String getCurrentProfile() {
