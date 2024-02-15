@@ -1,7 +1,7 @@
 package com.listywave.collaborator.repository;
 
 import com.listywave.collaborator.application.domain.Collaborator;
-import com.listywave.list.application.domain.ListEntity;
+import com.listywave.list.application.domain.list.ListEntity;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

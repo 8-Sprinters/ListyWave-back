@@ -1,6 +1,6 @@
 package com.listywave.list.application.dto.response;
 
-import com.listywave.list.application.domain.CategoryType;
+import com.listywave.list.application.domain.category.CategoryType;
 
 public record CategoryTypeResponse(
         String codeValue,

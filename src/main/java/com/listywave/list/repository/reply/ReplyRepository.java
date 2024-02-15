@@ -3,8 +3,8 @@ package com.listywave.list.repository.reply;
 import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 
 import com.listywave.common.exception.CustomException;
-import com.listywave.list.application.domain.Comment;
-import com.listywave.list.application.domain.Reply;
+import com.listywave.list.application.domain.comment.Comment;
+import com.listywave.list.application.domain.reply.Reply;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 

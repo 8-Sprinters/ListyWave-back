@@ -1,6 +1,6 @@
 package com.listywave.list.application.dto.response;
 
-import com.listywave.list.application.domain.ListEntity;
+import com.listywave.list.application.domain.list.ListEntity;
 import lombok.Builder;
 
 @Builder

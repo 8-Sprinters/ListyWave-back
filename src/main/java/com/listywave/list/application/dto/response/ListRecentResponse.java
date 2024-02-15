@@ -1,8 +1,8 @@
 package com.listywave.list.application.dto.response;
 
-import com.listywave.list.application.domain.Item;
-import com.listywave.list.application.domain.Label;
-import com.listywave.list.application.domain.ListEntity;
+import com.listywave.list.application.domain.item.Item;
+import com.listywave.list.application.domain.label.Label;
+import com.listywave.list.application.domain.list.ListEntity;
 import java.util.Comparator;
 import java.util.List;
 import lombok.Builder;

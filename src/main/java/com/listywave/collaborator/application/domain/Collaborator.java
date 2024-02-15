@@ -1,6 +1,6 @@
 package com.listywave.collaborator.application.domain;
 
-import com.listywave.list.application.domain.ListEntity;
+import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.user.application.domain.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

@@ -5,7 +5,7 @@ import static com.listywave.list.application.domain.QLabel.label;
 import static com.listywave.list.application.domain.QListEntity.listEntity;
 import static com.listywave.user.application.domain.QUser.user;
 
-import com.listywave.list.application.domain.ListEntity;
+import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.repository.list.custom.CustomListRepository;
 import com.listywave.user.application.domain.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;

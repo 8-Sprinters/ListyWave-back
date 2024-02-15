@@ -1,4 +1,4 @@
-package com.listywave.list.application.domain;
+package com.listywave.list.application.domain.category;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.listywave.common.exception.CustomException;

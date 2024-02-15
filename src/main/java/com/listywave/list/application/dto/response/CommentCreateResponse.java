@@ -1,6 +1,6 @@
 package com.listywave.list.application.dto.response;
 
-import com.listywave.list.application.domain.Comment;
+import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.user.application.domain.User;
 import java.time.LocalDateTime;
 import lombok.Builder;

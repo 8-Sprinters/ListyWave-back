@@ -1,15 +1,17 @@
-package com.listywave.list.application.domain;
+package com.listywave.list.application.domain.list;
 
 import static com.listywave.common.util.StringUtils.match;
 
+import com.listywave.list.application.domain.category.CategoryType;
+import com.listywave.list.application.domain.category.CategoryTypeConverter;
+import com.listywave.list.application.domain.item.Item;
+import com.listywave.list.application.domain.item.ItemComment;
+import com.listywave.list.application.domain.item.ItemImageUrl;
+import com.listywave.list.application.domain.item.ItemLink;
+import com.listywave.list.application.domain.item.ItemTitle;
+import com.listywave.list.application.domain.label.Label;
+import com.listywave.list.application.domain.label.LabelName;
 import com.listywave.list.application.dto.ListCreateCommand;
-import com.listywave.list.application.vo.ItemComment;
-import com.listywave.list.application.vo.ItemImageUrl;
-import com.listywave.list.application.vo.ItemLink;
-import com.listywave.list.application.vo.ItemTitle;
-import com.listywave.list.application.vo.LabelName;
-import com.listywave.list.application.vo.ListDescription;
-import com.listywave.list.application.vo.ListTitle;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.user.application.domain.User;
 import jakarta.persistence.CascadeType;

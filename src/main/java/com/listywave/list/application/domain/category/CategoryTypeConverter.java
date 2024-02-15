@@ -1,4 +1,4 @@
-package com.listywave.list.application.domain;
+package com.listywave.list.application.domain.category;
 
 import jakarta.persistence.AttributeConverter;
 

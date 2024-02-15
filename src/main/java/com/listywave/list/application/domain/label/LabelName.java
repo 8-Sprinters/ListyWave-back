@@ -1,4 +1,4 @@
-package com.listywave.list.application.vo;
+package com.listywave.list.application.domain.label;
 
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
@@ -15,21 +15,21 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
-public class ListTitle {
+public class LabelName {
 
-    private static final int LENGTH_LIMIT = 30;
+    private static final int LENGTH_LIMIT = 10;
 
-    @Column(name = "title", nullable = false, length = LENGTH_LIMIT)
+    @Column(name = "labels", length = LENGTH_LIMIT)
     private final String value;
 
-    public ListTitle(String value) {
+    public LabelName(String value) {
         validate(value);
         this.value = value;
     }
 
     private void validate(String value) {
-        if (value.length() > LENGTH_LIMIT) {
-            throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "리스트 제목은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
+        if (value != null && value.length() > LENGTH_LIMIT) {
+            throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "라벨명은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
 }

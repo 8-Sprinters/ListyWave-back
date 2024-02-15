@@ -1,6 +1,6 @@
 package com.listywave.list.presentation.controller;
 
-import com.listywave.list.application.domain.CategoryType;
+import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.dto.response.CategoryTypeResponse;
 import java.util.Arrays;
 import java.util.List;

@@ -2,8 +2,8 @@ package com.listywave.list.presentation.controller;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-import com.listywave.list.application.domain.CategoryType;
-import com.listywave.list.application.domain.SortType;
+import com.listywave.list.application.domain.category.CategoryType;
+import com.listywave.list.application.domain.list.SortType;
 import com.listywave.list.application.dto.ListCreateCommand;
 import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse;

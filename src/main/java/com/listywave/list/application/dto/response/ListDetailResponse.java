@@ -1,9 +1,9 @@
 package com.listywave.list.application.dto.response;
 
 import com.listywave.collaborator.application.domain.Collaborator;
-import com.listywave.list.application.domain.Item;
-import com.listywave.list.application.domain.Label;
-import com.listywave.list.application.domain.ListEntity;
+import com.listywave.list.application.domain.item.Item;
+import com.listywave.list.application.domain.label.Label;
+import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.user.application.domain.User;
 import java.time.LocalDateTime;
 import java.util.List;

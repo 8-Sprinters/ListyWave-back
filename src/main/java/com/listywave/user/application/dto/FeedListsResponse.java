@@ -1,7 +1,7 @@
 package com.listywave.user.application.dto;
 
-import com.listywave.list.application.domain.Item;
-import com.listywave.list.application.domain.ListEntity;
+import com.listywave.list.application.domain.item.Item;
+import com.listywave.list.application.domain.list.ListEntity;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Builder;

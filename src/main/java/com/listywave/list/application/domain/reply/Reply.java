@@ -1,7 +1,8 @@
-package com.listywave.list.application.domain;
+package com.listywave.list.application.domain.reply;
 
 import com.listywave.common.BaseEntity;
-import com.listywave.list.application.vo.Content;
+import com.listywave.list.application.domain.comment.Comment;
+import com.listywave.list.application.domain.list.Content;
 import com.listywave.user.application.domain.User;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;

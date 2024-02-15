@@ -1,8 +1,8 @@
 package com.listywave.list.application.dto;
 
-import com.listywave.list.application.domain.CategoryType;
-import com.listywave.list.application.vo.ListDescription;
-import com.listywave.list.application.vo.ListTitle;
+import com.listywave.list.application.domain.category.CategoryType;
+import com.listywave.list.application.domain.list.ListDescription;
+import com.listywave.list.application.domain.list.ListTitle;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
 
 public record ListCreateCommand(

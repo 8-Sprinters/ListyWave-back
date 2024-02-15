@@ -1,8 +1,8 @@
 package com.listywave.list.application.service;
 
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
-import static com.listywave.list.application.domain.SortType.COLLECTED;
-import static com.listywave.list.application.domain.SortType.OLD;
+import static com.listywave.list.application.domain.list.SortType.COLLECTED;
+import static com.listywave.list.application.domain.list.SortType.OLD;
 
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.collaborator.application.domain.Collaborator;
@@ -11,11 +11,11 @@ import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import com.listywave.common.util.UserUtil;
 import com.listywave.image.application.service.ImageService;
-import com.listywave.list.application.domain.CategoryType;
-import com.listywave.list.application.domain.Comment;
-import com.listywave.list.application.domain.Item;
-import com.listywave.list.application.domain.ListEntity;
-import com.listywave.list.application.domain.SortType;
+import com.listywave.list.application.domain.category.CategoryType;
+import com.listywave.list.application.domain.comment.Comment;
+import com.listywave.list.application.domain.item.Item;
+import com.listywave.list.application.domain.list.ListEntity;
+import com.listywave.list.application.domain.list.SortType;
 import com.listywave.list.application.dto.ListCreateCommand;
 import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse;

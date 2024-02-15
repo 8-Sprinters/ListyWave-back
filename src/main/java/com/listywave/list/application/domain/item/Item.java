@@ -1,10 +1,7 @@
-package com.listywave.list.application.domain;
+package com.listywave.list.application.domain.item;
 
 import com.listywave.common.BaseEntity;
-import com.listywave.list.application.vo.ItemComment;
-import com.listywave.list.application.vo.ItemImageUrl;
-import com.listywave.list.application.vo.ItemLink;
-import com.listywave.list.application.vo.ItemTitle;
+import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
