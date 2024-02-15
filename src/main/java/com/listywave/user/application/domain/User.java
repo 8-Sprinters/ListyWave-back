@@ -107,6 +107,10 @@ public class User extends BaseEntity {
         followingUser.followerCount--;
     }
 
+    public void updateKakaoAccessToken(String kakaoAccessToken) {
+        this.kakaoAccessToken = kakaoAccessToken;
+    }
+
     public String getNickname() {
         return nickname.getValue();
     }
