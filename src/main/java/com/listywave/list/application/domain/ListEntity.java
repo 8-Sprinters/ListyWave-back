@@ -200,6 +200,14 @@ public class ListEntity {
         return this.user.equals(user);
     }
 
+    public void incrementCollectCount() {
+        this.collectCount++;
+    }
+
+    public void decrementCollectCount() {
+        this.collectCount--;
+    }
+
     public String getCategoryName() {
         return category.name();
     }
