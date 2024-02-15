@@ -23,30 +23,24 @@ public class CollectionService {
     private final ListRepository listRepository;
     private final CollectionRepository collectionRepository;
 
-    public void collectOrCancel(Long userId, Long listId, String accessToken) {
+    public void collectOrCancel(Long listId, String accessToken) {
         Long tokenUserId = jwtManager.read(accessToken);
-        validateUserIdInAccessToken(userId, tokenUserId);
-
         User user = userRepository.getById(tokenUserId);
-        ListEntity list = findListById(listId);
+        ListEntity list = listRepository.getById(listId);
 
-        cannotCollectByOwner(user.getId(), list.getUser().getId());
+        if (user.isSame(list.getUser().getId())) {
+            throw new CustomException(ErrorCode.CANNOT_COLLECT_OWN_LIST);
+        }
 
-        if (isCollected(list, user.getId())) {
+        if (collectionRepository.existsByListAndUserId(list, user.getId())) {
             cancelCollect(list, user.getId());
         } else {
             addCollect(list, user.getId());
         }
     }
 
-    private void cannotCollectByOwner(Long userId, Long ownerId) {
-        if (userId.equals(ownerId)) {
-            throw new CustomException(ErrorCode.CANNOT_COLLECT_OWN_LIST);
-        }
-    }
-
     private void addCollect(ListEntity list, Long userId) {
-        Collect collection = Collect.createCollection(list, userId);
+        Collect collection = new Collect(list, userId);
         collectionRepository.save(collection);
         list.incrementCollectCount();
     }
@@ -54,21 +48,5 @@ public class CollectionService {
     private void cancelCollect(ListEntity list, Long userId) {
         collectionRepository.deleteByListAndUserId(list, userId);
         list.decrementCollectCount();
-    }
-
-    private boolean isCollected(ListEntity list, Long userId) {
-        return collectionRepository.existsByListAndUserId(list, userId);
-    }
-
-    private void validateUserIdInAccessToken(Long userId, Long tokenUserId) {
-        if (!userId.equals(tokenUserId)) {
-            throw new CustomException(ErrorCode.ACCESS_TOKEN_USER_MISMATCH);
-        }
-    }
-
-    private ListEntity findListById(Long listId) {
-        return listRepository
-                .findById(listId)
-                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "존재하지 않는 리스트입니다."));
     }
 }

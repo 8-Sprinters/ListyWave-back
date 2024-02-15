@@ -19,8 +19,7 @@ public enum ErrorCode {
     REQUIRED_ACCESS_TOKEN(UNAUTHORIZED, "인증 정보가 필요합니다."),
     INVALID_ACCESS_TOKEN(UNAUTHORIZED, "유효하지 않은 AccessToken 입니다. 다시 로그인해주세요."),
     INVALID_ACCESS(FORBIDDEN, "접근 권한이 존재하지 않습니다."),
-    ACCESS_TOKEN_USER_MISMATCH(UNAUTHORIZED, "AccessToken과 사용자가 일치하지 않습니다."),
-    CANNOT_COLLECT_OWN_LIST(FORBIDDEN, "리스트 작성자는 자신의 리스트에 콜렉트할 수 없습니다."),
+    CANNOT_COLLECT_OWN_LIST(BAD_REQUEST, "리스트 작성자는 자신의 리스트에 콜렉트할 수 없습니다."),
 
     // Http Request
     METHOD_ARGUMENT_TYPE_MISMATCH(BAD_REQUEST, "요청 한 값 타입이 잘못되어 binding에 실패하였습니다."),

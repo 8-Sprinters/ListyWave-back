@@ -12,13 +12,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Builder
 @AllArgsConstructor
 @Table(name = "collection")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -35,10 +33,8 @@ public class Collect {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    public static Collect createCollection(ListEntity list, Long userId) {
-        return Collect.builder()
-                .list(list)
-                .userId(userId)
-                .build();
+    public Collect(ListEntity list, Long userId) {
+        this.list = list;
+        this.userId = userId;
     }
 }

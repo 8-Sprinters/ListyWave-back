@@ -16,13 +16,12 @@ public class CollectionController {
 
     private final CollectionService collectionService;
 
-    @PostMapping("/collect/{userId}/{listId}")
+    @PostMapping("/lists/{listId}/collect")
     ResponseEntity<Void> collectOrCancel(
-            @PathVariable("userId") Long userId,
             @PathVariable("listId") Long listId,
             @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
     ) {
-        collectionService.collectOrCancel(userId, listId, accessToken);
+        collectionService.collectOrCancel(listId, accessToken);
         return ResponseEntity.noContent().build();
     }
 }
