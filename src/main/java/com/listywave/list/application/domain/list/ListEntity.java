@@ -47,6 +47,7 @@ public class ListEntity {
     @JoinColumn(name = "owner_id")
     private User user;
 
+    @Column(name = "category_code", length = 10, nullable = false)
     @Convert(converter = CategoryTypeConverter.class)
     private CategoryType category;
 
