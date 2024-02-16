@@ -1,4 +1,4 @@
-package com.listywave.list.application.domain.list;
+package com.listywave.list.application.domain.comment;
 
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
@@ -13,14 +13,14 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
-public class Content {
+public class CommentContent {
 
     private static final int LENGTH_LIMIT = 500;
 
     @Column(name = "content", nullable = false, length = LENGTH_LIMIT)
     private final String value;
 
-    public Content(String value) {
+    public CommentContent(String value) {
         validate(value);
         this.value = value;
     }

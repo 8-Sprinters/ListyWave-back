@@ -1,5 +1,7 @@
 package com.listywave.user.application.domain;
 
+import static lombok.AccessLevel.PROTECTED;
+
 import com.listywave.common.BaseEntity;
 import com.listywave.user.application.vo.BackgroundImageUrl;
 import com.listywave.user.application.vo.Description;
@@ -9,7 +11,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @Table(name = "users")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 public class User extends BaseEntity {
 
     @Column(nullable = false)
@@ -50,7 +51,7 @@ public class User extends BaseEntity {
     @Column(nullable = false, length = 5)
     private Boolean allPrivate;
 
-    @Column(nullable = false, length = 200)
+    @Column(nullable = false)
     private String kakaoAccessToken;
 
     public static User initialCreate(Long oauthId, String oauthEmail, String kakaoAccessToken) {

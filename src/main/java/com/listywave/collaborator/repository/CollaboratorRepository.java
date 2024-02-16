@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface CollaboratorRepository extends JpaRepository<Collaborator, Long> {
 
-    List<Collaborator> findAllByListId(Long listId);
-
+    List<Collaborator> findAllByList(ListEntity list);
+    
     @Query("select c from Collaborator c join fetch c.list l where c.user.id =:userId")
     List<Collaborator> findAllByUserId(Long userId);
 

@@ -4,7 +4,7 @@ import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import com.listywave.list.application.domain.comment.Comment;
-import com.listywave.list.application.domain.list.Content;
+import com.listywave.list.application.domain.comment.CommentContent;
 import com.listywave.list.application.domain.reply.Reply;
 import com.listywave.list.application.dto.ReplyDeleteCommand;
 import com.listywave.list.application.dto.response.ReplyCreateResponse;
@@ -34,7 +34,7 @@ public class ReplyService {
         User user = userRepository.getById(userId);
         Comment comment = commentRepository.getById(commentId);
 
-        Reply reply = new Reply(comment, user, new Content(content));
+        Reply reply = new Reply(comment, user, new CommentContent(content));
         Reply saved = replyRepository.save(reply);
 
         return ReplyCreateResponse.of(saved, comment, user);

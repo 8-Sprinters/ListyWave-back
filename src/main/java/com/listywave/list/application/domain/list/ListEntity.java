@@ -1,44 +1,35 @@
 package com.listywave.list.application.domain.list;
 
-import static com.listywave.common.util.StringUtils.match;
+import static com.listywave.list.application.domain.category.CategoryType.ENTIRE;
+import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.FetchType.LAZY;
+import static jakarta.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.category.CategoryTypeConverter;
-import com.listywave.list.application.domain.item.Item;
-import com.listywave.list.application.domain.item.ItemComment;
-import com.listywave.list.application.domain.item.ItemImageUrl;
-import com.listywave.list.application.domain.item.ItemLink;
-import com.listywave.list.application.domain.item.ItemTitle;
-import com.listywave.list.application.domain.label.Label;
-import com.listywave.list.application.domain.label.LabelName;
-import com.listywave.list.application.dto.ListCreateCommand;
-import com.listywave.list.presentation.dto.request.ItemCreateRequest;
+import com.listywave.list.application.domain.item.Items;
+import com.listywave.list.application.domain.label.Labels;
 import com.listywave.user.application.domain.User;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
@@ -47,27 +38,20 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @Table(name = "list")
 @EntityListeners(AuditingEntityListener.class)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 public class ListEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "owner_id")
-    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
+    @Enumerated(STRING)
     @Convert(converter = CategoryTypeConverter.class)
     private CategoryType category;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "list", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Label> labels = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "list", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Item> items = new ArrayList<>();
 
     @Embedded
     private ListTitle title;
@@ -90,116 +74,70 @@ public class ListEntity {
     @Column(nullable = false)
     private int collectCount;
 
+    @Embedded
+    private Labels labels;
+
+    @Embedded
+    private Items items;
+
     @CreatedDate
     @Column(updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdDate;
 
-    @LastModifiedDate
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedDate;
 
-    public static void addLabelToList(ListEntity list, List<String> labels) {
-        for (String label : labels) {
-            list.getLabels().add(
-                    Label.builder()
-                            .list(list)
-                            .labelName(
-                                    LabelName.builder()
-                                            .value(label)
-                                            .build()
-                            )
-                            .build()
-            );
-        }
-    }
-
-    private static void addItemToList(ListEntity list, List<ItemCreateRequest> items) {
-        for (ItemCreateRequest item : items) {
-            list.getItems().add(
-                    Item.builder()
-                            .list(list)
-                            .ranking(item.rank())
-                            .title(
-                                    ItemTitle.builder()
-                                            .value(item.title())
-                                            .build()
-                            )
-                            .comment(
-                                    ItemComment.builder()
-                                            .value(item.comment())
-                                            .build()
-                            )
-                            .link(
-                                    ItemLink.builder()
-                                            .value(item.link())
-                                            .build()
-                            )
-                            .imageUrl(
-                                    ItemImageUrl.builder()
-                                            .value(item.imageUrl())
-                                            .build()
-                            )
-                            .build()
-            );
-        }
-    }
-
-    public static ListEntity createList(
-            User user,
-            ListCreateCommand command,
-            List<String> labels,
-            List<ItemCreateRequest> items,
-            Boolean isLabels,
-            Boolean hasCollaboratorId
+    public ListEntity(
+            User user, CategoryType category, ListTitle title,
+            ListDescription description, boolean isPublic,
+            String backgroundColor, boolean hasCollaboration,
+            Labels labels, Items items
     ) {
-        ListEntity list = ListEntity.builder()
-                .user(user)
-                .category(command.category())
-                .hasCollaboration(hasCollaboratorId)
-                .title(command.title())
-                .isPublic(command.isPublic())
-                .backgroundColor(command.backgroundColor())
-                .description(command.description())
-                .build();
-
-        if (isLabels) {
-            addLabelToList(list, labels);
-        }
-        addItemToList(list, items);
-        return list;
+        this.user = user;
+        this.category = category;
+        this.title = title;
+        this.description = description;
+        this.isPublic = isPublic;
+        this.backgroundColor = backgroundColor;
+        this.hasCollaboration = hasCollaboration;
+        this.labels = labels.updateList(this);
+        this.items = items.updateList(this);
+        this.updatedDate = LocalDateTime.now();
     }
 
-    public boolean isRelatedWith(String keyword) {
-        if (keyword.isBlank()) {
-            return true;
-        }
-        if (match(title.getValue(), keyword)) {
-            return true;
-        }
-        if (labels.stream().anyMatch(label -> match(label.getLabelName(), keyword))) {
-            return true;
-        }
-        if (items.stream().anyMatch(item -> match(item.getTitle(), keyword) || match(item.getComment(), keyword))) {
-            return true;
-        }
-        return false;
+    public void sortItemsByRank() {
+        items = items.sortByRank();
     }
 
-    public boolean isIncluded(CategoryType category) {
-        if (category.equals(CategoryType.ENTIRE)) {
-            return true;
-        }
-        if (this.category.equals(category)) {
-            return true;
-        }
-        return false;
-    }
-
-    public void sortItems() {
-        this.getItems().sort(Comparator.comparing(Item::getRanking));
+    public String getFirstItemImageUrl() {
+        return items.getFirstImageUrl();
     }
 
     public boolean canDeleteBy(User user) {
         return this.user.equals(user);
+    }
+
+    public boolean isCategoryType(CategoryType category) {
+        return category.equals(ENTIRE) || this.category.equals(category);
+    }
+
+    public boolean isMatch(String keyword) {
+        return keyword.isBlank() || title.isMatch(keyword) || description.isMatch(keyword) || labels.anyMatch(keyword);
+    }
+
+    public int scoreRelation(String keyword) {
+        int totalScore = 0;
+        if (title.isMatch(keyword)) {
+            totalScore += 10;
+        }
+        if (description.isMatch(keyword)) {
+            totalScore += 5;
+        }
+        if (labels.anyMatch(keyword)) {
+            totalScore += 3;
+        }
+        return totalScore;
     }
 
     public void incrementCollectCount() {
@@ -208,17 +146,5 @@ public class ListEntity {
 
     public void decrementCollectCount() {
         this.collectCount--;
-    }
-
-    public String getCategoryName() {
-        return category.name();
-    }
-
-    public String getTitle() {
-        return title.getValue();
-    }
-
-    public String getDescription() {
-        return description.getValue();
     }
 }

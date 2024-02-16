@@ -1,7 +1,8 @@
 package com.listywave.list.repository;
 
-import static com.listywave.list.application.domain.QComment.comment;
-import static com.listywave.list.application.domain.QListEntity.listEntity;
+
+import static com.listywave.list.application.domain.comment.QComment.comment;
+import static com.listywave.list.application.domain.list.QListEntity.listEntity;
 
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.list.ListEntity;

@@ -1,5 +1,7 @@
 package com.listywave.list.application.domain.list;
 
+import static com.listywave.common.util.StringUtils.match;
+
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import jakarta.persistence.Column;
@@ -31,5 +33,9 @@ public class ListTitle {
         if (value.length() > LENGTH_LIMIT) {
             throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "리스트 제목은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
+    }
+
+    public boolean isMatch(String keyword) {
+        return match(value, keyword);
     }
 }

@@ -32,4 +32,8 @@ public class ItemImageUrl {
             throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "아이템의 이미지 URL은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
+
+    public boolean hasValue() {
+        return value != null && !value.isBlank();
+    }
 }
