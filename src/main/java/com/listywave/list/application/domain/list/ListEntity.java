@@ -1,7 +1,6 @@
 package com.listywave.list.application.domain.list;
 
 import static com.listywave.list.application.domain.category.CategoryType.ENTIRE;
-import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -16,7 +15,6 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -49,7 +47,6 @@ public class ListEntity {
     @JoinColumn(name = "owner_id")
     private User user;
 
-    @Enumerated(STRING)
     @Convert(converter = CategoryTypeConverter.class)
     private CategoryType category;
 
