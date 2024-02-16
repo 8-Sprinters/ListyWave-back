@@ -22,14 +22,14 @@ public class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    protected Long id;
+    private Long id;
 
     @CreatedDate
     @Column(updatable = false)
     @Temporal(TIMESTAMP)
-    protected LocalDateTime createdDate;
+    private LocalDateTime createdDate;
 
     @LastModifiedDate
     @Temporal(TIMESTAMP)
-    protected LocalDateTime updatedDate;
+    private LocalDateTime updatedDate;
 }

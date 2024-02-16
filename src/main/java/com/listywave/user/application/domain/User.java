@@ -95,7 +95,7 @@ public class User extends BaseEntity {
     }
 
     public boolean isSame(Long id) {
-        return this.id.equals(id);
+        return this.getId().equals(id);
     }
 
     public void follow(User followingUser) {
