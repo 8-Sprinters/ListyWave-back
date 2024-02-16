@@ -46,10 +46,10 @@ record ListResponse(
                 .ownerId(list.getUser().getId())
                 .ownerNickname(list.getUser().getNickname())
                 .ownerProfileImage(list.getUser().getProfileImageUrl())
-                .labels(LabelsResponse.toList(list.getLabels()))
-                .title(list.getTitle())
-                .description(list.getDescription())
-                .items(ItemsResponse.toList(list.getItems()))
+                .labels(LabelsResponse.toList(list.getLabels().getValues()))
+                .title(list.getTitle().getValue())
+                .description(list.getDescription().getValue())
+                .items(ItemsResponse.toList(list.getItems().getValues()))
                 .build();
     }
 }
@@ -69,7 +69,7 @@ record LabelsResponse(
     public static LabelsResponse of(Label label) {
         return LabelsResponse.builder()
                 .id(label.getId())
-                .name(label.getLabelName())
+                .name(label.getName())
                 .build();
     }
 }
@@ -94,8 +94,8 @@ record ItemsResponse(
         return ItemsResponse.builder()
                 .id(item.getId())
                 .rank(item.getRanking())
-                .title(item.getTitle())
-                .imageUrl(item.getImageUrl())
+                .title(item.getTitle().getValue())
+                .imageUrl(item.getImageUrl().getValue())
                 .build();
     }
 }

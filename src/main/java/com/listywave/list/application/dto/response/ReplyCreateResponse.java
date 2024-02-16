@@ -25,7 +25,7 @@ public record ReplyCreateResponse(
                 .userId(user.getId())
                 .userNickname(user.getNickname())
                 .userProfileImageUrl(user.getProfileImageUrl())
-                .content(reply.getContent())
+                .content(reply.getCommentContent())
                 .createdDate(reply.getCreatedDate())
                 .updatedDate(reply.getUpdatedDate())
                 .build();

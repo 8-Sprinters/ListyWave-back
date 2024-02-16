@@ -46,8 +46,8 @@ record ListInfo(
     private static ListInfo of(ListEntity list) {
         return ListInfo.builder()
                 .id(list.getId())
-                .title(list.getTitle())
-                .items(ItemInfo.toList(list.getItems()))
+                .title(list.getTitle().getValue())
+                .items(ItemInfo.toList(list.getItems().getValues()))
                 .isPublic(list.isPublic())
                 .backgroundColor(list.getBackgroundColor())
                 .updatedDate(list.getUpdatedDate())
@@ -73,7 +73,7 @@ record ItemInfo(
     private static ItemInfo of(Item item) {
         return ItemInfo.builder()
                 .id(item.getId())
-                .title(item.getTitle())
+                .title(item.getTitle().getValue())
                 .build();
     }
 }

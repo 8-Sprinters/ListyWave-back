@@ -66,7 +66,7 @@ record CommentResponse(
                 .userId(comment.getUserId())
                 .userNickname(comment.getUserNickname())
                 .userProfileImageUrl(comment.getUserProfileImageUrl())
-                .content(comment.getContent())
+                .content(comment.getCommentContent())
                 .createdDate(comment.getCreatedDate())
                 .updatedDate(comment.getUpdatedDate())
                 .isDeleted(comment.isDeleted())
@@ -100,7 +100,7 @@ record ReplyResponse(
                 .userId(reply.getUserId())
                 .userNickname(reply.getUserNickname())
                 .userProfileImageUrl(reply.getUserProfileImageUrl())
-                .content(reply.getContent())
+                .content(reply.getCommentContent())
                 .createdDate(reply.getCreatedDate())
                 .updatedDate(reply.getUpdatedDate())
                 .build();

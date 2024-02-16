@@ -22,7 +22,7 @@ public record CommentCreateResponse(
                 .userId(user.getId())
                 .userNickname(user.getNickname())
                 .userProfileImageUrl(user.getProfileImageUrl())
-                .content(comment.getContent())
+                .content(comment.getCommentContent())
                 .createdDate(comment.getCreatedDate())
                 .updatedDate(comment.getUpdatedDate())
                 .build();

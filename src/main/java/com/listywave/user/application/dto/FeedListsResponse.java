@@ -18,7 +18,7 @@ public record FeedListsResponse(
     public static FeedListsResponse of(ListEntity list) {
         return FeedListsResponse.builder()
                 .id(list.getId())
-                .title(list.getTitle())
+                .title(list.getTitle().getValue())
                 .isPublic(list.isPublic())
                 .backgroundColor(list.getBackgroundColor())
                 .listItems(ListItemsResponse.toList(list))
@@ -38,13 +38,13 @@ record ListItemsResponse(
         return ListItemsResponse.builder()
                 .id(item.getId())
                 .rank(item.getRanking())
-                .title(item.getTitle())
-                .imageUrl(item.getImageUrl())
+                .title(item.getTitle().getValue())
+                .imageUrl(item.getImageUrl().getValue())
                 .build();
     }
 
     public static List<ListItemsResponse> toList(ListEntity list) {
-        return list.getItems().stream()
+        return list.getItems().getValues().stream()
                 .map(ListItemsResponse::of)
                 .collect(Collectors.toList());
     }

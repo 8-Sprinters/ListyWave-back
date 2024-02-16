@@ -31,17 +31,17 @@ public record ListDetailResponse(
 
     public static ListDetailResponse of(ListEntity list, User user, boolean isCollected, List<Collaborator> collaborators) {
         return ListDetailResponse.builder()
-                .category(list.getCategoryName())
-                .labels(LabelResponse.toList(list.getLabels()))
-                .title(list.getTitle())
-                .description(list.getDescription())
+                .category(list.getCategory().name())
+                .labels(LabelResponse.toList(list.getLabels().getValues()))
+                .title(list.getTitle().getValue())
+                .description(list.getDescription().getValue())
                 .createdDate(list.getCreatedDate())
                 .lastUpdatedDate(list.getUpdatedDate())
                 .ownerId(user.getId())
                 .ownerNickname(user.getNickname())
                 .ownerProfileImageUrl(user.getProfileImageUrl())
                 .collaborators(CollaboratorResponse.toList(collaborators))
-                .items(ItemResponse.toList(list.getItems()))
+                .items(ItemResponse.toList(list.getItems().getValues()))
                 .isCollected(isCollected)
                 .isPublic(list.isPublic())
                 .backgroundColor(list.getBackgroundColor())
@@ -62,7 +62,7 @@ record LabelResponse(
     }
 
     public static LabelResponse of(Label label) {
-        return new LabelResponse(label.getLabelName());
+        return new LabelResponse(label.getName());
     }
 }
 
@@ -108,10 +108,10 @@ record ItemResponse(
         return ItemResponse.builder()
                 .id(item.getId())
                 .rank(item.getRanking())
-                .title(item.getTitle())
-                .comment(item.getComment())
-                .link(item.getLink())
-                .imageUrl(item.getImageUrl())
+                .title(item.getTitle().getValue())
+                .comment(item.getComment().getValue())
+                .link(item.getLink().getValue())
+                .imageUrl(item.getImageUrl().getValue())
                 .build();
     }
 }

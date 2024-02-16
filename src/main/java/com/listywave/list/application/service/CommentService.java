@@ -7,6 +7,7 @@ import static java.util.stream.Collectors.toMap;
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.comment.Comment;
+import com.listywave.list.application.domain.comment.CommentContent;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.domain.reply.Reply;
 import com.listywave.list.application.dto.response.CommentCreateResponse;
@@ -39,7 +40,7 @@ public class CommentService {
         User user = userRepository.getById(userId);
         ListEntity list = listRepository.getById(listId);
 
-        Comment comment = Comment.create(list, user, content);
+        Comment comment = Comment.create(list, user, new CommentContent(content));
         Comment saved = commentRepository.save(comment);
 
         return CommentCreateResponse.of(saved, user);
