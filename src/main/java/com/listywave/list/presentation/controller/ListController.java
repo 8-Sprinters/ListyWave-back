@@ -4,7 +4,6 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.SortType;
-import com.listywave.list.application.dto.ListCreateCommand;
 import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListRecentResponse;
@@ -22,30 +21,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/lists")
 public class ListController {
 
     private final ListService listService;
 
-    @PostMapping
-    ResponseEntity<ListCreateResponse> listCreate(@RequestBody ListCreateRequest request) {
-        ListCreateCommand listCreateCommand = request.toCommand();
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(listService.listCreate(
-                        listCreateCommand,
-                        request.labels(),
-                        request.collaboratorIds(),
-                        request.items()
-                ));
+    @PostMapping("/lists")
+    ResponseEntity<ListCreateResponse> listCreate(
+            @RequestBody ListCreateRequest request,
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+    ) {
+        ListCreateResponse response = listService.listCreate(request, accessToken);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/{listId}")
+    @GetMapping("/lists/{listId}")
     ResponseEntity<ListDetailResponse> getListDetail(
             @PathVariable Long listId,
             @RequestHeader(value = "Authorization", defaultValue = "") String accessToken
@@ -54,13 +48,13 @@ public class ListController {
         return ResponseEntity.ok(listDetailResponse);
     }
 
-    @GetMapping("/explore")
+    @GetMapping("/lists/explore")
     ResponseEntity<List<ListTrandingResponse>> getTrandingList() {
         List<ListTrandingResponse> trandingList = listService.getTrandingList();
         return ResponseEntity.ok().body(trandingList);
     }
 
-    @DeleteMapping("/{listId}")
+    @DeleteMapping("/lists/{listId}")
     ResponseEntity<Void> deleteList(
             @PathVariable(value = "listId") Long listId,
             @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
@@ -69,7 +63,7 @@ public class ListController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping()
+    @GetMapping("/lists")
     ResponseEntity<ListRecentResponse> getRecentLists(
             @RequestHeader(value = "Authorization", defaultValue = "") String accessToken
     ) {
@@ -77,7 +71,7 @@ public class ListController {
         return ResponseEntity.ok(recentLists);
     }
 
-    @GetMapping("/search")
+    @GetMapping("/lists/search")
     ResponseEntity<ListSearchResponse> search(
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "sort", defaultValue = "new") SortType sort,
