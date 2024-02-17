@@ -1,5 +1,6 @@
 package com.listywave.list.application.service;
 
+import static com.listywave.common.exception.ErrorCode.DUPLICATE_USER;
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 
 import com.listywave.auth.application.domain.JwtManager;
@@ -37,7 +38,9 @@ import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,7 +64,7 @@ public class ListService {
         User user = userRepository.getById(userId);
 
         List<Long> collaboratorIds = request.collaboratorIds();
-        Collaborators.validateDuplicateCollaboratorIds(collaboratorIds);
+        validateDuplicateCollaboratorIds(collaboratorIds);
         boolean hasCollaboration = !collaboratorIds.isEmpty();
 
         Labels labels = createLabels(request);
@@ -73,10 +76,18 @@ public class ListService {
         ListEntity savedList = listRepository.save(list);
 
         if (hasCollaboration) {
-            saveCollaborators(collaboratorIds, savedList);
+            Collaborators collaborators = createCollaborators(collaboratorIds, savedList);
+            collaboratorRepository.saveAll(collaborators.getCollaborators());
         }
 
         return ListCreateResponse.of(savedList.getId());
+    }
+
+    private void validateDuplicateCollaboratorIds(List<Long> collaboratorIds) {
+        Set<Long> uniqueIds = new HashSet<>(collaboratorIds);
+        if (collaboratorIds.size() != uniqueIds.size()) {
+            throw new CustomException(DUPLICATE_USER, "중복된 콜라보레이터를 선택할 수 없습니다.");
+        }
     }
 
     private Labels createLabels(ListCreateRequest request) {
@@ -95,12 +106,12 @@ public class ListService {
                 ).toList());
     }
 
-    private void saveCollaborators(List<Long> collaboratorIds, ListEntity list) {
+    private Collaborators createCollaborators(List<Long> collaboratorIds, ListEntity list) {
         List<Collaborator> collaborators = collaboratorIds.stream()
                 .map(userRepository::getById)
                 .map(user -> Collaborator.init(user, list))
                 .toList();
-        collaboratorRepository.saveAll(collaborators);
+        return new Collaborators(collaborators);
     }
 
     public ListDetailResponse getListDetail(Long listId, String accessToken) {
