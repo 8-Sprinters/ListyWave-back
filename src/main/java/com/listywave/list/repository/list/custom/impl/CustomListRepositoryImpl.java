@@ -23,7 +23,7 @@ public class CustomListRepositoryImpl implements CustomListRepository {
     public List<ListEntity> findTrandingLists() {
         return queryFactory
                 .selectFrom(listEntity)
-                .leftJoin(item).on(listEntity.items.eq(items)).fetchJoin()
+                .leftJoin(item).on(listEntity.items.eq(items))
                 .distinct()
                 .limit(10)
                 .orderBy(listEntity.collectCount.desc(), listEntity.viewCount.desc(), listEntity.id.desc())
