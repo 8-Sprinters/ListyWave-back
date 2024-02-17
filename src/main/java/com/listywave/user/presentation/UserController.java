@@ -13,6 +13,7 @@ import com.listywave.user.application.service.UserService;
 import com.listywave.user.presentation.dto.UserProfileUpdateRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -52,9 +53,10 @@ public class UserController {
             @RequestParam(name = "type", defaultValue = "my") String type,
             @RequestParam(name = "category", defaultValue = "entire") CategoryType category,
             @RequestParam(name = "cursorId", required = false) Long cursorId,
-            @RequestParam(name = "size") int size
+            Pageable pageable
     ) {
-        AllUserListsResponse allUserListsResponse = userService.getAllListOfUser(userId, type, category, cursorId, size);
+        AllUserListsResponse allUserListsResponse =
+                userService.getAllListOfUser(userId, type, category, cursorId, pageable);
         return ResponseEntity.ok(allUserListsResponse);
     }
 
