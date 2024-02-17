@@ -1,9 +1,7 @@
 package com.listywave.list.repository.list.custom.impl;
 
 import static com.listywave.list.application.domain.item.QItem.item;
-import static com.listywave.list.application.domain.item.QItems.items;
 import static com.listywave.list.application.domain.label.QLabel.label;
-import static com.listywave.list.application.domain.label.QLabels.labels;
 import static com.listywave.list.application.domain.list.QListEntity.listEntity;
 import static com.listywave.user.application.domain.QUser.user;
 
@@ -23,7 +21,7 @@ public class CustomListRepositoryImpl implements CustomListRepository {
     public List<ListEntity> findTrandingLists() {
         return queryFactory
                 .selectFrom(listEntity)
-                .leftJoin(item).on(listEntity.items.eq(items))
+                .leftJoin(item).on(listEntity.id.eq(item.list.id))
                 .distinct()
                 .limit(10)
                 .orderBy(listEntity.collectCount.desc(), listEntity.viewCount.desc(), listEntity.id.desc())
@@ -35,8 +33,8 @@ public class CustomListRepositoryImpl implements CustomListRepository {
         return queryFactory
                 .selectFrom(listEntity)
                 .join(listEntity.user, user).fetchJoin()
-                .leftJoin(label).on(listEntity.labels.eq(labels))
-                .leftJoin(item).on(listEntity.items.eq(items))
+                .leftJoin(label).on(listEntity.id.eq(label.list.id))
+                .leftJoin(item).on(listEntity.id.eq(item.list.id))
                 .distinct()
                 .limit(10)
                 .orderBy(listEntity.updatedDate.desc())
@@ -52,8 +50,8 @@ public class CustomListRepositoryImpl implements CustomListRepository {
         return queryFactory
                 .selectFrom(listEntity)
                 .join(listEntity.user, user).fetchJoin()
-                .leftJoin(label).on(listEntity.labels.eq(labels))
-                .leftJoin(item).on(listEntity.items.eq(items))
+                .leftJoin(label).on(listEntity.id.eq(label.list.id))
+                .leftJoin(item).on(listEntity.id.eq(item.list.id))
                 .where(listEntity.user.id.in(followingUserIds))
                 .distinct()
                 .limit(10)

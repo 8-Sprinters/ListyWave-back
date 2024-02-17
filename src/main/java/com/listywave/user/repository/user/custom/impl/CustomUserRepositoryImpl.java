@@ -1,7 +1,6 @@
 package com.listywave.user.repository.user.custom.impl;
 
 import static com.listywave.list.application.domain.item.QItem.item;
-import static com.listywave.list.application.domain.item.QItems.items;
 import static com.listywave.list.application.domain.list.QListEntity.listEntity;
 import static com.listywave.user.application.domain.QUser.user;
 
@@ -30,7 +29,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     public List<ListEntity> findFeedLists(List<Collaborator> collaborators, Long userId, String type, CategoryType category, Long cursorId, int size) {
         return queryFactory
                 .selectFrom(listEntity)
-                .leftJoin(item).on(listEntity.items.eq(items))
+                .leftJoin(item).on(listEntity.id.eq(item.list.id))
                 .where(
                         collaboEq(collaborators, type),
                         userIdEq(userId, type),
