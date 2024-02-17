@@ -2,6 +2,7 @@ package com.listywave.collection.application.service;
 
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.collection.application.domain.Collect;
+import com.listywave.collection.application.dto.CollectionResponse;
 import com.listywave.collection.repository.CollectionRepository;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
@@ -9,7 +10,10 @@ import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,5 +52,19 @@ public class CollectionService {
     private void cancelCollect(ListEntity list, Long userId) {
         collectionRepository.deleteByListAndUserId(list, userId);
         list.decrementCollectCount();
+    }
+
+    public CollectionResponse getCollection(String accessToken, Long cursorId, Pageable pageable) {
+        Long tokenUserId = jwtManager.read(accessToken);
+        User user = userRepository.getById(tokenUserId);
+
+        Slice<Collect> result = collectionRepository.getAllCollectionList(cursorId, pageable, user.getId());
+        List<Collect> collectionList = result.getContent();
+
+        cursorId = null;
+        if (!collectionList.isEmpty()) {
+            cursorId = collectionList.get(collectionList.size() - 1).getId();
+        }
+        return CollectionResponse.of(cursorId, result.hasNext(), collectionList);
     }
 }
