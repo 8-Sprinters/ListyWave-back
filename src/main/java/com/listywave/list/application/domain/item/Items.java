@@ -2,6 +2,7 @@ package com.listywave.list.application.domain.item;
 
 import static com.listywave.common.exception.ErrorCode.INVALID_COUNT;
 import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.exception.CustomException;
@@ -20,7 +21,7 @@ public class Items {
     private static final int MIN_SIZE = 3;
     private static final int MAX_SIZE = 10;
 
-    @OneToMany(mappedBy = "list", cascade = ALL, orphanRemoval = true)
+    @OneToMany(fetch = LAZY, mappedBy = "list", cascade = ALL, orphanRemoval = true)
     private final List<Item> values;
 
     public Items(List<Item> items) {

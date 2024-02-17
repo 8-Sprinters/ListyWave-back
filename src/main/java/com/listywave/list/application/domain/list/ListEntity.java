@@ -3,6 +3,7 @@ package com.listywave.list.application.domain.list;
 import static com.listywave.list.application.domain.category.CategoryType.ENTIRE;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
+import static jakarta.persistence.TemporalType.TIMESTAMP;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.list.application.domain.category.CategoryType;
@@ -21,7 +22,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,8 +35,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @AllArgsConstructor
 @Table(name = "list")
-@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class ListEntity {
 
     @Id
@@ -80,10 +80,10 @@ public class ListEntity {
 
     @CreatedDate
     @Column(updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private LocalDateTime createdDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private LocalDateTime updatedDate;
 
     public ListEntity(
