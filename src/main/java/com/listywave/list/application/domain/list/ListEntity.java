@@ -1,11 +1,13 @@
 package com.listywave.list.application.domain.list;
 
+import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 import static com.listywave.list.application.domain.category.CategoryType.ENTIRE;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static jakarta.persistence.TemporalType.TIMESTAMP;
 import static lombok.AccessLevel.PROTECTED;
 
+import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.category.CategoryTypeConverter;
 import com.listywave.list.application.domain.item.Items;
@@ -116,7 +118,7 @@ public class ListEntity {
         return items.getFirstImageUrl();
     }
 
-    public boolean canDeleteBy(User user) {
+    public boolean canDeleteOrUpdateBy(User user) {
         return this.user.equals(user);
     }
 
@@ -148,5 +150,41 @@ public class ListEntity {
 
     public void decrementCollectCount() {
         this.collectCount--;
+    }
+
+    public boolean canCreateHistory(Items newItems) {
+        return this.items.canCreateHistory(newItems);
+    }
+
+    public void update(
+            User owner,
+            CategoryType category,
+            ListTitle title,
+            ListDescription description,
+            boolean isPublic,
+            String backgroundColor,
+            boolean hasCollaboration,
+            LocalDateTime updatedDate,
+            Labels newLabels,
+            Items newItems
+    ) {
+        if (!canDeleteOrUpdateBy(owner)) {
+            throw new CustomException(INVALID_ACCESS);
+        }
+
+        this.category = category;
+        this.title = title;
+        this.description = description;
+        this.isPublic = isPublic;
+        this.backgroundColor = backgroundColor;
+        this.hasCollaboration = hasCollaboration;
+        this.updatedDate = updatedDate;
+
+        if (this.labels.isChange(newLabels)) {
+            this.labels.updateAll(newLabels, this);
+        }
+        if (this.items.isChange(newItems)) {
+            this.items.updateAll(newItems, this);
+        }
     }
 }

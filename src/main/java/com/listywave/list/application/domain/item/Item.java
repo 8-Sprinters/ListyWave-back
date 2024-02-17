@@ -4,12 +4,15 @@ import static jakarta.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.BaseEntity;
+import com.listywave.history.application.domain.HistoryItem;
+import com.listywave.history.application.domain.HistoryItemTitle;
 import com.listywave.list.application.domain.list.ListEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -57,5 +60,22 @@ public class Item extends BaseEntity {
 
     public void updateList(ListEntity list) {
         this.list = list;
+    }
+
+    public HistoryItem toHistoryItem() {
+        return new HistoryItem(this.ranking, new HistoryItemTitle(this.title.getValue()));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Item item = (Item) o;
+        return getRanking() == item.getRanking() && Objects.equals(getTitle(), item.getTitle()) && Objects.equals(getComment(), item.getComment()) && Objects.equals(getLink(), item.getLink()) && Objects.equals(getImageUrl(), item.getImageUrl()) && Objects.equals(getImageKey(), item.getImageKey());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getRanking(), getTitle(), getComment(), getLink(), getImageUrl(), getImageKey());
     }
 }
