@@ -15,6 +15,7 @@ public class JwtManager {
 
     private static final SecretKey key = Jwts.SIG.HS256.key().build();
     private static final Long ACCESS_TOKEN_VALID_MILLISECOND = HOURS.toMillis(8);
+    private static final String PREFIX = "Bearer ";
 
     public String createToken(Long userId) {
         Date now = new Date();
@@ -30,10 +31,10 @@ public class JwtManager {
     }
 
     public Long read(String token) {
-        if (token.isBlank() || !token.startsWith("Bearer ")) {
+        if (token.isBlank() || !token.startsWith(PREFIX)) {
             throw new CustomException(REQUIRED_ACCESS_TOKEN);
         }
-        token = token.substring(7);
+        token = token.substring(PREFIX.length());
 
         String subject = Jwts.parser()
                 .verifyWith(key)

@@ -2,7 +2,7 @@ package com.listywave.user.presentation;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-import com.listywave.list.application.domain.CategoryType;
+import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.user.application.dto.AllUserListsResponse;
 import com.listywave.user.application.dto.AllUserResponse;
 import com.listywave.user.application.dto.FollowersResponse;
@@ -108,7 +108,7 @@ public class UserController {
         userService.updateUserProfile(userId, accessToken, request.toCommand());
         return ResponseEntity.noContent().build();
     }
-  
+
     @GetMapping("/users/exists")
     ResponseEntity<Boolean> checkNicknameDuplicate(
             @RequestParam(name = "nickname") String nickname,

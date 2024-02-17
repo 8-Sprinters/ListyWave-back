@@ -3,11 +3,11 @@ package com.listywave.list.application.service;
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
-import com.listywave.list.application.domain.Comment;
-import com.listywave.list.application.domain.Reply;
+import com.listywave.list.application.domain.comment.Comment;
+import com.listywave.list.application.domain.comment.CommentContent;
+import com.listywave.list.application.domain.reply.Reply;
 import com.listywave.list.application.dto.ReplyDeleteCommand;
 import com.listywave.list.application.dto.response.ReplyCreateResponse;
-import com.listywave.list.application.vo.Content;
 import com.listywave.list.repository.CommentRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
@@ -34,7 +34,7 @@ public class ReplyService {
         User user = userRepository.getById(userId);
         Comment comment = commentRepository.getById(commentId);
 
-        Reply reply = new Reply(comment, user, new Content(content));
+        Reply reply = new Reply(comment, user, new CommentContent(content));
         Reply saved = replyRepository.save(reply);
 
         return ReplyCreateResponse.of(saved, comment, user);
@@ -50,7 +50,7 @@ public class ReplyService {
         if (!reply.canDeleteBy(user)) {
             throw new CustomException(ErrorCode.INVALID_ACCESS, "답글은 작성자만 삭제할 수 있습니다.");
         }
-        
+
         replyRepository.deleteById(command.replyId());
         if (!replyRepository.existsByComment(comment) && comment.isDeleted()) {
             commentRepository.delete(comment);

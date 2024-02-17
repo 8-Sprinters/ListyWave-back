@@ -1,15 +1,16 @@
 package com.listywave.collaborator.application.domain;
 
-import com.listywave.list.application.domain.ListEntity;
+import static jakarta.persistence.FetchType.LAZY;
+import static jakarta.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
+
+import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.user.application.domain.User;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,26 +20,23 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 public class Collaborator {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "list_id")
     private ListEntity list;
 
-    public static Collaborator createCollaborator(User user, ListEntity list) {
-        return Collaborator.builder()
-                .user(user)
-                .list(list)
-                .build();
+    public static Collaborator init(User user, ListEntity list) {
+        return new Collaborator(null, user, list);
     }
 
     public String getUserNickname() {

@@ -1,13 +1,14 @@
 package com.listywave.user.repository.user.custom.impl;
 
-import static com.listywave.list.application.domain.QItem.item;
-import static com.listywave.list.application.domain.QListEntity.listEntity;
+import static com.listywave.list.application.domain.item.QItem.item;
+import static com.listywave.list.application.domain.item.QItems.items;
+import static com.listywave.list.application.domain.list.QListEntity.listEntity;
 import static com.listywave.user.application.domain.QUser.user;
 
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.application.dto.CollaboratorResponse;
-import com.listywave.list.application.domain.CategoryType;
-import com.listywave.list.application.domain.ListEntity;
+import com.listywave.list.application.domain.category.CategoryType;
+import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.custom.CustomUserRepository;
 import com.querydsl.core.types.Projections;
@@ -28,9 +29,8 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     @Override
     public List<ListEntity> findFeedLists(List<Collaborator> collaborators, Long userId, String type, CategoryType category, Long cursorId, int size) {
         return queryFactory
-                .select(listEntity)
-                .from(listEntity)
-                .leftJoin(listEntity.items, item)
+                .selectFrom(listEntity)
+                .leftJoin(item).on(listEntity.items.eq(items))
                 .where(
                         collaboEq(collaborators, type),
                         userIdEq(userId, type),

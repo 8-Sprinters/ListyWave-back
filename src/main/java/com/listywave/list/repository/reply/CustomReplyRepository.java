@@ -1,6 +1,6 @@
 package com.listywave.list.repository.reply;
 
-import com.listywave.list.application.domain.ListEntity;
+import com.listywave.list.application.domain.list.ListEntity;
 
 public interface CustomReplyRepository {
 

@@ -1,7 +1,7 @@
 package com.listywave.list.application.dto.response;
 
-import com.listywave.list.application.domain.Item;
-import com.listywave.list.application.domain.ListEntity;
+import com.listywave.list.application.domain.item.Item;
+import com.listywave.list.application.domain.list.ListEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
@@ -46,8 +46,8 @@ record ListInfo(
     private static ListInfo of(ListEntity list) {
         return ListInfo.builder()
                 .id(list.getId())
-                .title(list.getTitle())
-                .items(ItemInfo.toList(list.getItems()))
+                .title(list.getTitle().getValue())
+                .items(ItemInfo.toList(list.getItems().getValues()))
                 .isPublic(list.isPublic())
                 .backgroundColor(list.getBackgroundColor())
                 .updatedDate(list.getUpdatedDate())
@@ -73,7 +73,7 @@ record ItemInfo(
     private static ItemInfo of(Item item) {
         return ItemInfo.builder()
                 .id(item.getId())
-                .title(item.getTitle())
+                .title(item.getTitle().getValue())
                 .build();
     }
 }

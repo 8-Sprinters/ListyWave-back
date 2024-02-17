@@ -1,10 +1,10 @@
 package com.listywave.list.repository.reply;
 
-import static com.listywave.list.application.domain.QComment.comment;
-import static com.listywave.list.application.domain.QListEntity.listEntity;
-import static com.listywave.list.application.domain.QReply.reply;
+import static com.listywave.list.application.domain.comment.QComment.comment;
+import static com.listywave.list.application.domain.list.QListEntity.listEntity;
+import static com.listywave.list.application.domain.reply.QReply.reply;
 
-import com.listywave.list.application.domain.ListEntity;
+import com.listywave.list.application.domain.list.ListEntity;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 

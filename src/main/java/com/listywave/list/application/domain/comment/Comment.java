@@ -1,15 +1,16 @@
-package com.listywave.list.application.domain;
+package com.listywave.list.application.domain.comment;
+
+import static jakarta.persistence.FetchType.LAZY;
+import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.BaseEntity;
-import com.listywave.list.application.vo.Content;
+import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.user.application.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,25 +18,25 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 public class Comment extends BaseEntity {
 
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "list_id")
-    @ManyToOne(fetch = FetchType.LAZY)
     private ListEntity list;
 
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
-    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     @Embedded
-    private Content content;
+    private CommentContent commentContent;
 
     @Column(nullable = false, length = 5)
     private Boolean isDeleted;
 
-    public static Comment create(ListEntity list, User user, String content) {
-        return new Comment(list, user, new Content(content), false);
+    public static Comment create(ListEntity list, User user, CommentContent content) {
+        return new Comment(list, user, content, false);
     }
 
     public boolean canDeleteBy(User user) {
@@ -46,8 +47,8 @@ public class Comment extends BaseEntity {
         this.isDeleted = true;
     }
 
-    public String getContent() {
-        return content.getValue();
+    public String getCommentContent() {
+        return commentContent.getValue();
     }
 
     public boolean isDeleted() {

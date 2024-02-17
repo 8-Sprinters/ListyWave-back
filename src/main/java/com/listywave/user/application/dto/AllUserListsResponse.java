@@ -1,6 +1,6 @@
 package com.listywave.user.application.dto;
 
-import com.listywave.list.application.domain.ListEntity;
+import com.listywave.list.application.domain.list.ListEntity;
 import java.util.List;
 
 public record AllUserListsResponse(

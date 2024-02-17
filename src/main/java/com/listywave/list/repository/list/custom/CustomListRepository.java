@@ -1,6 +1,6 @@
 package com.listywave.list.repository.list.custom;
 
-import com.listywave.list.application.domain.ListEntity;
+import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.user.application.domain.User;
 import java.util.List;
 

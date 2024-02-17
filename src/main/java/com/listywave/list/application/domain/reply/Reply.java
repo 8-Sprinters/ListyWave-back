@@ -1,14 +1,16 @@
-package com.listywave.list.application.domain;
+package com.listywave.list.application.domain.reply;
+
+import static jakarta.persistence.FetchType.LAZY;
+import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.BaseEntity;
-import com.listywave.list.application.vo.Content;
+import com.listywave.list.application.domain.comment.Comment;
+import com.listywave.list.application.domain.comment.CommentContent;
 import com.listywave.user.application.domain.User;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,19 +18,19 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 public class Reply extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @Embedded
-    private Content content;
+    private CommentContent commentContent;
 
     public boolean canDeleteBy(User user) {
         return this.user.equals(user);
@@ -38,8 +40,8 @@ public class Reply extends BaseEntity {
         return comment.getId();
     }
 
-    public String getContent() {
-        return content.getValue();
+    public String getCommentContent() {
+        return commentContent.getValue();
     }
 
     public Long getUserId() {

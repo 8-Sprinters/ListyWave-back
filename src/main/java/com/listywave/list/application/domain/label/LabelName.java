@@ -1,4 +1,4 @@
-package com.listywave.list.application.vo;
+package com.listywave.list.application.domain.label;
 
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
@@ -15,21 +15,21 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
-public class ItemImageUrl {
+public class LabelName {
 
-    private static final int LENGTH_LIMIT = 2048;
+    private static final int LENGTH_LIMIT = 10;
 
-    @Column(name = "image_url", length = LENGTH_LIMIT)
+    @Column(name = "name", length = LENGTH_LIMIT)
     private final String value;
 
-    public ItemImageUrl(String value) {
+    public LabelName(String value) {
         validate(value);
         this.value = value;
     }
 
     private void validate(String value) {
         if (value != null && value.length() > LENGTH_LIMIT) {
-            throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "아이템의 이미지 URL은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
+            throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "라벨명은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
 }

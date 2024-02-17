@@ -1,7 +1,7 @@
 package com.listywave.list.repository;
 
-import com.listywave.list.application.domain.Comment;
-import com.listywave.list.application.domain.ListEntity;
+import com.listywave.list.application.domain.comment.Comment;
+import com.listywave.list.application.domain.list.ListEntity;
 import java.util.List;
 
 public interface CustomCommentRepository {

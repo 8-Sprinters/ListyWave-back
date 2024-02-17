@@ -1,7 +1,7 @@
 package com.listywave.list.application.dto.response;
 
-import com.listywave.list.application.domain.Comment;
-import com.listywave.list.application.domain.Reply;
+import com.listywave.list.application.domain.comment.Comment;
+import com.listywave.list.application.domain.reply.Reply;
 import com.listywave.user.application.domain.User;
 import java.time.LocalDateTime;
 import lombok.Builder;
@@ -25,7 +25,7 @@ public record ReplyCreateResponse(
                 .userId(user.getId())
                 .userNickname(user.getNickname())
                 .userProfileImageUrl(user.getProfileImageUrl())
-                .content(reply.getContent())
+                .content(reply.getCommentContent())
                 .createdDate(reply.getCreatedDate())
                 .updatedDate(reply.getUpdatedDate())
                 .build();

@@ -2,8 +2,8 @@ package com.listywave.list.application.dto.response;
 
 import static java.util.Collections.emptyList;
 
-import com.listywave.list.application.domain.Comment;
-import com.listywave.list.application.domain.Reply;
+import com.listywave.list.application.domain.comment.Comment;
+import com.listywave.list.application.domain.reply.Reply;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +66,7 @@ record CommentResponse(
                 .userId(comment.getUserId())
                 .userNickname(comment.getUserNickname())
                 .userProfileImageUrl(comment.getUserProfileImageUrl())
-                .content(comment.getContent())
+                .content(comment.getCommentContent())
                 .createdDate(comment.getCreatedDate())
                 .updatedDate(comment.getUpdatedDate())
                 .isDeleted(comment.isDeleted())
@@ -100,7 +100,7 @@ record ReplyResponse(
                 .userId(reply.getUserId())
                 .userNickname(reply.getUserNickname())
                 .userProfileImageUrl(reply.getUserProfileImageUrl())
-                .content(reply.getContent())
+                .content(reply.getCommentContent())
                 .createdDate(reply.getCreatedDate())
                 .updatedDate(reply.getUpdatedDate())
                 .build();

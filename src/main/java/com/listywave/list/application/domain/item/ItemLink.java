@@ -1,4 +1,4 @@
-package com.listywave.list.application.vo;
+package com.listywave.list.application.domain.item;
 
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;

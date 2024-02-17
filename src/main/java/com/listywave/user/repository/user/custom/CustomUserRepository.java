@@ -2,8 +2,8 @@ package com.listywave.user.repository.user.custom;
 
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.application.dto.CollaboratorResponse;
-import com.listywave.list.application.domain.CategoryType;
-import com.listywave.list.application.domain.ListEntity;
+import com.listywave.list.application.domain.category.CategoryType;
+import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.user.application.domain.User;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
