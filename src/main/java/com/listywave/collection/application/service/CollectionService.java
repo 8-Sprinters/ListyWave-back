@@ -1,5 +1,6 @@
 package com.listywave.collection.application.service;
 
+import com.listywave.alarm.application.domain.AlarmEvent;
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.collection.application.domain.Collect;
 import com.listywave.collection.repository.CollectionRepository;
@@ -10,6 +11,7 @@ import com.listywave.list.repository.list.ListRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ public class CollectionService {
     private final UserRepository userRepository;
     private final ListRepository listRepository;
     private final CollectionRepository collectionRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public void collectOrCancel(Long listId, String accessToken) {
         Long tokenUserId = jwtManager.read(accessToken);
@@ -35,14 +38,16 @@ public class CollectionService {
         if (collectionRepository.existsByListAndUserId(list, user.getId())) {
             cancelCollect(list, user.getId());
         } else {
-            addCollect(list, user.getId());
+            addCollect(list, user);
         }
     }
 
-    private void addCollect(ListEntity list, Long userId) {
-        Collect collection = new Collect(list, userId);
+    private void addCollect(ListEntity list, User user) {
+        Collect collection = new Collect(list, user.getId());
         collectionRepository.save(collection);
         list.incrementCollectCount();
+
+        applicationEventPublisher.publishEvent(AlarmEvent.collectOf(user, list));
     }
 
     private void cancelCollect(ListEntity list, Long userId) {

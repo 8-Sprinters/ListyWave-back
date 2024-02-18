@@ -4,6 +4,7 @@ import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
+import com.listywave.alarm.application.domain.AlarmEvent;
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.comment.Comment;
@@ -22,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,6 +36,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final ReplyRepository replyRepository;
     private final CommentRepository commentRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public CommentCreateResponse create(Long listId, String content, String accessToken) {
         Long userId = jwtManager.read(accessToken);
@@ -43,6 +46,7 @@ public class CommentService {
         Comment comment = Comment.create(list, user, new CommentContent(content));
         Comment saved = commentRepository.save(comment);
 
+        applicationEventPublisher.publishEvent(AlarmEvent.commentOf(list, saved));
         return CommentCreateResponse.of(saved, user);
     }
 

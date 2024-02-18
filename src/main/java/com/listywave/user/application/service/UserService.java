@@ -1,5 +1,6 @@
 package com.listywave.user.application.service;
 
+import com.listywave.alarm.application.domain.AlarmEvent;
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.repository.CollaboratorRepository;
@@ -19,6 +20,7 @@ import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final CollaboratorRepository collaboratorRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
     public UserInfoResponse getUserInfo(Long userId, String accessToken) {
@@ -104,6 +107,8 @@ public class UserService {
         followRepository.save(follow);
 
         followerUser.follow(followingUser);
+
+        applicationEventPublisher.publishEvent(AlarmEvent.followOf(followerUser, followingUser));
     }
 
     public void unfollow(Long followingUserId, String accessToken) {
