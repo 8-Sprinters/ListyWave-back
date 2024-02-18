@@ -1,6 +1,7 @@
 package com.listywave.list.application.domain.list;
 
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
+import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 import static com.listywave.list.application.domain.category.CategoryType.ENTIRE;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -10,6 +11,7 @@ import static lombok.AccessLevel.PROTECTED;
 import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.category.CategoryTypeConverter;
+import com.listywave.list.application.domain.item.Item;
 import com.listywave.list.application.domain.item.Items;
 import com.listywave.list.application.domain.label.Labels;
 import com.listywave.user.application.domain.User;
@@ -118,6 +120,12 @@ public class ListEntity {
         return items.getFirstImageUrl();
     }
 
+    public void validateOwner(User user) {
+        if (!this.user.equals(user)) {
+            throw new CustomException(INVALID_ACCESS);
+        }
+    }
+
     public boolean canDeleteOrUpdateBy(User user) {
         return this.user.equals(user);
     }
@@ -185,6 +193,12 @@ public class ListEntity {
         }
         if (this.items.isChange(newItems)) {
             this.items.updateAll(newItems, this);
+        }
+    }
+
+    public void validateHasItem(Item item) {
+        if (!this.items.contains(item)) {
+            throw new CustomException(RESOURCE_NOT_FOUND);
         }
     }
 }

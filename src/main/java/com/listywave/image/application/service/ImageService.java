@@ -22,6 +22,7 @@ import com.listywave.image.application.dto.ExtensionRanks;
 import com.listywave.image.application.dto.response.ItemPresignedUrlResponse;
 import com.listywave.image.application.dto.response.UserPresignedUrlResponse;
 import com.listywave.list.application.domain.item.Item;
+import com.listywave.list.application.domain.item.ItemImageUrl;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.repository.ItemRepository;
 import com.listywave.list.repository.list.ListRepository;
@@ -63,6 +64,19 @@ public class ImageService {
 
         ListEntity list = findListById(listId);
         validateListUserMismatch(list, user);
+
+//        List<ItemPresignedUrlResponse> result = new ArrayList<>();
+//        for (ExtensionRanks extensionRank : extensionRanks) {
+//            String imageKey = generatedUUID();
+//            GeneratePresignedUrlRequest generatePresignedUrlRequest =
+//                    getGeneratePresignedUrl(LISTS_ITEM, listId, imageKey, extensionRank.extension());
+//            updateItemImageKey(listId, extensionRank, imageKey);
+//
+//            result.add(ItemPresignedUrlResponse.of(
+//                    extensionRank.rank(),
+//                    amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString()));
+//        }
+//        return result;
 
         return extensionRanks.stream()
                 .map((extensionRank) -> {
@@ -445,5 +459,19 @@ public class ImageService {
         } catch (AmazonServiceException e) {
             throw new CustomException(S3_DELETE_OBJECTS_EXCEPTION);
         }
+    }
+
+    public void deleteImageOfItem(Long listId, Long itemId, String accessToken) {
+        Long userId = jwtManager.read(accessToken);
+        User user = userRepository.getById(userId);
+        ListEntity list = listRepository.getById(listId);
+        Item item = itemRepository.getReferenceById(itemId);
+
+        list.validateOwner(user);
+        list.validateHasItem(item);
+        ItemImageUrl itemImageUrl = item.getImageUrl();
+
+        String fileFullName = getFileFullName(itemImageUrl.getValue());
+        deleteImageFile(fileFullName);
     }
 }
