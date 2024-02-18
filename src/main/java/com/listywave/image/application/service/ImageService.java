@@ -1,6 +1,7 @@
 package com.listywave.image.application.service;
 
 import static com.listywave.common.exception.ErrorCode.S3_DELETE_OBJECTS_EXCEPTION;
+import static com.listywave.image.application.domain.ImageType.LISTS_ITEM;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.HttpMethod;
@@ -57,7 +58,6 @@ public class ImageService {
     private final UserRepository userRepository;
 
     public List<ItemPresignedUrlResponse> createListsPresignedUrl(Long ownerId, Long listId, List<ExtensionRanks> extensionRanks) {
-
         //TODO: 회원이 존재하는지 않하는지 검증 (security)
         final User user = userUtil.getUserByUserid(ownerId);
 
@@ -68,12 +68,7 @@ public class ImageService {
                 .map((extensionRank) -> {
                             String imageKey = generatedUUID();
                             GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                                    getGeneratePresignedUrl(
-                                            ImageType.LISTS_ITEM,
-                                            listId,
-                                            imageKey,
-                                            extensionRank.extension()
-                                    );
+                                    getGeneratePresignedUrl(LISTS_ITEM, listId, imageKey, extensionRank.extension());
                             updateItemImageKey(listId, extensionRank, imageKey);
 
                             return ItemPresignedUrlResponse.of(
@@ -94,12 +89,7 @@ public class ImageService {
         extensionRanks.forEach(
                 extensionRank -> {
                     Item item = findItem(listId, extensionRank.rank());
-                    String imageUrl = createReadImageUrl(
-                            ImageType.LISTS_ITEM,
-                            listId,
-                            item.getImageKey(),
-                            extensionRank.extension()
-                    );
+                    String imageUrl = createReadImageUrl(LISTS_ITEM, listId, item.getImageKey(), extensionRank.extension());
                     item.updateItemImageUrl(imageUrl);
                 }
         );
@@ -207,20 +197,20 @@ public class ImageService {
         }
     }
 
-    private void deleteImageFile(String fileFullPath) {
-        try {
-            amazonS3.deleteObject(bucket, fileFullPath);
-        } catch (AmazonServiceException e) {
-            throw new CustomException(ErrorCode.S3_DELETE_OBJECTS_EXCEPTION);
-        }
-    }
-
     private boolean isCustomUserImage(String url) {
         if (url.split("/").length >= 4) {
             String type = url.split("/")[3];
             return !type.equals("basic");
         }
         return false;
+    }
+
+    private void deleteImageFile(String fileFullPath) {
+        try {
+            amazonS3.deleteObject(bucket, fileFullPath);
+        } catch (AmazonServiceException e) {
+            throw new CustomException(ErrorCode.S3_DELETE_OBJECTS_EXCEPTION);
+        }
     }
 
     private String getFileFullName(String url) {
@@ -339,6 +329,23 @@ public class ImageService {
     }
 
 
+    private String createFileName(
+            ImageType imageType,
+            Long targetId,
+            String imageKey,
+            ImageFileExtension imageFileExtension
+    ) {
+        return getCurrentProfile()
+                + "/"
+                + imageType.getValue()
+                + "/"
+                + targetId
+                + "/"
+                + imageKey
+                + "."
+                + imageFileExtension.getUploadExtension();
+    }
+
     private String createReadImageUrl(
             ImageType imageType,
             Long targetId,
@@ -358,36 +365,19 @@ public class ImageService {
                 + imageFileExtension.getUploadExtension();
     }
 
-    private String createFileName(
-            ImageType imageType,
-            Long targetId,
-            String imageKey,
-            ImageFileExtension imageFileExtension
-    ) {
-        return getCurrentProfile()
-                + "/"
-                + imageType.getValue()
-                + "/"
-                + targetId
-                + "/"
-                + imageKey
-                + "."
-                + imageFileExtension.getUploadExtension();
-    }
-
     private void updateItemImageKey(Long listId, ExtensionRanks extensionRank, String imageKey) {
         findItem(listId, extensionRank.rank())
                 .updateItemImageKey(imageKey);
-    }
-
-    private void updateUserImageKey(User user, String profileImageKey, String backgroundImageKey) {
-        user.updateUserImageUrl(profileImageKey, backgroundImageKey);
     }
 
     private Item findItem(Long listId, int rank) {
         return itemRepository
                 .findByListIdAndRanking(listId, rank)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "해당 아이템이 존재하지 않습니다."));
+    }
+
+    private void updateUserImageKey(User user, String profileImageKey, String backgroundImageKey) {
+        user.updateUserImageUrl(profileImageKey, backgroundImageKey);
     }
 
     private GeneratePresignedUrlRequest createGeneratePreSignedUrlRequest(
