@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface CustomFollowRepository {
 
-    List<Follow> findAllByFollowingUser(User user, int size, int cursorId);
+    List<Follow> findAllFollowersBy(User user, int size, int cursorId);
 }
