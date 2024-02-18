@@ -161,4 +161,12 @@ public class UserService {
         userRepository.getById(loginUserId);
         return userRepository.existsByNicknameValue(nickname);
     }
+
+    public void deleteFollower(Long targetUserId, String accessToken) {
+        Long loginUserId = jwtManager.read(accessToken);
+        User targetUser = userRepository.getById(targetUserId);
+        User loginUser = userRepository.getById(loginUserId);
+
+        followRepository.deleteByFollowingUserAndFollowerUser(loginUser, targetUser);
+    }
 }

@@ -116,4 +116,13 @@ public class UserController {
     ) {
         return ResponseEntity.ok(userService.checkNicknameDuplicate(nickname, accessToken));
     }
+
+    @DeleteMapping("/followers/{userId}")
+    ResponseEntity<Void> deleteFollower(
+            @PathVariable("userId") Long targetUserId,
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+    ) {
+        userService.deleteFollower(targetUserId, accessToken);
+        return ResponseEntity.noContent().build();
+    }
 }
