@@ -63,10 +63,10 @@ public class Items {
         return new ArrayList<>(values);
     }
 
-//    public Items sortByRankTop3() {
-//        List<Item> sorted = values.stream().sorted(Comparator.comparing(Item::getRanking))
-//                .toList();
-//        return new Items(sorted);
-//    }
-
+    public void sortItemsByRankTop3() {
+        values.sort(Comparator.comparing(Item::getRanking));
+        if (values.size() > 3) {
+            values.subList(3, values.size()).clear();
+        }
+    }
 }
