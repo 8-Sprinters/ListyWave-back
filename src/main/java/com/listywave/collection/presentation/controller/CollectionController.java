@@ -6,6 +6,7 @@ import com.listywave.collection.application.dto.CollectionResponse;
 import com.listywave.collection.application.service.CollectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +34,7 @@ public class CollectionController {
     ResponseEntity<CollectionResponse> getCollection(
             @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken,
             @RequestParam(name = "cursorId", required = false) Long cursorId,
-            Pageable pageable
+            @PageableDefault(size = 10) Pageable pageable
     ) {
         CollectionResponse collection = collectionService.getCollection(accessToken, cursorId, pageable);
         return ResponseEntity.ok(collection);
