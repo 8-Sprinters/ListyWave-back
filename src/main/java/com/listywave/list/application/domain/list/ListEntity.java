@@ -108,6 +108,10 @@ public class ListEntity {
         items = items.sortByRank();
     }
 
+//    public void sortItemsByRankTop3() {
+//        items = items.sortByRankTop3();
+//    }
+
     public String getFirstItemImageUrl() {
         return items.getFirstImageUrl();
     }

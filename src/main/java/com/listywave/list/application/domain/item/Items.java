@@ -62,4 +62,11 @@ public class Items {
     public List<Item> getValues() {
         return new ArrayList<>(values);
     }
+
+//    public Items sortByRankTop3() {
+//        List<Item> sorted = values.stream().sorted(Comparator.comparing(Item::getRanking))
+//                .toList();
+//        return new Items(sorted);
+//    }
+
 }
