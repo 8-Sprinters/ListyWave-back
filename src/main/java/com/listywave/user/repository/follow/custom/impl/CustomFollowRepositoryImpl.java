@@ -15,7 +15,7 @@ public class CustomFollowRepositoryImpl implements CustomFollowRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Follow> findAllFollowersBy(User followingUser, int size, int cursorId) {
+    public List<Follow> findAllByFollowingUserOrderByFollowerUserNicknameDesc(User followingUser, int size, int cursorId) {
         return queryFactory.selectFrom(follow)
                 .where(
                         follow.followingUser.id.eq(followingUser.getId()),

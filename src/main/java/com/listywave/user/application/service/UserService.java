@@ -123,7 +123,7 @@ public class UserService {
     public FollowersResponse getFollowers(Long userId, int size, int cursorId) {
         User followingUser = userRepository.getById(userId);
 
-        List<Follow> follows = followRepository.findAllFollowersBy(followingUser, size, cursorId);
+        List<Follow> follows = followRepository.findAllByFollowingUserOrderByFollowerUserNicknameDesc(followingUser, size, cursorId);
         List<User> followerUsers = follows.stream()
                 .map(Follow::getFollowerUser)
                 .toList();
