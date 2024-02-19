@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 
-public class PaginationUtils {
+public abstract class PaginationUtils {
 
     public static <T> Slice<T> checkEndPage(Pageable pageable, List<T> results) {
         boolean hasNext = false;
