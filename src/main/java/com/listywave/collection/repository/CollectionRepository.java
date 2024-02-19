@@ -1,7 +1,7 @@
 package com.listywave.collection.repository;
 
-import com.listywave.collaborator.repository.custom.CustomCollectionRepository;
 import com.listywave.collection.application.domain.Collect;
+import com.listywave.collection.repository.custom.CustomCollectionRepository;
 import com.listywave.list.application.domain.list.ListEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,4 +1,4 @@
-package com.listywave.collaborator.repository.custom;
+package com.listywave.collection.repository.custom;
 
 import com.listywave.collection.application.domain.Collect;
 import org.springframework.data.domain.Pageable;
