@@ -1,27 +1,37 @@
 package com.listywave.auth.application.domain;
 
 import static com.listywave.common.exception.ErrorCode.REQUIRED_ACCESS_TOKEN;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.HOURS;
 
+import com.amazonaws.util.Base64;
 import com.listywave.common.exception.CustomException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import java.time.Instant;
 import java.util.Date;
 import javax.crypto.SecretKey;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtManager {
 
-    private static final SecretKey key = Jwts.SIG.HS256.key().build();
     private static final Long ACCESS_TOKEN_VALID_MILLISECOND = HOURS.toMillis(8);
     private static final String PREFIX = "Bearer ";
+
+    private final SecretKey secretKey;
+
+    public JwtManager(@Value("${jwt.plain-secret-key}") String plainSecretKey) {
+        byte[] encoded = Base64.encode(plainSecretKey.getBytes(UTF_8));
+        secretKey = Keys.hmacShaKeyFor(encoded);
+    }
 
     public String createToken(Long userId) {
         Date now = new Date();
         return Jwts.builder()
                 .header().type("jwt").and()
-                .signWith(key)
+                .signWith(secretKey)
                 .issuer("https://dev.api.listywave.com")
                 .issuedAt(now)
                 .subject(String.valueOf(userId))
@@ -37,7 +47,7 @@ public class JwtManager {
         token = token.substring(PREFIX.length());
 
         String subject = Jwts.parser()
-                .verifyWith(key)
+                .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()

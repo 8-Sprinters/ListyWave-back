@@ -43,3 +43,6 @@ cloud:
   s3:
     endpoint:
     bucket:
+
+jwt:
+  plain-secret-key: testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest
