@@ -108,7 +108,7 @@ public class UserService {
 
         followerUser.follow(followingUser);
 
-        applicationEventPublisher.publishEvent(AlarmEvent.followOf(followerUser, followingUser));
+        applicationEventPublisher.publishEvent(AlarmEvent.follow(followerUser, followingUser));
     }
 
     public void unfollow(Long followingUserId, String accessToken) {

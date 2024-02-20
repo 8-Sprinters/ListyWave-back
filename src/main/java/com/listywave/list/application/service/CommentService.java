@@ -46,7 +46,7 @@ public class CommentService {
         Comment comment = Comment.create(list, user, new CommentContent(content));
         Comment saved = commentRepository.save(comment);
 
-        applicationEventPublisher.publishEvent(AlarmEvent.commentOf(list, saved));
+        applicationEventPublisher.publishEvent(AlarmEvent.comment(list, saved));
         return CommentCreateResponse.of(saved, user);
     }
 

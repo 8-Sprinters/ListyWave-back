@@ -1,5 +1,12 @@
 package com.listywave.alarm.application.domain;
 
+import static com.listywave.alarm.application.domain.AlarmType.COLLECT;
+import static com.listywave.alarm.application.domain.AlarmType.COMMENT;
+import static com.listywave.alarm.application.domain.AlarmType.FOLLOW;
+import static com.listywave.alarm.application.domain.AlarmType.REPLY;
+
+import com.listywave.common.exception.CustomException;
+import com.listywave.common.exception.ErrorCode;
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.domain.reply.Reply;
@@ -25,47 +32,49 @@ public record AlarmEvent(
                 .build();
     }
 
-    public static AlarmEvent followOf(User publisher, User listenerUser) {
+    public static AlarmEvent follow(User publisher, User listenerUser) {
         return AlarmEvent.builder()
                 .publisher(publisher)
                 .listenerId(listenerUser.getId())
                 .listId(null)
                 .commentId(null)
-                .alarmType(AlarmType.FOLLOW)
+                .alarmType(FOLLOW)
                 .build();
     }
 
-    public static AlarmEvent collectOf(User publisher, ListEntity list) {
+    public static AlarmEvent collect(User publisher, ListEntity list) {
         return AlarmEvent.builder()
                 .publisher(publisher)
                 .listenerId(list.getUser().getId())
                 .listId(list.getId())
                 .commentId(null)
-                .alarmType(AlarmType.COLLECT)
+                .alarmType(COLLECT)
                 .build();
     }
 
-    public static AlarmEvent commentOf(ListEntity list, Comment comment) {
+    public static AlarmEvent comment(ListEntity list, Comment comment) {
         return AlarmEvent.builder()
                 .publisher(comment.getUser())
                 .listenerId(list.getUser().getId())
                 .listId(list.getId())
                 .commentId(comment.getId())
-                .alarmType(AlarmType.COMMENT)
+                .alarmType(COMMENT)
                 .build();
     }
 
-    public static AlarmEvent replyOf(Comment comment, Reply reply) {
+    public static AlarmEvent reply(Comment comment, Reply reply) {
         return AlarmEvent.builder()
                 .publisher(reply.getUser())
                 .listenerId(comment.getUser().getId())
                 .listId(comment.getList().getId())
                 .commentId(comment.getId())
-                .alarmType(AlarmType.REPLY)
+                .alarmType(REPLY)
                 .build();
     }
 
-    public boolean isDifferentPublisher() {
-        return !publisher.isSame(listenerId);
+    public void validateDifferentPublisherAndReceiver() {
+        if (publisher.isSame(listenerId)) {
+            throw new CustomException(ErrorCode.CANNOT_SEND_OWN_ALARM);
+        }
     }
 }

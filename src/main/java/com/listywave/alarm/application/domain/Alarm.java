@@ -43,7 +43,10 @@ public class Alarm {
     @Column(nullable = false)
     private Long receiveUserId;
 
+    @Column(nullable = true)
     private Long listId;
+
+    @Column(nullable = true)
     private Long commentId;
 
     @Column(nullable = false)
@@ -58,7 +61,7 @@ public class Alarm {
     @Column(updatable = false)
     private LocalDateTime createdDate;
 
-    public void alarmRead() {
+    public void readAlarm() {
         this.isChecked = true;
     }
 }

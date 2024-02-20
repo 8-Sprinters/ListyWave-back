@@ -2,6 +2,7 @@ package com.listywave.alarm.application.service;
 
 import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 
+import com.listywave.alarm.application.domain.Alarm;
 import com.listywave.alarm.application.domain.AlarmEvent;
 import com.listywave.alarm.application.dto.AlarmListResponse;
 import com.listywave.alarm.repository.AlarmRepository;
@@ -27,21 +28,22 @@ public class AlarmService {
     public AlarmListResponse getAlarms(String accessToken) {
         Long tokenUserId = jwtManager.read(accessToken);
         User user = userRepository.getById(tokenUserId);
-        return AlarmListResponse.of(alarmRepository.getAlarms(user));
+        return new AlarmListResponse(alarmRepository.getAlarms(user));
     }
 
-    public void alarmRead(Long alarmId, String accessToken) {
+    public void readAlarm(Long alarmId, String accessToken) {
         Long tokenUserId = jwtManager.read(accessToken);
         User user = userRepository.getById(tokenUserId);
-        alarmRepository.findAlarmByIdAndReceiveUserId(alarmId, user.getId())
-                .orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND))
-                .alarmRead();
+
+        Alarm alarm = alarmRepository.findAlarmByIdAndReceiveUserId(alarmId, user.getId())
+                .orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND));
+
+        alarm.readAlarm();
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void save(AlarmEvent alarmEvent) {
-        if (alarmEvent.isDifferentPublisher()) {
-            alarmRepository.save(alarmEvent.toEntity());
-        }
+        alarmEvent.validateDifferentPublisherAndReceiver();
+        alarmRepository.save(alarmEvent.toEntity());
     }
 }

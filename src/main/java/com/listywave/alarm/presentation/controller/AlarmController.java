@@ -26,11 +26,11 @@ public class AlarmController {
     }
 
     @PatchMapping("/alarms/{alarmId}")
-    ResponseEntity<AlarmListResponse> alarmRead(
+    ResponseEntity<AlarmListResponse> readAlarm(
             @PathVariable("alarmId") Long alarmId,
             @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
     ) {
-        alarmService.alarmRead(alarmId, accessToken);
+        alarmService.readAlarm(alarmId, accessToken);
         return ResponseEntity.noContent().build();
     }
 }

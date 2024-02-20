@@ -47,7 +47,7 @@ public class CollectionService {
         collectionRepository.save(collection);
         list.incrementCollectCount();
 
-        applicationEventPublisher.publishEvent(AlarmEvent.collectOf(user, list));
+        applicationEventPublisher.publishEvent(AlarmEvent.collect(user, list));
     }
 
     private void cancelCollect(ListEntity list, Long userId) {

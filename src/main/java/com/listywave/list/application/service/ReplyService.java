@@ -40,7 +40,7 @@ public class ReplyService {
         Reply reply = new Reply(comment, user, new CommentContent(content));
         Reply saved = replyRepository.save(reply);
 
-        applicationEventPublisher.publishEvent(AlarmEvent.replyOf(comment, saved));
+        applicationEventPublisher.publishEvent(AlarmEvent.reply(comment, saved));
         return ReplyCreateResponse.of(saved, comment, user);
     }
 
