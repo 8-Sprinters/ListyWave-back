@@ -8,6 +8,9 @@ import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.application.domain.Collaborators;
 import com.listywave.collaborator.repository.CollaboratorRepository;
 import com.listywave.common.exception.CustomException;
+import com.listywave.history.application.domain.History;
+import com.listywave.history.application.domain.HistoryItem;
+import com.listywave.history.repository.HistoryRepository;
 import com.listywave.image.application.service.ImageService;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.comment.Comment;
@@ -30,7 +33,9 @@ import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListRecentResponse;
 import com.listywave.list.application.dto.response.ListSearchResponse;
 import com.listywave.list.application.dto.response.ListTrandingResponse;
+import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
+import com.listywave.list.presentation.dto.request.ListUpdateRequest;
 import com.listywave.list.repository.CommentRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
@@ -38,6 +43,7 @@ import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,9 +61,10 @@ public class ListService {
     private final ListRepository listRepository;
     private final UserRepository userRepository;
     private final ReplyRepository replyRepository;
-    private final CommentRepository commentRepository;
-    private final CollaboratorRepository collaboratorRepository;
     private final FollowRepository followRepository;
+    private final CommentRepository commentRepository;
+    private final HistoryRepository historyRepository;
+    private final CollaboratorRepository collaboratorRepository;
 
     public ListCreateResponse listCreate(ListCreateRequest request, String accessToken) {
         Long userId = jwtManager.read(accessToken);
@@ -67,8 +74,8 @@ public class ListService {
         validateDuplicateCollaboratorIds(collaboratorIds);
         boolean hasCollaboration = !collaboratorIds.isEmpty();
 
-        Labels labels = createLabels(request);
-        Items items = createItems(request);
+        Labels labels = createLabels(request.labels());
+        Items items = createItems(request.items());
 
         ListEntity list = new ListEntity(user, request.category(), new ListTitle(request.title()),
                 new ListDescription(request.description()), request.isPublic(),
@@ -76,6 +83,7 @@ public class ListService {
         ListEntity savedList = listRepository.save(list);
 
         if (hasCollaboration) {
+            collaboratorIds.add(user.getId());
             Collaborators collaborators = createCollaborators(collaboratorIds, savedList);
             collaboratorRepository.saveAll(collaborators.getCollaborators());
         }
@@ -90,19 +98,19 @@ public class ListService {
         }
     }
 
-    private Labels createLabels(ListCreateRequest request) {
-        return new Labels(request.labels().stream()
+    private Labels createLabels(List<String> labels) {
+        return new Labels(labels.stream()
                 .map(LabelName::new)
                 .map(Label::init)
                 .toList());
     }
 
-    private Items createItems(ListCreateRequest request) {
-        return new Items(request.items().stream()
+    private Items createItems(List<ItemCreateRequest> itemCreateRequests) {
+        return new Items(itemCreateRequests.stream()
                 .map(it -> Item.init(
                         it.rank(),
                         new ItemTitle(it.title()), new ItemComment(it.comment()),
-                        new ItemLink(it.comment()), new ItemImageUrl(it.imageUrl()))
+                        new ItemLink(it.link()), new ItemImageUrl(it.imageUrl()))
                 ).toList());
     }
 
@@ -138,7 +146,7 @@ public class ListService {
         Long loginUserId = jwtManager.read(accessToken);
         User loginUser = userRepository.getById(loginUserId);
 
-        if (!list.canDeleteBy(loginUser)) {
+        if (!list.canDeleteOrUpdateBy(loginUser)) {
             throw new CustomException(INVALID_ACCESS, "리스트는 작성자만 삭제 가능합니다.");
         }
 
@@ -188,5 +196,32 @@ public class ListService {
             return ListSearchResponse.of(paged, totalCount, null, false);
         }
         return ListSearchResponse.of(paged, totalCount, paged.get(paged.size() - 1).getId(), false);
+    }
+
+    public void update(Long listId, String accessToken, ListUpdateRequest request) {
+        Long userId = jwtManager.read(accessToken);
+        User user = userRepository.getById(userId);
+        ListEntity list = listRepository.getById(listId);
+
+        List<Long> collaboratorIds = request.collaboratorIds();
+        validateDuplicateCollaboratorIds(collaboratorIds);
+        boolean hasCollaborator = !collaboratorIds.isEmpty();
+
+        Labels labels = createLabels(request.labels());
+        Items newItems = createItems(request.items());
+
+        LocalDateTime updatedDate = LocalDateTime.now();
+        if (list.canCreateHistory(newItems)) {
+            Items beforeItems = list.getItems();
+            List<HistoryItem> historyItems = beforeItems.toHistoryItems();
+            History history = new History(list, historyItems, updatedDate, request.isPublic());
+            historyRepository.save(history);
+        }
+        list.update(user, request.category(), new ListTitle(request.title()), new ListDescription(request.description()), request.isPublic(), request.backgroundColor(), hasCollaborator, updatedDate, labels, newItems);
+
+        if (hasCollaborator) {
+            Collaborators collaborators = createCollaborators(collaboratorIds, list);
+            collaboratorRepository.saveAll(collaborators.getCollaborators());
+        }
     }
 }

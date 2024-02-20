@@ -13,6 +13,9 @@ import com.listywave.user.application.service.UserService;
 import com.listywave.user.presentation.dto.UserProfileUpdateRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,9 +54,10 @@ public class UserController {
             @RequestParam(name = "type", defaultValue = "my") String type,
             @RequestParam(name = "category", defaultValue = "entire") CategoryType category,
             @RequestParam(name = "cursorId", required = false) Long cursorId,
-            @RequestParam(name = "size") int size
+            @PageableDefault(size = 10) Pageable pageable
     ) {
-        AllUserListsResponse allUserListsResponse = userService.getAllListOfUser(userId, type, category, cursorId, size);
+        AllUserListsResponse allUserListsResponse =
+                userService.getAllListOfUser(userId, type, category, cursorId, pageable);
         return ResponseEntity.ok(allUserListsResponse);
     }
 
@@ -113,5 +117,14 @@ public class UserController {
             @RequestParam(name = "nickname") String nickname
     ) {
         return ResponseEntity.ok(userService.checkNicknameDuplicate(nickname));
+    }
+
+    @DeleteMapping("/followers/{userId}")
+    ResponseEntity<Void> deleteFollower(
+            @PathVariable("userId") Long targetUserId,
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+    ) {
+        userService.deleteFollower(targetUserId, accessToken);
+        return ResponseEntity.noContent().build();
     }
 }

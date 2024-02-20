@@ -11,7 +11,10 @@ import org.springframework.data.domain.Slice;
 
 public interface CustomUserRepository {
 
-    List<ListEntity> findFeedLists(List<Collaborator> listBycollabo, Long userId, String type, CategoryType category, Long cursorId, int size);
+    Slice<ListEntity> findFeedLists(
+            List<Collaborator> listBycollabo, Long userId, String type,
+            CategoryType category, Long cursorId, Pageable pageable
+    );
 
     List<User> getRecommendUsers();
 
