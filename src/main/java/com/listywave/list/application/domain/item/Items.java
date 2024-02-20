@@ -96,22 +96,10 @@ public class Items {
                 ));
     }
 
-    public Item get(int index) {
-        return values.get(index);
-    }
-
-    public int size() {
-        return values.size();
-    }
-
     public List<HistoryItem> toHistoryItems() {
         return values.stream()
                 .map(Item::toHistoryItem)
                 .toList();
-    }
-
-    public List<Item> getValues() {
-        return new ArrayList<>(values);
     }
 
     public boolean isChange(Items newItems) {
@@ -152,9 +140,15 @@ public class Items {
         return this.values.contains(item);
     }
 
-//    public Items sortByRankTop3() {
-//        List<Item> sorted = values.stream().sorted(Comparator.comparing(Item::getRanking))
-//                .toList();
-//        return new Items(sorted);
-//    }
+    public Item get(int index) {
+        return values.get(index);
+    }
+
+    public int size() {
+        return values.size();
+    }
+
+    public List<Item> getValues() {
+        return new ArrayList<>(values);
+    }
 }
