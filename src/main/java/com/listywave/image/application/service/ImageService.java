@@ -52,15 +52,12 @@ public class ImageService {
     private String bucket;
     private final Environment environment;
     private final AmazonS3 amazonS3;
-    private final UserUtil userUtil;
-    private final JwtManager jwtManager;
     private final ItemRepository itemRepository;
     private final ListRepository listRepository;
     private final UserRepository userRepository;
 
     public List<ItemPresignedUrlResponse> createListsPresignedUrl(Long ownerId, Long listId, List<ExtensionRanks> extensionRanks) {
-        //TODO: 회원이 존재하는지 않하는지 검증 (security)
-        final User user = userUtil.getUserByUserid(ownerId);
+        User user = userRepository.getById(ownerId);
 
         ListEntity list = findListById(listId);
         validateListUserMismatch(list, user);
@@ -94,8 +91,7 @@ public class ImageService {
     }
 
     public void uploadCompleteItemImages(Long ownerId, Long listId, List<ExtensionRanks> extensionRanks) {
-        //TODO: 보내는 회원이 존재하는지 검증 (security)
-        final User user = userUtil.getUserByUserid(ownerId);
+        final User user = userRepository.getById(ownerId);
 
         ListEntity list = findListById(listId);
         validateListUserMismatch(list, user);
@@ -112,10 +108,9 @@ public class ImageService {
     public UserPresignedUrlResponse updateUserImagePresignedUrl(
             ImageFileExtension profileExtension,
             ImageFileExtension backgroundExtension,
-            String accessToken
+            Long loginUserId
     ) {
-        Long ownerId = jwtManager.read(accessToken);
-        User user = userRepository.getById(ownerId);
+        User user = userRepository.getById(loginUserId);
 
         if (isExistProfileExtension(profileExtension, backgroundExtension)) {
             deleteCustomUserImageFile(user.getProfileImageUrl());
@@ -157,9 +152,8 @@ public class ImageService {
     public void uploadCompleteUserImages(
             ImageFileExtension profileExtension,
             ImageFileExtension backgroundExtension,
-            String accessToken
+            Long ownerId
     ) {
-        Long ownerId = jwtManager.read(accessToken);
         User user = userRepository.getById(ownerId);
 
         String profileImageUrl = "";
@@ -461,9 +455,8 @@ public class ImageService {
         }
     }
 
-    public void deleteImageOfItem(Long listId, Long itemId, String accessToken) {
-        Long userId = jwtManager.read(accessToken);
-        User user = userRepository.getById(userId);
+    public void deleteImageOfItem(Long listId, Long itemId, Long loginUserID) {
+        User user = userRepository.getById(loginUserID);
         ListEntity list = listRepository.getById(listId);
         Item item = itemRepository.getReferenceById(itemId);
 

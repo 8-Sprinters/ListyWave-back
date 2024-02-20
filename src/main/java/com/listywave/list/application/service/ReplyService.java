@@ -1,6 +1,5 @@
 package com.listywave.list.application.service;
 
-import com.listywave.alarm.application.domain.AlarmEvent;
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
@@ -16,7 +15,6 @@ import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,17 +23,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReplyService {
 
-    private final JwtManager jwtManager;
     private final ListRepository listRepository;
     private final UserRepository userRepository;
     private final ReplyRepository replyRepository;
     private final CommentRepository commentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public ReplyCreateResponse createReply(Long listId, Long commentId, String content, String accessToken) {
+    public ReplyCreateResponse createReply(Long listId, Long commentId, String content, Long loginUserId) {
         listRepository.getById(listId);
-        Long userId = jwtManager.read(accessToken);
-        User user = userRepository.getById(userId);
+        User user = userRepository.getById(loginUserId);
         Comment comment = commentRepository.getById(commentId);
 
         Reply reply = new Reply(comment, user, new CommentContent(content));
@@ -45,10 +41,9 @@ public class ReplyService {
         return ReplyCreateResponse.of(saved, comment, user);
     }
 
-    public void delete(ReplyDeleteCommand command, String accessToken) {
+    public void delete(ReplyDeleteCommand command, Long loginUserId) {
         listRepository.getById(command.listId());
-        Long userId = jwtManager.read(accessToken);
-        User user = userRepository.getById(userId);
+        User user = userRepository.getById(loginUserId);
         Comment comment = commentRepository.getById(command.commentId());
         Reply reply = replyRepository.getById(command.replyId());
 

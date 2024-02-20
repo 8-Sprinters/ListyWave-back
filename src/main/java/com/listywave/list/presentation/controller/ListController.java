@@ -1,7 +1,7 @@
 package com.listywave.list.presentation.controller;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-
+import com.listywave.common.auth.Auth;
+import com.listywave.common.auth.OptionalAuth;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.SortType;
 import com.listywave.list.application.dto.response.ListCreateResponse;
@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,18 +36,18 @@ public class ListController {
     @PostMapping("/lists")
     ResponseEntity<ListCreateResponse> listCreate(
             @RequestBody ListCreateRequest request,
-            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+            @Auth Long loginUserId
     ) {
-        ListCreateResponse response = listService.listCreate(request, accessToken);
+        ListCreateResponse response = listService.listCreate(request, loginUserId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/lists/{listId}")
     ResponseEntity<ListDetailResponse> getListDetail(
             @PathVariable Long listId,
-            @RequestHeader(value = "Authorization", defaultValue = "") String accessToken
+            @OptionalAuth Long loginUserId
     ) {
-        ListDetailResponse listDetailResponse = listService.getListDetail(listId, accessToken);
+        ListDetailResponse listDetailResponse = listService.getListDetail(listId, loginUserId);
         return ResponseEntity.ok(listDetailResponse);
     }
 
@@ -61,19 +60,19 @@ public class ListController {
     @DeleteMapping("/lists/{listId}")
     ResponseEntity<Void> deleteList(
             @PathVariable(value = "listId") Long listId,
-            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+            @Auth Long loginUserId
     ) {
-        listService.deleteList(listId, accessToken);
+        listService.deleteList(listId, loginUserId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/lists")
     ResponseEntity<ListRecentResponse> getRecentLists(
-            @RequestHeader(value = "Authorization", defaultValue = "") String accessToken,
+            @OptionalAuth Long loginUserId,
             @RequestParam(name = "cursorId", required = false) Long cursorId,
             @PageableDefault(size = 10) Pageable pageable
     ) {
-        ListRecentResponse recentLists = listService.getRecentLists(accessToken, cursorId, pageable);
+        ListRecentResponse recentLists = listService.getRecentLists(loginUserId, cursorId, pageable);
         return ResponseEntity.ok(recentLists);
     }
 
@@ -92,10 +91,10 @@ public class ListController {
     @PatchMapping("/lists/{listId}")
     ResponseEntity<Void> update(
             @PathVariable("listId") Long listId,
-            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken,
+            @Auth Long loginUserId,
             @RequestBody ListUpdateRequest request
     ) {
-        listService.update(listId, accessToken, request);
+        listService.update(listId, loginUserId, request);
         return ResponseEntity.noContent().build();
     }
 }

@@ -3,7 +3,6 @@ package com.listywave.list.application.service;
 import static com.listywave.common.exception.ErrorCode.DUPLICATE_USER;
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 
-import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.application.domain.Collaborators;
 import com.listywave.collaborator.repository.CollaboratorRepository;
@@ -58,7 +57,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ListService {
 
-    private final JwtManager jwtManager;
     private final ImageService imageService;
     private final ListRepository listRepository;
     private final UserRepository userRepository;
@@ -68,9 +66,8 @@ public class ListService {
     private final HistoryRepository historyRepository;
     private final CollaboratorRepository collaboratorRepository;
 
-    public ListCreateResponse listCreate(ListCreateRequest request, String accessToken) {
-        Long userId = jwtManager.read(accessToken);
-        User user = userRepository.getById(userId);
+    public ListCreateResponse listCreate(ListCreateRequest request, Long loginUserId) {
+        User user = userRepository.getById(loginUserId);
 
         List<Long> collaboratorIds = request.collaboratorIds();
         validateDuplicateCollaboratorIds(collaboratorIds);
@@ -124,11 +121,11 @@ public class ListService {
         return new Collaborators(collaborators);
     }
 
-    public ListDetailResponse getListDetail(Long listId, String accessToken) {
+    public ListDetailResponse getListDetail(Long listId, Long loginUserId) {
         ListEntity list = listRepository.getById(listId);
         List<Collaborator> collaborators = collaboratorRepository.findAllByList(list);
 
-        if (accessToken.isBlank()) {
+        if (loginUserId == null) {
             return ListDetailResponse.of(list, list.getUser(), false, collaborators);
         }
         return ListDetailResponse.of(list, list.getUser(), true, collaborators);
@@ -143,9 +140,8 @@ public class ListService {
                 .toList();
     }
 
-    public void deleteList(Long listId, String accessToken) {
+    public void deleteList(Long listId, Long loginUserId) {
         ListEntity list = listRepository.getById(listId);
-        Long loginUserId = jwtManager.read(accessToken);
         User loginUser = userRepository.getById(loginUserId);
 
         if (!list.canDeleteOrUpdateBy(loginUser)) {
@@ -162,9 +158,8 @@ public class ListService {
     }
 
     @Transactional(readOnly = true)
-    public ListRecentResponse getRecentLists(String accessToken, Long cursorId, Pageable pageable) {
-        if (isSignedIn(accessToken)) {
-            Long loginUserId = jwtManager.read(accessToken);
+    public ListRecentResponse getRecentLists(Long loginUserId, Long cursorId, Pageable pageable) {
+        if (loginUserId != null) {
             User user = userRepository.getById(loginUserId);
             List<Follow> follows = followRepository.getAllByFollowerUser(user);
 
@@ -176,7 +171,6 @@ public class ListService {
                     listRepository.getRecentListsByFollowing(myFollowingUsers, cursorId, pageable);
             return getListRecentResponse(result);
         }
-
         Slice<ListEntity> result = listRepository.getRecentLists(cursorId, pageable);
         return getListRecentResponse(result);
     }
@@ -189,10 +183,6 @@ public class ListService {
             cursorId = recentList.get(recentList.size() - 1).getId();
         }
         return ListRecentResponse.of(recentList, cursorId, result.hasNext());
-    }
-
-    private boolean isSignedIn(String accessToken) {
-        return !accessToken.isBlank();
     }
 
     public ListSearchResponse search(String keyword, SortType sortType, CategoryType category, int size, Long cursorId) {
@@ -215,9 +205,8 @@ public class ListService {
         return ListSearchResponse.of(paged, totalCount, paged.get(paged.size() - 1).getId(), false);
     }
 
-    public void update(Long listId, String accessToken, ListUpdateRequest request) {
-        Long userId = jwtManager.read(accessToken);
-        User user = userRepository.getById(userId);
+    public void update(Long listId, Long loginUserId, ListUpdateRequest request) {
+        User user = userRepository.getById(loginUserId);
         ListEntity list = listRepository.getById(listId);
 
         List<Long> collaboratorIds = request.collaboratorIds();

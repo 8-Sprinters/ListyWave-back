@@ -1,7 +1,6 @@
 package com.listywave.image.presentation.controller;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-
+import com.listywave.common.auth.Auth;
 import com.listywave.image.application.dto.response.ItemPresignedUrlResponse;
 import com.listywave.image.application.dto.response.UserPresignedUrlResponse;
 import com.listywave.image.application.service.ImageService;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -44,12 +42,12 @@ public class ImageController {
     @PostMapping("/users/upload-url")
     ResponseEntity<UserPresignedUrlResponse> userImagePresignedUrlCreate(
             @RequestBody UserImageUpdateRequest request,
-            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+            @Auth Long loginUserId
     ) {
         UserPresignedUrlResponse userPresignedUrlResponse = imageService.updateUserImagePresignedUrl(
                 request.profileExtension(),
                 request.backgroundExtension(),
-                accessToken
+                loginUserId
         );
         return ResponseEntity.ok(userPresignedUrlResponse);
     }
@@ -71,9 +69,9 @@ public class ImageController {
     ResponseEntity<Void> deleteImageOfItem(
             @PathVariable("listId") Long listId,
             @PathVariable("itemId") Long itemId,
-            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+            @Auth Long loginUserId
     ) {
-        imageService.deleteImageOfItem(listId, itemId, accessToken);
+        imageService.deleteImageOfItem(listId, itemId, loginUserId);
         return ResponseEntity.noContent().build();
     }
 }
