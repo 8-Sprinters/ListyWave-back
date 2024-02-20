@@ -1,5 +1,7 @@
 package com.listywave.user.application.service;
 
+import static java.util.Comparator.comparing;
+
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.repository.CollaboratorRepository;
@@ -90,6 +92,7 @@ public class UserService {
 
         List<User> followingUsers = follows.stream()
                 .map(Follow::getFollowingUser)
+                .sorted(comparing(User::getNickname))
                 .toList();
         return FollowingsResponse.of(followingUsers);
     }
@@ -120,7 +123,7 @@ public class UserService {
     public FollowersResponse getFollowers(Long userId, int size, int cursorId) {
         User followingUser = userRepository.getById(userId);
 
-        List<Follow> follows = followRepository.findAllByFollowingUser(followingUser, size, cursorId);
+        List<Follow> follows = followRepository.findAllByFollowingUserOrderByFollowerUserNicknameDesc(followingUser, size, cursorId);
         List<User> followerUsers = follows.stream()
                 .map(Follow::getFollowerUser)
                 .toList();
@@ -160,5 +163,13 @@ public class UserService {
         Long loginUserId = jwtManager.read(accessToken);
         userRepository.getById(loginUserId);
         return userRepository.existsByNicknameValue(nickname);
+    }
+
+    public void deleteFollower(Long targetUserId, String accessToken) {
+        Long loginUserId = jwtManager.read(accessToken);
+        User targetUser = userRepository.getById(targetUserId);
+        User loginUser = userRepository.getById(loginUserId);
+
+        followRepository.deleteByFollowingUserAndFollowerUser(loginUser, targetUser);
     }
 }

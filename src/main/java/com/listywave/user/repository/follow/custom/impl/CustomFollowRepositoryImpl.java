@@ -15,13 +15,13 @@ public class CustomFollowRepositoryImpl implements CustomFollowRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Follow> findAllByFollowingUser(User followingUser, int size, int cursorId) {
+    public List<Follow> findAllByFollowingUserOrderByFollowerUserNicknameDesc(User followingUser, int size, int cursorId) {
         return queryFactory.selectFrom(follow)
                 .where(
-                        follow.followingUser.eq(followingUser),
+                        follow.followingUser.id.eq(followingUser.getId()),
                         follow.followingUser.id.gt(cursorId)
                 )
-                .orderBy(follow.createdDate.desc())
+                .orderBy(follow.followerUser.nickname.value.asc())
                 .limit(size + 1)
                 .fetch();
     }
