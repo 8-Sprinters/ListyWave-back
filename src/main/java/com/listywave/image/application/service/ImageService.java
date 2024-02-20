@@ -106,12 +106,11 @@ public class ImageService {
     }
 
     public UserPresignedUrlResponse updateUserImagePresignedUrl(
-            Long ownerId,
             ImageFileExtension profileExtension,
             ImageFileExtension backgroundExtension,
             String accessToken
     ) {
-        jwtManager.read(accessToken);
+        Long ownerId = jwtManager.read(accessToken);
         User user = userRepository.getById(ownerId);
 
         if (isExistProfileExtension(profileExtension, backgroundExtension)) {
@@ -152,10 +151,11 @@ public class ImageService {
     }
 
     public void uploadCompleteUserImages(
-            Long ownerId,
             ImageFileExtension profileExtension,
-            ImageFileExtension backgroundExtension
+            ImageFileExtension backgroundExtension,
+            String accessToken
     ) {
+        Long ownerId = jwtManager.read(accessToken);
         User user = userRepository.getById(ownerId);
 
         String profileImageUrl = "";
