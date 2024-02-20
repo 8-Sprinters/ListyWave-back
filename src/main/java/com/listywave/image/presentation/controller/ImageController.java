@@ -10,6 +10,8 @@ import com.listywave.image.presentation.dto.request.UserImageUpdateRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -25,12 +27,12 @@ public class ImageController {
     ResponseEntity<List<ItemPresignedUrlResponse>> listItemPresignedUrlCreate(
             @RequestBody ListsImagesCreateRequest request
     ) {
-        return ResponseEntity.ok()
-                .body(imageService.createListsPresignedUrl(
-                        request.ownerId(),
-                        request.listId(),
-                        request.extensionRanks()
-                ));
+        List<ItemPresignedUrlResponse> response = imageService.createListsPresignedUrl(
+                request.ownerId(),
+                request.listId(),
+                request.extensionRanks()
+        );
+        return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/lists/upload-complete")
@@ -65,4 +67,13 @@ public class ImageController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/lists/{listId}/items/{itemId}")
+    ResponseEntity<Void> deleteImageOfItem(
+            @PathVariable("listId") Long listId,
+            @PathVariable("itemId") Long itemId,
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+    ) {
+        imageService.deleteImageOfItem(listId, itemId, accessToken);
+        return ResponseEntity.noContent().build();
+    }
 }
