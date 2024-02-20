@@ -1,12 +1,12 @@
 package com.listywave.user.repository.user.custom.impl;
 
+import static com.listywave.common.util.PaginationUtils.checkEndPage;
 import static com.listywave.list.application.domain.item.QItem.item;
 import static com.listywave.list.application.domain.list.QListEntity.listEntity;
 import static com.listywave.user.application.domain.QUser.user;
 
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.application.dto.CollaboratorResponse;
-import com.listywave.common.util.PaginationUtils;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.user.application.domain.User;
@@ -46,7 +46,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .orderBy(listEntity.updatedDate.desc())
                 .fetch();
 
-        return PaginationUtils.checkEndPage(pageable, fetch);
+        return checkEndPage(pageable, fetch);
     }
 
     private BooleanExpression collaboEq(List<Collaborator> collaborators, String type) {
@@ -135,6 +135,6 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .limit(pageable.getPageSize() + 1)
                 .offset(pageable.getOffset())
                 .fetch();
-        return PaginationUtils.checkEndPage(pageable, fetch);
+        return checkEndPage(pageable, fetch);
     }
 }

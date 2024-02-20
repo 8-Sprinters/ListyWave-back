@@ -15,7 +15,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,18 +61,22 @@ public class UserController {
     }
 
     @GetMapping("/users/{userId}/followings")
-    ResponseEntity<FollowingsResponse> getFollowings(@PathVariable(name = "userId") Long userId) {
-        FollowingsResponse response = userService.getFollowings(userId);
+    ResponseEntity<FollowingsResponse> getFollowings(
+            @PathVariable(name = "userId") Long userId,
+            @RequestParam(name = "search", defaultValue = "") String search
+    ) {
+        FollowingsResponse response = userService.getFollowings(userId, search);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/users/{userId}/followers")
     ResponseEntity<FollowersResponse> getFollowers(
             @PathVariable(name = "userId") Long userId,
-            @RequestParam(name = "size", defaultValue = "20") int size,
-            @RequestParam(name = "cursorId", defaultValue = "0") int cursorId
+            @RequestParam(name = "cursorId", required = false) String cursorId,
+            @RequestParam(name = "search", defaultValue = "") String search,
+            @PageableDefault(size = 20) Pageable pageable
     ) {
-        FollowersResponse response = userService.getFollowers(userId, size, cursorId);
+        FollowersResponse response = userService.getFollowers(userId, pageable, search, cursorId);
         return ResponseEntity.ok(response);
     }
 

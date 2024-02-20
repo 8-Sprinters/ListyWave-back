@@ -34,4 +34,3 @@ record FollowingUserInfo(
                 .build();
     }
 }
-

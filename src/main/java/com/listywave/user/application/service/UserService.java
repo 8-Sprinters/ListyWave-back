@@ -1,8 +1,6 @@
 package com.listywave.user.application.service;
 
 
-import static java.util.Comparator.comparing;
-
 import com.listywave.alarm.application.domain.AlarmEvent;
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.collaborator.application.domain.Collaborator;
@@ -90,14 +88,9 @@ public class UserService {
         return AllUserResponse.of(allUser);
     }
 
-    public FollowingsResponse getFollowings(Long userId) {
-        User user = userRepository.getById(userId);
-        List<Follow> follows = followRepository.getAllByFollowerUser(user);
-
-        List<User> followingUsers = follows.stream()
-                .map(Follow::getFollowingUser)
-                .sorted(comparing(User::getNickname))
-                .toList();
+    public FollowingsResponse getFollowings(Long userId, String search) {
+        User followerUser = userRepository.getById(userId);
+        List<User> followingUsers = followRepository.findAllByFollowerUserOrderByFollowingUserNicknameAsc(followerUser, search);
         return FollowingsResponse.of(followingUsers);
     }
 
@@ -126,23 +119,19 @@ public class UserService {
         followerUser.unfollow(followingUser);
     }
 
-    public FollowersResponse getFollowers(Long userId, int size, int cursorId) {
+    public FollowersResponse getFollowers(Long userId, Pageable pageable, String search, String cursorId) {
         User followingUser = userRepository.getById(userId);
 
-        List<Follow> follows = followRepository.findAllByFollowingUserOrderByFollowerUserNicknameDesc(followingUser, size, cursorId);
-        List<User> followerUsers = follows.stream()
-                .map(Follow::getFollowerUser)
-                .toList();
+        Slice<User> result =
+                followRepository.findAllByFollowingUserOrderByFollowerUserNicknameAsc(followingUser, pageable, search, cursorId);
+        List<User> followerUserList = result.getContent();
 
-        if (followerUsers.isEmpty()) {
+        if (followerUserList.isEmpty()) {
             return FollowersResponse.empty();
         }
-
         int totalCount = followRepository.countByFollowingUser(followingUser);
-        if (followerUsers.size() > size) {
-            return FollowersResponse.of(followerUsers.subList(0, size), totalCount, true);
-        }
-        return FollowersResponse.of(followerUsers, totalCount, false);
+
+        return FollowersResponse.of(followerUserList, totalCount, result.hasNext());
     }
 
     @Transactional(readOnly = true)
