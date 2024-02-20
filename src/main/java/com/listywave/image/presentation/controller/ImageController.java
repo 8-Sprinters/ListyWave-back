@@ -47,7 +47,6 @@ public class ImageController {
             @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
     ) {
         UserPresignedUrlResponse userPresignedUrlResponse = imageService.updateUserImagePresignedUrl(
-                request.ownerId(),
                 request.profileExtension(),
                 request.backgroundExtension(),
                 accessToken
@@ -57,12 +56,13 @@ public class ImageController {
 
     @PostMapping("/users/upload-complete")
     ResponseEntity<Void> userImageUpload(
-            @RequestBody UserImageUpdateRequest request
+            @RequestBody UserImageUpdateRequest request,
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
     ) {
         imageService.uploadCompleteUserImages(
-                request.ownerId(),
                 request.profileExtension(),
-                request.backgroundExtension()
+                request.backgroundExtension(),
+                accessToken
         );
         return ResponseEntity.noContent().build();
     }

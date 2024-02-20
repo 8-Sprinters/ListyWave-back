@@ -1,7 +1,9 @@
 package com.listywave.user.application.service;
 
+
 import static java.util.Comparator.comparing;
 
+import com.listywave.alarm.application.domain.AlarmEvent;
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.repository.CollaboratorRepository;
@@ -21,6 +23,7 @@ import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -36,6 +39,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final CollaboratorRepository collaboratorRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
     public UserInfoResponse getUserInfo(Long userId, String accessToken) {
@@ -107,6 +111,8 @@ public class UserService {
         followRepository.save(follow);
 
         followerUser.follow(followingUser);
+
+        applicationEventPublisher.publishEvent(AlarmEvent.follow(followerUser, followingUser));
     }
 
     public void unfollow(Long followingUserId, String accessToken) {
@@ -159,9 +165,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Boolean checkNicknameDuplicate(String nickname, String accessToken) {
-        Long loginUserId = jwtManager.read(accessToken);
-        userRepository.getById(loginUserId);
+    public Boolean checkNicknameDuplicate(String nickname) {
         return userRepository.existsByNicknameValue(nickname);
     }
 

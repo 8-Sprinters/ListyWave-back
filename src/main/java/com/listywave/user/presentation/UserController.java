@@ -114,10 +114,9 @@ public class UserController {
 
     @GetMapping("/users/exists")
     ResponseEntity<Boolean> checkNicknameDuplicate(
-            @RequestParam(name = "nickname") String nickname,
-            @RequestHeader(value = HttpHeaders.AUTHORIZATION, defaultValue = "") String accessToken
+            @RequestParam(name = "nickname") String nickname
     ) {
-        return ResponseEntity.ok(userService.checkNicknameDuplicate(nickname, accessToken));
+        return ResponseEntity.ok(userService.checkNicknameDuplicate(nickname));
     }
 
     @DeleteMapping("/followers/{userId}")
