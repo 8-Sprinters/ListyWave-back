@@ -1,5 +1,7 @@
 package com.listywave.user.application.service;
 
+import static java.util.Comparator.comparing;
+
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.repository.CollaboratorRepository;
@@ -19,6 +21,8 @@ import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,22 +64,20 @@ public class UserService {
             String type,
             CategoryType category,
             Long cursorId,
-            int size
+            Pageable pageable
     ) {
         userUtil.getUserByUserid(userId);
 
         List<Collaborator> collaboList = collaboratorRepository.findAllByUserId(userId);
-        List<ListEntity> feedList = userRepository.findFeedLists(collaboList, userId, type, category, cursorId, size);
+        Slice<ListEntity> result =
+                userRepository.findFeedLists(collaboList, userId, type, category, cursorId, pageable);
+        List<ListEntity> feedList = result.getContent();
 
-        boolean hasNext = false;
         cursorId = null;
-
-        if (feedList.size() == size + 1) {
-            feedList.remove(size);
-            hasNext = true;
+        if (!feedList.isEmpty()) {
             cursorId = feedList.get(feedList.size() - 1).getId();
         }
-        return AllUserListsResponse.of(hasNext, cursorId, feedList);
+        return AllUserListsResponse.of(result.hasNext(), cursorId, feedList);
     }
 
     @Transactional(readOnly = true)
@@ -90,6 +92,7 @@ public class UserService {
 
         List<User> followingUsers = follows.stream()
                 .map(Follow::getFollowingUser)
+                .sorted(comparing(User::getNickname))
                 .toList();
         return FollowingsResponse.of(followingUsers);
     }
@@ -120,7 +123,7 @@ public class UserService {
     public FollowersResponse getFollowers(Long userId, int size, int cursorId) {
         User followingUser = userRepository.getById(userId);
 
-        List<Follow> follows = followRepository.findAllByFollowingUser(followingUser, size, cursorId);
+        List<Follow> follows = followRepository.findAllByFollowingUserOrderByFollowerUserNicknameDesc(followingUser, size, cursorId);
         List<User> followerUsers = follows.stream()
                 .map(Follow::getFollowerUser)
                 .toList();

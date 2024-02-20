@@ -6,6 +6,7 @@ import static com.listywave.user.application.domain.QUser.user;
 
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.application.dto.CollaboratorResponse;
+import com.listywave.common.util.PaginationUtils;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.user.application.domain.User;
@@ -26,8 +27,11 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<ListEntity> findFeedLists(List<Collaborator> collaborators, Long userId, String type, CategoryType category, Long cursorId, int size) {
-        return queryFactory
+    public Slice<ListEntity> findFeedLists(
+            List<Collaborator> collaborators, Long userId, String type,
+            CategoryType category, Long cursorId, Pageable pageable
+    ) {
+        List<ListEntity> fetch = queryFactory
                 .selectFrom(listEntity)
                 .leftJoin(item).on(listEntity.id.eq(item.list.id))
                 .where(
@@ -38,9 +42,11 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                         listIdLt(cursorId)
                 )
                 .distinct()
-                .limit(size + 1)
+                .limit(pageable.getPageSize() + 1)
                 .orderBy(listEntity.updatedDate.desc())
                 .fetch();
+
+        return PaginationUtils.checkEndPage(pageable, fetch);
     }
 
     private BooleanExpression collaboEq(List<Collaborator> collaborators, String type) {
@@ -111,7 +117,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
         if (search.isEmpty()) {
             return new SliceImpl<>(List.of(), pageable, false);
         }
-        List<CollaboratorResponse> collaborators = queryFactory
+        List<CollaboratorResponse> fetch = queryFactory
                 .select(Projections.fields(CollaboratorResponse.class,
                         user.id,
                         user.nickname.value.as("nickname"),
@@ -129,15 +135,6 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .limit(pageable.getPageSize() + 1)
                 .offset(pageable.getOffset())
                 .fetch();
-        return checkEndPage(pageable, collaborators);
-    }
-
-    private Slice<CollaboratorResponse> checkEndPage(Pageable pageable, List<CollaboratorResponse> results) {
-        boolean hasNext = false;
-        if (results.size() > pageable.getPageSize()) {
-            hasNext = true;
-            results.remove(pageable.getPageSize());
-        }
-        return new SliceImpl<>(results, pageable, hasNext);
+        return PaginationUtils.checkEndPage(pageable, fetch);
     }
 }
