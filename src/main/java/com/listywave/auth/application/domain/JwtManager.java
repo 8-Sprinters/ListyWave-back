@@ -41,7 +41,7 @@ public class JwtManager {
     }
 
     public Long read(String token) {
-        if (token.isBlank() || !token.startsWith(PREFIX)) {
+        if (token == null || token.isBlank() || !token.startsWith(PREFIX)) {
             throw new CustomException(REQUIRED_ACCESS_TOKEN);
         }
         token = token.substring(PREFIX.length());
