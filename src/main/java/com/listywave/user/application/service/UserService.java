@@ -161,9 +161,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Boolean checkNicknameDuplicate(String nickname, String accessToken) {
-        Long loginUserId = jwtManager.read(accessToken);
-        userRepository.getById(loginUserId);
+    public Boolean checkNicknameDuplicate(String nickname) {
         return userRepository.existsByNicknameValue(nickname);
     }
 }
