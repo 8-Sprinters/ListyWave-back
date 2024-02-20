@@ -76,6 +76,7 @@ public class ListService {
         ListEntity savedList = listRepository.save(list);
 
         if (hasCollaboration) {
+            collaboratorIds.add(user.getId());
             Collaborators collaborators = createCollaborators(collaboratorIds, savedList);
             collaboratorRepository.saveAll(collaborators.getCollaborators());
         }

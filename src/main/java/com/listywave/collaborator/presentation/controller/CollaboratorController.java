@@ -6,6 +6,7 @@ import com.listywave.collaborator.application.dto.CollaboratorSearchResponse;
 import com.listywave.collaborator.application.service.CollaboratorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -22,7 +23,7 @@ public class CollaboratorController {
     ResponseEntity<CollaboratorSearchResponse> getCollaborators(
             @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken,
             @RequestParam(name = "search", defaultValue = "") String search,
-            Pageable pageable
+            @PageableDefault(size = 10) Pageable pageable
     ) {
         CollaboratorSearchResponse collaborators = collaboratorService.getCollaborators(accessToken, search, pageable);
         return ResponseEntity.ok(collaborators);
