@@ -55,12 +55,12 @@ public class ImageController {
     @PostMapping("/users/upload-complete")
     ResponseEntity<Void> userImageUpload(
             @RequestBody UserImageUpdateRequest request,
-            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+            @Auth Long loginUserId
     ) {
         imageService.uploadCompleteUserImages(
                 request.profileExtension(),
                 request.backgroundExtension(),
-                accessToken
+                loginUserId
         );
         return ResponseEntity.noContent().build();
     }

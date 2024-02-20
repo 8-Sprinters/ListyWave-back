@@ -78,8 +78,8 @@ public class UserService {
         return AllUserResponse.of(allUser);
     }
 
-    public FollowingsResponse getFollowings(Long userId, String search) {
-        User followerUser = userRepository.getById(userId);
+    public FollowingsResponse getFollowings(Long followerUserId, String search) {
+        User followerUser = userRepository.getById(followerUserId);
         List<User> followingUsers = followRepository.findAllByFollowerUserOrderByFollowingUserNicknameAsc(followerUser, search);
         return FollowingsResponse.of(followingUsers);
     }

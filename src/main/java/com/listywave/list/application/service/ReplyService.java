@@ -1,6 +1,6 @@
 package com.listywave.list.application.service;
 
-import com.listywave.auth.application.domain.JwtManager;
+import com.listywave.alarm.application.domain.AlarmEvent;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import com.listywave.list.application.domain.comment.Comment;
@@ -15,6 +15,7 @@ import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

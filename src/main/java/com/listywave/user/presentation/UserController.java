@@ -1,8 +1,7 @@
 package com.listywave.user.presentation;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-
 import com.listywave.common.auth.Auth;
+import com.listywave.common.auth.OptionalAuth;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.user.application.dto.AllUserListsResponse;
 import com.listywave.user.application.dto.AllUserResponse;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,9 +34,9 @@ public class UserController {
     @GetMapping("/users/{userId}")
     ResponseEntity<UserInfoResponse> getUserInfo(
             @PathVariable(value = "userId") Long userId,
-            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+            @OptionalAuth Long loginUserId
     ) {
-        UserInfoResponse userInfoResponse = userService.getUserInfo(userId, accessToken);
+        UserInfoResponse userInfoResponse = userService.getUserInfo(userId, loginUserId);
         return ResponseEntity.ok(userInfoResponse);
     }
 
