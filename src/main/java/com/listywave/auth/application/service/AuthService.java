@@ -4,6 +4,7 @@ import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.auth.application.domain.kakao.KakaoOauthClient;
 import com.listywave.auth.application.domain.kakao.KakaoRedirectUriProvider;
 import com.listywave.auth.application.dto.LoginResult;
+import com.listywave.auth.application.dto.UpdateTokenResult;
 import com.listywave.auth.infra.kakao.response.KakaoMember;
 import com.listywave.auth.infra.kakao.response.KakaoTokenResponse;
 import com.listywave.user.application.domain.User;
@@ -58,5 +59,13 @@ public class AuthService {
     public void logout(Long userId) {
         User user = userRepository.getById(userId);
         kakaoOauthClient.logout(user.getKakaoAccessToken());
+    }
+
+    public UpdateTokenResult updateToken(String refreshToken) {
+        Long userId = jwtManager.read(refreshToken);
+
+        String accessToken = jwtManager.createAccessToken(userId);
+        String newRefreshToken = jwtManager.createRefreshToken(userId);
+        return new UpdateTokenResult(accessToken, newRefreshToken);
     }
 }
