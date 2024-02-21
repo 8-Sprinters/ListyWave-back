@@ -48,6 +48,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -159,19 +161,33 @@ public class ListService {
     }
 
     @Transactional(readOnly = true)
-    public ListRecentResponse getRecentLists(String accessToken) {
+    public ListRecentResponse getRecentLists(String accessToken, Long cursorId, Pageable pageable) {
         if (isSignedIn(accessToken)) {
             Long loginUserId = jwtManager.read(accessToken);
             User user = userRepository.getById(loginUserId);
             List<Follow> follows = followRepository.getAllByFollowerUser(user);
 
-            List<User> followingUsers = follows.stream()
+            List<User> myFollowingUsers = follows.stream()
                     .map(Follow::getFollowingUser)
                     .toList();
-            return ListRecentResponse.of(listRepository.getRecentListsByFollowing(followingUsers));
+
+            Slice<ListEntity> result =
+                    listRepository.getRecentListsByFollowing(myFollowingUsers, cursorId, pageable);
+            return getListRecentResponse(result);
         }
 
-        return ListRecentResponse.of(listRepository.getRecentLists());
+        Slice<ListEntity> result = listRepository.getRecentLists(cursorId, pageable);
+        return getListRecentResponse(result);
+    }
+
+    private ListRecentResponse getListRecentResponse(Slice<ListEntity> result) {
+        List<ListEntity> recentList = result.getContent();
+
+        Long cursorId = null;
+        if (!recentList.isEmpty()) {
+            cursorId = recentList.get(recentList.size() - 1).getId();
+        }
+        return ListRecentResponse.of(recentList, cursorId, result.hasNext());
     }
 
     private boolean isSignedIn(String accessToken) {

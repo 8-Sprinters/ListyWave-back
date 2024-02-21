@@ -14,6 +14,8 @@ import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -67,9 +69,11 @@ public class ListController {
 
     @GetMapping("/lists")
     ResponseEntity<ListRecentResponse> getRecentLists(
-            @RequestHeader(value = "Authorization", defaultValue = "") String accessToken
+            @RequestHeader(value = "Authorization", defaultValue = "") String accessToken,
+            @RequestParam(name = "cursorId", required = false) Long cursorId,
+            @PageableDefault(size = 10) Pageable pageable
     ) {
-        ListRecentResponse recentLists = listService.getRecentLists(accessToken);
+        ListRecentResponse recentLists = listService.getRecentLists(accessToken, cursorId, pageable);
         return ResponseEntity.ok(recentLists);
     }
 
