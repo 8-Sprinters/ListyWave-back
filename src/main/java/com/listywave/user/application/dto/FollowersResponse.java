@@ -9,7 +9,7 @@ import lombok.Builder;
 public record FollowersResponse(
         List<FollowerInfo> followers,
         int totalCount,
-        Long cursorId,
+        String cursorId,
         boolean hasNext
 ) {
 
@@ -17,7 +17,7 @@ public record FollowersResponse(
         return FollowersResponse.builder()
                 .followers(FollowerInfo.toList(users))
                 .totalCount(totalCount)
-                .cursorId(users.get(users.size() - 1).getId())
+                .cursorId(users.get(users.size() - 1).getNickname())
                 .hasNext(hasNext)
                 .build();
     }
