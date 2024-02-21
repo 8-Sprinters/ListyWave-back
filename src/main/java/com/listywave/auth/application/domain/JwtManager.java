@@ -1,6 +1,7 @@
 package com.listywave.auth.application.domain;
 
 import static com.listywave.common.exception.ErrorCode.REQUIRED_ACCESS_TOKEN;
+import static com.listywave.common.exception.ErrorCode.REQUIRED_REFRESH_TOKEN;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -67,6 +68,20 @@ public class JwtManager {
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+        return Long.valueOf(subject);
+    }
+
+    public Long readRefreshToken(String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new CustomException(REQUIRED_REFRESH_TOKEN);
+        }
+
+        String subject = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(refreshToken)
                 .getPayload()
                 .getSubject();
         return Long.valueOf(subject);

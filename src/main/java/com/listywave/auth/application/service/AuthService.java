@@ -62,7 +62,7 @@ public class AuthService {
     }
 
     public UpdateTokenResult updateToken(String refreshToken) {
-        Long userId = jwtManager.read(refreshToken);
+        Long userId = jwtManager.readRefreshToken(refreshToken);
 
         String accessToken = jwtManager.createAccessToken(userId);
         String newRefreshToken = jwtManager.createRefreshToken(userId);

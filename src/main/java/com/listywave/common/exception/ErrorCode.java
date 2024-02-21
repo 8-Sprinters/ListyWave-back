@@ -17,6 +17,7 @@ public enum ErrorCode {
     // Auth
     NOT_SUPPORTED_OAUTH_SERVER(BAD_REQUEST, "지원하지 않는 OAuth 서버입니다."),
     REQUIRED_ACCESS_TOKEN(UNAUTHORIZED, "인증 정보가 필요합니다."),
+    REQUIRED_REFRESH_TOKEN(UNAUTHORIZED, "리프레시 토큰이 포함되지 않았습니다."),
     INVALID_ACCESS_TOKEN(UNAUTHORIZED, "유효하지 않은 AccessToken 입니다. 다시 로그인해주세요."),
     INVALID_ACCESS(FORBIDDEN, "접근 권한이 존재하지 않습니다."),
     CANNOT_COLLECT_OWN_LIST(BAD_REQUEST, "리스트 작성자는 자신의 리스트에 콜렉트할 수 없습니다."),
