@@ -63,7 +63,7 @@ public class CollectionService {
         Long tokenUserId = jwtManager.read(accessToken);
         User user = userRepository.getById(tokenUserId);
 
-        Slice<Collect> result = collectionRepository.getAllCollectionList(cursorId, pageable, user.getId());
+        Slice<Collect> result = collectionRepository.getAllCollectionList(cursorId, pageable, user.getId(), category);
         List<Collect> collectionList = result.getContent();
 
         cursorId = null;
