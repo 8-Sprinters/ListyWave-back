@@ -27,9 +27,8 @@ public class HistoryController {
         return ResponseEntity.ok(result);
     }
 
-    @PatchMapping("/lists/{listId}/histories/{historyId}")
+    @PatchMapping("/histories/{historyId}")
     ResponseEntity<Void> updatePublic(
-            @PathVariable("listId") Long listId,
             @PathVariable("historyId") Long historyId,
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, defaultValue = "") String accessToken
     ) {
@@ -37,9 +36,8 @@ public class HistoryController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/lists/{listId}/histories/{historyId}")
+    @DeleteMapping("/histories/{historyId}")
     ResponseEntity<Void> deleteHistory(
-            @PathVariable("listId") Long listId,
             @PathVariable("historyId") Long historyId,
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, defaultValue = "") String accessToken
     ) {
