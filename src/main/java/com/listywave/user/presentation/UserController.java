@@ -15,7 +15,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -96,8 +95,10 @@ public class UserController {
     }
 
     @GetMapping("/users/recommend")
-    ResponseEntity<List<RecommendUsersResponse>> getRecommendUsers() {
-        List<RecommendUsersResponse> recommendUsers = userService.getRecommendUsers();
+    ResponseEntity<List<RecommendUsersResponse>> getRecommendUsers(
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+    ) {
+        List<RecommendUsersResponse> recommendUsers = userService.getRecommendUsers(accessToken);
         return ResponseEntity.ok(recommendUsers);
     }
 

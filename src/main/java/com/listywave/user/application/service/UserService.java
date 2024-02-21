@@ -146,8 +146,17 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<RecommendUsersResponse> getRecommendUsers() {
-        List<User> recommendUsers = userRepository.getRecommendUsers();
+    public List<RecommendUsersResponse> getRecommendUsers(String accessToken) {
+        Long userId = jwtManager.read(accessToken);
+        User user = userRepository.getById(userId);
+
+        List<Follow> follows = followRepository.getAllByFollowerUser(user);
+
+        List<User> myFollowingUsers = follows.stream()
+                .map(Follow::getFollowingUser)
+                .toList();
+
+        List<User> recommendUsers = userRepository.getRecommendUsers(myFollowingUsers, user);
         return recommendUsers.stream()
                 .map(RecommendUsersResponse::of)
                 .toList();

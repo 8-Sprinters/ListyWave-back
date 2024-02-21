@@ -16,7 +16,7 @@ public interface CustomUserRepository {
             CategoryType category, Long cursorId, Pageable pageable
     );
 
-    List<User> getRecommendUsers();
+    List<User> getRecommendUsers(List<User> myFollowingUsers, User user);
 
     Long getCollaboratorCount(String search, User user);
 
