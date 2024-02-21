@@ -32,8 +32,12 @@ public class Reply extends BaseEntity {
     @Embedded
     private CommentContent commentContent;
 
-    public boolean canDeleteBy(User user) {
+    public boolean canDeleteOrUpdateBy(User user) {
         return this.user.equals(user);
+    }
+
+    public void update(CommentContent content) {
+        this.commentContent = content;
     }
 
     public Long getCommentId() {

@@ -6,11 +6,12 @@ import static org.springframework.http.HttpStatus.CREATED;
 import com.listywave.list.application.dto.response.CommentCreateResponse;
 import com.listywave.list.application.dto.response.CommentFindResponse;
 import com.listywave.list.application.service.CommentService;
-import com.listywave.list.presentation.dto.request.comment.CommentCreateRequest;
+import com.listywave.list.presentation.dto.request.comment.CommentRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,9 +31,9 @@ public class CommentController {
     ResponseEntity<CommentCreateResponse> create(
             @PathVariable(value = "listId") Long listId,
             @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken,
-            @RequestBody CommentCreateRequest commentCreateRequest
+            @RequestBody CommentRequest commentRequest
     ) {
-        CommentCreateResponse response = commentService.create(listId, commentCreateRequest.content(), accessToken);
+        CommentCreateResponse response = commentService.create(listId, commentRequest.content(), accessToken);
         return ResponseEntity.status(CREATED).body(response);
     }
 
@@ -53,6 +54,17 @@ public class CommentController {
             @PathVariable(value = "commentId") Long commentId
     ) {
         commentService.delete(listId, commentId, accessToken);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{commentId}")
+    ResponseEntity<Void> update(
+            @PathVariable(value = "listId") Long listId,
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken,
+            @PathVariable(value = "commentId") Long commentId,
+            @RequestBody CommentRequest commentRequest
+    ) {
+        commentService.update(listId, commentId, accessToken, commentRequest.content());
         return ResponseEntity.noContent().build();
     }
 }

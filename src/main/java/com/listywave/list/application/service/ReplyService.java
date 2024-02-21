@@ -8,6 +8,7 @@ import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.comment.CommentContent;
 import com.listywave.list.application.domain.reply.Reply;
 import com.listywave.list.application.dto.ReplyDeleteCommand;
+import com.listywave.list.application.dto.ReplyUpdateCommand;
 import com.listywave.list.application.dto.response.ReplyCreateResponse;
 import com.listywave.list.repository.CommentRepository;
 import com.listywave.list.repository.list.ListRepository;
@@ -51,7 +52,7 @@ public class ReplyService {
         Comment comment = commentRepository.getById(command.commentId());
         Reply reply = replyRepository.getById(command.replyId());
 
-        if (!reply.canDeleteBy(user)) {
+        if (!reply.canDeleteOrUpdateBy(user)) {
             throw new CustomException(ErrorCode.INVALID_ACCESS, "답글은 작성자만 삭제할 수 있습니다.");
         }
 
@@ -59,5 +60,19 @@ public class ReplyService {
         if (!replyRepository.existsByComment(comment) && comment.isDeleted()) {
             commentRepository.delete(comment);
         }
+    }
+
+    public void update(ReplyUpdateCommand command, String accessToken) {
+        listRepository.getById(command.listId());
+        Long userId = jwtManager.read(accessToken);
+        User user = userRepository.getById(userId);
+        Comment comment = commentRepository.getById(command.commentId());
+        Reply reply = replyRepository.getById(command.replyId());
+
+        if (!reply.canDeleteOrUpdateBy(user)) {
+            throw new CustomException(ErrorCode.INVALID_ACCESS, "답글은 작성자만 수정할 수 있습니다.");
+        }
+
+        reply.update(new CommentContent(command.content()));
     }
 }

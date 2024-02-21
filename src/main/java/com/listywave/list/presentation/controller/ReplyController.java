@@ -4,12 +4,14 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.CREATED;
 
 import com.listywave.list.application.dto.ReplyDeleteCommand;
+import com.listywave.list.application.dto.ReplyUpdateCommand;
 import com.listywave.list.application.dto.response.ReplyCreateResponse;
 import com.listywave.list.application.service.ReplyService;
-import com.listywave.list.presentation.dto.request.ReplyCreateRequest;
+import com.listywave.list.presentation.dto.request.ReplyRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +31,7 @@ public class ReplyController {
             @PathVariable(value = "listId") Long listId,
             @PathVariable(value = "commentId") Long commentId,
             @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken,
-            @RequestBody ReplyCreateRequest request
+            @RequestBody ReplyRequest request
     ) {
         ReplyCreateResponse response = replyService.createReply(listId, commentId, request.content(), accessToken);
         return ResponseEntity.status(CREATED).body(response);
@@ -44,6 +46,19 @@ public class ReplyController {
     ) {
         ReplyDeleteCommand replyDeleteCommand = new ReplyDeleteCommand(listId, commentId, replyId);
         replyService.delete(replyDeleteCommand, accessToken);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{replyId}")
+    ResponseEntity<Void> updateReply(
+            @PathVariable(value = "listId") Long listId,
+            @PathVariable(value = "commentId") Long commentId,
+            @PathVariable(value = "replyId") Long replyId,
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken,
+            @RequestBody ReplyRequest request
+    ) {
+        ReplyUpdateCommand replyUpdateCommand = new ReplyUpdateCommand(listId, commentId, replyId, request.content());
+        replyService.update(replyUpdateCommand, accessToken);
         return ResponseEntity.noContent().build();
     }
 }
