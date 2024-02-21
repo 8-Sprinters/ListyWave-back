@@ -48,10 +48,10 @@ public class CustomCollectionRepositoryImpl implements CustomCollectionRepositor
         return cursorId == null ? null : collect.id.lt(cursorId);
     }
 
-    private BooleanExpression categoryEq(CategoryType categoryCode) {
-        if ("0".equals(categoryCode.getCodeValue())) {
+    private BooleanExpression categoryEq(CategoryType category) {
+        if ("0".equals(category.getCodeValue())) {
             return null;
         }
-        return listEntity.category.eq(categoryCode);
+        return listEntity.category.eq(category);
     }
 }

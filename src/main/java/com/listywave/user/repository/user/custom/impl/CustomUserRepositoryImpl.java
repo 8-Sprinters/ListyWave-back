@@ -64,11 +64,11 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
         return cursorId == null ? null : listEntity.id.lt(cursorId);
     }
 
-    private BooleanExpression categoryEq(CategoryType categoryCode) {
-        if ("0".equals(categoryCode.getCodeValue())) {
+    private BooleanExpression categoryEq(CategoryType category) {
+        if ("0".equals(category.getCodeValue())) {
             return null;
         }
-        return listEntity.category.eq(categoryCode);
+        return listEntity.category.eq(category);
     }
 
     private BooleanExpression typeEq(String type) {
