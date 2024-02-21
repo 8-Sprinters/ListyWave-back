@@ -31,7 +31,7 @@ public record ListDetailResponse(
 
     public static ListDetailResponse of(ListEntity list, User user, boolean isCollected, List<Collaborator> collaborators) {
         return ListDetailResponse.builder()
-                .category(list.getCategory().name())
+                .category(list.getCategory().getKorNameValue())
                 .labels(LabelResponse.toList(list.getLabels().getValues()))
                 .title(list.getTitle().getValue())
                 .description(list.getDescription().getValue())
