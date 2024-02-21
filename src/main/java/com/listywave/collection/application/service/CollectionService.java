@@ -7,6 +7,7 @@ import com.listywave.collection.application.dto.CollectionResponse;
 import com.listywave.collection.repository.CollectionRepository;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
+import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.user.application.domain.User;
@@ -59,11 +60,11 @@ public class CollectionService {
         list.decrementCollectCount();
     }
 
-    public CollectionResponse getCollection(String accessToken, Long cursorId, Pageable pageable) {
+    public CollectionResponse getCollection(String accessToken, Long cursorId, Pageable pageable, CategoryType category) {
         Long tokenUserId = jwtManager.read(accessToken);
         User user = userRepository.getById(tokenUserId);
 
-        Slice<Collect> result = collectionRepository.getAllCollectionList(cursorId, pageable, user.getId());
+        Slice<Collect> result = collectionRepository.getAllCollectionList(cursorId, pageable, user.getId(), category);
         List<Collect> collectionList = result.getContent();
 
         cursorId = null;
