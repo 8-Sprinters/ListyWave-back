@@ -82,7 +82,7 @@ public class CommentService {
         User user = userRepository.getById(userId);
         Comment comment = commentRepository.getById(commentId);
 
-        if (!comment.canDeleteOrUpdateBy(user)) {
+        if (!comment.isOwner(user)) {
             throw new CustomException(INVALID_ACCESS, "댓글은 작성자만 지울 수 있습니다.");
         }
 
@@ -99,7 +99,7 @@ public class CommentService {
         User user = userRepository.getById(userId);
         Comment comment = commentRepository.getById(commentId);
 
-        if (!comment.canDeleteOrUpdateBy(user)) {
+        if (!comment.isOwner(user)) {
             throw new CustomException(INVALID_ACCESS, "댓글은 작성자만 수정할 수 있습니다.");
         }
         comment.update(new CommentContent(content));

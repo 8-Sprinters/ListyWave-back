@@ -52,7 +52,7 @@ public class ReplyService {
         Comment comment = commentRepository.getById(command.commentId());
         Reply reply = replyRepository.getById(command.replyId());
 
-        if (!reply.canDeleteOrUpdateBy(user)) {
+        if (!reply.isOwner(user)) {
             throw new CustomException(ErrorCode.INVALID_ACCESS, "답글은 작성자만 삭제할 수 있습니다.");
         }
 
@@ -66,13 +66,12 @@ public class ReplyService {
         listRepository.getById(command.listId());
         Long userId = jwtManager.read(accessToken);
         User user = userRepository.getById(userId);
-        Comment comment = commentRepository.getById(command.commentId());
+        commentRepository.getById(command.commentId());
         Reply reply = replyRepository.getById(command.replyId());
 
-        if (!reply.canDeleteOrUpdateBy(user)) {
+        if (!reply.isOwner(user)) {
             throw new CustomException(ErrorCode.INVALID_ACCESS, "답글은 작성자만 수정할 수 있습니다.");
         }
-
         reply.update(new CommentContent(command.content()));
     }
 }

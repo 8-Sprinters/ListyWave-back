@@ -1,6 +1,6 @@
 package com.listywave.list.presentation.dto.request;
 
-public record ReplyRequest(
+public record ReplyCreateRequest(
         String content
 ) {
 }

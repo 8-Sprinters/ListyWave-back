@@ -39,7 +39,7 @@ public class Comment extends BaseEntity {
         return new Comment(list, user, content, false);
     }
 
-    public boolean canDeleteOrUpdateBy(User user) {
+    public boolean isOwner(User user) {
         return this.user.equals(user);
     }
 

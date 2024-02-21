@@ -7,7 +7,8 @@ import com.listywave.list.application.dto.ReplyDeleteCommand;
 import com.listywave.list.application.dto.ReplyUpdateCommand;
 import com.listywave.list.application.dto.response.ReplyCreateResponse;
 import com.listywave.list.application.service.ReplyService;
-import com.listywave.list.presentation.dto.request.ReplyRequest;
+import com.listywave.list.presentation.dto.request.ReplyCreateRequest;
+import com.listywave.list.presentation.dto.request.ReplyUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,10 +29,10 @@ public class ReplyController {
 
     @PostMapping
     ResponseEntity<ReplyCreateResponse> create(
-            @PathVariable(value = "listId") Long listId,
-            @PathVariable(value = "commentId") Long commentId,
+            @PathVariable("listId") Long listId,
+            @PathVariable("commentId") Long commentId,
             @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken,
-            @RequestBody ReplyRequest request
+            @RequestBody ReplyCreateRequest request
     ) {
         ReplyCreateResponse response = replyService.createReply(listId, commentId, request.content(), accessToken);
         return ResponseEntity.status(CREATED).body(response);
@@ -39,9 +40,9 @@ public class ReplyController {
 
     @DeleteMapping("/{replyId}")
     ResponseEntity<Void> deleteReply(
-            @PathVariable(value = "listId") Long listId,
-            @PathVariable(value = "commentId") Long commentId,
-            @PathVariable(value = "replyId") Long replyId,
+            @PathVariable("listId") Long listId,
+            @PathVariable("commentId") Long commentId,
+            @PathVariable("replyId") Long replyId,
             @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
     ) {
         ReplyDeleteCommand replyDeleteCommand = new ReplyDeleteCommand(listId, commentId, replyId);
@@ -51,11 +52,11 @@ public class ReplyController {
 
     @PatchMapping("/{replyId}")
     ResponseEntity<Void> updateReply(
-            @PathVariable(value = "listId") Long listId,
-            @PathVariable(value = "commentId") Long commentId,
-            @PathVariable(value = "replyId") Long replyId,
+            @PathVariable("listId") Long listId,
+            @PathVariable("commentId") Long commentId,
+            @PathVariable("replyId") Long replyId,
             @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken,
-            @RequestBody ReplyRequest request
+            @RequestBody ReplyUpdateRequest request
     ) {
         ReplyUpdateCommand replyUpdateCommand = new ReplyUpdateCommand(listId, commentId, replyId, request.content());
         replyService.update(replyUpdateCommand, accessToken);

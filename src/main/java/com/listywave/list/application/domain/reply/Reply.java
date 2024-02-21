@@ -32,7 +32,7 @@ public class Reply extends BaseEntity {
     @Embedded
     private CommentContent commentContent;
 
-    public boolean canDeleteOrUpdateBy(User user) {
+    public boolean isOwner(User user) {
         return this.user.equals(user);
     }
 

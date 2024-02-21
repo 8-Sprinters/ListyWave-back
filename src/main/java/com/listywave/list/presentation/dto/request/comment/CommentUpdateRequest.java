@@ -1,6 +1,6 @@
 package com.listywave.list.presentation.dto.request.comment;
 
-public record CommentRequest(
+public record CommentUpdateRequest(
         String content
 ) {
 }
