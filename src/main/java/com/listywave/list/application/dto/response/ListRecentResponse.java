@@ -9,10 +9,14 @@ import lombok.Builder;
 
 @Builder
 public record ListRecentResponse(
+        boolean hasNext,
+        Long cursorId,
         List<ListResponse> lists
 ) {
-    public static ListRecentResponse of(List<ListEntity> lists) {
+    public static ListRecentResponse of(List<ListEntity> lists, Long cursorId, boolean hasNext) {
         return ListRecentResponse.builder()
+                .hasNext(hasNext)
+                .cursorId(cursorId)
                 .lists(ListResponse.toList(lists))
                 .build();
     }
