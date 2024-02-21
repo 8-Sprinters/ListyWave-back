@@ -5,7 +5,7 @@ import lombok.Builder;
 
 @Builder
 public record CollaboratorSearchResponse(
-        List<CollaboratorResponse> collaborators,
+        List<CollaboratorResponse> users,
         Long totalCount,
         Boolean hasNext
 ) {
@@ -16,7 +16,7 @@ public record CollaboratorSearchResponse(
             Boolean hasNext
     ) {
         return CollaboratorSearchResponse.builder()
-                .collaborators(users)
+                .users(users)
                 .totalCount(totalCount)
                 .hasNext(hasNext)
                 .build();
