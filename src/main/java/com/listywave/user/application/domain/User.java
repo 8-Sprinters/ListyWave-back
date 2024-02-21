@@ -56,7 +56,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String kakaoAccessToken;
 
-    public static User initialCreate(Long oauthId, String oauthEmail, String kakaoAccessToken) {
+    public static User init(Long oauthId, String oauthEmail, String kakaoAccessToken) {
         return new User(
                 oauthId,
                 oauthEmail,
