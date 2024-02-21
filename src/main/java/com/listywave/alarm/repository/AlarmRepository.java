@@ -10,8 +10,10 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long>, CustomAlarm
 
     Optional<Alarm> findAlarmByIdAndReceiveUserId(Long id, Long receiveUserId);
 
-    @Query("select case when count(*) > 0 then false else true end " +
-            " from Alarm a " +
-            " where a.receiveUserId = :receiveUserId and a.isChecked = false")
-    Boolean isCheckedByReceiveUserId(Long receiveUserId);
+    @Query("""
+            select case when count(*) > 0 then false else true end
+            from Alarm a
+            where a.receiveUserId = :receiveUserId and a.isChecked = false
+            """)
+    Boolean hasCheckedAlarmsByReceiveUserId(Long receiveUserId);
 }

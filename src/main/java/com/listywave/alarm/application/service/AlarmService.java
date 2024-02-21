@@ -48,9 +48,9 @@ public class AlarmService {
         alarmRepository.save(alarmEvent.toEntity());
     }
 
-    public AlarmCheckResponse checkAlarm(String accessToken) {
+    public AlarmCheckResponse checkAllAlarmsRead(String accessToken) {
         Long tokenUserId = jwtManager.read(accessToken);
         User user = userRepository.getById(tokenUserId);
-        return new AlarmCheckResponse(alarmRepository.isCheckedByReceiveUserId(user.getId()));
+        return new AlarmCheckResponse(alarmRepository.hasCheckedAlarmsByReceiveUserId(user.getId()));
     }
 }

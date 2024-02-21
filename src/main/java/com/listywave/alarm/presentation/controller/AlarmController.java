@@ -35,11 +35,11 @@ public class AlarmController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/alarms/check")
-    ResponseEntity<AlarmCheckResponse> readAlarm(
+    @GetMapping("/alarms/check-new")
+    ResponseEntity<AlarmCheckResponse> checkAllAlarmsRead(
             @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
     ) {
-        return ResponseEntity.ok().body(alarmService.checkAlarm(accessToken));
+        return ResponseEntity.ok().body(alarmService.checkAllAlarmsRead(accessToken));
     }
 
 }
