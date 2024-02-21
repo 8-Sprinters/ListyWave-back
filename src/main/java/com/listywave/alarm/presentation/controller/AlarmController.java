@@ -2,6 +2,7 @@ package com.listywave.alarm.presentation.controller;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+import com.listywave.alarm.application.dto.AlarmCheckResponse;
 import com.listywave.alarm.application.dto.AlarmListResponse;
 import com.listywave.alarm.application.service.AlarmService;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +27,19 @@ public class AlarmController {
     }
 
     @PatchMapping("/alarms/{alarmId}")
-    ResponseEntity<AlarmListResponse> readAlarm(
+    ResponseEntity<Void> readAlarm(
             @PathVariable("alarmId") Long alarmId,
             @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
     ) {
         alarmService.readAlarm(alarmId, accessToken);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/alarms/check")
+    ResponseEntity<AlarmCheckResponse> readAlarm(
+            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+    ) {
+        return ResponseEntity.ok().body(alarmService.checkAlarm(accessToken));
+    }
+
 }
