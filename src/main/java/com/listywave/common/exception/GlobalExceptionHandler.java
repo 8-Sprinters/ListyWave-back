@@ -4,6 +4,7 @@ import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS_TOKEN;
 import static com.listywave.common.exception.ErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(SignatureException.class)
     ResponseEntity<ErrorResponse> handleSignatureException(SignatureException e) {
         log.error("[SignatureException] : {}", e.getMessage(), e);
-        CustomException customException = new CustomException(INVALID_ACCESS_TOKEN);
+        CustomException customException = new CustomException(INVALID_ACCESS_TOKEN, "서명 값이 잘못된 액세스 토큰입니다.");
+        return ErrorResponse.toResponseEntity(customException);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    ResponseEntity<ErrorResponse> handleExpiredJwtException(ExpiredJwtException e) {
+        log.error("[ExpiredJwtException] : {}", e.getMessage(), e);
+        CustomException customException = new CustomException(INVALID_ACCESS_TOKEN, "만료된 액세스 토큰입니다.");
         return ErrorResponse.toResponseEntity(customException);
     }
 }
