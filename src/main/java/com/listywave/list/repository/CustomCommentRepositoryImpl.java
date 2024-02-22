@@ -24,7 +24,7 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
                 .where(
                         listEntity.id.eq(list.getId()),
                         comment.id.gt(cursorId),
-                        listEntity.user.isDelete.eq(false)
+                        comment.user.isDelete.eq(false)
                 )
                 .orderBy(comment.id.asc())
                 .limit(size + 1)
