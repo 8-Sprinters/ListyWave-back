@@ -6,6 +6,7 @@ import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.application.domain.Collaborators;
 import com.listywave.collaborator.repository.CollaboratorRepository;
+import com.listywave.collection.repository.CollectionRepository;
 import com.listywave.common.exception.CustomException;
 import com.listywave.history.application.domain.History;
 import com.listywave.history.application.domain.HistoryItem;
@@ -64,6 +65,7 @@ public class ListService {
     private final FollowRepository followRepository;
     private final CommentRepository commentRepository;
     private final HistoryRepository historyRepository;
+    private final CollectionRepository collectionRepository;
     private final CollaboratorRepository collaboratorRepository;
 
     public ListCreateResponse listCreate(ListCreateRequest request, Long loginUserId) {
@@ -125,10 +127,11 @@ public class ListService {
         ListEntity list = listRepository.getById(listId);
         List<Collaborator> collaborators = collaboratorRepository.findAllByList(list);
 
-        if (loginUserId == null) {
-            return ListDetailResponse.of(list, list.getUser(), false, collaborators);
+        boolean isCollected = false;
+        if (loginUserId != null) {
+            isCollected = collectionRepository.existsByListAndUserId(list, loginUserId);
         }
-        return ListDetailResponse.of(list, list.getUser(), true, collaborators);
+        return ListDetailResponse.of(list, list.getUser(), isCollected, collaborators);
     }
 
     @Transactional(readOnly = true)
