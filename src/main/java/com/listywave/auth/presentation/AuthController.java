@@ -6,9 +6,9 @@ import static org.springframework.http.HttpHeaders.SET_COOKIE;
 import com.listywave.auth.application.dto.LoginResult;
 import com.listywave.auth.application.dto.UpdateTokenResult;
 import com.listywave.auth.application.service.AuthService;
-import com.listywave.common.auth.Auth;
 import com.listywave.auth.presentation.dto.LoginResponse;
 import com.listywave.auth.presentation.dto.UpdateTokenResponse;
+import com.listywave.common.auth.Auth;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
@@ -52,6 +52,7 @@ public class AuthController {
     private ResponseCookie createRefreshTokenCookie(String refreshToken) {
         return ResponseCookie.from("RefreshToken")
                 .value(refreshToken)
+                .domain("localhost")
                 .maxAge(Duration.ofSeconds(REFRESH_TOKEN_VALID_SECOND))
                 .httpOnly(true)
                 .secure(true)
