@@ -37,6 +37,8 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             new UriAndMethod("/auth/kakao", GET),
             new UriAndMethod("/auth/redirect/kakao", GET),
             new UriAndMethod("/categories", GET),
+            new UriAndMethod("/users/basic-profile-image", GET),
+            new UriAndMethod("/users/basic-background-image", GET),
     };
 
     private final JwtManager jwtManager;

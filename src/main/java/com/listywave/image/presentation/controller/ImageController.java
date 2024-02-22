@@ -1,15 +1,21 @@
 package com.listywave.image.presentation.controller;
 
 import com.listywave.common.auth.Auth;
+import com.listywave.image.application.domain.BasicBackgroundImage;
+import com.listywave.image.application.domain.BasicProfileImage;
+import com.listywave.image.application.dto.response.BasicBackgroundImageUrlResponse;
+import com.listywave.image.application.dto.response.BasicProfileImageUrlResponse;
 import com.listywave.image.application.dto.response.ItemPresignedUrlResponse;
 import com.listywave.image.application.dto.response.UserPresignedUrlResponse;
 import com.listywave.image.application.service.ImageService;
 import com.listywave.image.presentation.dto.request.ListsImagesCreateRequest;
 import com.listywave.image.presentation.dto.request.UserImageUpdateRequest;
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -76,4 +82,21 @@ public class ImageController {
         imageService.deleteImageOfItem(listId, itemId, loginUserId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/users/basic-profile-image")
+    ResponseEntity<List<BasicProfileImageUrlResponse>> getAllBasicProfileImageUrl() {
+        List<BasicProfileImageUrlResponse> response = Arrays.stream(BasicProfileImage.values())
+                .map(BasicProfileImageUrlResponse::of)
+                .toList();
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/users/basic-background-image")
+    ResponseEntity<List<BasicBackgroundImageUrlResponse>> getAllBasicBackgroundImageUrl() {
+        List<BasicBackgroundImageUrlResponse> response = Arrays.stream(BasicBackgroundImage.values())
+                .map(BasicBackgroundImageUrlResponse::of)
+                .toList();
+        return ResponseEntity.ok().body(response);
+    }
+
 }
