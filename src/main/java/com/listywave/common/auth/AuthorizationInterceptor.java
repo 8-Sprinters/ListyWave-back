@@ -1,6 +1,7 @@
 package com.listywave.common.auth;
 
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.OPTIONS;
 
 import com.listywave.auth.application.domain.JwtManager;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,6 +45,10 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        if (isPreflight(request)) {
+            return true;
+        }
+
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         RequestMapping requestMapping = handlerMethod.getMethodAnnotation(RequestMapping.class);
         String mappingUri = requestMapping.value()[0];
@@ -56,6 +61,10 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         Long userId = jwtManager.read(accessToken);
         authContext.setUserId(userId);
         return true;
+    }
+
+    private boolean isPreflight(HttpServletRequest request) {
+        return request.getMethod().equals(OPTIONS.name());
     }
 
     private boolean isNonRequiredAuthentication(String mappingUri, HttpMethod mappingMethod) {
