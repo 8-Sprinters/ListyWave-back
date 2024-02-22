@@ -126,18 +126,18 @@ public class ListService {
     public ListDetailResponse getListDetail(Long listId, Long loginUserId) {
         ListEntity list = listRepository.getById(listId);
         List<Collaborator> collaborators = collaboratorRepository.findAllByList(list);
+        Items sortedItems = list.getSortItemsByRank();
 
         boolean isCollected = false;
         if (loginUserId != null) {
             isCollected = collectionRepository.existsByListAndUserId(list, loginUserId);
         }
-        return ListDetailResponse.of(list, list.getUser(), isCollected, collaborators);
+        return ListDetailResponse.of(list, list.getUser(), isCollected, collaborators, sortedItems.getValues());
     }
 
     @Transactional(readOnly = true)
     public List<ListTrandingResponse> getTrandingList() {
         List<ListEntity> lists = listRepository.findTrandingLists();
-        lists.forEach(ListEntity::sortItemsByRank);
         return lists.stream()
                 .map(list -> ListTrandingResponse.of(list, list.getFirstItemImageUrl()))
                 .toList();
