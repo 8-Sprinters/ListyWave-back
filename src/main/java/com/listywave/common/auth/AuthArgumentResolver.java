@@ -29,7 +29,7 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
             ModelAndViewContainer mavContainer,
             NativeWebRequest webRequest,
             WebDataBinderFactory binderFactory
-    ) throws Exception {
+    ) {
         Long userId = authContext.getUserId();
         if (userId == null) {
             throw new CustomException(REQUIRED_ACCESS_TOKEN);

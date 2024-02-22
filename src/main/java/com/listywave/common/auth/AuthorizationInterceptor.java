@@ -33,7 +33,6 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             new UriAndMethod("/users/{userId}/lists", GET),
             new UriAndMethod("/users/{userId}/followers", GET),
             new UriAndMethod("/users/{userId}/followings", GET),
-            new UriAndMethod("/users/recommend", GET),
             new UriAndMethod("/users/exists", GET),
             new UriAndMethod("/auth/kakao", GET),
             new UriAndMethod("/auth/redirect/kakao", GET),
