@@ -52,7 +52,6 @@ public class AuthController {
     private ResponseCookie createRefreshTokenCookie(String refreshToken) {
         return ResponseCookie.from("RefreshToken")
                 .value(refreshToken)
-                .domain("localhost")
                 .maxAge(Duration.ofSeconds(REFRESH_TOKEN_VALID_SECOND))
                 .httpOnly(true)
                 .secure(true)
