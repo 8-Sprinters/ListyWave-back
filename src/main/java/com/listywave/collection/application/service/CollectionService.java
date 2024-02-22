@@ -31,7 +31,7 @@ public class CollectionService {
         User loginUser = userRepository.getById(loginUserId);
         ListEntity list = listRepository.getById(listId);
 
-        list.validateOwner(loginUser);
+        list.validateOwnerRestriction(loginUser);
 
         if (collectionRepository.existsByListAndUserId(list, loginUser.getId())) {
             cancelCollect(list, loginUser.getId());

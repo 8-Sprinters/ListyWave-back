@@ -1,5 +1,6 @@
 package com.listywave.alarm.presentation.controller;
 
+import com.listywave.alarm.application.dto.AlarmCheckResponse;
 import com.listywave.alarm.application.dto.AlarmListResponse;
 import com.listywave.alarm.application.service.AlarmService;
 import com.listywave.common.auth.Auth;
@@ -25,11 +26,18 @@ public class AlarmController {
     }
 
     @PatchMapping("/alarms/{alarmId}")
-    ResponseEntity<AlarmListResponse> readAlarm(
+    ResponseEntity<Void> readAlarm(
             @PathVariable("alarmId") Long alarmId,
             @Auth Long loginUserId
     ) {
         alarmService.readAlarm(alarmId, loginUserId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/alarms/check-new")
+    ResponseEntity<AlarmCheckResponse> checkAllAlarmsRead(
+            @Auth Long loginUserId
+    ) {
+        return ResponseEntity.ok().body(alarmService.checkAllAlarmsRead(loginUserId));
     }
 }

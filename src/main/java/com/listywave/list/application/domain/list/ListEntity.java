@@ -126,6 +126,12 @@ public class ListEntity {
         }
     }
 
+    public void validateOwnerRestriction(User user) {
+        if (this.user.equals(user)) {
+            throw new CustomException(INVALID_ACCESS);
+        }
+    }
+
     public boolean canDeleteOrUpdateBy(User user) {
         return this.user.equals(user);
     }

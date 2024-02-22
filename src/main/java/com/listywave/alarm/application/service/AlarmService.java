@@ -4,6 +4,7 @@ import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 
 import com.listywave.alarm.application.domain.Alarm;
 import com.listywave.alarm.application.domain.AlarmEvent;
+import com.listywave.alarm.application.dto.AlarmCheckResponse;
 import com.listywave.alarm.application.dto.AlarmListResponse;
 import com.listywave.alarm.repository.AlarmRepository;
 import com.listywave.common.exception.CustomException;
@@ -39,5 +40,10 @@ public class AlarmService {
     public void save(AlarmEvent alarmEvent) {
         alarmEvent.validateDifferentPublisherAndReceiver();
         alarmRepository.save(alarmEvent.toEntity());
+    }
+
+    public AlarmCheckResponse checkAllAlarmsRead(Long loginUserId) {
+        User user = userRepository.getById(loginUserId);
+        return new AlarmCheckResponse(alarmRepository.hasCheckedAlarmsByReceiveUserId(user.getId()));
     }
 }
