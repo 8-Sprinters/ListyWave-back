@@ -13,12 +13,13 @@ import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.AllUserListsResponse;
-import com.listywave.user.application.dto.AllUserResponse;
 import com.listywave.user.application.dto.FollowersResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
 import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.dto.UserProflieUpdateCommand;
+import com.listywave.user.application.dto.search.AllUserSearchResponse;
+import com.listywave.user.application.dto.search.UserSearchResponse;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
@@ -78,9 +79,18 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public AllUserResponse getAllUser() {
-        List<User> allUser = userRepository.findAll();
-        return AllUserResponse.of(allUser);
+    public AllUserSearchResponse getUsersBySearch(Long loginUserId, String search, Pageable pageable) {
+        if (loginUserId == null) {
+            return getAllUserSearchResponse(null, search, pageable);
+        }
+        User user = userRepository.getById(loginUserId);
+        return getAllUserSearchResponse(user.getId(), search, pageable);
+    }
+
+    private AllUserSearchResponse getAllUserSearchResponse(Long loginUserId, String search, Pageable pageable) {
+        Long count = userRepository.getCollaboratorCount(search, loginUserId);
+        Slice<UserSearchResponse> users = userRepository.getCollaborators(search, pageable, loginUserId);
+        return AllUserSearchResponse.of(users.getContent(), count, users.hasNext());
     }
 
     public FollowingsResponse getFollowings(Long followerUserId, String search) {

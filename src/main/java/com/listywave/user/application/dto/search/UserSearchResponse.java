@@ -1,11 +1,11 @@
-package com.listywave.collaborator.application.dto;
+package com.listywave.user.application.dto.search;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class CollaboratorResponse {
+public class UserSearchResponse {
     Long id;
     String nickname;
     String profileImageUrl;

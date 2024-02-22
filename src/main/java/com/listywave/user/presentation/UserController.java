@@ -4,11 +4,11 @@ import com.listywave.common.auth.Auth;
 import com.listywave.common.auth.OptionalAuth;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.user.application.dto.AllUserListsResponse;
-import com.listywave.user.application.dto.AllUserResponse;
 import com.listywave.user.application.dto.FollowersResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
 import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
+import com.listywave.user.application.dto.search.AllUserSearchResponse;
 import com.listywave.user.application.service.UserService;
 import com.listywave.user.presentation.dto.UserProfileUpdateRequest;
 import java.util.List;
@@ -41,9 +41,13 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    ResponseEntity<AllUserResponse> getAllUser() {
-        AllUserResponse allUserResponse = userService.getAllUser();
-        return ResponseEntity.ok(allUserResponse);
+    ResponseEntity<AllUserSearchResponse> getUsers(
+            @OptionalAuth Long loginUserId,
+            @RequestParam(name = "search", defaultValue = "") String search,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        AllUserSearchResponse collaborators = userService.getUsersBySearch(loginUserId, search, pageable);
+        return ResponseEntity.ok(collaborators);
     }
 
     @GetMapping("/users/{userId}/lists")
