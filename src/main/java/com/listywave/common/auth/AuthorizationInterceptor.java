@@ -19,9 +19,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
     private static final UriAndMethod[] whiteList = {
-            new UriAndMethod("/auth/kakao", GET),
-            new UriAndMethod("/auth/redirect/kakao", GET),
-            new UriAndMethod("/categories", GET),
             new UriAndMethod("/lists", GET),
             new UriAndMethod("/lists/{listId}", GET),
             new UriAndMethod("/lists/explore", GET),
@@ -29,10 +26,17 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             new UriAndMethod("/lists/{listId}/comments", GET),
             new UriAndMethod("/lists/upload-url", GET),
             new UriAndMethod("/lists/upload-complete", GET),
+            new UriAndMethod("/lists/{listId}/histories", GET),
             new UriAndMethod("/users", GET),
             new UriAndMethod("/users/{userId}", GET),
             new UriAndMethod("/users/{userId}/lists", GET),
-            new UriAndMethod("/users/recommend", GET)
+            new UriAndMethod("/users/{userId}/followers", GET),
+            new UriAndMethod("/users/{userId}/followings", GET),
+            new UriAndMethod("/users/recommend", GET),
+            new UriAndMethod("/users/exists", GET),
+            new UriAndMethod("/auth/kakao", GET),
+            new UriAndMethod("/auth/redirect/kakao", GET),
+            new UriAndMethod("/categories", GET),
     };
 
     private final JwtManager jwtManager;
