@@ -29,7 +29,7 @@ public class HistoryItem {
     @JoinColumn(name = "history_id")
     private History history;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "ranking", nullable = false, updatable = false)
     private int rank;
 
     @Embedded

@@ -7,7 +7,6 @@ import com.listywave.alarm.application.domain.AlarmEvent;
 import com.listywave.alarm.application.dto.AlarmCheckResponse;
 import com.listywave.alarm.application.dto.AlarmListResponse;
 import com.listywave.alarm.repository.AlarmRepository;
-import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.common.exception.CustomException;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
@@ -21,24 +20,19 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AlarmService {
 
-    private final JwtManager jwtManager;
     private final AlarmRepository alarmRepository;
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public AlarmListResponse getAlarms(String accessToken) {
-        Long tokenUserId = jwtManager.read(accessToken);
-        User user = userRepository.getById(tokenUserId);
+    public AlarmListResponse getAlarms(Long loginUserId) {
+        User user = userRepository.getById(loginUserId);
         return new AlarmListResponse(alarmRepository.getAlarms(user));
     }
 
-    public void readAlarm(Long alarmId, String accessToken) {
-        Long tokenUserId = jwtManager.read(accessToken);
-        User user = userRepository.getById(tokenUserId);
-
+    public void readAlarm(Long alarmId, Long loginUserId) {
+        User user = userRepository.getById(loginUserId);
         Alarm alarm = alarmRepository.findAlarmByIdAndReceiveUserId(alarmId, user.getId())
                 .orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND));
-
         alarm.readAlarm();
     }
 

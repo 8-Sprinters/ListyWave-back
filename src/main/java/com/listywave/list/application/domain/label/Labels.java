@@ -2,7 +2,7 @@ package com.listywave.list.application.domain.label;
 
 import static com.listywave.common.exception.ErrorCode.INVALID_COUNT;
 import static jakarta.persistence.CascadeType.ALL;
-import static jakarta.persistence.FetchType.EAGER;
+import static jakarta.persistence.FetchType.LAZY;
 import static java.util.stream.Collectors.toSet;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -22,7 +22,7 @@ public class Labels {
 
     private static final int MAX_SIZE = 3;
 
-    @OneToMany(fetch = EAGER, mappedBy = "list", cascade = ALL, orphanRemoval = true)
+    @OneToMany(fetch = LAZY, mappedBy = "list", cascade = ALL, orphanRemoval = true)
     private final List<Label> values;
 
     public Labels(List<Label> labels) {

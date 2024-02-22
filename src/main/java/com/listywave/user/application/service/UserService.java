@@ -1,11 +1,13 @@
 package com.listywave.user.application.service;
 
+import static com.listywave.common.exception.ErrorCode.ALREADY_FOLLOWED_EXCEPTION;
+import static com.listywave.common.exception.ErrorCode.ALREADY_NOT_FOLLOWED_EXCEPTION;
+import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 
 import com.listywave.alarm.application.domain.AlarmEvent;
-import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.repository.CollaboratorRepository;
-import com.listywave.common.util.UserUtil;
+import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.user.application.domain.Follow;
@@ -32,54 +34,47 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserUtil userUtil;
-    private final JwtManager jwtManager;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final CollaboratorRepository collaboratorRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
-    public UserInfoResponse getUserInfo(Long userId, String accessToken) {
-        User user = userRepository.getById(userId);
+    public UserInfoResponse getUserInfo(Long targetUserId, Long loginUserId) {
+        User targetUser = userRepository.getById(targetUserId);
 
-        if (isGuest(accessToken)) {
-            return UserInfoResponse.of(user, false, false);
+        if (loginUserId == null) {
+            return UserInfoResponse.of(targetUser, false, false);
         }
 
-        Long loginUserId = jwtManager.read(accessToken);
-        if (user.isSame(loginUserId)) {
-            return UserInfoResponse.of(user, false, true);
+        if (targetUser.isSame(loginUserId)) {
+            return UserInfoResponse.of(targetUser, false, true);
         }
         User loginUser = userRepository.getById(loginUserId);
-        boolean isFollowed = followRepository.existsByFollowerUserAndFollowingUser(loginUser, user);
-        return UserInfoResponse.of(user, isFollowed, false);
-    }
-
-    private boolean isGuest(String accessToken) {
-        return accessToken.isBlank();
+        boolean isFollowed = followRepository.existsByFollowerUserAndFollowingUser(loginUser, targetUser);
+        return UserInfoResponse.of(targetUser, isFollowed, false);
     }
 
     @Transactional(readOnly = true)
     public AllUserListsResponse getAllListOfUser(
-            Long userId,
+            Long targetUserId,
             String type,
             CategoryType category,
             Long cursorId,
             Pageable pageable
     ) {
-        userUtil.getUserByUserid(userId);
+        userRepository.getById(targetUserId);
 
-        List<Collaborator> collaboList = collaboratorRepository.findAllByUserId(userId);
+        List<Collaborator> collaborators = collaboratorRepository.findAllByUserId(targetUserId);
         Slice<ListEntity> result =
-                userRepository.findFeedLists(collaboList, userId, type, category, cursorId, pageable);
-        List<ListEntity> feedList = result.getContent();
+                userRepository.findFeedLists(collaborators, targetUserId, type, category, cursorId, pageable);
+        List<ListEntity> lists = result.getContent();
 
         cursorId = null;
-        if (!feedList.isEmpty()) {
-            cursorId = feedList.get(feedList.size() - 1).getId();
+        if (!lists.isEmpty()) {
+            cursorId = lists.get(lists.size() - 1).getId();
         }
-        return AllUserListsResponse.of(result.hasNext(), cursorId, feedList);
+        return AllUserListsResponse.of(result.hasNext(), cursorId, lists);
     }
 
     @Transactional(readOnly = true)
@@ -88,34 +83,38 @@ public class UserService {
         return AllUserResponse.of(allUser);
     }
 
-    public FollowingsResponse getFollowings(Long userId, String search) {
-        User followerUser = userRepository.getById(userId);
+    public FollowingsResponse getFollowings(Long followerUserId, String search) {
+        User followerUser = userRepository.getById(followerUserId);
         List<User> followingUsers = followRepository.findAllByFollowerUserOrderByFollowingUserNicknameAsc(followerUser, search);
         return FollowingsResponse.of(followingUsers);
     }
 
-    public void follow(Long followingUserId, String accessToken) {
-        User followingUser = userRepository.getById(followingUserId);
+    public void follow(Long followingUserId, Long followerUserId) {
+        if (followingUserId.equals(followerUserId)) {
+            throw new CustomException(INVALID_ACCESS, "본인을 팔로우 할 수 없습니다.");
+        }
 
-        Long followerUserId = jwtManager.read(accessToken);
+        User followingUser = userRepository.getById(followingUserId);
         User followerUser = userRepository.getById(followerUserId);
 
-        Follow follow = new Follow(followingUser, followerUser);
-        followRepository.save(follow);
+        if (followRepository.existsByFollowerUserAndFollowingUser(followerUser, followingUser)) {
+            throw new CustomException(ALREADY_FOLLOWED_EXCEPTION);
+        }
 
+        followRepository.save(new Follow(followingUser, followerUser));
         followerUser.follow(followingUser);
-
         applicationEventPublisher.publishEvent(AlarmEvent.follow(followerUser, followingUser));
     }
 
-    public void unfollow(Long followingUserId, String accessToken) {
+    public void unfollow(Long followingUserId, Long followerUserId) {
         User followingUser = userRepository.getById(followingUserId);
+        User followerUser = userRepository.getById(followerUserId);
 
-        Long loginUserId = jwtManager.read(accessToken);
-        User followerUser = userRepository.getById(loginUserId);
+        if (!followRepository.existsByFollowerUserAndFollowingUser(followerUser, followingUser)) {
+            throw new CustomException(ALREADY_NOT_FOLLOWED_EXCEPTION);
+        }
 
         followRepository.deleteByFollowingUserAndFollowerUser(followingUser, followerUser);
-
         followerUser.unfollow(followingUser);
     }
 
@@ -135,10 +134,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<RecommendUsersResponse> getRecommendUsers(String accessToken) {
-        Long userId = jwtManager.read(accessToken);
-        User user = userRepository.getById(userId);
-
+    public List<RecommendUsersResponse> getRecommendUsers(Long loginUserId) {
+        User user = userRepository.getById(loginUserId);
         List<Follow> follows = followRepository.getAllByFollowerUser(user);
 
         List<User> myFollowingUsers = follows.stream()
@@ -151,10 +148,10 @@ public class UserService {
                 .toList();
     }
 
-    public void updateUserProfile(Long userId, String accessToken, UserProflieUpdateCommand profile) {
-        jwtManager.read(accessToken);
-        User user = userRepository.getById(userId);
-        user.updateUserProfile(
+    public void updateUserProfile(Long targetUserId, Long loginUserId, UserProflieUpdateCommand profile) {
+        User targetUser = userRepository.getById(targetUserId);
+        targetUser.validateUpdate(loginUserId);
+        targetUser.updateUserProfile(
                 profile.nickname(),
                 profile.description(),
                 profile.profileImageUrl(),
@@ -167,10 +164,9 @@ public class UserService {
         return userRepository.existsByNicknameValue(nickname);
     }
 
-    public void deleteFollower(Long targetUserId, String accessToken) {
-        Long loginUserId = jwtManager.read(accessToken);
-        User targetUser = userRepository.getById(targetUserId);
-        User loginUser = userRepository.getById(loginUserId);
+    public void deleteFollower(Long followerUserId, Long followingUserId) {
+        User targetUser = userRepository.getById(followerUserId);
+        User loginUser = userRepository.getById(followingUserId);
 
         followRepository.deleteByFollowingUserAndFollowerUser(loginUser, targetUser);
     }

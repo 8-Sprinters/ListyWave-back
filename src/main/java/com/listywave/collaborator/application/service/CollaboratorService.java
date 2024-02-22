@@ -1,6 +1,5 @@
 package com.listywave.collaborator.application.service;
 
-import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.collaborator.application.dto.CollaboratorResponse;
 import com.listywave.collaborator.application.dto.CollaboratorSearchResponse;
 import com.listywave.user.application.domain.User;
@@ -15,12 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CollaboratorService {
 
-    private final JwtManager jwtManager;
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public CollaboratorSearchResponse getCollaborators(String accessToken, String search, Pageable pageable) {
-        Long loginUserId = jwtManager.read(accessToken);
+    public CollaboratorSearchResponse getCollaborators(Long loginUserId, String search, Pageable pageable) {
         User user = userRepository.getById(loginUserId);
 
         Long count = userRepository.getCollaboratorCount(search, user);

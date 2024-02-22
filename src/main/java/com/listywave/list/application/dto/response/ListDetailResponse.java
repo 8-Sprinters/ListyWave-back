@@ -69,6 +69,7 @@ record LabelResponse(
 @Builder
 record CollaboratorResponse(
         Long id,
+        Long userId,
         String nickname,
         String profileImageUrl
 ) {
@@ -82,6 +83,7 @@ record CollaboratorResponse(
     public static CollaboratorResponse of(Collaborator collaborator) {
         return CollaboratorResponse.builder()
                 .id(collaborator.getId())
+                .userId(collaborator.getUser().getId())
                 .nickname(collaborator.getUserNickname())
                 .profileImageUrl(collaborator.getUserProfileImageUrl())
                 .build();

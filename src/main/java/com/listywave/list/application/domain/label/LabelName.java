@@ -19,7 +19,7 @@ public class LabelName {
 
     private static final int LENGTH_LIMIT = 10;
 
-    @Column(name = "name", length = LENGTH_LIMIT)
+    @Column(name = "name", length = LENGTH_LIMIT, nullable = false)
     private final String value;
 
     public LabelName(String value) {

@@ -15,4 +15,6 @@ public interface HistoryRepository extends JpaRepository<History, Long> {
             order by h.id
             """)
     List<History> findAllByList(ListEntity list);
+
+    void deleteAllByList(ListEntity list);
 }
