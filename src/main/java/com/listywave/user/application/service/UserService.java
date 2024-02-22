@@ -1,8 +1,13 @@
 package com.listywave.user.application.service;
 
+import static com.listywave.common.exception.ErrorCode.ALREADY_FOLLOWED_EXCEPTION;
+import static com.listywave.common.exception.ErrorCode.ALREADY_NOT_FOLLOWED_EXCEPTION;
+import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
+
 import com.listywave.alarm.application.domain.AlarmEvent;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.repository.CollaboratorRepository;
+import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.user.application.domain.Follow;
@@ -85,14 +90,19 @@ public class UserService {
     }
 
     public void follow(Long followingUserId, Long followerUserId) {
+        if (followingUserId.equals(followerUserId)) {
+            throw new CustomException(INVALID_ACCESS, "본인을 팔로우 할 수 없습니다.");
+        }
+
         User followingUser = userRepository.getById(followingUserId);
         User followerUser = userRepository.getById(followerUserId);
 
-        Follow follow = new Follow(followingUser, followerUser);
-        followRepository.save(follow);
+        if (followRepository.existsByFollowerUserAndFollowingUser(followerUser, followingUser)) {
+            throw new CustomException(ALREADY_FOLLOWED_EXCEPTION);
+        }
 
+        followRepository.save(new Follow(followingUser, followerUser));
         followerUser.follow(followingUser);
-
         applicationEventPublisher.publishEvent(AlarmEvent.follow(followerUser, followingUser));
     }
 
@@ -100,8 +110,11 @@ public class UserService {
         User followingUser = userRepository.getById(followingUserId);
         User followerUser = userRepository.getById(followerUserId);
 
-        followRepository.deleteByFollowingUserAndFollowerUser(followingUser, followerUser);
+        if (!followRepository.existsByFollowerUserAndFollowingUser(followerUser, followingUser)) {
+            throw new CustomException(ALREADY_NOT_FOLLOWED_EXCEPTION);
+        }
 
+        followRepository.deleteByFollowingUserAndFollowerUser(followingUser, followerUser);
         followerUser.unfollow(followingUser);
     }
 
