@@ -29,7 +29,13 @@ public record ListDetailResponse(
         int viewCount
 ) {
 
-    public static ListDetailResponse of(ListEntity list, User user, boolean isCollected, List<Collaborator> collaborators) {
+    public static ListDetailResponse of(
+            ListEntity list,
+            User user,
+            boolean isCollected,
+            List<Collaborator> collaborators,
+            List<Item> items
+    ) {
         return ListDetailResponse.builder()
                 .category(list.getCategory().getKorNameValue())
                 .labels(LabelResponse.toList(list.getLabels().getValues()))
@@ -41,7 +47,7 @@ public record ListDetailResponse(
                 .ownerNickname(user.getNickname())
                 .ownerProfileImageUrl(user.getProfileImageUrl())
                 .collaborators(CollaboratorResponse.toList(collaborators))
-                .items(ItemResponse.toList(list.getItems().getValues()))
+                .items(ItemResponse.toList(items))
                 .isCollected(isCollected)
                 .isPublic(list.isPublic())
                 .backgroundColor(list.getBackgroundColor())
