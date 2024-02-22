@@ -110,19 +110,35 @@ public class User extends BaseEntity {
     }
 
     public void follow(User followingUser) {
-        if (this.followingCount == MAX_FOLLOW_COUNT) {
-            throw new CustomException(EXCEED_FOLLOW_COUNT_EXCEPTION, "팔로우는 최대 " + MAX_FOLLOW_COUNT + "명까지 가능합니다.");
-        }
-        this.followingCount++;
-        followingUser.followerCount++;
+        this.increaseFollowingCount();
+        followingUser.increaseFollowerCount();
     }
 
     public void unfollow(User followingUser) {
+        this.decreaseFollowingCount();
+        followingUser.decreaseFollowerCount();
+    }
+
+    public void increaseFollowingCount() {
+        if (this.followingCount >= MAX_FOLLOW_COUNT) {
+            throw new CustomException(EXCEED_FOLLOW_COUNT_EXCEPTION, "팔로우는 최대 " + MAX_FOLLOW_COUNT + "명까지 가능합니다.");
+        }
+        this.followingCount++;
+    }
+
+    public void increaseFollowerCount() {
+        this.followerCount++;
+    }
+
+    public void decreaseFollowingCount() {
         if (this.followingCount > 0) {
             this.followingCount--;
         }
-        if (followingUser.followerCount > 0) {
-            followingUser.followerCount--;
+    }
+
+    public void decreaseFollowerCount() {
+        if (this.followerCount > 0) {
+            this.followerCount--;
         }
     }
 
