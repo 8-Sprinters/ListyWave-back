@@ -1,5 +1,7 @@
 package com.listywave.user.application.service;
 
+import static com.listywave.common.exception.ErrorCode.ALREADY_FOLLOWED_EXCEPTION;
+import static com.listywave.common.exception.ErrorCode.ALREADY_NOT_FOLLOWED_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 
 import com.listywave.alarm.application.domain.AlarmEvent;
@@ -94,7 +96,11 @@ public class UserService {
 
         User followingUser = userRepository.getById(followingUserId);
         User followerUser = userRepository.getById(followerUserId);
-        
+
+        if (followRepository.existsByFollowerUserAndFollowingUser(followerUser, followingUser)) {
+            throw new CustomException(ALREADY_FOLLOWED_EXCEPTION);
+        }
+
         followRepository.save(new Follow(followingUser, followerUser));
         followerUser.follow(followingUser);
         applicationEventPublisher.publishEvent(AlarmEvent.follow(followerUser, followingUser));
@@ -104,8 +110,11 @@ public class UserService {
         User followingUser = userRepository.getById(followingUserId);
         User followerUser = userRepository.getById(followerUserId);
 
-        followRepository.deleteByFollowingUserAndFollowerUser(followingUser, followerUser);
+        if (!followRepository.existsByFollowerUserAndFollowingUser(followerUser, followingUser)) {
+            throw new CustomException(ALREADY_NOT_FOLLOWED_EXCEPTION);
+        }
 
+        followRepository.deleteByFollowingUserAndFollowerUser(followingUser, followerUser);
         followerUser.unfollow(followingUser);
     }
 

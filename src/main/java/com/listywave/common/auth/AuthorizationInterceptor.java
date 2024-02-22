@@ -48,6 +48,9 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         if (isPreflight(request)) {
             return true;
         }
+        if (!(handler instanceof HandlerMethod)) {
+            return true;
+        }
 
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         RequestMapping requestMapping = handlerMethod.getMethodAnnotation(RequestMapping.class);

@@ -34,6 +34,8 @@ public enum ErrorCode {
     INVALID_COUNT(BAD_REQUEST, "선택한 아이템 및 라벨 및 콜라보레이터의 수가 올바르지 않습니다."),
     DUPLICATE_USER(BAD_REQUEST, "중복된 사용자를 선택할 수 없습니다."),
     EXCEED_FOLLOW_COUNT_EXCEPTION(BAD_REQUEST, "요청할 수 있는 최대 사용자의 수를 초과했습니다."),
+    ALREADY_FOLLOWED_EXCEPTION(BAD_REQUEST, "이미 팔로우를 하고 있습니다."),
+    ALREADY_NOT_FOLLOWED_EXCEPTION(BAD_REQUEST, "이미 팔로우가 되어 있지 않습니다."),
 
     // S3
     S3_DELETE_OBJECTS_EXCEPTION(INTERNAL_SERVER_ERROR, "S3의 이미지를 삭제 요청하는 과정에서 에러가 발생했습니다."),
