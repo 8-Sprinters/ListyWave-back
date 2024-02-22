@@ -8,7 +8,7 @@ public record CategoryTypeResponse(
         String korNameValue
 ) {
 
-    public static CategoryTypeResponse fromEnum(CategoryType categoryType) {
+    public static CategoryTypeResponse of(CategoryType categoryType) {
         return new CategoryTypeResponse(
                 categoryType.getCodeValue(),
                 categoryType.name().toLowerCase(),

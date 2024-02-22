@@ -1,8 +1,10 @@
 package com.listywave.user.application.domain;
 
+import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.BaseEntity;
+import com.listywave.common.exception.CustomException;
 import com.listywave.user.application.vo.BackgroundImageUrl;
 import com.listywave.user.application.vo.Description;
 import com.listywave.user.application.vo.Nickname;
@@ -54,7 +56,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String kakaoAccessToken;
 
-    public static User initialCreate(Long oauthId, String oauthEmail, String kakaoAccessToken) {
+    public static User init(Long oauthId, String oauthEmail, String kakaoAccessToken) {
         return new User(
                 oauthId,
                 oauthEmail,
@@ -96,6 +98,12 @@ public class User extends BaseEntity {
 
     public boolean isSame(Long id) {
         return this.getId().equals(id);
+    }
+
+    public void validateUpdate(Long id) {
+        if (!this.getId().equals(id)) {
+            throw new CustomException(INVALID_ACCESS);
+        }
     }
 
     public void follow(User followingUser) {
