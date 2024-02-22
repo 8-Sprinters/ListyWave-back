@@ -16,7 +16,7 @@ public class HistoryItemTitle {
 
     private static final int MAX_LENGTH = 100;
 
-    @Column(name = "title", length = MAX_LENGTH, updatable = false)
+    @Column(name = "title", length = MAX_LENGTH, updatable = false, nullable = false)
     private final String value;
 
     public HistoryItemTitle(String value) {

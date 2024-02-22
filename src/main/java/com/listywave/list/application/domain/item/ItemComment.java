@@ -1,5 +1,7 @@
 package com.listywave.list.application.domain.item;
 
+import static java.util.Objects.requireNonNull;
+
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
 import jakarta.persistence.Column;
@@ -19,16 +21,17 @@ public class ItemComment {
 
     private static final int LENGTH_LIMIT = 100;
 
-    @Column(name = "comment", length = LENGTH_LIMIT)
+    @Column(name = "comment", length = LENGTH_LIMIT, nullable = false)
     private final String value;
 
     public ItemComment(String value) {
-        validate(value);
+        requireNonNull(value, "Item Comment에 null 값이 포함되었습니다.");
+        validateLength(value);
         this.value = value;
     }
 
-    private void validate(String value) {
-        if (value != null && value.length() > LENGTH_LIMIT) {
+    private void validateLength(String value) {
+        if (value.length() > LENGTH_LIMIT) {
             throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "아이템 comment는 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
