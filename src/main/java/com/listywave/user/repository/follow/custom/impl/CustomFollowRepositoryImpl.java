@@ -19,7 +19,7 @@ public class CustomFollowRepositoryImpl implements CustomFollowRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Slice<User> findAllByFollowingUserOrderByFollowerUserNicknameAsc(
+    public Slice<User> findAllFollowerUserBy(
             User followingUser,
             Pageable pageable,
             String search,
@@ -43,7 +43,7 @@ public class CustomFollowRepositoryImpl implements CustomFollowRepository {
     }
 
     @Override
-    public List<User> findAllByFollowerUserOrderByFollowingUserNicknameAsc(User followerUser, String search) {
+    public List<User> findAllFollowingUserBy(User followerUser, String search) {
         return queryFactory.selectFrom(user)
                 .join(follow).on(follow.followingUser.id.eq(user.id))
                 .where(

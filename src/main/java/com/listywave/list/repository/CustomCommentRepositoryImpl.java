@@ -3,6 +3,7 @@ package com.listywave.list.repository;
 
 import static com.listywave.list.application.domain.comment.QComment.comment;
 import static com.listywave.list.application.domain.list.QListEntity.listEntity;
+import static com.listywave.list.application.domain.reply.QReply.reply;
 
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.list.ListEntity;
@@ -18,11 +19,12 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
     @Override
     public List<Comment> getComments(ListEntity list, int size, Long cursorId) {
         return queryFactory.selectFrom(comment)
-                .join(listEntity).fetchJoin()
-                .on(listEntity.id.eq(comment.list.id))
+                .join(listEntity).fetchJoin().on(listEntity.id.eq(comment.list.id))
+                .join(reply).fetchJoin().on(comment.id.eq(reply.id))
                 .where(
                         listEntity.id.eq(list.getId()),
-                        comment.id.gt(cursorId)
+                        comment.id.gt(cursorId),
+                        listEntity.user.isDelete.eq(false)
                 )
                 .orderBy(comment.id.asc())
                 .limit(size + 1)

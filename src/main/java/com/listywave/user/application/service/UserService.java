@@ -95,7 +95,7 @@ public class UserService {
 
     public FollowingsResponse getFollowings(Long followerUserId, String search) {
         User followerUser = userRepository.getById(followerUserId);
-        List<User> followingUsers = followRepository.findAllByFollowerUserOrderByFollowingUserNicknameAsc(followerUser, search);
+        List<User> followingUsers = followRepository.findAllFollowingUserBy(followerUser, search);
         return FollowingsResponse.of(followingUsers);
     }
 
@@ -132,7 +132,7 @@ public class UserService {
         User followingUser = userRepository.getById(userId);
 
         Slice<User> result =
-                followRepository.findAllByFollowingUserOrderByFollowerUserNicknameAsc(followingUser, pageable, search, cursorId);
+                followRepository.findAllFollowerUserBy(followingUser, pageable, search, cursorId);
         List<User> followerUserList = result.getContent();
 
         if (followerUserList.isEmpty()) {
@@ -150,6 +150,7 @@ public class UserService {
 
         List<User> myFollowingUsers = follows.stream()
                 .map(Follow::getFollowingUser)
+                .filter(followingUser -> !followingUser.getIsDelete())
                 .toList();
 
         List<User> recommendUsers = userRepository.getRecommendUsers(myFollowingUsers, user);

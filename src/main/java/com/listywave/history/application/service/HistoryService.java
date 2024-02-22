@@ -1,5 +1,8 @@
 package com.listywave.history.application.service;
 
+import static com.listywave.common.exception.ErrorCode.DELETED_USER_EXCEPTION;
+
+import com.listywave.common.exception.CustomException;
 import com.listywave.history.application.domain.History;
 import com.listywave.history.application.dto.HistorySearchResponse;
 import com.listywave.history.repository.HistoryRepository;
@@ -21,6 +24,9 @@ public class HistoryService {
 
     public List<HistorySearchResponse> searchHistories(Long listId) {
         ListEntity list = listRepository.getById(listId);
+        if (list.isDeletedUser()) {
+            throw new CustomException(DELETED_USER_EXCEPTION);
+        }
         List<History> histories = historyRepository.findAllByList(list);
 
         return HistorySearchResponse.toList(histories);

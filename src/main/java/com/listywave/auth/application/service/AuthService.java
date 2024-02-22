@@ -1,5 +1,7 @@
 package com.listywave.auth.application.service;
 
+import static com.listywave.common.exception.ErrorCode.DELETED_USER_EXCEPTION;
+
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.auth.application.domain.kakao.KakaoOauthClient;
 import com.listywave.auth.application.domain.kakao.KakaoRedirectUriProvider;
@@ -7,6 +9,7 @@ import com.listywave.auth.application.dto.LoginResult;
 import com.listywave.auth.application.dto.UpdateTokenResult;
 import com.listywave.auth.infra.kakao.response.KakaoMember;
 import com.listywave.auth.infra.kakao.response.KakaoTokenResponse;
+import com.listywave.common.exception.CustomException;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.Optional;
@@ -42,6 +45,9 @@ public class AuthService {
     }
 
     private LoginResult loginNonInit(User user, String kakaoAccessToken) {
+        if (user.getIsDelete()) {
+            throw new CustomException(DELETED_USER_EXCEPTION);
+        }
         user.updateKakaoAccessToken(kakaoAccessToken);
         String accessToken = jwtManager.createAccessToken(user.getId());
         String refreshToken = jwtManager.createRefreshToken(user.getId());
