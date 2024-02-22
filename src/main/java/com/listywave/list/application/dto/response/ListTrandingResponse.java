@@ -7,6 +7,8 @@ import lombok.Builder;
 public record ListTrandingResponse(
         Long id,
         Long ownerId,
+        String ownerNickname,
+        String ownerProfileImageUrl,
         String title,
         String description,
         String itemImageUrl,
@@ -17,6 +19,8 @@ public record ListTrandingResponse(
         return ListTrandingResponse.builder()
                 .id(list.getId())
                 .ownerId(list.getUser().getId())
+                .ownerNickname(list.getUser().getNickname())
+                .ownerProfileImageUrl(list.getUser().getProfileImageUrl())
                 .title(list.getTitle().getValue())
                 .description(list.getDescription().getValue())
                 .itemImageUrl(imageUrlTopRankItem)
