@@ -59,6 +59,9 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String kakaoAccessToken;
 
+    @Column(nullable = false, length = 5)
+    private Boolean isDelete;
+
     public static User init(Long oauthId, String oauthEmail, String kakaoAccessToken) {
         return new User(
                 oauthId,
@@ -70,7 +73,8 @@ public class User extends BaseEntity {
                 0,
                 0,
                 false,
-                kakaoAccessToken
+                kakaoAccessToken,
+                false
         );
     }
 
@@ -140,6 +144,10 @@ public class User extends BaseEntity {
         if (this.followerCount > 0) {
             this.followerCount--;
         }
+    }
+
+    public void softDelete() {
+        this.isDelete = true;
     }
 
     public void updateKakaoAccessToken(String kakaoAccessToken) {

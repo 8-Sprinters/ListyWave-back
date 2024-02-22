@@ -180,4 +180,10 @@ public class UserService {
 
         followRepository.deleteByFollowingUserAndFollowerUser(loginUser, targetUser);
     }
+
+    public void withdraw(Long userId) {
+        User user = userRepository.getById(userId);
+        user.validateUpdate(userId);
+        user.softDelete();
+    }
 }
