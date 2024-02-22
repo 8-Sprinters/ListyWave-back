@@ -13,7 +13,8 @@ public record LoginResponse(
         int followingCount,
         int followerCount,
         boolean isFirst,
-        String accessToken
+        String accessToken,
+        String refreshToken
 ) {
 
     public static LoginResponse of(LoginResult result) {
@@ -27,6 +28,7 @@ public record LoginResponse(
                 .followingCount(result.followingCount())
                 .isFirst(result.isFirst())
                 .accessToken(result.accessToken())
+                .refreshToken(result.refreshToken())
                 .build();
     }
 }

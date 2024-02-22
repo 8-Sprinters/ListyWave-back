@@ -62,10 +62,13 @@ public class AuthService {
     }
 
     public UpdateTokenResult updateToken(String refreshToken) {
-        Long userId = jwtManager.readRefreshToken(refreshToken);
+//        Long userId = jwtManager.readRefreshToken(refreshToken);
+        Long userId = jwtManager.read(refreshToken);
 
-        String accessToken = jwtManager.createAccessToken(userId);
-        String newRefreshToken = jwtManager.createRefreshToken(userId);
+        User user = userRepository.getById(userId);
+
+        String accessToken = jwtManager.createAccessToken(user.getId());
+        String newRefreshToken = jwtManager.createRefreshToken(user.getId());
         return new UpdateTokenResult(accessToken, newRefreshToken);
     }
 }

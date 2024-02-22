@@ -122,6 +122,12 @@ public class ListEntity {
         }
     }
 
+    public void validateOwnerRestriction(User user) {
+        if (this.user.equals(user)) {
+            throw new CustomException(INVALID_ACCESS);
+        }
+    }
+
     public boolean canDeleteOrUpdateBy(User user) {
         return this.user.equals(user);
     }
@@ -196,5 +202,9 @@ public class ListEntity {
         if (!this.items.contains(item)) {
             throw new CustomException(RESOURCE_NOT_FOUND);
         }
+    }
+
+    public String getRepresentImageUrl() {
+        return items.getRepresentImageUrl();
     }
 }

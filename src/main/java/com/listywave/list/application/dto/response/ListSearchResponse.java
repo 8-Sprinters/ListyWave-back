@@ -14,7 +14,12 @@ public record ListSearchResponse(
         boolean hasNext
 ) {
 
-    public static ListSearchResponse of(List<ListEntity> lists, Long totalCount, Long cursorId, boolean hasNext) {
+    public static ListSearchResponse of(
+            List<ListEntity> lists,
+            Long totalCount,
+            Long cursorId,
+            boolean hasNext
+    ) {
         return ListSearchResponse.builder()
                 .resultLists(ListInfo.toList(lists))
                 .totalCount(totalCount)
@@ -34,7 +39,8 @@ record ListInfo(
         LocalDateTime updatedDate,
         Long ownerId,
         String ownerNickname,
-        String ownerProfileImageUrl
+        String ownerProfileImageUrl,
+        String representImageUrl
 ) {
 
     public static List<ListInfo> toList(List<ListEntity> lists) {
@@ -54,6 +60,7 @@ record ListInfo(
                 .ownerId(list.getUser().getId())
                 .ownerNickname(list.getUser().getNickname())
                 .ownerProfileImageUrl(list.getUser().getProfileImageUrl())
+                .representImageUrl(list.getRepresentImageUrl())
                 .build();
     }
 }

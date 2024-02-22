@@ -151,4 +151,13 @@ public class Items {
     public List<Item> getValues() {
         return new ArrayList<>(values);
     }
+
+    public String getRepresentImageUrl() {
+        return sortByRank().values.stream()
+                .map(Item::getImageUrl)
+                .filter(ItemImageUrl::hasValue)
+                .map(ItemImageUrl::getValue)
+                .findFirst()
+                .orElse("");
+    }
 }
