@@ -28,6 +28,7 @@ public class CustomListRepositoryImpl implements CustomListRepository {
 
         return queryFactory
                 .selectFrom(listEntity)
+                .join(listEntity.user, user).fetchJoin()
                 .leftJoin(item).on(listEntity.id.eq(item.list.id))
                 .where(listEntity.updatedDate.goe(thirtyDaysAgo))
                 .distinct()
