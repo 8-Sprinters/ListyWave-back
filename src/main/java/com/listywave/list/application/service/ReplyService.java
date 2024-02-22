@@ -58,10 +58,9 @@ public class ReplyService {
         }
     }
 
-    public void update(ReplyUpdateCommand command, String accessToken) {
+    public void update(ReplyUpdateCommand command, Long loginUserId) {
         listRepository.getById(command.listId());
-        Long userId = jwtManager.read(accessToken);
-        User user = userRepository.getById(userId);
+        User user = userRepository.getById(loginUserId);
         commentRepository.getById(command.commentId());
         Reply reply = replyRepository.getById(command.replyId());
 

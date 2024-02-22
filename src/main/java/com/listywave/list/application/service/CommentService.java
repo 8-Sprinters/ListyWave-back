@@ -89,10 +89,9 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-    public void update(Long listId, Long commentId, String accessToken, String content) {
+    public void update(Long listId, Long commentId, Long loginUserId, String content) {
         listRepository.getById(listId);
-        Long userId = jwtManager.read(accessToken);
-        User user = userRepository.getById(userId);
+        User user = userRepository.getById(loginUserId);
         Comment comment = commentRepository.getById(commentId);
 
         if (!comment.isOwner(user)) {
