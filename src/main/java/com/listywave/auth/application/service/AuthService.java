@@ -46,8 +46,7 @@ public class AuthService {
         return LoginResponse.of(foundUser.get(), false, jwtManager.createToken(user.getId()));
     }
 
-    public void logout(String accessToken) {
-        Long userId = jwtManager.read(accessToken);
+    public void logout(Long userId) {
         User user = userRepository.getById(userId);
         kakaoOauthClient.logout(user.getKakaoAccessToken());
     }
