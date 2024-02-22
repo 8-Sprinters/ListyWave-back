@@ -30,7 +30,8 @@ public class CustomFollowRepositoryImpl implements CustomFollowRepository {
                 .where(
                         followingUserNicknameGt(cursorId),
                         follow.followingUser.id.eq(followingUser.getId()),
-                        follow.followerUser.nickname.value.contains(search)
+                        follow.followerUser.nickname.value.contains(search),
+                        user.isDelete.eq(false)
                 )
                 .orderBy(follow.followerUser.nickname.value.asc())
                 .limit(pageable.getPageSize() + 1)
@@ -48,7 +49,8 @@ public class CustomFollowRepositoryImpl implements CustomFollowRepository {
                 .join(follow).on(follow.followingUser.id.eq(user.id))
                 .where(
                         follow.followerUser.id.eq(followerUser.getId()),
-                        follow.followingUser.nickname.value.contains(search)
+                        follow.followingUser.nickname.value.contains(search),
+                        user.isDelete.eq(false)
                 )
                 .orderBy(follow.followingUser.nickname.value.asc())
                 .fetch();
