@@ -156,42 +156,23 @@ public class ImageService {
 
         String profileImageUrl = "";
         String backgroundImageUrl = "";
-        Boolean isBoth = true;
+        boolean isBoth = true;
+
         if (isExistProfileExtension(profileExtension, backgroundExtension)) {
-            profileImageUrl = createReadImageUrl(
-                    ImageType.USER_PROFILE,
-                    user.getId(),
-                    user.getProfileImageUrl(),
-                    profileExtension
-            );
+            profileImageUrl = createReadImageUrl(ImageType.USER_PROFILE, user.getId(), user.getProfileImageUrl(), profileExtension);
             user.updateUserImageUrl(profileImageUrl, backgroundImageUrl);
             isBoth = false;
         }
 
         if (isExistBackgroundExtension(backgroundExtension, profileExtension)) {
-            backgroundImageUrl = createReadImageUrl(
-                    ImageType.USER_BACKGROUND,
-                    user.getId(),
-                    user.getBackgroundImageUrl(),
-                    backgroundExtension
-            );
+            backgroundImageUrl = createReadImageUrl(ImageType.USER_BACKGROUND, user.getId(), user.getBackgroundImageUrl(), backgroundExtension);
             user.updateUserImageUrl(profileImageUrl, backgroundImageUrl);
             isBoth = false;
         }
 
         if (isBoth) {
-            profileImageUrl = createReadImageUrl(
-                    ImageType.USER_PROFILE,
-                    user.getId(),
-                    user.getProfileImageUrl(),
-                    profileExtension
-            );
-            backgroundImageUrl = createReadImageUrl(
-                    ImageType.USER_BACKGROUND,
-                    user.getId(),
-                    user.getBackgroundImageUrl(),
-                    backgroundExtension
-            );
+            profileImageUrl = createReadImageUrl(ImageType.USER_PROFILE, user.getId(), user.getProfileImageUrl(), profileExtension);
+            backgroundImageUrl = createReadImageUrl(ImageType.USER_BACKGROUND, user.getId(), user.getBackgroundImageUrl(), backgroundExtension);
             user.updateUserImageUrl(profileImageUrl, backgroundImageUrl);
         }
     }
@@ -239,71 +220,65 @@ public class ImageService {
             User user,
             Boolean isBoth
     ) {
-        String profileImageKey = "";
-        String backgroundImageKey = "";
-
-        if (profileImageType != null && !isBoth) {
-            profileImageKey = generatedUUID();
-
-            GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                    getGeneratePresignedUrl(
-                            profileImageType,
-                            user.getId(),
-                            profileImageKey,
-                            profileExtension
-                    );
-
-            updateUserImageKey(user, profileImageKey, backgroundImageKey);
-            return UserPresignedUrlResponse.of(
-                    user.getId(),
-                    amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString(),
-                    ""
-            );
+        if (!isBoth && profileImageType != null) {
+            return generateUserPresignedUrlResponse(profileImageType, profileExtension, user, "", generatedUUID());
         }
-
-        if (backgroundImageType != null && !isBoth) {
-            backgroundImageKey = generatedUUID();
-
-            GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                    getGeneratePresignedUrl(
-                            backgroundImageType,
-                            user.getId(),
-                            backgroundImageKey,
-                            backgroundExtension
-                    );
-
-            updateUserImageKey(user, profileImageKey, backgroundImageKey);
-            return UserPresignedUrlResponse.of(
-                    user.getId(),
-                    "",
-                    amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString()
-            );
+        if (!isBoth && backgroundImageType != null) {
+            return generateUserPresignedUrlResponse(backgroundImageType, backgroundExtension, user, generatedUUID(), "");
         }
+        return generateUserPresignedUrlResponseByBoth(profileImageType, backgroundImageType, profileExtension, backgroundExtension, user);
+    }
 
-        profileImageKey = generatedUUID();
-        backgroundImageKey = generatedUUID();
+    private UserPresignedUrlResponse generateUserPresignedUrlResponseByBoth(
+            ImageType profileImageType,
+            ImageType backgroundImageType,
+            ImageFileExtension profileExtension,
+            ImageFileExtension backgroundExtension,
+            User user
+    ) {
+        String profileImageKey = generatedUUID();
+        String backgroundImageKey = generatedUUID();
 
-        GeneratePresignedUrlRequest generateProfilePresignedUrlRequest =
-                getGeneratePresignedUrl(
-                        profileImageType,
-                        user.getId(),
-                        profileImageKey,
-                        profileExtension
-                );
-        GeneratePresignedUrlRequest generateBackgroundPresignedUrlRequest =
-                getGeneratePresignedUrl(
-                        backgroundImageType,
-                        user.getId(),
-                        backgroundImageKey,
-                        backgroundExtension
-                );
-
-        updateUserImageKey(user, profileImageKey, backgroundImageKey);
+        GeneratePresignedUrlRequest profileUrlRequest =
+                getGeneratePresignedUrl(profileImageType, user.getId(), profileImageKey, profileExtension);
+        GeneratePresignedUrlRequest backgroundUrlRequest =
+                getGeneratePresignedUrlRequest(backgroundImageType, backgroundExtension, user, backgroundImageKey, backgroundImageKey);
         return UserPresignedUrlResponse.of(
                 user.getId(),
-                amazonS3.generatePresignedUrl(generateProfilePresignedUrlRequest).toString(),
-                amazonS3.generatePresignedUrl(generateBackgroundPresignedUrlRequest).toString()
+                amazonS3.generatePresignedUrl(profileUrlRequest).toString(),
+                amazonS3.generatePresignedUrl(backgroundUrlRequest).toString()
         );
+    }
+
+    private UserPresignedUrlResponse generateUserPresignedUrlResponse(
+            ImageType imageType,
+            ImageFileExtension extension,
+            User user,
+            String profileImageKey,
+            String backgroundImageKey
+    ) {
+        GeneratePresignedUrlRequest presignedUrlRequest =
+                getGeneratePresignedUrlRequest(imageType, extension, user, profileImageKey, backgroundImageKey);
+        return UserPresignedUrlResponse.of(
+                user.getId(),
+                imageType == ImageType.USER_PROFILE ?
+                        amazonS3.generatePresignedUrl(presignedUrlRequest).toString() : "",
+                imageType == ImageType.USER_BACKGROUND ?
+                        amazonS3.generatePresignedUrl(presignedUrlRequest).toString() : ""
+        );
+    }
+
+    private GeneratePresignedUrlRequest getGeneratePresignedUrlRequest(
+            ImageType imageType,
+            ImageFileExtension extension,
+            User user,
+            String profileImageKey,
+            String backgroundImageKey
+    ) {
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                getGeneratePresignedUrl(imageType, user.getId(), profileImageKey, extension);
+        updateUserImageKey(user, profileImageKey, backgroundImageKey);
+        return generatePresignedUrlRequest;
     }
 
     private boolean isExistProfileExtension(
