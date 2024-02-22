@@ -201,4 +201,8 @@ public class ListEntity {
             throw new CustomException(RESOURCE_NOT_FOUND);
         }
     }
+
+    public String getRepresentImageUrl() {
+        return items.getRepresentImageUrl();
+    }
 }
