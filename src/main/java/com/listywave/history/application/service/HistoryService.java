@@ -1,6 +1,5 @@
 package com.listywave.history.application.service;
 
-import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.history.application.domain.History;
 import com.listywave.history.application.dto.HistorySearchResponse;
 import com.listywave.history.repository.HistoryRepository;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class HistoryService {
 
-    private final JwtManager jwtManager;
     private final UserRepository userRepository;
     private final ListRepository listRepository;
     private final HistoryRepository historyRepository;
@@ -28,16 +26,16 @@ public class HistoryService {
         return HistorySearchResponse.toList(histories);
     }
 
-    public void updatePublic(Long historyId, String accessToken) {
-        User user = userRepository.getById(jwtManager.read(accessToken));
+    public void updatePublic(Long historyId, Long loginUserId) {
+        User user = userRepository.getById(loginUserId);
         History history = historyRepository.getReferenceById(historyId);
 
         history.validateOwner(user);
         history.updatePublic();
     }
 
-    public void deleteHistory(Long historyId, String accessToken) {
-        User user = userRepository.getById(jwtManager.read(accessToken));
+    public void deleteHistory(Long historyId, Long loginUserId) {
+        User user = userRepository.getById(loginUserId);
         History history = historyRepository.getReferenceById(historyId);
 
         history.validateOwner(user);

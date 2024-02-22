@@ -4,9 +4,9 @@ import static com.listywave.alarm.application.domain.AlarmType.COLLECT;
 import static com.listywave.alarm.application.domain.AlarmType.COMMENT;
 import static com.listywave.alarm.application.domain.AlarmType.FOLLOW;
 import static com.listywave.alarm.application.domain.AlarmType.REPLY;
+import static com.listywave.common.exception.ErrorCode.CANNOT_SEND_OWN_ALARM;
 
 import com.listywave.common.exception.CustomException;
-import com.listywave.common.exception.ErrorCode;
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.domain.reply.Reply;
@@ -74,7 +74,7 @@ public record AlarmEvent(
 
     public void validateDifferentPublisherAndReceiver() {
         if (publisher.isSame(listenerId)) {
-            throw new CustomException(ErrorCode.CANNOT_SEND_OWN_ALARM);
+            throw new CustomException(CANNOT_SEND_OWN_ALARM);
         }
     }
 }

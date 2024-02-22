@@ -1,6 +1,7 @@
 package com.listywave.user.repository.user.custom.impl;
 
 import static com.listywave.common.util.PaginationUtils.checkEndPage;
+import static com.listywave.list.application.domain.category.CategoryType.ENTIRE;
 import static com.listywave.list.application.domain.item.QItem.item;
 import static com.listywave.list.application.domain.list.QListEntity.listEntity;
 import static com.listywave.user.application.domain.QUser.user;
@@ -64,11 +65,11 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
         return cursorId == null ? null : listEntity.id.lt(cursorId);
     }
 
-    private BooleanExpression categoryEq(CategoryType categoryCode) {
-        if ("0".equals(categoryCode.getCodeValue())) {
+    private BooleanExpression categoryEq(CategoryType category) {
+        if (category.equals(ENTIRE)) {
             return null;
         }
-        return listEntity.category.eq(categoryCode);
+        return listEntity.category.eq(category);
     }
 
     private BooleanExpression typeEq(String type) {

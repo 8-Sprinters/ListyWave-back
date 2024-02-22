@@ -1,7 +1,9 @@
 package com.listywave.common.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.convert.ApplicationConversionService;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -11,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Value("${cors.allowedOrigins}")
     private String[] allowedOrigins;
-
+    
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
@@ -26,5 +28,10 @@ public class WebConfig implements WebMvcConfigurer {
                 )
                 .allowCredentials(true)
                 .exposedHeaders("*");
+    }
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        ApplicationConversionService.configure(registry);
     }
 }

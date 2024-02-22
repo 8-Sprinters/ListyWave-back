@@ -2,7 +2,7 @@ package com.listywave.auth.application.dto;
 
 import com.listywave.user.application.domain.User;
 
-public record LoginResponse(
+public record LoginResult(
         Long id,
         String profileImageUrl,
         String backgroundImageUrl,
@@ -11,11 +11,12 @@ public record LoginResponse(
         int followingCount,
         int followerCount,
         boolean isFirst,
-        String accessToken
+        String accessToken,
+        String refreshToken
 ) {
 
-    public static LoginResponse of(User user, boolean isFirst, String accessToken) {
-        return new LoginResponse(
+    public static LoginResult of(User user, boolean isFirst, String accessToken, String refreshToken) {
+        return new LoginResult(
                 user.getId(),
                 user.getProfileImageUrl(),
                 user.getBackgroundImageUrl(),
@@ -24,7 +25,8 @@ public record LoginResponse(
                 user.getFollowingCount(),
                 user.getFollowerCount(),
                 isFirst,
-                accessToken
+                accessToken,
+                refreshToken
         );
     }
 }

@@ -1,10 +1,9 @@
 package com.listywave.alarm.presentation.controller;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-
 import com.listywave.alarm.application.dto.AlarmCheckResponse;
 import com.listywave.alarm.application.dto.AlarmListResponse;
 import com.listywave.alarm.application.service.AlarmService;
+import com.listywave.common.auth.Auth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,25 +20,26 @@ public class AlarmController {
 
     @GetMapping("/alarms")
     ResponseEntity<AlarmListResponse> getAlarms(
-            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+            @Auth Long loginUserId
     ) {
-        return ResponseEntity.ok(alarmService.getAlarms(accessToken));
+        AlarmListResponse response = alarmService.getAlarms(loginUserId);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/alarms/{alarmId}")
     ResponseEntity<Void> readAlarm(
             @PathVariable("alarmId") Long alarmId,
-            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+            @Auth Long loginUserId
     ) {
-        alarmService.readAlarm(alarmId, accessToken);
+        alarmService.readAlarm(alarmId, loginUserId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/alarms/check-new")
     ResponseEntity<AlarmCheckResponse> checkAllAlarmsRead(
-            @RequestHeader(value = AUTHORIZATION, defaultValue = "") String accessToken
+            @Auth Long loginUserId
     ) {
-        return ResponseEntity.ok().body(alarmService.checkAllAlarmsRead(accessToken));
+        return ResponseEntity.ok().body(alarmService.checkAllAlarmsRead(loginUserId));
     }
 
 }

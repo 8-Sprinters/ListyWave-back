@@ -1,8 +1,11 @@
 package com.listywave.user.application.domain;
 
+import static com.listywave.common.exception.ErrorCode.EXCEED_FOLLOW_COUNT_EXCEPTION;
+import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.BaseEntity;
+import com.listywave.common.exception.CustomException;
 import com.listywave.user.application.vo.BackgroundImageUrl;
 import com.listywave.user.application.vo.Description;
 import com.listywave.user.application.vo.Nickname;
@@ -23,6 +26,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 @NoArgsConstructor(access = PROTECTED)
 public class User extends BaseEntity {
+
+    private static final int MAX_FOLLOW_COUNT = 1000;
 
     @Column(nullable = false)
     private Long oauthId;
@@ -54,7 +59,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String kakaoAccessToken;
 
-    public static User initialCreate(Long oauthId, String oauthEmail, String kakaoAccessToken) {
+    public static User init(Long oauthId, String oauthEmail, String kakaoAccessToken) {
         return new User(
                 oauthId,
                 oauthEmail,
@@ -98,14 +103,43 @@ public class User extends BaseEntity {
         return this.getId().equals(id);
     }
 
+    public void validateUpdate(Long id) {
+        if (!this.getId().equals(id)) {
+            throw new CustomException(INVALID_ACCESS);
+        }
+    }
+
     public void follow(User followingUser) {
-        this.followingCount++;
-        followingUser.followerCount++;
+        this.increaseFollowingCount();
+        followingUser.increaseFollowerCount();
     }
 
     public void unfollow(User followingUser) {
-        this.followingCount--;
-        followingUser.followerCount--;
+        this.decreaseFollowingCount();
+        followingUser.decreaseFollowerCount();
+    }
+
+    public void increaseFollowingCount() {
+        if (this.followingCount >= MAX_FOLLOW_COUNT) {
+            throw new CustomException(EXCEED_FOLLOW_COUNT_EXCEPTION, "팔로우는 최대 " + MAX_FOLLOW_COUNT + "명까지 가능합니다.");
+        }
+        this.followingCount++;
+    }
+
+    public void increaseFollowerCount() {
+        this.followerCount++;
+    }
+
+    public void decreaseFollowingCount() {
+        if (this.followingCount > 0) {
+            this.followingCount--;
+        }
+    }
+
+    public void decreaseFollowerCount() {
+        if (this.followerCount > 0) {
+            this.followerCount--;
+        }
     }
 
     public void updateKakaoAccessToken(String kakaoAccessToken) {

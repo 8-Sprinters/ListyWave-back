@@ -5,7 +5,6 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 import com.listywave.alarm.application.domain.AlarmEvent;
-import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.comment.CommentContent;
@@ -31,16 +30,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CommentService {
 
-    private final JwtManager jwtManager;
     private final ListRepository listRepository;
     private final UserRepository userRepository;
     private final ReplyRepository replyRepository;
     private final CommentRepository commentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public CommentCreateResponse create(Long listId, String content, String accessToken) {
-        Long userId = jwtManager.read(accessToken);
-        User user = userRepository.getById(userId);
+    public CommentCreateResponse create(Long listId, String content, Long loginUserId) {
+        User user = userRepository.getById(loginUserId);
         ListEntity list = listRepository.getById(listId);
 
         Comment comment = Comment.create(list, user, new CommentContent(content));
@@ -76,13 +73,12 @@ public class CommentService {
         return CommentFindResponse.from(totalCount, newCursorId, hasNext, result);
     }
 
-    public void delete(Long listId, Long commentId, String accessToken) {
+    public void delete(Long listId, Long commentId, Long loginUserId) {
         listRepository.getById(listId);
-        Long userId = jwtManager.read(accessToken);
-        User user = userRepository.getById(userId);
+        User user = userRepository.getById(loginUserId);
         Comment comment = commentRepository.getById(commentId);
 
-        if (!comment.canDeleteBy(user)) {
+        if (!comment.isOwner(user)) {
             throw new CustomException(INVALID_ACCESS, "댓글은 작성자만 지울 수 있습니다.");
         }
 
@@ -91,5 +87,16 @@ public class CommentService {
             return;
         }
         commentRepository.delete(comment);
+    }
+
+    public void update(Long listId, Long commentId, Long loginUserId, String content) {
+        listRepository.getById(listId);
+        User user = userRepository.getById(loginUserId);
+        Comment comment = commentRepository.getById(commentId);
+
+        if (!comment.isOwner(user)) {
+            throw new CustomException(INVALID_ACCESS, "댓글은 작성자만 수정할 수 있습니다.");
+        }
+        comment.update(new CommentContent(content));
     }
 }
