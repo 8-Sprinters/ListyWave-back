@@ -20,7 +20,7 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
     public List<Comment> getComments(ListEntity list, int size, Long cursorId) {
         return queryFactory.selectFrom(comment)
                 .join(listEntity).fetchJoin().on(listEntity.id.eq(comment.list.id))
-                .join(reply).fetchJoin().on(comment.id.eq(reply.id))
+                .join(reply).fetchJoin().on(comment.id.eq(reply.comment.id))
                 .where(
                         listEntity.id.eq(list.getId()),
                         comment.id.gt(cursorId),
