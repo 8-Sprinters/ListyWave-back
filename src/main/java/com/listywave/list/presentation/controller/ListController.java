@@ -59,7 +59,7 @@ public class ListController {
 
     @DeleteMapping("/lists/{listId}")
     ResponseEntity<Void> deleteList(
-            @PathVariable(value = "listId") Long listId,
+            @PathVariable("listId") Long listId,
             @Auth Long loginUserId
     ) {
         listService.deleteList(listId, loginUserId);

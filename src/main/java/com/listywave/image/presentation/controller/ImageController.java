@@ -34,7 +34,9 @@ public class ImageController {
     }
 
     @PostMapping("/lists/upload-complete")
-    ResponseEntity<Void> listItemImagesUpload(@RequestBody ListsImagesCreateRequest request) {
+    ResponseEntity<Void> listItemImagesUpload(
+            @RequestBody ListsImagesCreateRequest request
+    ) {
         imageService.uploadCompleteItemImages(request.ownerId(), request.listId(), request.extensionRanks());
         return ResponseEntity.noContent().build();
     }

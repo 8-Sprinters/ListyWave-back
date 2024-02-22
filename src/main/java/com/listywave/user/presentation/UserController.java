@@ -48,7 +48,7 @@ public class UserController {
 
     @GetMapping("/users/{userId}/lists")
     ResponseEntity<AllUserListsResponse> getAllUserLists(
-            @PathVariable(name = "userId") Long targetUserId,
+            @PathVariable("userId") Long targetUserId,
             @RequestParam(name = "type", defaultValue = "my") String type,
             @RequestParam(name = "category", defaultValue = "entire") CategoryType category,
             @RequestParam(name = "cursorId", required = false) Long cursorId,
@@ -81,7 +81,7 @@ public class UserController {
 
     @PostMapping("/follow/{userId}")
     ResponseEntity<Void> follow(
-            @PathVariable(value = "userId") Long followingUserId,
+            @PathVariable("userId") Long followingUserId,
             @Auth Long followerUserId
     ) {
         userService.follow(followingUserId, followerUserId);
@@ -90,7 +90,7 @@ public class UserController {
 
     @DeleteMapping("/follow/{userId}")
     ResponseEntity<Void> unfollow(
-            @PathVariable(value = "userId") Long followingUserId,
+            @PathVariable("userId") Long followingUserId,
             @Auth Long followerUserId
     ) {
         userService.unfollow(followingUserId, followerUserId);
@@ -108,7 +108,7 @@ public class UserController {
 
     @PatchMapping("/users/{userId}")
     ResponseEntity<Void> updateUserProfile(
-            @PathVariable(value = "userId") Long targetUserId,
+            @PathVariable("userId") Long targetUserId,
             @Auth Long loginUserId,
             @RequestBody UserProfileUpdateRequest request
     ) {
@@ -118,7 +118,7 @@ public class UserController {
 
     @GetMapping("/users/exists")
     ResponseEntity<Boolean> checkNicknameDuplicate(
-            @RequestParam(name = "nickname") String nickname
+            @RequestParam("nickname") String nickname
     ) {
         return ResponseEntity.ok(userService.checkNicknameDuplicate(nickname));
     }
