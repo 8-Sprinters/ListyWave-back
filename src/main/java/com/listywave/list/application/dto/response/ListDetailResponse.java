@@ -31,7 +31,7 @@ public record ListDetailResponse(
 
     public static ListDetailResponse of(
             ListEntity list,
-            User user,
+            User owner,
             boolean isCollected,
             List<Collaborator> collaborators,
             List<Item> items
@@ -43,9 +43,9 @@ public record ListDetailResponse(
                 .description(list.getDescription().getValue())
                 .createdDate(list.getCreatedDate())
                 .lastUpdatedDate(list.getUpdatedDate())
-                .ownerId(user.getId())
-                .ownerNickname(user.getNickname())
-                .ownerProfileImageUrl(user.getProfileImageUrl())
+                .ownerId(owner.getId())
+                .ownerNickname(owner.getNickname())
+                .ownerProfileImageUrl(owner.getProfileImageUrl())
                 .collaborators(CollaboratorResponse.toList(collaborators))
                 .items(ItemResponse.toList(list.getSortedItems().getValues()))
                 .isCollected(isCollected)
