@@ -39,7 +39,7 @@ public class CommentController {
     ResponseEntity<CommentFindResponse> getAllCommentsByList(
             @PathVariable("listId") Long listId,
             @RequestParam(value = "size", defaultValue = "5") int size,
-            @RequestParam(value = "cursorId", defaultValue = "0") Long cursorId
+            @RequestParam(value = "cursorId", required = false) Long cursorId
     ) {
         CommentFindResponse response = commentService.getComments(listId, size, cursorId);
         return ResponseEntity.ok(response);
