@@ -1,10 +1,10 @@
 package com.listywave.image.presentation.controller;
 
 import com.listywave.common.auth.Auth;
-import com.listywave.image.application.domain.BasicBackgroundImage;
-import com.listywave.image.application.domain.BasicProfileImage;
-import com.listywave.image.application.dto.response.BasicBackgroundImageUrlResponse;
-import com.listywave.image.application.dto.response.BasicProfileImageUrlResponse;
+import com.listywave.image.application.domain.DefaultBackgroundImages;
+import com.listywave.image.application.domain.DefaultProfileImages;
+import com.listywave.image.application.dto.response.DefaultBackgroundImageUrlResponse;
+import com.listywave.image.application.dto.response.DefaultProfileImageUrlResponse;
 import com.listywave.image.application.dto.response.ItemPresignedUrlResponse;
 import com.listywave.image.application.dto.response.UserPresignedUrlResponse;
 import com.listywave.image.application.service.ImageService;
@@ -83,18 +83,18 @@ public class ImageController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/users/basic-profile-image")
-    ResponseEntity<List<BasicProfileImageUrlResponse>> getAllBasicProfileImageUrl() {
-        List<BasicProfileImageUrlResponse> response = Arrays.stream(BasicProfileImage.values())
-                .map(BasicProfileImageUrlResponse::of)
+    @GetMapping("/users/default-profile-images")
+    ResponseEntity<List<DefaultProfileImageUrlResponse>> getAllDefaultProfileImageUrl() {
+        List<DefaultProfileImageUrlResponse> response = Arrays.stream(DefaultProfileImages.values())
+                .map(DefaultProfileImageUrlResponse::of)
                 .toList();
         return ResponseEntity.ok().body(response);
     }
 
-    @GetMapping("/users/basic-background-image")
-    ResponseEntity<List<BasicBackgroundImageUrlResponse>> getAllBasicBackgroundImageUrl() {
-        List<BasicBackgroundImageUrlResponse> response = Arrays.stream(BasicBackgroundImage.values())
-                .map(BasicBackgroundImageUrlResponse::of)
+    @GetMapping("/users/default-background-images")
+    ResponseEntity<List<DefaultBackgroundImageUrlResponse>> getAllDefaultBackgroundImageUrl() {
+        List<DefaultBackgroundImageUrlResponse> response = Arrays.stream(DefaultBackgroundImages.values())
+                .map(DefaultBackgroundImageUrlResponse::of)
                 .toList();
         return ResponseEntity.ok().body(response);
     }

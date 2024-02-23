@@ -5,10 +5,11 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum BasicBackgroundImage {
+public enum DefaultProfileImages {
 
-    BACKGROUND_IMAGE_A("https://image.listywave.com/basic/listywave_background_a.png"),
+    PROFILE_IMAGE_A("https://image.listywave.com/basic/listywave_profile_a.png"),
     ;
 
     private final String value;
+
 }
