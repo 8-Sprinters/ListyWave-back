@@ -1,10 +1,10 @@
 package com.listywave.user.repository.user.custom;
 
 import com.listywave.collaborator.application.domain.Collaborator;
-import com.listywave.collaborator.application.dto.CollaboratorResponse;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.user.application.domain.User;
+import com.listywave.user.application.dto.search.UserSearchResponse;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -18,7 +18,7 @@ public interface CustomUserRepository {
 
     List<User> getRecommendUsers(List<User> myFollowingUsers, User user);
 
-    Long getCollaboratorCount(String search, User user);
+    Long getCollaboratorCount(String search, Long loginUserId);
 
-    Slice<CollaboratorResponse> getCollaborators(String search, Pageable pageable, User user);
+    Slice<UserSearchResponse> getCollaborators(String search, Pageable pageable, Long loginUserId);
 }

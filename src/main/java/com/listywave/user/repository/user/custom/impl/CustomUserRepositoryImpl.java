@@ -7,10 +7,10 @@ import static com.listywave.list.application.domain.list.QListEntity.listEntity;
 import static com.listywave.user.application.domain.QUser.user;
 
 import com.listywave.collaborator.application.domain.Collaborator;
-import com.listywave.collaborator.application.dto.CollaboratorResponse;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.user.application.domain.User;
+import com.listywave.user.application.dto.search.UserSearchResponse;
 import com.listywave.user.repository.user.custom.CustomUserRepository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -107,7 +107,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     }
 
     @Override
-    public Long getCollaboratorCount(String search, User me) {
+    public Long getCollaboratorCount(String search, Long loginUserId) {
         if (search.isEmpty()) {
             return 0L;
         }
@@ -115,26 +115,26 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .select(user.count())
                 .from(user)
                 .where(
-                        user.id.ne(me.getId()),
+                        userIdNe(loginUserId),
                         user.nickname.value.contains(search)
                 )
                 .fetchOne();
     }
 
     @Override
-    public Slice<CollaboratorResponse> getCollaborators(String search, Pageable pageable, User me) {
+    public Slice<UserSearchResponse> getCollaborators(String search, Pageable pageable, Long loginUserId) {
         if (search.isEmpty()) {
             return new SliceImpl<>(List.of(), pageable, false);
         }
-        List<CollaboratorResponse> fetch = queryFactory
-                .select(Projections.fields(CollaboratorResponse.class,
+        List<UserSearchResponse> fetch = queryFactory
+                .select(Projections.fields(UserSearchResponse.class,
                         user.id,
                         user.nickname.value.as("nickname"),
                         user.profileImageUrl.value.as("profileImageUrl")
                 ))
                 .from(user)
                 .where(
-                        user.id.ne(me.getId()),
+                        userIdNe(loginUserId),
                         user.nickname.value.contains(search)
                 )
                 .orderBy(
@@ -145,5 +145,9 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .offset(pageable.getOffset())
                 .fetch();
         return checkEndPage(pageable, fetch);
+    }
+
+    private BooleanExpression userIdNe(Long loginUserId) {
+        return loginUserId == null ? null : user.id.ne(loginUserId);
     }
 }
