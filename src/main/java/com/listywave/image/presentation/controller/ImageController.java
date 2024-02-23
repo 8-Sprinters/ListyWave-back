@@ -29,10 +29,11 @@ public class ImageController {
 
     @PostMapping("/lists/upload-url")
     ResponseEntity<List<ItemPresignedUrlResponse>> listItemPresignedUrlCreate(
-            @RequestBody ListsImagesCreateRequest request
+            @RequestBody ListsImagesCreateRequest request,
+            @Auth Long loginUserId
     ) {
         List<ItemPresignedUrlResponse> response = imageService.createListsPresignedUrl(
-                request.ownerId(),
+                loginUserId,
                 request.listId(),
                 request.extensionRanks()
         );
@@ -41,9 +42,10 @@ public class ImageController {
 
     @PostMapping("/lists/upload-complete")
     ResponseEntity<Void> listItemImagesUpload(
-            @RequestBody ListsImagesCreateRequest request
+            @RequestBody ListsImagesCreateRequest request,
+            @Auth Long loginUserId
     ) {
-        imageService.uploadCompleteItemImages(request.ownerId(), request.listId(), request.extensionRanks());
+        imageService.uploadCompleteItemImages(loginUserId, request.listId(), request.extensionRanks());
         return ResponseEntity.noContent().build();
     }
 

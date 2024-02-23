@@ -54,24 +54,11 @@ public class ImageService {
     private final ListRepository listRepository;
     private final UserRepository userRepository;
 
-    public List<ItemPresignedUrlResponse> createListsPresignedUrl(Long ownerId, Long listId, List<ExtensionRanks> extensionRanks) {
-        User user = userRepository.getById(ownerId);
+    public List<ItemPresignedUrlResponse> createListsPresignedUrl(Long loginUserId, Long listId, List<ExtensionRanks> extensionRanks) {
+        User user = userRepository.getById(loginUserId);
 
         ListEntity list = findListById(listId);
         validateListUserMismatch(list, user);
-
-//        List<ItemPresignedUrlResponse> result = new ArrayList<>();
-//        for (ExtensionRanks extensionRank : extensionRanks) {
-//            String imageKey = generatedUUID();
-//            GeneratePresignedUrlRequest generatePresignedUrlRequest =
-//                    getGeneratePresignedUrl(LISTS_ITEM, listId, imageKey, extensionRank.extension());
-//            updateItemImageKey(listId, extensionRank, imageKey);
-//
-//            result.add(ItemPresignedUrlResponse.of(
-//                    extensionRank.rank(),
-//                    amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString()));
-//        }
-//        return result;
 
         return extensionRanks.stream()
                 .map((extensionRank) -> {
@@ -88,8 +75,8 @@ public class ImageService {
                 .toList();
     }
 
-    public void uploadCompleteItemImages(Long ownerId, Long listId, List<ExtensionRanks> extensionRanks) {
-        final User user = userRepository.getById(ownerId);
+    public void uploadCompleteItemImages(Long loginUserId, Long listId, List<ExtensionRanks> extensionRanks) {
+        final User user = userRepository.getById(loginUserId);
 
         ListEntity list = findListById(listId);
         validateListUserMismatch(list, user);
