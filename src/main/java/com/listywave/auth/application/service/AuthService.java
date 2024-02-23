@@ -51,7 +51,7 @@ public class AuthService {
         user.updateKakaoAccessToken(kakaoAccessToken);
         String accessToken = jwtManager.createAccessToken(user.getId());
         String refreshToken = jwtManager.createRefreshToken(user.getId());
-        return LoginResult.of(user, true, accessToken, refreshToken);
+        return LoginResult.of(user, false, accessToken, refreshToken);
     }
 
     private LoginResult loginInit(Long kakaoId, String kakaoEmail, String kakaoAccessToken) {
