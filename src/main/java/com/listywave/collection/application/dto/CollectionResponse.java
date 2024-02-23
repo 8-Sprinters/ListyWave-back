@@ -3,6 +3,7 @@ package com.listywave.collection.application.dto;
 import com.listywave.collection.application.domain.Collect;
 import com.listywave.list.application.domain.item.Item;
 import com.listywave.list.application.domain.list.ListEntity;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import lombok.Builder;
@@ -45,6 +46,8 @@ record ListsResponse(
         String title,
         Long ownerId,
         String ownerNickname,
+        String ownerProfileImageUrl,
+        LocalDateTime updatedDate,
         List<ListItemsResponse> listItems
 ) {
 
@@ -55,6 +58,8 @@ record ListsResponse(
                 .title(list.getTitle().getValue())
                 .ownerId(list.getUser().getId())
                 .ownerNickname(list.getUser().getNickname())
+                .ownerProfileImageUrl(list.getUser().getProfileImageUrl())
+                .updatedDate(list.getUpdatedDate())
                 .listItems(toList(list.getItems().getValues()))
                 .build();
     }
