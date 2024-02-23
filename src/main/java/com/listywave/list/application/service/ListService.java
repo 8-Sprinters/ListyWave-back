@@ -130,7 +130,8 @@ public class ListService {
 
         boolean isCollected = false;
         if (loginUserId != null) {
-            isCollected = collectionRepository.existsByListAndUserId(list, loginUserId);
+            User user = userRepository.getById(loginUserId);
+            isCollected = collectionRepository.existsByListAndUserId(list, user.getId());
         }
         return ListDetailResponse.of(list, list.getUser(), isCollected, collaborators, sortedItems.getValues());
     }
@@ -168,6 +169,7 @@ public class ListService {
 
             List<User> myFollowingUsers = follows.stream()
                     .map(Follow::getFollowingUser)
+                    .filter(followingUser -> !followingUser.getIsDelete())
                     .toList();
 
             Slice<ListEntity> result =
@@ -189,7 +191,10 @@ public class ListService {
     }
 
     public ListSearchResponse search(String keyword, SortType sortType, CategoryType category, int size, Long cursorId) {
-        ListEntities allList = new ListEntities(listRepository.findAll());
+        List<ListEntity> lists = listRepository.findAll().stream()
+                .filter(user -> !user.isDeletedUser())
+                .toList();
+        ListEntities allList = new ListEntities(lists);
         ListEntities filtered = allList.filterBy(category)
                 .filterBy(keyword)
                 .sortBy(sortType, keyword);

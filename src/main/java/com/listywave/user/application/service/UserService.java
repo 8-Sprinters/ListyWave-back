@@ -95,7 +95,7 @@ public class UserService {
 
     public FollowingsResponse getFollowings(Long followerUserId, String search) {
         User followerUser = userRepository.getById(followerUserId);
-        List<User> followingUsers = followRepository.findAllByFollowerUserOrderByFollowingUserNicknameAsc(followerUser, search);
+        List<User> followingUsers = followRepository.findAllFollowingUserBy(followerUser, search);
         return FollowingsResponse.of(followingUsers);
     }
 
@@ -132,7 +132,7 @@ public class UserService {
         User followingUser = userRepository.getById(userId);
 
         Slice<User> result =
-                followRepository.findAllByFollowingUserOrderByFollowerUserNicknameAsc(followingUser, pageable, search, cursorId);
+                followRepository.findAllFollowerUserBy(followingUser, pageable, search, cursorId);
         List<User> followerUserList = result.getContent();
 
         if (followerUserList.isEmpty()) {
@@ -150,6 +150,7 @@ public class UserService {
 
         List<User> myFollowingUsers = follows.stream()
                 .map(Follow::getFollowingUser)
+                .filter(followingUser -> !followingUser.getIsDelete())
                 .toList();
 
         List<User> recommendUsers = userRepository.getRecommendUsers(myFollowingUsers, user);
@@ -179,5 +180,19 @@ public class UserService {
         User loginUser = userRepository.getById(followingUserId);
 
         followRepository.deleteByFollowingUserAndFollowerUser(loginUser, targetUser);
+    }
+
+    public void withdraw(Long userId) {
+        User user = userRepository.getById(userId);
+        user.validateUpdate(userId);
+        user.softDelete();
+
+        followRepository.getAllByFollowerUser(user).stream()
+                .map(Follow::getFollowingUser) // 탈퇴하는 회원이 팔로우 하는 회원들 모두 조회해서
+                .forEach(User::decreaseFollowerCount);
+
+        followRepository.getAllByFollowingUser(user).stream()
+                .map(Follow::getFollowerUser)
+                .forEach(User::decreaseFollowingCount);
     }
 }

@@ -19,7 +19,7 @@ public class CustomFollowRepositoryImpl implements CustomFollowRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Slice<User> findAllByFollowingUserOrderByFollowerUserNicknameAsc(
+    public Slice<User> findAllFollowerUserBy(
             User followingUser,
             Pageable pageable,
             String search,
@@ -30,7 +30,8 @@ public class CustomFollowRepositoryImpl implements CustomFollowRepository {
                 .where(
                         followingUserNicknameGt(cursorId),
                         follow.followingUser.id.eq(followingUser.getId()),
-                        follow.followerUser.nickname.value.contains(search)
+                        follow.followerUser.nickname.value.contains(search),
+                        user.isDelete.eq(false)
                 )
                 .orderBy(follow.followerUser.nickname.value.asc())
                 .limit(pageable.getPageSize() + 1)
@@ -43,12 +44,13 @@ public class CustomFollowRepositoryImpl implements CustomFollowRepository {
     }
 
     @Override
-    public List<User> findAllByFollowerUserOrderByFollowingUserNicknameAsc(User followerUser, String search) {
+    public List<User> findAllFollowingUserBy(User followerUser, String search) {
         return queryFactory.selectFrom(user)
                 .join(follow).on(follow.followingUser.id.eq(user.id))
                 .where(
                         follow.followerUser.id.eq(followerUser.getId()),
-                        follow.followingUser.nickname.value.contains(search)
+                        follow.followingUser.nickname.value.contains(search),
+                        user.isDelete.eq(false)
                 )
                 .orderBy(follow.followingUser.nickname.value.asc())
                 .fetch();

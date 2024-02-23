@@ -7,7 +7,7 @@ import org.springframework.data.domain.Slice;
 
 public interface CustomFollowRepository {
 
-    Slice<User> findAllByFollowingUserOrderByFollowerUserNicknameAsc(User user, Pageable pageable, String search, String cursorId);
+    Slice<User> findAllFollowerUserBy(User followingUser, Pageable pageable, String search, String cursorId);
 
-    List<User> findAllByFollowerUserOrderByFollowingUserNicknameAsc(User user, String search);
+    List<User> findAllFollowingUserBy(User followerUser, String search);
 }

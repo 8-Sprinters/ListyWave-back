@@ -48,7 +48,8 @@ public class CustomListRepositoryImpl implements CustomListRepository {
                 .leftJoin(item).on(listEntity.id.eq(item.list.id))
                 .where(
                         listEntity.updatedDate.goe(thirtyDaysAgo),
-                        listIdLt(cursorId)
+                        listIdLt(cursorId),
+                        listEntity.user.isDelete.eq(false)
                 )
                 .distinct()
                 .limit(pageable.getPageSize() + 1)

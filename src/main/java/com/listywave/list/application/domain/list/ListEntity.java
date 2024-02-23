@@ -207,4 +207,8 @@ public class ListEntity {
     public String getRepresentImageUrl() {
         return items.getRepresentImageUrl();
     }
+
+    public boolean isDeletedUser() {
+        return user.getIsDelete();
+    }
 }
