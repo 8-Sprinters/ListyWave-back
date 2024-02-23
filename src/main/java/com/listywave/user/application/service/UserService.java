@@ -186,5 +186,13 @@ public class UserService {
         User user = userRepository.getById(userId);
         user.validateUpdate(userId);
         user.softDelete();
+
+        followRepository.getAllByFollowerUser(user).stream()
+                .map(Follow::getFollowingUser) // 탈퇴하는 회원이 팔로우 하는 회원들 모두 조회해서
+                .forEach(User::decreaseFollowerCount);
+
+        followRepository.getAllByFollowingUser(user).stream()
+                .map(Follow::getFollowerUser)
+                .forEach(User::decreaseFollowingCount);
     }
 }
