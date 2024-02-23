@@ -208,10 +208,10 @@ public class ImageService {
             Boolean isBoth
     ) {
         if (!isBoth && profileImageType != null) {
-            return generateUserPresignedUrlResponse(profileImageType, profileExtension, user, "", generatedUUID());
+            return generateUserPresignedUrlResponse(profileImageType, profileExtension, user, generatedUUID(), "");
         }
         if (!isBoth && backgroundImageType != null) {
-            return generateUserPresignedUrlResponse(backgroundImageType, backgroundExtension, user, generatedUUID(), "");
+            return generateUserPresignedUrlResponse(backgroundImageType, backgroundExtension, user, "", generatedUUID());
         }
         return generateUserPresignedUrlResponseByBoth(profileImageType, backgroundImageType, profileExtension, backgroundExtension, user);
     }
@@ -229,7 +229,7 @@ public class ImageService {
         GeneratePresignedUrlRequest profileUrlRequest =
                 getGeneratePresignedUrl(profileImageType, user.getId(), profileImageKey, profileExtension);
         GeneratePresignedUrlRequest backgroundUrlRequest =
-                getGeneratePresignedUrlRequest(backgroundImageType, backgroundExtension, user, backgroundImageKey, backgroundImageKey);
+                getGeneratePresignedUrlRequest(backgroundImageType, backgroundExtension, user, profileImageKey, backgroundImageKey);
         return UserPresignedUrlResponse.of(
                 user.getId(),
                 amazonS3.generatePresignedUrl(profileUrlRequest).toString(),
@@ -262,8 +262,15 @@ public class ImageService {
             String profileImageKey,
             String backgroundImageKey
     ) {
+        String imageKey = "";
+        if (imageType == ImageType.USER_PROFILE) {
+            imageKey = profileImageKey;
+        }
+        if (imageType == ImageType.USER_BACKGROUND) {
+            imageKey = backgroundImageKey;
+        }
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                getGeneratePresignedUrl(imageType, user.getId(), profileImageKey, extension);
+                getGeneratePresignedUrl(imageType, user.getId(), imageKey, extension);
         updateUserImageKey(user, profileImageKey, backgroundImageKey);
         return generatePresignedUrlRequest;
     }
