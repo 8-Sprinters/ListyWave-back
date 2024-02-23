@@ -16,17 +16,15 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/lists/{listId}/comments/{commentId}/replies")
 public class ReplyController {
 
     private final ReplyService replyService;
 
-    @PostMapping
+    @PostMapping("/lists/{listId}/comments/{commentId}/replies")
     ResponseEntity<ReplyCreateResponse> create(
             @PathVariable("listId") Long listId,
             @PathVariable("commentId") Long commentId,
@@ -37,7 +35,7 @@ public class ReplyController {
         return ResponseEntity.status(CREATED).body(response);
     }
 
-    @DeleteMapping("/{replyId}")
+    @DeleteMapping("/lists/{listId}/comments/{commentId}/replies/{replyId}")
     ResponseEntity<Void> deleteReply(
             @PathVariable("listId") Long listId,
             @PathVariable("commentId") Long commentId,
@@ -49,7 +47,7 @@ public class ReplyController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{replyId}")
+    @PatchMapping("/lists/{listId}/comments/{commentId}/replies/{replyId}")
     ResponseEntity<Void> updateReply(
             @PathVariable("listId") Long listId,
             @PathVariable("commentId") Long commentId,
