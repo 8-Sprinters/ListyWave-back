@@ -6,7 +6,6 @@ import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.BaseEntity;
 import com.listywave.common.exception.CustomException;
-import com.listywave.common.util.RandomEnumGenerator;
 import com.listywave.image.application.domain.DefaultBackgroundImages;
 import com.listywave.image.application.domain.DefaultProfileImages;
 import com.listywave.user.application.vo.BackgroundImageUrl;
@@ -69,9 +68,9 @@ public class User extends BaseEntity {
         return new User(
                 oauthId,
                 oauthEmail,
-                Nickname.initialCreate(java.lang.String.valueOf(oauthId)),
-                new BackgroundImageUrl(getRandomDefaultBackgroundImageUrl()),
-                new ProfileImageUrl(getRandomDefaultProfileImageUrl()),
+                Nickname.initialCreate(String.valueOf(oauthId)),
+                new BackgroundImageUrl(DefaultBackgroundImages.getRandomImageUrl()),
+                new ProfileImageUrl(DefaultProfileImages.getRandomImageUrl()),
                 new Description(""),
                 0,
                 0,
@@ -79,16 +78,6 @@ public class User extends BaseEntity {
                 kakaoAccessToken,
                 false
         );
-    }
-
-    public static String getRandomDefaultBackgroundImageUrl() {
-        RandomEnumGenerator<DefaultBackgroundImages> generator = new RandomEnumGenerator<>(DefaultBackgroundImages.class);
-        return generator.getRandomEnum().getValue();
-    }
-
-    public static String getRandomDefaultProfileImageUrl() {
-        RandomEnumGenerator<DefaultProfileImages> generator = new RandomEnumGenerator<>(DefaultProfileImages.class);
-        return generator.getRandomEnum().getValue();
     }
 
     public void updateUserProfile(
