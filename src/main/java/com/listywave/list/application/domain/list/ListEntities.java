@@ -43,7 +43,7 @@ public record ListEntities(
                     .sorted(comparing(ListEntity::getUpdatedDate))
                     .toList();
 
-            case COLLECTED -> listEntities.stream()
+            case COLLECT -> listEntities.stream()
                     .sorted(comparing(ListEntity::getCollectCount))
                     .toList();
 

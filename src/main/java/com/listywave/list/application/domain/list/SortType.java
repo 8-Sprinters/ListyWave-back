@@ -5,6 +5,6 @@ public enum SortType {
     NEW,
     OLD,
     RELATED,
-    COLLECTED,
+    COLLECT,
     ;
 }
