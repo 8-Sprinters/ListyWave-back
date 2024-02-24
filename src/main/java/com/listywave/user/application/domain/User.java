@@ -86,10 +86,18 @@ public class User extends BaseEntity {
             String profileImageUrl,
             String backgroundImageUrl
     ) {
-        this.nickname = new Nickname(nickname);
-        this.description = new Description(description);
-        this.profileImageUrl = new ProfileImageUrl(profileImageUrl);
-        this.backgroundImageUrl = new BackgroundImageUrl(backgroundImageUrl);
+        if (nickname != null) {
+            this.nickname = new Nickname(nickname);
+        }
+        if (description != null) {
+            this.description = new Description(description);
+        }
+        if (profileImageUrl != null) {
+            this.profileImageUrl = new ProfileImageUrl(profileImageUrl);
+        }
+        if (backgroundImageUrl != null) {
+            this.backgroundImageUrl = new BackgroundImageUrl(backgroundImageUrl);
+        }
     }
 
     public void updateUserImageUrl(String profileImage, String backgroundImage) {
