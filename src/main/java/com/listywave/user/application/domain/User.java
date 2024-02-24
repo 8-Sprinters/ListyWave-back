@@ -6,6 +6,8 @@ import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.BaseEntity;
 import com.listywave.common.exception.CustomException;
+import com.listywave.image.application.domain.DefaultBackgroundImages;
+import com.listywave.image.application.domain.DefaultProfileImages;
 import com.listywave.user.application.vo.BackgroundImageUrl;
 import com.listywave.user.application.vo.Description;
 import com.listywave.user.application.vo.Nickname;
@@ -67,8 +69,8 @@ public class User extends BaseEntity {
                 oauthId,
                 oauthEmail,
                 Nickname.initialCreate(String.valueOf(oauthId)),
-                new BackgroundImageUrl(""),
-                new ProfileImageUrl(""),
+                new BackgroundImageUrl(DefaultBackgroundImages.getRandomImageUrl()),
+                new ProfileImageUrl(DefaultProfileImages.getRandomImageUrl()),
                 new Description(""),
                 0,
                 0,
