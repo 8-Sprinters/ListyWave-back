@@ -7,6 +7,9 @@ import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.reply.Reply;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ReplyRepository extends JpaRepository<Reply, Long>, CustomReplyRepository {
 
@@ -18,5 +21,7 @@ public interface ReplyRepository extends JpaRepository<Reply, Long>, CustomReply
 
     List<Reply> getAllByComment(Comment comment);
 
-    void deleteAllByCommentIn(List<Comment> comments);
+    @Modifying
+    @Query("delete from Reply r where r.comment in :comments")
+    void deleteAllByCommentIn(@Param("comments") List<Comment> comments);
 }
