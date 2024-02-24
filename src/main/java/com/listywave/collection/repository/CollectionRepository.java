@@ -10,4 +10,6 @@ public interface CollectionRepository extends JpaRepository<Collect, Long>, Cust
     boolean existsByListAndUserId(ListEntity list, Long userId);
 
     void deleteByListAndUserId(ListEntity list, Long userId);
+
+    void deleteAllByList(ListEntity list);
 }

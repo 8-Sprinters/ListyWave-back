@@ -152,6 +152,7 @@ public class ListService {
             throw new CustomException(INVALID_ACCESS, "리스트는 작성자만 삭제 가능합니다.");
         }
 
+        collectionRepository.deleteAllByList(list);
         imageService.deleteAllOfListImages(listId);
         collaboratorRepository.deleteAllByList(list);
         List<Comment> comments = commentRepository.findAllByList(list);
