@@ -3,6 +3,7 @@ package com.listywave.list.application.service;
 import static com.listywave.common.exception.ErrorCode.DUPLICATE_USER;
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 
+import com.listywave.alarm.repository.AlarmRepository;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.application.domain.Collaborators;
 import com.listywave.collaborator.repository.CollaboratorRepository;
@@ -67,6 +68,7 @@ public class ListService {
     private final HistoryRepository historyRepository;
     private final CollectionRepository collectionRepository;
     private final CollaboratorRepository collaboratorRepository;
+    private final AlarmRepository alarmRepository;
 
     public ListCreateResponse listCreate(ListCreateRequest request, Long loginUserId) {
         User user = userRepository.getById(loginUserId);
@@ -153,6 +155,7 @@ public class ListService {
         }
 
         collectionRepository.deleteAllByList(list);
+        alarmRepository.deleteAllByListId(list.getId());
         imageService.deleteAllOfListImages(listId);
         collaboratorRepository.deleteAllByList(list);
         List<Comment> comments = commentRepository.findAllByList(list);

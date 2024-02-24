@@ -16,4 +16,6 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long>, CustomAlarm
             where a.receiveUserId = :receiveUserId and a.isChecked = false
             """)
     Boolean hasCheckedAlarmsByReceiveUserId(Long receiveUserId);
+
+    void deleteAllByListId(Long listId);
 }
