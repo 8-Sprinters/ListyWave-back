@@ -6,6 +6,7 @@ import com.listywave.collection.application.dto.CollectionResponse;
 import com.listywave.collection.repository.CollectionRepository;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.ListEntity;
+import com.listywave.list.application.dto.response.CategoryTypeResponse;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
@@ -64,5 +65,13 @@ public class CollectionService {
 //            collectionList.forEach(collect -> collect.getList().sortItemsByRankTop3());
         }
         return CollectionResponse.of(cursorId, result.hasNext(), collectionList);
+    }
+
+    public List<CategoryTypeResponse> getCategoriesOfCollection(Long loginUserId) {
+        User user = userRepository.getById(loginUserId);
+        List<CategoryType> categories = collectionRepository.getCategoriesByCollect(user);
+        return categories.stream()
+                .map(CategoryTypeResponse::of)
+                .toList();
     }
 }

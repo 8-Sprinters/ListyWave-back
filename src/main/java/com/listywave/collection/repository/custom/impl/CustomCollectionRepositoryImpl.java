@@ -10,6 +10,7 @@ import static com.listywave.user.application.domain.QUser.user;
 import com.listywave.collection.application.domain.Collect;
 import com.listywave.collection.repository.custom.CustomCollectionRepository;
 import com.listywave.list.application.domain.category.CategoryType;
+import com.listywave.user.application.domain.User;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -41,10 +42,6 @@ public class CustomCollectionRepositoryImpl implements CustomCollectionRepositor
         return checkEndPage(pageable, fetch);
     }
 
-    private BooleanExpression userIdEq(Long userId) {
-        return userId == null ? null : collect.userId.eq(userId);
-    }
-
     private BooleanExpression collectIdLt(Long cursorId) {
         return cursorId == null ? null : collect.id.lt(cursorId);
     }
@@ -54,5 +51,19 @@ public class CustomCollectionRepositoryImpl implements CustomCollectionRepositor
             return null;
         }
         return listEntity.category.eq(category);
+    }
+
+    @Override
+    public List<CategoryType> getCategoriesByCollect(User user) {
+        return queryFactory.select(listEntity.category)
+                .from(collect)
+                .join(listEntity).on(listEntity.id.eq(collect.list.id))
+                .where(userIdEq(user.getId()))
+                .groupBy(listEntity.category)
+                .fetch();
+    }
+
+    private BooleanExpression userIdEq(Long userId) {
+        return userId == null ? null : collect.userId.eq(userId);
     }
 }
