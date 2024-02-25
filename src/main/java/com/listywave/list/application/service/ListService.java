@@ -1,7 +1,7 @@
 package com.listywave.list.application.service;
 
 import static com.listywave.common.exception.ErrorCode.DUPLICATE_USER;
-import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
+import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 
 import com.listywave.alarm.repository.AlarmRepository;
 import com.listywave.collaborator.application.domain.Collaborator;
@@ -38,6 +38,8 @@ import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
 import com.listywave.list.repository.CommentRepository;
+import com.listywave.list.repository.ItemRepository;
+import com.listywave.list.repository.label.LabelRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.user.application.domain.Follow;
@@ -66,6 +68,8 @@ public class ListService {
     private final FollowRepository followRepository;
     private final CommentRepository commentRepository;
     private final HistoryRepository historyRepository;
+    private final ItemRepository itemRepository;
+    private final LabelRepository labelRepository;
     private final CollectionRepository collectionRepository;
     private final CollaboratorRepository collaboratorRepository;
     private final AlarmRepository alarmRepository;
@@ -149,10 +153,7 @@ public class ListService {
     public void deleteList(Long listId, Long loginUserId) {
         ListEntity list = listRepository.getById(listId);
         User loginUser = userRepository.getById(loginUserId);
-
-        if (!list.canDeleteOrUpdateBy(loginUser)) {
-            throw new CustomException(INVALID_ACCESS, "리스트는 작성자만 삭제 가능합니다.");
-        }
+        list.validateOwner(loginUser);
 
         collectionRepository.deleteAllByList(list);
         alarmRepository.deleteAllByListId(list.getId());
@@ -241,5 +242,34 @@ public class ListService {
             Collaborators collaborators = createCollaborators(collaboratorIds, list);
             collaboratorRepository.saveAll(collaborators.getCollaborators());
         }
+    }
+
+    public void deleteLists(Long loginUserId, List<Long> listIds) {
+        List<ListEntity> lists = listRepository.findAllById(listIds);
+        if (lists.isEmpty()) {
+            throw new CustomException(RESOURCE_NOT_FOUND);
+        }
+        User loginUser = userRepository.getById(loginUserId);
+        lists.forEach(list -> list.validateOwner(loginUser));
+
+        deleteListImages(lists);
+        alarmRepository.deleteAllByListIdIn(listIds);
+        collectionRepository.deleteAllByListIn(lists);
+        collaboratorRepository.deleteAllByListIn(lists);
+        List<Comment> comments = commentRepository.findAllByListIn(lists);
+        replyRepository.deleteAllByCommentIn(comments);
+        commentRepository.deleteAllInBatch(comments);
+        itemRepository.deleteAllListIn(lists);
+        labelRepository.deleteAllListIn(lists);
+        historyRepository.deleteAllByListIn(lists);
+        listRepository.deleteAllInBatch(lists);
+    }
+
+    private void deleteListImages(List<ListEntity> lists) {
+        lists.forEach(
+                list -> {
+                    imageService.deleteAllOfListImages(list.getId());
+                }
+        );
     }
 }

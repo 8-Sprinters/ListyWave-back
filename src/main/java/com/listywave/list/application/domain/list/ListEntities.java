@@ -7,6 +7,7 @@ import static java.util.Comparator.reverseOrder;
 
 import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.category.CategoryType;
+import com.listywave.user.application.domain.User;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.lang.Nullable;
@@ -83,4 +84,10 @@ public record ListEntities(
     public List<ListEntity> listEntities() {
         return new ArrayList<>(listEntities);
     }
+
+    public void canDeleteOrUpdateBy(User loginUser) {
+
+    }
+
+
 }
