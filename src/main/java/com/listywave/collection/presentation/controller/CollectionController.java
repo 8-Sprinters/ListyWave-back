@@ -4,6 +4,8 @@ import com.listywave.collection.application.dto.CollectionResponse;
 import com.listywave.collection.application.service.CollectionService;
 import com.listywave.common.auth.Auth;
 import com.listywave.list.application.domain.category.CategoryType;
+import com.listywave.list.application.dto.response.CategoryTypeResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -38,5 +40,13 @@ public class CollectionController {
     ) {
         CollectionResponse collection = collectionService.getCollection(loginUserId, cursorId, pageable, category);
         return ResponseEntity.ok(collection);
+    }
+
+    @GetMapping("/collection/categories")
+    ResponseEntity<List<CategoryTypeResponse>> getCategoriesOfCollection(
+            @Auth Long loginUserId
+    ) {
+        List<CategoryTypeResponse> categories = collectionService.getCategoriesOfCollection(loginUserId);
+        return ResponseEntity.ok().body(categories);
     }
 }
