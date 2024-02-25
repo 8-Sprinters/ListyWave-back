@@ -10,6 +10,7 @@ import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.dto.search.AllUserSearchResponse;
 import com.listywave.user.application.service.UserService;
+import com.listywave.user.presentation.dto.ListVisibilityUpdateRequest;
 import com.listywave.user.presentation.dto.UserProfileUpdateRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -140,5 +141,14 @@ public class UserController {
     ResponseEntity<Void> withdraw(@Auth Long userId) {
         userService.withdraw(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/users/list-visibility")
+    ResponseEntity<Void> updateListVisibility(
+            @Auth Long loginUserId,
+            @RequestBody ListVisibilityUpdateRequest request
+    ) {
+        userService.updateListVisibility(loginUserId, request.listId(), request.isPublic());
+        return ResponseEntity.ok().build();
     }
 }

@@ -10,6 +10,7 @@ import com.listywave.collaborator.repository.CollaboratorRepository;
 import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.ListEntity;
+import com.listywave.list.repository.list.ListRepository;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.AllUserListsResponse;
@@ -38,6 +39,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final CollaboratorRepository collaboratorRepository;
+    private final ListRepository listRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
@@ -194,5 +196,13 @@ public class UserService {
         followRepository.getAllByFollowingUser(user).stream()
                 .map(Follow::getFollowerUser)
                 .forEach(User::decreaseFollowingCount);
+    }
+
+    public void updateListVisibility(Long loginUserId, Long listId, Boolean isPublic) {
+        User user = userRepository.getById(loginUserId);
+        ListEntity list = listRepository.getById(listId);
+        list.validateOwner(user);
+        
+        list.updateVisibility(!isPublic);
     }
 }
