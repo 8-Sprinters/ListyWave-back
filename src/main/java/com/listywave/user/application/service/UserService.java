@@ -3,13 +3,24 @@ package com.listywave.user.application.service;
 import static com.listywave.common.exception.ErrorCode.ALREADY_FOLLOWED_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.ALREADY_NOT_FOLLOWED_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
+import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 
 import com.listywave.alarm.application.domain.AlarmEvent;
+import com.listywave.alarm.repository.AlarmRepository;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.repository.CollaboratorRepository;
+import com.listywave.collection.repository.CollectionRepository;
 import com.listywave.common.exception.CustomException;
+import com.listywave.history.repository.HistoryRepository;
+import com.listywave.image.application.service.ImageService;
 import com.listywave.list.application.domain.category.CategoryType;
+import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.list.ListEntity;
+import com.listywave.list.repository.CommentRepository;
+import com.listywave.list.repository.ItemRepository;
+import com.listywave.list.repository.label.LabelRepository;
+import com.listywave.list.repository.list.ListRepository;
+import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.AllUserListsResponse;
@@ -38,6 +49,15 @@ public class UserService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final CollaboratorRepository collaboratorRepository;
+    private final CollectionRepository collectionRepository;
+    private final ReplyRepository replyRepository;
+    private final CommentRepository commentRepository;
+    private final HistoryRepository historyRepository;
+    private final ImageService imageService;
+    private final AlarmRepository alarmRepository;
+    private final ListRepository listRepository;
+    private final ItemRepository itemRepository;
+    private final LabelRepository labelRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
@@ -194,5 +214,44 @@ public class UserService {
         followRepository.getAllByFollowingUser(user).stream()
                 .map(Follow::getFollowerUser)
                 .forEach(User::decreaseFollowingCount);
+    }
+
+    public void deleteLists(Long loginUserId, List<Long> listIds) {
+        List<ListEntity> lists = listRepository.findAllById(listIds);
+        if (lists.isEmpty()) {
+            throw new CustomException(RESOURCE_NOT_FOUND);
+        }
+        User loginUser = userRepository.getById(loginUserId);
+        validateOwner(lists, loginUser);
+
+        deleteListImages(lists);
+        alarmRepository.deleteAllByListIdIn(listIds);
+        collectionRepository.deleteAllByListIn(lists);
+        collaboratorRepository.deleteAllByListIn(lists);
+        List<Comment> comments = commentRepository.findAllByListIn(lists);
+        replyRepository.deleteAllByCommentIn(comments);
+        commentRepository.deleteAllInBatch(comments);
+        itemRepository.deleteAllListIn(lists);
+        labelRepository.deleteAllListIn(lists);
+        historyRepository.deleteAllByListIn(lists);
+        listRepository.deleteAllInBatch(lists);
+    }
+
+    private void deleteListImages(List<ListEntity> lists) {
+        lists.forEach(
+                list -> {
+                    imageService.deleteAllOfListImages(list.getId());
+                }
+        );
+    }
+
+    private void validateOwner(List<ListEntity> lists, User loginUser) {
+        lists.forEach(
+                list -> {
+                    if (!list.canDeleteOrUpdateBy(loginUser)) {
+                        throw new CustomException(INVALID_ACCESS, "리스트는 작성자만 삭제 가능합니다.");
+                    }
+                }
+        );
     }
 }

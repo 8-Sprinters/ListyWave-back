@@ -161,8 +161,8 @@ public class ListService {
         List<Comment> comments = commentRepository.findAllByList(list);
         replyRepository.deleteAllByCommentIn(comments);
         commentRepository.deleteAllInBatch(comments);
-        listRepository.deleteById(listId);
         historyRepository.deleteAllByList(list);
+        listRepository.deleteById(listId);
     }
 
     @Transactional(readOnly = true)
