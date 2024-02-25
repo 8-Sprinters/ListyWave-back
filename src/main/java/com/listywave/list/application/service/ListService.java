@@ -196,7 +196,7 @@ public class ListService {
 
     public ListSearchResponse search(String keyword, SortType sortType, CategoryType category, int size, Long cursorId) {
         List<ListEntity> lists = listRepository.findAll().stream()
-                .filter(user -> !user.isDeletedUser())
+                .filter(list -> !list.isDeletedUser() && list.isPublic())
                 .toList();
         ListEntities allList = new ListEntities(lists);
         ListEntities filtered = allList.filterBy(category)

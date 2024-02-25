@@ -30,7 +30,11 @@ public class CustomListRepositoryImpl implements CustomListRepository {
                 .selectFrom(listEntity)
                 .join(listEntity.user, user).fetchJoin()
                 .leftJoin(item).on(listEntity.id.eq(item.list.id))
-                .where(listEntity.updatedDate.goe(thirtyDaysAgo))
+                .where(
+                        listEntity.updatedDate.goe(thirtyDaysAgo),
+                        listEntity.isPublic.eq(true),
+                        listEntity.user.isDelete.eq(false)
+                )
                 .distinct()
                 .limit(10)
                 .orderBy(listEntity.collectCount.desc(), listEntity.viewCount.desc(), listEntity.id.desc())
@@ -49,7 +53,8 @@ public class CustomListRepositoryImpl implements CustomListRepository {
                 .where(
                         listEntity.updatedDate.goe(thirtyDaysAgo),
                         listIdLt(cursorId),
-                        listEntity.user.isDelete.eq(false)
+                        listEntity.user.isDelete.eq(false),
+                        listEntity.isPublic.eq(true)
                 )
                 .distinct()
                 .limit(pageable.getPageSize() + 1)
@@ -75,7 +80,8 @@ public class CustomListRepositoryImpl implements CustomListRepository {
                 .where(
                         listEntity.updatedDate.goe(thirtyDaysAgo),
                         listEntity.user.id.in(followingUserIds),
-                        listIdLt(cursorId)
+                        listIdLt(cursorId),
+                        listEntity.isPublic.eq(true)
                 )
                 .distinct()
                 .limit(pageable.getPageSize() + 1)
