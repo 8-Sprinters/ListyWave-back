@@ -32,7 +32,7 @@ public class Labels {
 
     private void validateSize(List<Label> labels) {
         if (labels.size() > MAX_SIZE) {
-            throw new CustomException(INVALID_COUNT);
+            throw new CustomException(INVALID_COUNT, "라벨의 개수가 " + MAX_SIZE + "개를 넘었습니다.");
         }
     }
 
