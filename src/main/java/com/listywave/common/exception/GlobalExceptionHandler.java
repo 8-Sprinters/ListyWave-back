@@ -19,7 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RequiredArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler
+    @ExceptionHandler(CustomException.class)
     ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
         String message = e.getErrorCode().getDetail();
         log.error("[CustomException] : {}", message, e);

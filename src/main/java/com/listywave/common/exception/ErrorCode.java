@@ -26,6 +26,7 @@ public enum ErrorCode {
     // Http Request
     METHOD_ARGUMENT_TYPE_MISMATCH(BAD_REQUEST, "요청 한 값 타입이 잘못되어 binding에 실패하였습니다."),
     RESOURCE_NOT_FOUND(NOT_FOUND, "대상이 존재하지 않습니다."),
+    RESOURCES_EMPTY(NOT_FOUND, "해당 대상들이 존재하지 않습니다."),
 
     // Validation
     NICKNAME_CONTAINS_WHITESPACE(BAD_REQUEST, "닉네임의 처음과 마지막에 공백이 존재할 수 없습니다."),
@@ -37,6 +38,7 @@ public enum ErrorCode {
     ALREADY_FOLLOWED_EXCEPTION(BAD_REQUEST, "이미 팔로우를 하고 있습니다."),
     ALREADY_NOT_FOLLOWED_EXCEPTION(BAD_REQUEST, "이미 팔로우가 되어 있지 않습니다."),
     DELETED_USER_EXCEPTION(BAD_REQUEST, "탈퇴한 회원입니다."),
+    ALREADY_LOGOUT_EXCEPTION(BAD_REQUEST, "이미 로그아웃 처리가 된 상태입니다."),
 
     // S3
     S3_DELETE_OBJECTS_EXCEPTION(INTERNAL_SERVER_ERROR, "S3의 이미지를 삭제 요청하는 과정에서 에러가 발생했습니다."),
