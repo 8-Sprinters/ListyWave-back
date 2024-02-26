@@ -20,7 +20,8 @@ public class CustomReplyRepositoryImpl implements CustomReplyRepository {
                 .leftJoin(comment).on(comment.id.eq(reply.comment.id))
                 .leftJoin(listEntity).on(listEntity.id.eq(comment.list.id))
                 .where(
-                        listEntity.id.eq(list.getId())
+                        listEntity.id.eq(list.getId()),
+                        reply.user.isDelete.isFalse()
                 )
                 .fetchOne();
     }
