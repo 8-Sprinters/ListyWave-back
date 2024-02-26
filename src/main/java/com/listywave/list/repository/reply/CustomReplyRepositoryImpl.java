@@ -14,11 +14,14 @@ public class CustomReplyRepositoryImpl implements CustomReplyRepository {
     private final JPAQueryFactory queryFactory;
 
     public Long countByList(ListEntity list) {
-        return queryFactory.select(reply.count())
+        return queryFactory
+                .select(reply.count())
                 .from(reply)
-                .leftJoin(comment).on(comment.id.eq(reply.id))
+                .leftJoin(comment).on(comment.id.eq(reply.comment.id))
                 .leftJoin(listEntity).on(listEntity.id.eq(comment.list.id))
-                .where(listEntity.id.eq(list.getId()))
+                .where(
+                        listEntity.id.eq(list.getId())
+                )
                 .fetchOne();
     }
 }
