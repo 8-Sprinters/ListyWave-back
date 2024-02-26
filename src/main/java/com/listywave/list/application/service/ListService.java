@@ -218,12 +218,14 @@ public class ListService {
     }
 
     public void update(Long listId, Long loginUserId, ListUpdateRequest request) {
-        User user = userRepository.getById(loginUserId);
-        ListEntity list = listRepository.getById(listId);
+        validateDuplicateCollaboratorIds(request.collaboratorIds());
 
-        List<Long> collaboratorIds = request.collaboratorIds();
-        validateDuplicateCollaboratorIds(collaboratorIds);
-        boolean hasCollaborator = !collaboratorIds.isEmpty();
+        User loginUser = userRepository.getById(loginUserId);
+        ListEntity list = listRepository.getById(listId);
+        Collaborators beforeCollaborators = new Collaborators(collaboratorRepository.findAllByList(list));
+
+        beforeCollaborators.validateListUpdateAuthority(loginUser);
+        updateCollaborators(beforeCollaborators, request.collaboratorIds(), list);
 
         Labels labels = createLabels(request.labels());
         Items newItems = createItems(request.items());
@@ -235,12 +237,20 @@ public class ListService {
             History history = new History(list, historyItems, updatedDate, request.isPublic());
             historyRepository.save(history);
         }
-        list.update(user, request.category(), new ListTitle(request.title()), new ListDescription(request.description()), request.isPublic(), request.backgroundColor(), hasCollaborator, updatedDate, labels, newItems);
+        boolean hasCollaborator = !request.collaboratorIds().isEmpty();
+        list.update(loginUser, request.category(), new ListTitle(request.title()), new ListDescription(request.description()), request.isPublic(), request.backgroundColor(), hasCollaborator, updatedDate, labels, newItems);
+    }
 
-        if (hasCollaborator) {
-            collaboratorIds.add(list.getUser().getId());
-            Collaborators collaborators = createCollaborators(collaboratorIds, list);
-            collaboratorRepository.saveAll(collaborators.getCollaborators());
+    private void updateCollaborators(Collaborators beforeCollaborators, List<Long> collaboratorIds, ListEntity list) {
+        Collaborators newCollaborators = createCollaborators(collaboratorIds, list);
+
+        Collaborators removedCollaborators = beforeCollaborators.filterRemovedCollaborators(newCollaborators);
+        collaboratorRepository.deleteAllInBatch(removedCollaborators.getCollaborators());
+
+        Collaborators addedCollaborators = beforeCollaborators.filterAddedCollaborators(newCollaborators);
+        if (!addedCollaborators.contains(list.getUser())) {
+            addedCollaborators.add(Collaborator.init(list.getUser(), list));
         }
+        collaboratorRepository.saveAll(addedCollaborators.getCollaborators());
     }
 }
