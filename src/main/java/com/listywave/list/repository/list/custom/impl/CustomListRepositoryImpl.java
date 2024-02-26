@@ -1,5 +1,6 @@
 package com.listywave.list.repository.list.custom.impl;
 
+import static com.listywave.collection.application.domain.QCollect.collect;
 import static com.listywave.common.exception.ErrorCode.NOT_SUPPORT_FILTER_ARGUMENT_EXCEPTION;
 import static com.listywave.common.util.PaginationUtils.checkEndPage;
 import static com.listywave.list.application.domain.category.CategoryType.ENTIRE;
@@ -159,5 +160,15 @@ public class CustomListRepositoryImpl implements CustomListRepository {
             return null;
         }
         return listEntity.category.eq(category);
+    }
+
+    @Override
+    public List<ListEntity> findAllCollectedListBy(Long userId) {
+        return queryFactory.selectFrom(listEntity)
+                .leftJoin(collect).on(collect.list.id.eq(listEntity.id))
+                .where(
+                        collect.userId.eq(userId)
+                )
+                .fetch();
     }
 }

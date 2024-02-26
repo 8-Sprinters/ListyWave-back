@@ -24,4 +24,6 @@ public interface CustomListRepository {
             Long cursorId,
             Pageable pageable
     );
+
+    List<ListEntity> findAllCollectedListBy(Long userId);
 }
