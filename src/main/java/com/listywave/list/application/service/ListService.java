@@ -44,6 +44,7 @@ import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
+import com.listywave.user.application.dto.AllListOfUserSearchResponse;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import java.time.LocalDateTime;
@@ -132,7 +133,7 @@ public class ListService {
     public ListDetailResponse getListDetail(Long listId, Long loginUserId) {
         ListEntity list = listRepository.getById(listId);
         List<Collaborator> collaborators = collaboratorRepository.findAllByList(list);
-        Items sortedItems = list.getSortItemsByRank();
+        Items sortedItems = list.getSortedItems();
 
         boolean isCollected = false;
         if (loginUserId != null) {
@@ -146,7 +147,7 @@ public class ListService {
     public List<ListTrandingResponse> getTrandingList() {
         List<ListEntity> lists = listRepository.findTrandingLists();
         return lists.stream()
-                .map(list -> ListTrandingResponse.of(list, list.getFirstItemImageUrl()))
+                .map(ListTrandingResponse::of)
                 .toList();
     }
 
@@ -219,12 +220,14 @@ public class ListService {
     }
 
     public void update(Long listId, Long loginUserId, ListUpdateRequest request) {
-        User user = userRepository.getById(loginUserId);
-        ListEntity list = listRepository.getById(listId);
+        validateDuplicateCollaboratorIds(request.collaboratorIds());
 
-        List<Long> collaboratorIds = request.collaboratorIds();
-        validateDuplicateCollaboratorIds(collaboratorIds);
-        boolean hasCollaborator = !collaboratorIds.isEmpty();
+        User loginUser = userRepository.getById(loginUserId);
+        ListEntity list = listRepository.getById(listId);
+        Collaborators beforeCollaborators = new Collaborators(collaboratorRepository.findAllByList(list));
+
+        beforeCollaborators.validateListUpdateAuthority(loginUser);
+        updateCollaborators(beforeCollaborators, request.collaboratorIds(), list);
 
         Labels labels = createLabels(request.labels());
         Items newItems = createItems(request.items());
@@ -236,13 +239,21 @@ public class ListService {
             History history = new History(list, historyItems, updatedDate, request.isPublic());
             historyRepository.save(history);
         }
-        list.update(user, request.category(), new ListTitle(request.title()), new ListDescription(request.description()), request.isPublic(), request.backgroundColor(), hasCollaborator, updatedDate, labels, newItems);
+        boolean hasCollaborator = !request.collaboratorIds().isEmpty();
+        list.update(loginUser, request.category(), new ListTitle(request.title()), new ListDescription(request.description()), request.isPublic(), request.backgroundColor(), hasCollaborator, updatedDate, labels, newItems);
+    }
 
-        if (hasCollaborator) {
-            collaboratorIds.add(list.getUser().getId());
-            Collaborators collaborators = createCollaborators(collaboratorIds, list);
-            collaboratorRepository.saveAll(collaborators.getCollaborators());
+    private void updateCollaborators(Collaborators beforeCollaborators, List<Long> collaboratorIds, ListEntity list) {
+        Collaborators newCollaborators = createCollaborators(collaboratorIds, list);
+
+        Collaborators removedCollaborators = beforeCollaborators.filterRemovedCollaborators(newCollaborators);
+        collaboratorRepository.deleteAllInBatch(removedCollaborators.getCollaborators());
+
+        Collaborators addedCollaborators = beforeCollaborators.filterAddedCollaborators(newCollaborators);
+        if (!addedCollaborators.contains(list.getUser())) {
+            addedCollaborators.add(Collaborator.init(list.getUser(), list));
         }
+        collaboratorRepository.saveAll(addedCollaborators.getCollaborators());
     }
 
     public void deleteLists(Long loginUserId, List<Long> listIds) {
@@ -268,5 +279,27 @@ public class ListService {
 
     private void deleteListImages(List<ListEntity> lists) {
         lists.forEach(list -> imageService.deleteAllOfListImages(list.getId()));
+    }
+
+    @Transactional(readOnly = true)
+    public AllListOfUserSearchResponse getAllListOfUser(
+            Long targetUserId,
+            String type,
+            CategoryType category,
+            Long cursorId,
+            Pageable pageable
+    ) {
+        userRepository.getById(targetUserId);
+
+        List<Collaborator> collaborators = collaboratorRepository.findAllByUserId(targetUserId);
+        Slice<ListEntity> result =
+                listRepository.findFeedLists(collaborators, targetUserId, type, category, cursorId, pageable);
+        List<ListEntity> lists = result.getContent();
+
+        cursorId = null;
+        if (!lists.isEmpty()) {
+            cursorId = lists.get(lists.size() - 1).getId();
+        }
+        return AllListOfUserSearchResponse.of(result.hasNext(), cursorId, lists);
     }
 }

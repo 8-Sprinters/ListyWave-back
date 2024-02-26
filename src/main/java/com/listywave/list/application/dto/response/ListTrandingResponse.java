@@ -15,7 +15,7 @@ public record ListTrandingResponse(
         String backgroundColor
 ) {
 
-    public static ListTrandingResponse of(ListEntity list, String imageUrlTopRankItem) {
+    public static ListTrandingResponse of(ListEntity list) {
         return ListTrandingResponse.builder()
                 .id(list.getId())
                 .ownerId(list.getUser().getId())
@@ -23,7 +23,7 @@ public record ListTrandingResponse(
                 .ownerProfileImageUrl(list.getUser().getProfileImageUrl())
                 .title(list.getTitle().getValue())
                 .description(list.getDescription().getValue())
-                .itemImageUrl(imageUrlTopRankItem)
+                .itemImageUrl(list.getFirstItemImageUrl())
                 .backgroundColor(list.getBackgroundColor())
                 .build();
     }

@@ -33,7 +33,7 @@ public record ListSearchResponse(
 record ListInfo(
         Long id,
         String title,
-        java.util.List<ItemInfo> items,
+        List<ItemInfo> items,
         boolean isPublic,
         String backgroundColor,
         LocalDateTime updatedDate,
@@ -53,7 +53,7 @@ record ListInfo(
         return ListInfo.builder()
                 .id(list.getId())
                 .title(list.getTitle().getValue())
-                .items(ItemInfo.toList(list.getItems().getValues()))
+                .items(ItemInfo.toList(list.getTop3Items().getValues()))
                 .isPublic(list.isPublic())
                 .backgroundColor(list.getBackgroundColor())
                 .updatedDate(list.getUpdatedDate())
@@ -71,7 +71,7 @@ record ItemInfo(
         String title
 ) {
 
-    public static java.util.List<ItemInfo> toList(java.util.List<Item> items) {
+    public static List<ItemInfo> toList(List<Item> items) {
         return items.stream()
                 .map(ItemInfo::of)
                 .toList();

@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
+import com.listywave.common.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -34,5 +35,9 @@ public class ItemComment {
         if (value.length() > LENGTH_LIMIT) {
             throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "아이템 comment는 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
+    }
+
+    public boolean isMatch(String keyword) {
+        return StringUtils.match(this.value, keyword);
     }
 }

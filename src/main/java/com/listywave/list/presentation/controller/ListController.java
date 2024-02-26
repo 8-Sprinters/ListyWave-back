@@ -13,6 +13,7 @@ import com.listywave.list.application.service.ListService;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
 import com.listywave.list.presentation.dto.request.ListsDeleteRequest;
+import com.listywave.user.application.dto.AllListOfUserSearchResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -97,6 +98,19 @@ public class ListController {
     ) {
         listService.update(listId, loginUserId, request);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/users/{userId}/lists")
+    ResponseEntity<AllListOfUserSearchResponse> getAllListOfUser(
+            @PathVariable("userId") Long targetUserId,
+            @RequestParam(name = "type", defaultValue = "my") String type,
+            @RequestParam(name = "category", defaultValue = "entire") CategoryType category,
+            @RequestParam(name = "cursorId", required = false) Long cursorId,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        AllListOfUserSearchResponse result
+                = listService.getAllListOfUser(targetUserId, type, category, cursorId, pageable);
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/users/lists")

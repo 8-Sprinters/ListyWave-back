@@ -2,8 +2,6 @@ package com.listywave.user.presentation;
 
 import com.listywave.common.auth.Auth;
 import com.listywave.common.auth.OptionalAuth;
-import com.listywave.list.application.domain.category.CategoryType;
-import com.listywave.user.application.dto.AllUserListsResponse;
 import com.listywave.user.application.dto.FollowersResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
 import com.listywave.user.application.dto.RecommendUsersResponse;
@@ -49,19 +47,6 @@ public class UserController {
     ) {
         AllUserSearchResponse collaborators = userService.getUsersBySearch(loginUserId, search, pageable);
         return ResponseEntity.ok(collaborators);
-    }
-
-    @GetMapping("/users/{userId}/lists")
-    ResponseEntity<AllUserListsResponse> getAllUserLists(
-            @PathVariable("userId") Long targetUserId,
-            @RequestParam(name = "type", defaultValue = "my") String type,
-            @RequestParam(name = "category", defaultValue = "entire") CategoryType category,
-            @RequestParam(name = "cursorId", required = false) Long cursorId,
-            @PageableDefault(size = 10) Pageable pageable
-    ) {
-        AllUserListsResponse allUserListsResponse =
-                userService.getAllListOfUser(targetUserId, type, category, cursorId, pageable);
-        return ResponseEntity.ok(allUserListsResponse);
     }
 
     @GetMapping("/users/{userId}/followings")

@@ -38,6 +38,7 @@ public enum ErrorCode {
     ALREADY_FOLLOWED_EXCEPTION(BAD_REQUEST, "이미 팔로우를 하고 있습니다."),
     ALREADY_NOT_FOLLOWED_EXCEPTION(BAD_REQUEST, "이미 팔로우가 되어 있지 않습니다."),
     DELETED_USER_EXCEPTION(BAD_REQUEST, "탈퇴한 회원입니다."),
+    NOT_SUPPORT_FILTER_ARGUMENT_EXCEPTION(BAD_REQUEST, "지원하지 않는 필터링 조건입니다."),
     ALREADY_LOGOUT_EXCEPTION(BAD_REQUEST, "이미 로그아웃 처리가 된 상태입니다."),
 
     // S3
