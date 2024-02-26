@@ -7,4 +7,6 @@ import java.util.List;
 public interface CustomCommentRepository {
 
     List<Comment> getComments(ListEntity list, int size, Long cursorId);
+
+    Long countByList(ListEntity list);
 }

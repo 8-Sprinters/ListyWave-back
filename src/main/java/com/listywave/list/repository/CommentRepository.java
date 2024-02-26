@@ -18,8 +18,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, CustomC
 
     List<Comment> findAllByList(ListEntity list);
 
-    Long countByList(ListEntity list);
-
     @Query("select c from Comment c where c.list in :lists")
     List<Comment> findAllByListIn(@Param("lists") List<ListEntity> lists);
 }

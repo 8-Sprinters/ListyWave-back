@@ -36,4 +36,18 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
         }
         return comment.id.gt(cursorId);
     }
+
+    @Override
+    public Long countByList(ListEntity list) {
+        return queryFactory
+                .select(comment.count())
+                .from(comment)
+                .leftJoin(listEntity).on(comment.list.id.eq(listEntity.id))
+                .where(
+                        comment.list.id.eq(list.getId()),
+                        comment.isDeleted.isFalse(),
+                        comment.user.isDelete.isFalse()
+                )
+                .fetchOne();
+    }
 }
