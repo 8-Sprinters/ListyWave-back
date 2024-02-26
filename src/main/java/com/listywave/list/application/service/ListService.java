@@ -266,10 +266,6 @@ public class ListService {
     }
 
     private void deleteListImages(List<ListEntity> lists) {
-        lists.forEach(
-                list -> {
-                    imageService.deleteAllOfListImages(list.getId());
-                }
-        );
+        lists.forEach(list -> imageService.deleteAllOfListImages(list.getId()));
     }
 }
