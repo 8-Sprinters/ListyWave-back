@@ -11,10 +11,10 @@ public record CategoryTypeResponse(
 
     public static CategoryTypeResponse of(CategoryType categoryType) {
         return new CategoryTypeResponse(
-                categoryType.getCodeValue(),
+                categoryType.getCode(),
                 categoryType.name().toLowerCase(),
-                categoryType.getKorNameValue(),
-                categoryType.getCategoryImageUrl()
+                categoryType.getViewName(),
+                categoryType.getImageUrl()
         );
     }
 }

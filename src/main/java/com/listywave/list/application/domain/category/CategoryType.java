@@ -22,21 +22,21 @@ public enum CategoryType {
     ETC("8", "기타", "https://image.listywave.com/category/category_etc.png"),
     ;
 
-    private final String codeValue;
-    private final String korNameValue;
-    private final String categoryImageUrl;
+    private final String code;
+    private final String viewName;
+    private final String imageUrl;
 
-    public static CategoryType enumOf(String codeValue) {
+    public static CategoryType codeOf(String code) {
         return Arrays.stream(CategoryType.values())
-                .filter(t -> t.getCodeValue().equals(codeValue))
+                .filter(t -> t.getCode().equals(code))
                 .findAny()
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "해당 카테고리코드는 존재하지 않습니다."));
     }
 
     @JsonCreator
-    public static CategoryType fromString(String key) {
+    public static CategoryType nameOf(String name) {
         return Arrays.stream(CategoryType.values())
-                .filter(categoryType -> categoryType.name().equalsIgnoreCase(key))
+                .filter(categoryType -> categoryType.name().equalsIgnoreCase(name))
                 .findFirst()
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "해당 카테고리는 존재하지 않습니다."));
     }
