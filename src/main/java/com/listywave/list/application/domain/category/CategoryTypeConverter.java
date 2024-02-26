@@ -9,7 +9,7 @@ public class CategoryTypeConverter implements AttributeConverter<CategoryType, S
         if (categoryType == null) {
             throw new NullPointerException("CategoryType을 DB 칼럼으로 변경하는 과정에서 null이 포함되었습니다.");
         }
-        return categoryType.getCodeValue();
+        return categoryType.getCode();
     }
 
     @Override
@@ -17,6 +17,6 @@ public class CategoryTypeConverter implements AttributeConverter<CategoryType, S
         if (dbData == null) {
             throw new NullPointerException("List 테이블의 category_id 값이 null입니다.");
         }
-        return CategoryType.enumOf(dbData);
+        return CategoryType.codeOf(dbData);
     }
 }
