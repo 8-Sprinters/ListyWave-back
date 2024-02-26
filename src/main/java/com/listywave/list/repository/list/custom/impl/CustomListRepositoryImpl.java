@@ -117,7 +117,8 @@ public class CustomListRepositoryImpl implements CustomListRepository {
                         userIdEq(userId, type),
                         typeEq(type),
                         categoryEq(category),
-                        listIdLt(cursorId)
+                        listIdLt(cursorId),
+                        listEntity.user.isDelete.isFalse()
                 )
                 .distinct()
                 .limit(pageable.getPageSize() + 1)
