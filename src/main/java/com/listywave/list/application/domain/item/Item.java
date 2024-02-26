@@ -66,6 +66,14 @@ public class Item extends BaseEntity {
         return new HistoryItem(this.ranking, new HistoryItemTitle(this.title.getValue()));
     }
 
+    public boolean isMatchTitle(String keyword) {
+        return this.title.isMatch(keyword);
+    }
+
+    public boolean isMatchComment(String keyword) {
+        return this.comment.isMatch(keyword);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

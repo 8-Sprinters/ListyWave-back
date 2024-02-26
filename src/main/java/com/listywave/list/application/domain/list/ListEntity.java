@@ -143,13 +143,19 @@ public class ListEntity {
     public int scoreRelation(String keyword) {
         int totalScore = 0;
         if (title.isMatch(keyword)) {
-            totalScore += 10;
+            totalScore += 5;
         }
         if (description.isMatch(keyword)) {
-            totalScore += 5;
+            totalScore += 4;
         }
         if (labels.anyMatch(keyword)) {
             totalScore += 3;
+        }
+        if (items.anyMatchTitle(keyword)) {
+            totalScore += 2;
+        }
+        if (items.anyMatchComment(keyword)) {
+            totalScore += 1;
         }
         return totalScore;
     }
