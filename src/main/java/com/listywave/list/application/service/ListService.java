@@ -133,7 +133,7 @@ public class ListService {
     public ListDetailResponse getListDetail(Long listId, Long loginUserId) {
         ListEntity list = listRepository.getById(listId);
         List<Collaborator> collaborators = collaboratorRepository.findAllByList(list);
-        Items sortedItems = list.getSortItemsByRank();
+        Items sortedItems = list.getSortedItems();
 
         boolean isCollected = false;
         if (loginUserId != null) {
