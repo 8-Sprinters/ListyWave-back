@@ -198,11 +198,11 @@ public class UserService {
                 .forEach(User::decreaseFollowingCount);
     }
 
-    public void updateListVisibility(Long loginUserId, Long listId, Boolean isPublic) {
+    public void updateListVisibility(Long loginUserId, Long listId, Boolean beforeIsPublic) {
         User user = userRepository.getById(loginUserId);
         ListEntity list = listRepository.getById(listId);
         list.validateOwner(user);
-        
-        list.updateVisibility(!isPublic);
+
+        list.updateVisibility(!beforeIsPublic);
     }
 }
