@@ -47,7 +47,7 @@ public record ListDetailResponse(
                 .ownerNickname(user.getNickname())
                 .ownerProfileImageUrl(user.getProfileImageUrl())
                 .collaborators(CollaboratorResponse.toList(collaborators))
-                .items(ItemResponse.toList(items))
+                .items(ItemResponse.toList(list.getSortedItems().getValues()))
                 .isCollected(isCollected)
                 .isPublic(list.isPublic())
                 .backgroundColor(list.getBackgroundColor())

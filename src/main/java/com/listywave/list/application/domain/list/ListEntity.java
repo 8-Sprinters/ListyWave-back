@@ -108,8 +108,12 @@ public class ListEntity {
         this.updatedDate = LocalDateTime.now();
     }
 
-    public Items getSortItemsByRank() {
+    public Items getSortedItems() {
         return items.sortByRank();
+    }
+
+    public Items getTop3Items() {
+        return items.getTop3();
     }
 
     public String getFirstItemImageUrl() {
