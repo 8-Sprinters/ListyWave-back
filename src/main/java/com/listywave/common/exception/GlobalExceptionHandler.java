@@ -3,8 +3,10 @@ package com.listywave.common.exception;
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS_TOKEN;
 import static com.listywave.common.exception.ErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,5 +53,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("[ExpiredJwtException] : {}", e.getMessage(), e);
         CustomException customException = new CustomException(INVALID_ACCESS_TOKEN, "만료된 액세스 토큰입니다.");
         return ErrorResponse.toResponseEntity(customException);
+    }
+
+    @ExceptionHandler(MalformedJwtException.class)
+    ResponseEntity<Void> handleMalformedJwtException(MalformedJwtException e) {
+        log.error("[MalformedJwtException] : {}", e.getMessage(), e);
+        return ResponseEntity.status(UNAUTHORIZED).build();
     }
 }
