@@ -128,10 +128,6 @@ public class ListEntity {
         }
     }
 
-    public boolean canDeleteOrUpdateBy(User user) {
-        return this.user.equals(user);
-    }
-
     public boolean isCategoryType(CategoryType category) {
         return category.equals(ENTIRE) || this.category.equals(category);
     }
@@ -178,9 +174,7 @@ public class ListEntity {
             Labels newLabels,
             Items newItems
     ) {
-        if (!canDeleteOrUpdateBy(owner)) {
-            throw new CustomException(INVALID_ACCESS);
-        }
+        validateOwner(owner);
 
         this.category = category;
         this.title = title;

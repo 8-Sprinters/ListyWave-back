@@ -12,6 +12,7 @@ import com.listywave.list.application.dto.response.ListTrandingResponse;
 import com.listywave.list.application.service.ListService;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
+import com.listywave.list.presentation.dto.request.ListsDeleteRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -96,5 +97,14 @@ public class ListController {
     ) {
         listService.update(listId, loginUserId, request);
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/users/lists")
+    ResponseEntity<Void> deleteLists(
+            @Auth Long userId,
+            @RequestBody ListsDeleteRequest request
+    ) {
+        listService.deleteLists(userId, request.listId());
+        return ResponseEntity.ok().build();
     }
 }

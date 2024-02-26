@@ -26,6 +26,7 @@ public enum ErrorCode {
     // Http Request
     METHOD_ARGUMENT_TYPE_MISMATCH(BAD_REQUEST, "요청 한 값 타입이 잘못되어 binding에 실패하였습니다."),
     RESOURCE_NOT_FOUND(NOT_FOUND, "대상이 존재하지 않습니다."),
+    RESOURCES_EMPTY(NOT_FOUND, "해당 대상들이 존재하지 않습니다."),
 
     // Validation
     NICKNAME_CONTAINS_WHITESPACE(BAD_REQUEST, "닉네임의 처음과 마지막에 공백이 존재할 수 없습니다."),
