@@ -37,6 +37,7 @@ public enum ErrorCode {
     ALREADY_FOLLOWED_EXCEPTION(BAD_REQUEST, "이미 팔로우를 하고 있습니다."),
     ALREADY_NOT_FOLLOWED_EXCEPTION(BAD_REQUEST, "이미 팔로우가 되어 있지 않습니다."),
     DELETED_USER_EXCEPTION(BAD_REQUEST, "탈퇴한 회원입니다."),
+    ALREADY_LOGOUT_EXCEPTION(BAD_REQUEST, "이미 로그아웃 처리가 된 상태입니다."),
 
     // S3
     S3_DELETE_OBJECTS_EXCEPTION(INTERNAL_SERVER_ERROR, "S3의 이미지를 삭제 요청하는 과정에서 에러가 발생했습니다."),

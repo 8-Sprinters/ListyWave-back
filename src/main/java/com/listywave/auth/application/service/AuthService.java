@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AuthService {
 
@@ -30,7 +31,6 @@ public class AuthService {
         return kakaoRedirectUriProvider.provide();
     }
 
-    @Transactional
     public LoginResult login(String authCode) {
         KakaoTokenResponse kakaoTokenResponse = kakaoOauthClient.requestToken(authCode);
         KakaoMember kakaoMember = kakaoOauthClient.fetchMember(kakaoTokenResponse.accessToken());
@@ -64,7 +64,9 @@ public class AuthService {
 
     public void logout(Long userId) {
         User user = userRepository.getById(userId);
+        user.validateHasKakaoAccessToken();
         kakaoOauthClient.logout(user.getKakaoAccessToken());
+        user.updateKakaoAccessToken("");
     }
 
     public UpdateTokenResult updateToken(String refreshToken) {
