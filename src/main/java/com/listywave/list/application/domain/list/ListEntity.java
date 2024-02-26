@@ -180,7 +180,6 @@ public class ListEntity {
     }
 
     public void update(
-            User owner,
             CategoryType category,
             ListTitle title,
             ListDescription description,
@@ -191,8 +190,6 @@ public class ListEntity {
             Labels newLabels,
             Items newItems
     ) {
-        validateOwner(owner);
-
         this.category = category;
         this.title = title;
         this.description = description;
