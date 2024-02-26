@@ -1,5 +1,6 @@
 package com.listywave.user.application.domain;
 
+import static com.listywave.common.exception.ErrorCode.ALREADY_LOGOUT_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.EXCEED_FOLLOW_COUNT_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 import static lombok.AccessLevel.PROTECTED;
@@ -162,6 +163,12 @@ public class User extends BaseEntity {
 
     public void updateKakaoAccessToken(String kakaoAccessToken) {
         this.kakaoAccessToken = kakaoAccessToken;
+    }
+
+    public void validateHasKakaoAccessToken() {
+        if (kakaoAccessToken == null || kakaoAccessToken.isBlank()) {
+            throw new CustomException(ALREADY_LOGOUT_EXCEPTION);
+        }
     }
 
     public String getNickname() {
