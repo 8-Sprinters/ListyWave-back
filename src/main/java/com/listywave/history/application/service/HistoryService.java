@@ -13,8 +13,10 @@ import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class HistoryService {
 
@@ -22,13 +24,13 @@ public class HistoryService {
     private final ListRepository listRepository;
     private final HistoryRepository historyRepository;
 
+    @Transactional(readOnly = true)
     public List<HistorySearchResponse> searchHistories(Long listId) {
         ListEntity list = listRepository.getById(listId);
         if (list.isDeletedUser()) {
             throw new CustomException(DELETED_USER_EXCEPTION);
         }
         List<History> histories = historyRepository.findAllByList(list);
-
         return HistorySearchResponse.toList(histories);
     }
 
