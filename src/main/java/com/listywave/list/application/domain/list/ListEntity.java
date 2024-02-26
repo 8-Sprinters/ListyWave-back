@@ -1,5 +1,6 @@
 package com.listywave.list.application.domain.list;
 
+import static com.listywave.common.exception.ErrorCode.DELETED_USER_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 import static com.listywave.list.application.domain.category.CategoryType.ENTIRE;
@@ -212,5 +213,11 @@ public class ListEntity {
 
     public boolean isDeletedUser() {
         return user.getIsDelete();
+    }
+
+    public void validateDoesNotDeleteOwner() {
+        if (this.user.getIsDelete()) {
+            throw new CustomException(DELETED_USER_EXCEPTION, "탈퇴한 회원의 리스트입니다.");
+        }
     }
 }
