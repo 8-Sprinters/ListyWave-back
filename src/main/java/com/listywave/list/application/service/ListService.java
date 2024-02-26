@@ -196,7 +196,7 @@ public class ListService {
 
     public ListSearchResponse search(String keyword, SortType sortType, CategoryType category, int size, Long cursorId) {
         List<ListEntity> lists = listRepository.findAll().stream()
-                .filter(user -> !user.isDeletedUser())
+                .filter(list -> !list.isDeletedUser() && list.isPublic())
                 .toList();
         ListEntities allList = new ListEntities(lists);
         ListEntities filtered = allList.filterBy(category)
@@ -238,6 +238,7 @@ public class ListService {
         list.update(user, request.category(), new ListTitle(request.title()), new ListDescription(request.description()), request.isPublic(), request.backgroundColor(), hasCollaborator, updatedDate, labels, newItems);
 
         if (hasCollaborator) {
+            collaboratorIds.add(list.getUser().getId());
             Collaborators collaborators = createCollaborators(collaboratorIds, list);
             collaboratorRepository.saveAll(collaborators.getCollaborators());
         }
