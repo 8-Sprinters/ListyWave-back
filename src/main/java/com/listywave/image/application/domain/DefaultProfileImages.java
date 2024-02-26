@@ -11,6 +11,10 @@ import lombok.Getter;
 public enum DefaultProfileImages {
 
     PROFILE_IMAGE_A("https://image.listywave.com/basic/listywave_profile_a.png"),
+    PROFILE_IMAGE_B("https://image.listywave.com/basic/listywave_profile_b.png"),
+    PROFILE_IMAGE_C("https://image.listywave.com/basic/listywave_profile_c.png"),
+    PROFILE_IMAGE_D("https://image.listywave.com/basic/listywave_profile_d.png"),
+    PROFILE_IMAGE_E("https://image.listywave.com/basic/listywave_profile_e.png"),
     ;
 
     private final String value;
