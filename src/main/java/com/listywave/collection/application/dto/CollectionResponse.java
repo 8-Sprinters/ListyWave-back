@@ -4,7 +4,6 @@ import com.listywave.collection.application.domain.Collect;
 import com.listywave.list.application.domain.item.Item;
 import com.listywave.list.application.domain.list.ListEntity;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import lombok.Builder;
 
@@ -65,9 +64,7 @@ public record CollectionResponse(
 
         public static List<ListItemsResponse> toList(List<Item> items) {
             return items.stream()
-                    .sorted(Comparator.comparing(Item::getRanking))
                     .map(ListItemsResponse::of)
-                    .limit(3)
                     .toList();
         }
     }
