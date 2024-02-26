@@ -155,11 +155,11 @@ public class ListEntity {
         return totalScore;
     }
 
-    public void incrementCollectCount() {
+    public void increaseCollectCount() {
         this.collectCount++;
     }
 
-    public void decrementCollectCount() {
+    public void decreaseCollectCount() {
         this.collectCount--;
     }
 
