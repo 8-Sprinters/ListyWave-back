@@ -23,7 +23,7 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
                 .where(
                         comment.list.id.eq(list.getId()),
                         commentIdGt(cursorId),
-                        comment.user.isDelete.eq(false)
+                        comment.user.isDelete.isFalse()
                 )
                 .orderBy(comment.id.asc())
                 .limit(size + 1)
