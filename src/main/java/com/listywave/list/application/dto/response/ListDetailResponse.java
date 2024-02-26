@@ -37,7 +37,7 @@ public record ListDetailResponse(
             List<Item> items
     ) {
         return ListDetailResponse.builder()
-                .category(list.getCategory().getKorNameValue())
+                .category(list.getCategory().getViewName())
                 .labels(LabelResponse.toList(list.getLabels().getValues()))
                 .title(list.getTitle().getValue())
                 .description(list.getDescription().getValue())

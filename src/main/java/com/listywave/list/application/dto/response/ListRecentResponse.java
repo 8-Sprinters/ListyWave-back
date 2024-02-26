@@ -45,7 +45,7 @@ record ListResponse(
     public static ListResponse of(ListEntity list) {
         return ListResponse.builder()
                 .id(list.getId())
-                .category(list.getCategory().getKorNameValue())
+                .category(list.getCategory().getViewName())
                 .backgroundColor(list.getBackgroundColor())
                 .ownerId(list.getUser().getId())
                 .ownerNickname(list.getUser().getNickname())
