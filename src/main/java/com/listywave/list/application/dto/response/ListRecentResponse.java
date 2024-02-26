@@ -20,86 +20,87 @@ public record ListRecentResponse(
                 .lists(ListResponse.toList(lists))
                 .build();
     }
-}
 
-@Builder
-record ListResponse(
-        Long id,
-        String category,
-        String backgroundColor,
-        Long ownerId,
-        String ownerNickname,
-        String ownerProfileImage,
-        List<LabelsResponse> labels,
-        String title,
-        String description,
-        List<ItemsResponse> items
-) {
+    @Builder
+    public record ListResponse(
+            Long id,
+            String category,
+            String backgroundColor,
+            Long ownerId,
+            String ownerNickname,
+            String ownerProfileImage,
+            List<LabelsResponse> labels,
+            String title,
+            String description,
+            List<ItemsResponse> items
+    ) {
 
-    public static List<ListResponse> toList(List<ListEntity> lists) {
-        return lists.stream()
-                .map(ListResponse::of)
-                .toList();
+        public static List<ListResponse> toList(List<ListEntity> lists) {
+            return lists.stream()
+                    .map(ListResponse::of)
+                    .toList();
+        }
+
+        public static ListResponse of(ListEntity list) {
+            return ListResponse.builder()
+                    .id(list.getId())
+                    .category(list.getCategory().getKorNameValue())
+                    .backgroundColor(list.getBackgroundColor())
+                    .ownerId(list.getUser().getId())
+                    .ownerNickname(list.getUser().getNickname())
+                    .ownerProfileImage(list.getUser().getProfileImageUrl())
+                    .labels(LabelsResponse.toList(list.getLabels().getValues()))
+                    .title(list.getTitle().getValue())
+                    .description(list.getDescription().getValue())
+                    .items(ItemsResponse.toList(list.getTop3Items().getValues()))
+                    .build();
+        }
     }
 
-    public static ListResponse of(ListEntity list) {
-        return ListResponse.builder()
-                .id(list.getId())
-                .category(list.getCategory().getKorNameValue())
-                .backgroundColor(list.getBackgroundColor())
-                .ownerId(list.getUser().getId())
-                .ownerNickname(list.getUser().getNickname())
-                .ownerProfileImage(list.getUser().getProfileImageUrl())
-                .labels(LabelsResponse.toList(list.getLabels().getValues()))
-                .title(list.getTitle().getValue())
-                .description(list.getDescription().getValue())
-                .items(ItemsResponse.toList(list.getItems().getValues()))
-                .build();
-    }
-}
+    @Builder
+    public record LabelsResponse(
+            Long id,
+            String name
+    ) {
 
-@Builder
-record LabelsResponse(
-        Long id,
-        String name
-) {
+        public static List<LabelsResponse> toList(List<Label> labels) {
+            return labels.stream()
+                    .map(LabelsResponse::of)
+                    .toList();
+        }
 
-    public static List<LabelsResponse> toList(List<Label> labels) {
-        return labels.stream()
-                .map(LabelsResponse::of)
-                .toList();
+        public static LabelsResponse of(Label label) {
+            return LabelsResponse.builder()
+                    .id(label.getId())
+                    .name(label.getName())
+                    .build();
+        }
     }
 
-    public static LabelsResponse of(Label label) {
-        return LabelsResponse.builder()
-                .id(label.getId())
-                .name(label.getName())
-                .build();
-    }
-}
+    @Builder
+    public record ItemsResponse(
+            Long id,
+            int rank,
+            String title,
+            String imageUrl
+    ) {
 
-@Builder
-record ItemsResponse(
-        Long id,
-        int rank,
-        String title,
-        String imageUrl
-) {
+        public static List<ItemsResponse> toList(List<Item> items) {
+            return items.stream()
+                    .sorted(Comparator.comparing(Item::getRanking))
+                    .map(ItemsResponse::of)
+                    .limit(3)
+                    .toList();
+        }
 
-    public static List<ItemsResponse> toList(List<Item> items) {
-        return items.stream()
-                .sorted(Comparator.comparing(Item::getRanking))
-                .map(ItemsResponse::of)
-                .limit(3)
-                .toList();
+        public static ItemsResponse of(Item item) {
+            return ItemsResponse.builder()
+                    .id(item.getId())
+                    .rank(item.getRanking())
+                    .title(item.getTitle().getValue())
+                    .imageUrl(item.getImageUrl().getValue())
+                    .build();
+        }
     }
 
-    public static ItemsResponse of(Item item) {
-        return ItemsResponse.builder()
-                .id(item.getId())
-                .rank(item.getRanking())
-                .title(item.getTitle().getValue())
-                .imageUrl(item.getImageUrl().getValue())
-                .build();
-    }
 }

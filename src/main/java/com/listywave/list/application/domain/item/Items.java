@@ -136,6 +136,12 @@ public class Items {
         this.values.addAll(newItemsSet);
     }
 
+    public Items getTop3() {
+        return new Items(sortByRank().values.stream()
+                .limit(3)
+                .toList());
+    }
+
     public boolean anyMatchTitle(String keyword) {
         return values.stream()
                 .anyMatch(item -> item.isMatchTitle(keyword));

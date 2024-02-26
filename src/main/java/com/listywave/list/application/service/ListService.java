@@ -147,7 +147,7 @@ public class ListService {
     public List<ListTrandingResponse> getTrandingList() {
         List<ListEntity> lists = listRepository.findTrandingLists();
         return lists.stream()
-                .map(list -> ListTrandingResponse.of(list, list.getFirstItemImageUrl()))
+                .map(ListTrandingResponse::of)
                 .toList();
     }
 

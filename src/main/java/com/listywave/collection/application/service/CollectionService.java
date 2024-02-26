@@ -62,7 +62,6 @@ public class CollectionService {
         cursorId = null;
         if (!collectionList.isEmpty()) {
             cursorId = collectionList.get(collectionList.size() - 1).getId();
-//            collectionList.forEach(collect -> collect.getList().sortItemsByRankTop3());
         }
         return CollectionResponse.of(cursorId, result.hasNext(), collectionList);
     }
