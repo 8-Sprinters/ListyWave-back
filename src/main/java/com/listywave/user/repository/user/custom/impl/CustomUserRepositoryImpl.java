@@ -1,14 +1,9 @@
 package com.listywave.user.repository.user.custom.impl;
 
 import static com.listywave.common.util.PaginationUtils.checkEndPage;
-import static com.listywave.list.application.domain.category.CategoryType.ENTIRE;
-import static com.listywave.list.application.domain.item.QItem.item;
 import static com.listywave.list.application.domain.list.QListEntity.listEntity;
 import static com.listywave.user.application.domain.QUser.user;
 
-import com.listywave.collaborator.application.domain.Collaborator;
-import com.listywave.list.application.domain.category.CategoryType;
-import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.search.UserSearchResponse;
 import com.listywave.user.repository.user.custom.CustomUserRepository;
@@ -26,65 +21,6 @@ import org.springframework.data.domain.SliceImpl;
 public class CustomUserRepositoryImpl implements CustomUserRepository {
 
     private final JPAQueryFactory queryFactory;
-
-    @Override
-    public Slice<ListEntity> findFeedLists(
-            List<Collaborator> collaborators, Long userId, String type,
-            CategoryType category, Long cursorId, Pageable pageable
-    ) {
-        List<ListEntity> fetch = queryFactory
-                .selectFrom(listEntity)
-                .leftJoin(item).on(listEntity.id.eq(item.list.id))
-                .where(
-                        collaboEq(collaborators, type),
-                        userIdEq(userId, type),
-                        typeEq(type),
-                        categoryEq(category),
-                        listIdLt(cursorId)
-                )
-                .distinct()
-                .limit(pageable.getPageSize() + 1)
-                .orderBy(listEntity.updatedDate.desc())
-                .fetch();
-
-        return checkEndPage(pageable, fetch);
-    }
-
-    private BooleanExpression collaboEq(List<Collaborator> collaborators, String type) {
-        if (type.equals("collabo") && collaborators != null) {
-            return listEntity.id.in(
-                    collaborators.stream()
-                            .map(collaborator -> collaborator.getList().getId())
-                            .toList()
-            );
-        }
-        return null;
-    }
-
-    private BooleanExpression listIdLt(Long cursorId) {
-        return cursorId == null ? null : listEntity.id.lt(cursorId);
-    }
-
-    private BooleanExpression categoryEq(CategoryType category) {
-        if (category.equals(ENTIRE)) {
-            return null;
-        }
-        return listEntity.category.eq(category);
-    }
-
-    private BooleanExpression typeEq(String type) {
-        if (type.equals("my")) {
-            return listEntity.hasCollaboration.eq(false);
-        }
-        return listEntity.hasCollaboration.eq(true);
-    }
-
-    private BooleanExpression userIdEq(Long userId, String type) {
-        if (type.equals("my")) {
-            return userId == null ? null : listEntity.user.id.eq(userId);
-        }
-        return null;
-    }
 
     @Override
     public List<User> getRecommendUsers(List<User> myFollowingUsers, User me) {

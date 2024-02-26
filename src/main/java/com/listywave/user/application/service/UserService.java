@@ -5,15 +5,11 @@ import static com.listywave.common.exception.ErrorCode.ALREADY_NOT_FOLLOWED_EXCE
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 
 import com.listywave.alarm.application.domain.AlarmEvent;
-import com.listywave.collaborator.application.domain.Collaborator;
-import com.listywave.collaborator.repository.CollaboratorRepository;
 import com.listywave.common.exception.CustomException;
-import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
-import com.listywave.user.application.dto.AllUserListsResponse;
 import com.listywave.user.application.dto.FollowersResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
 import com.listywave.user.application.dto.RecommendUsersResponse;
@@ -36,10 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
 
+    private final ListRepository listRepository;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
-    private final CollaboratorRepository collaboratorRepository;
-    private final ListRepository listRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
@@ -56,28 +51,6 @@ public class UserService {
         User loginUser = userRepository.getById(loginUserId);
         boolean isFollowed = followRepository.existsByFollowerUserAndFollowingUser(loginUser, targetUser);
         return UserInfoResponse.of(targetUser, isFollowed, false);
-    }
-
-    @Transactional(readOnly = true)
-    public AllUserListsResponse getAllListOfUser(
-            Long targetUserId,
-            String type,
-            CategoryType category,
-            Long cursorId,
-            Pageable pageable
-    ) {
-        userRepository.getById(targetUserId);
-
-        List<Collaborator> collaborators = collaboratorRepository.findAllByUserId(targetUserId);
-        Slice<ListEntity> result =
-                userRepository.findFeedLists(collaborators, targetUserId, type, category, cursorId, pageable);
-        List<ListEntity> lists = result.getContent();
-
-        cursorId = null;
-        if (!lists.isEmpty()) {
-            cursorId = lists.get(lists.size() - 1).getId();
-        }
-        return AllUserListsResponse.of(result.hasNext(), cursorId, lists);
     }
 
     @Transactional(readOnly = true)

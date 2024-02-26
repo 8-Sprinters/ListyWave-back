@@ -44,6 +44,7 @@ import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
+import com.listywave.user.application.dto.AllListOfUserSearchResponse;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import java.time.LocalDateTime;
@@ -278,5 +279,27 @@ public class ListService {
 
     private void deleteListImages(List<ListEntity> lists) {
         lists.forEach(list -> imageService.deleteAllOfListImages(list.getId()));
+    }
+
+    @Transactional(readOnly = true)
+    public AllListOfUserSearchResponse getAllListOfUser(
+            Long targetUserId,
+            String type,
+            CategoryType category,
+            Long cursorId,
+            Pageable pageable
+    ) {
+        userRepository.getById(targetUserId);
+
+        List<Collaborator> collaborators = collaboratorRepository.findAllByUserId(targetUserId);
+        Slice<ListEntity> result =
+                listRepository.findFeedLists(collaborators, targetUserId, type, category, cursorId, pageable);
+        List<ListEntity> lists = result.getContent();
+
+        cursorId = null;
+        if (!lists.isEmpty()) {
+            cursorId = lists.get(lists.size() - 1).getId();
+        }
+        return AllListOfUserSearchResponse.of(result.hasNext(), cursorId, lists);
     }
 }
