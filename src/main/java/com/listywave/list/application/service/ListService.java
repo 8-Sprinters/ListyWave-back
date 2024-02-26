@@ -1,7 +1,7 @@
 package com.listywave.list.application.service;
 
 import static com.listywave.common.exception.ErrorCode.DUPLICATE_USER;
-import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
+import static com.listywave.common.exception.ErrorCode.RESOURCES_EMPTY;
 
 import com.listywave.alarm.repository.AlarmRepository;
 import com.listywave.collaborator.application.domain.Collaborator;
@@ -247,7 +247,7 @@ public class ListService {
     public void deleteLists(Long loginUserId, List<Long> listIds) {
         List<ListEntity> lists = listRepository.findAllById(listIds);
         if (lists.isEmpty()) {
-            throw new CustomException(RESOURCE_NOT_FOUND);
+            throw new CustomException(RESOURCES_EMPTY, "해당 리스트들이 존재하지 않습니다.");
         }
         User loginUser = userRepository.getById(loginUserId);
         lists.forEach(list -> list.validateOwner(loginUser));
