@@ -32,7 +32,7 @@ public class CollectionService {
         User loginUser = userRepository.getById(loginUserId);
         ListEntity list = listRepository.getById(listId);
 
-        list.validateOwnerRestriction(loginUser);
+        list.validateOwner(loginUser);
 
         if (collectionRepository.existsByListAndUserId(list, loginUser.getId())) {
             cancelCollect(list, loginUser.getId());
@@ -44,14 +44,14 @@ public class CollectionService {
     private void addCollect(ListEntity list, User user) {
         Collect collection = new Collect(list, user.getId());
         collectionRepository.save(collection);
-        list.incrementCollectCount();
+        list.increaseCollectCount();
 
         applicationEventPublisher.publishEvent(AlarmEvent.collect(user, list));
     }
 
     private void cancelCollect(ListEntity list, Long userId) {
         collectionRepository.deleteByListAndUserId(list, userId);
-        list.decrementCollectCount();
+        list.decreaseCollectCount();
     }
 
     public CollectionResponse getCollection(Long loginUserId, Long cursorId, Pageable pageable, CategoryType category) {
