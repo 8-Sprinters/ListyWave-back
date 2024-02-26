@@ -43,7 +43,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     }
 
     @Override
-    public Long getCollaboratorCount(String search, Long loginUserId) {
+    public Long countBySearch(String search, Long loginUserId) {
         if (search.isEmpty()) {
             return 0L;
         }
@@ -52,13 +52,18 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .from(user)
                 .where(
                         userIdNe(loginUserId),
-                        user.nickname.value.contains(search)
+                        user.nickname.value.contains(search),
+                        user.isDelete.isFalse()
                 )
                 .fetchOne();
     }
 
+    private BooleanExpression userIdNe(Long loginUserId) {
+        return loginUserId == null ? null : user.id.ne(loginUserId);
+    }
+
     @Override
-    public Slice<UserSearchResponse> getCollaborators(String search, Pageable pageable, Long loginUserId) {
+    public Slice<UserSearchResponse> findAllBySearch(String search, Pageable pageable, Long loginUserId) {
         if (search.isEmpty()) {
             return new SliceImpl<>(List.of(), pageable, false);
         }
@@ -71,7 +76,8 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .from(user)
                 .where(
                         userIdNe(loginUserId),
-                        user.nickname.value.contains(search)
+                        user.nickname.value.contains(search),
+                        user.isDelete.isFalse()
                 )
                 .orderBy(
                         Expressions.stringTemplate("LOCATE({0}, {1})", search, user.nickname.value).asc(),
@@ -81,9 +87,5 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .offset(pageable.getOffset())
                 .fetch();
         return checkEndPage(pageable, fetch);
-    }
-
-    private BooleanExpression userIdNe(Long loginUserId) {
-        return loginUserId == null ? null : user.id.ne(loginUserId);
     }
 }

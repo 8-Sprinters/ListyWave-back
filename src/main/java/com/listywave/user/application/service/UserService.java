@@ -63,8 +63,8 @@ public class UserService {
     }
 
     private AllUserSearchResponse getAllUserSearchResponse(Long loginUserId, String search, Pageable pageable) {
-        Long count = userRepository.getCollaboratorCount(search, loginUserId);
-        Slice<UserSearchResponse> users = userRepository.getCollaborators(search, pageable, loginUserId);
+        Long count = userRepository.countBySearch(search, loginUserId);
+        Slice<UserSearchResponse> users = userRepository.findAllBySearch(search, pageable, loginUserId);
         return AllUserSearchResponse.of(users.getContent(), count, users.hasNext());
     }
 
