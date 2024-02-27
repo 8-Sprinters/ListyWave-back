@@ -103,5 +103,6 @@ public class AuthService {
         List<ListEntity> lists = listRepository.findAllCollectedListBy(userId);
         lists.forEach(ListEntity::decreaseCollectCount);
 
+        kakaoOauthClient.logout(user.getKakaoAccessToken());
     }
 }
