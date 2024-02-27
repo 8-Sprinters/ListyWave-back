@@ -45,6 +45,7 @@ public record CollectionResponse(
             Long ownerId,
             String ownerNickname,
             String ownerProfileImageUrl,
+            String representativeImageUrl,
             LocalDateTime updatedDate,
             List<ListItemsResponse> listItems
     ) {
@@ -57,6 +58,7 @@ public record CollectionResponse(
                     .ownerId(list.getUser().getId())
                     .ownerNickname(list.getUser().getNickname())
                     .ownerProfileImageUrl(list.getUser().getProfileImageUrl())
+                    .representativeImageUrl(list.getFirstItemImageUrl())
                     .updatedDate(list.getUpdatedDate())
                     .listItems(toList(list.getTop3Items().getValues()))
                     .build();
