@@ -221,7 +221,7 @@ public class ListEntity {
         return user.getIsDelete();
     }
 
-    public void validateDoesNotDeleteOwner() {
+    public void validateOwnerIsNotDelete() {
         if (this.user.getIsDelete()) {
             throw new CustomException(DELETED_USER_EXCEPTION, "탈퇴한 회원의 리스트입니다.");
         }

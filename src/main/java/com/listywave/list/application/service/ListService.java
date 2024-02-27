@@ -132,7 +132,7 @@ public class ListService {
 
     public ListDetailResponse getListDetail(Long listId, Long loginUserId) {
         ListEntity list = listRepository.getById(listId);
-        list.validateDoesNotDeleteOwner();
+        list.validateOwnerIsNotDelete();
         List<Collaborator> collaborators = collaboratorRepository.findAllByList(list);
         Items sortedItems = list.getSortedItems();
 
