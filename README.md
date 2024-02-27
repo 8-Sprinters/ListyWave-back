@@ -1,6 +1,7 @@
 ## 이미지 흐름도
 
-![image](https://github.com/8-Sprinters/ListyWave-back/assets/107859870/cf16fc70-6421-47cf-979a-8f8434f42032)
+![image](https://github.com/8-Sprinters/ListyWave-back/assets/107859870/8c22f209-292a-4376-89d7-06d0ac7c09a1)
+
 
 
 ## ERD
