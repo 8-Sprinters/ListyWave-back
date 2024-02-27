@@ -3,6 +3,10 @@
 ![image](https://github.com/8-Sprinters/ListyWave-back/assets/107859870/cf16fc70-6421-47cf-979a-8f8434f42032)
 
 
+## ERD
+
+![image](https://github.com/8-Sprinters/ListyWave-back/assets/107859870/ea329fc2-ec0e-4ae6-b1a5-2903ac3f3bca)
+
 ## 멤버
 
 ### 백엔드
