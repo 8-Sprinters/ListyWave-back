@@ -14,6 +14,7 @@ import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
 import com.listywave.list.presentation.dto.request.ListsDeleteRequest;
 import com.listywave.user.application.dto.AllListOfUserSearchResponse;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -71,10 +72,10 @@ public class ListController {
     @GetMapping("/lists")
     ResponseEntity<ListRecentResponse> getRecentLists(
             @OptionalAuth Long loginUserId,
-            @RequestParam(name = "cursorId", required = false) Long cursorId,
+            @RequestParam(name = "cursorUpdatedDate", required = false) LocalDateTime cursorUpdatedDate,
             @PageableDefault(size = 10) Pageable pageable
     ) {
-        ListRecentResponse recentLists = listService.getRecentLists(loginUserId, cursorId, pageable);
+        ListRecentResponse recentLists = listService.getRecentLists(loginUserId, cursorUpdatedDate, pageable);
         return ResponseEntity.ok(recentLists);
     }
 
@@ -105,11 +106,11 @@ public class ListController {
             @PathVariable("userId") Long targetUserId,
             @RequestParam(name = "type", defaultValue = "my") String type,
             @RequestParam(name = "category", defaultValue = "entire") CategoryType category,
-            @RequestParam(name = "cursorId", required = false) Long cursorId,
+            @RequestParam(name = "cursorUpdatedDate", required = false) LocalDateTime cursorUpdatedDate,
             @PageableDefault(size = 10) Pageable pageable
     ) {
         AllListOfUserSearchResponse result
-                = listService.getAllListOfUser(targetUserId, type, category, cursorId, pageable);
+                = listService.getAllListOfUser(targetUserId, type, category, cursorUpdatedDate, pageable);
         return ResponseEntity.ok(result);
     }
 

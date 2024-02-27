@@ -169,7 +169,7 @@ public class ListService {
     }
 
     @Transactional(readOnly = true)
-    public ListRecentResponse getRecentLists(Long loginUserId, Long cursorId, Pageable pageable) {
+    public ListRecentResponse getRecentLists(Long loginUserId, LocalDateTime cursorUpdatedDate, Pageable pageable) {
         if (loginUserId != null) {
             User user = userRepository.getById(loginUserId);
             List<Follow> follows = followRepository.getAllByFollowerUser(user);
@@ -180,21 +180,21 @@ public class ListService {
                     .toList();
 
             Slice<ListEntity> result =
-                    listRepository.getRecentListsByFollowing(myFollowingUsers, cursorId, pageable);
+                    listRepository.getRecentListsByFollowing(myFollowingUsers, cursorUpdatedDate, pageable);
             return getListRecentResponse(result);
         }
-        Slice<ListEntity> result = listRepository.getRecentLists(cursorId, pageable);
+        Slice<ListEntity> result = listRepository.getRecentLists(cursorUpdatedDate, pageable);
         return getListRecentResponse(result);
     }
 
     private ListRecentResponse getListRecentResponse(Slice<ListEntity> result) {
         List<ListEntity> recentList = result.getContent();
 
-        Long cursorId = null;
+        LocalDateTime cursorUpdatedDate = null;
         if (!recentList.isEmpty()) {
-            cursorId = recentList.get(recentList.size() - 1).getId();
+            cursorUpdatedDate = recentList.get(recentList.size() - 1).getUpdatedDate();
         }
-        return ListRecentResponse.of(recentList, cursorId, result.hasNext());
+        return ListRecentResponse.of(recentList, cursorUpdatedDate, result.hasNext());
     }
 
     public ListSearchResponse search(String keyword, SortType sortType, CategoryType category, int size, Long cursorId) {
@@ -287,20 +287,20 @@ public class ListService {
             Long targetUserId,
             String type,
             CategoryType category,
-            Long cursorId,
+            LocalDateTime cursorUpdatedDate,
             Pageable pageable
     ) {
         userRepository.getById(targetUserId);
 
         List<Collaborator> collaborators = collaboratorRepository.findAllByUserId(targetUserId);
         Slice<ListEntity> result =
-                listRepository.findFeedLists(collaborators, targetUserId, type, category, cursorId, pageable);
+                listRepository.findFeedLists(collaborators, targetUserId, type, category, cursorUpdatedDate, pageable);
         List<ListEntity> lists = result.getContent();
 
-        cursorId = null;
+        cursorUpdatedDate = null;
         if (!lists.isEmpty()) {
-            cursorId = lists.get(lists.size() - 1).getId();
+            cursorUpdatedDate = lists.get(lists.size() - 1).getUpdatedDate();
         }
-        return AllListOfUserSearchResponse.of(result.hasNext(), cursorId, lists);
+        return AllListOfUserSearchResponse.of(result.hasNext(), cursorUpdatedDate, lists);
     }
 }

@@ -2,18 +2,19 @@ package com.listywave.user.application.dto;
 
 import com.listywave.list.application.domain.item.Item;
 import com.listywave.list.application.domain.list.ListEntity;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 
 public record AllListOfUserSearchResponse(
-        Long cursorId,
+        LocalDateTime cursorUpdatedDate,
         Boolean hasNext,
         List<FeedListsResponse> feedLists
 ) {
 
-    public static AllListOfUserSearchResponse of(boolean hasNext, Long cursorId, List<ListEntity> feedLists) {
+    public static AllListOfUserSearchResponse of(boolean hasNext, LocalDateTime cursorUpdatedDate, List<ListEntity> feedLists) {
         return new AllListOfUserSearchResponse(
-                cursorId,
+                cursorUpdatedDate,
                 hasNext,
                 toList(feedLists)
         );

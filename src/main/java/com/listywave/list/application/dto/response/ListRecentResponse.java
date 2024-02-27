@@ -3,6 +3,7 @@ package com.listywave.list.application.dto.response;
 import com.listywave.list.application.domain.item.Item;
 import com.listywave.list.application.domain.label.Label;
 import com.listywave.list.application.domain.list.ListEntity;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import lombok.Builder;
@@ -10,13 +11,13 @@ import lombok.Builder;
 @Builder
 public record ListRecentResponse(
         boolean hasNext,
-        Long cursorId,
+        LocalDateTime cursorUpdatedDate,
         List<ListResponse> lists
 ) {
-    public static ListRecentResponse of(List<ListEntity> lists, Long cursorId, boolean hasNext) {
+    public static ListRecentResponse of(List<ListEntity> lists, LocalDateTime cursorUpdatedDate, boolean hasNext) {
         return ListRecentResponse.builder()
                 .hasNext(hasNext)
-                .cursorId(cursorId)
+                .cursorUpdatedDate(cursorUpdatedDate)
                 .lists(ListResponse.toList(lists))
                 .build();
     }
