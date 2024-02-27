@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -76,5 +77,11 @@ public class AuthController {
         return ResponseEntity.ok()
 //                .header(SET_COOKIE, refreshTokenCookie.toString())
                 .body(new UpdateTokenResponse(result.accessToken()));
+    }
+
+    @DeleteMapping("/withdraw")
+    ResponseEntity<Void> withdraw(@Auth Long userId) {
+        authService.withdraw(userId);
+        return ResponseEntity.noContent().build();
     }
 }

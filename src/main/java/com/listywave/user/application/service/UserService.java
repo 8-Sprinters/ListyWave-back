@@ -157,23 +157,6 @@ public class UserService {
         followRepository.deleteByFollowingUserAndFollowerUser(loginUser, targetUser);
     }
 
-    public void withdraw(Long userId) {
-        User user = userRepository.getById(userId);
-        user.validateUpdate(userId);
-        user.softDelete();
-
-        followRepository.getAllByFollowerUser(user).stream()
-                .map(Follow::getFollowingUser)
-                .forEach(User::decreaseFollowerCount);
-
-        followRepository.getAllByFollowingUser(user).stream()
-                .map(Follow::getFollowerUser)
-                .forEach(User::decreaseFollowingCount);
-
-        List<ListEntity> lists = listRepository.findAllCollectedListBy(userId);
-        lists.forEach(ListEntity::decreaseCollectCount);
-    }
-
     public void updateListVisibility(Long loginUserId, Long listId, Boolean beforeIsPublic) {
         User user = userRepository.getById(loginUserId);
         ListEntity list = listRepository.getById(listId);

@@ -122,12 +122,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/withdraw")
-    ResponseEntity<Void> withdraw(@Auth Long userId) {
-        userService.withdraw(userId);
-        return ResponseEntity.noContent().build();
-    }
-
     @PatchMapping("/users/list-visibility")
     ResponseEntity<Void> updateListVisibility(
             @Auth Long loginUserId,

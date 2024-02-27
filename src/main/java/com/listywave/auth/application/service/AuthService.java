@@ -10,8 +10,13 @@ import com.listywave.auth.application.dto.UpdateTokenResult;
 import com.listywave.auth.infra.kakao.response.KakaoMember;
 import com.listywave.auth.infra.kakao.response.KakaoTokenResponse;
 import com.listywave.common.exception.CustomException;
+import com.listywave.list.application.domain.list.ListEntity;
+import com.listywave.list.repository.list.ListRepository;
+import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
+import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,7 +29,9 @@ public class AuthService {
 
     private final JwtManager jwtManager;
     private final UserRepository userRepository;
+    private final ListRepository listRepository;
     private final KakaoOauthClient kakaoOauthClient;
+    private final FollowRepository followRepository;
     private final KakaoRedirectUriProvider kakaoRedirectUriProvider;
 
     public String provideRedirectUri() {
@@ -78,5 +85,23 @@ public class AuthService {
         String accessToken = jwtManager.createAccessToken(user.getId());
         String newRefreshToken = jwtManager.createRefreshToken(user.getId());
         return new UpdateTokenResult(accessToken, newRefreshToken);
+    }
+
+    public void withdraw(Long userId) {
+        User user = userRepository.getById(userId);
+        user.validateUpdate(userId);
+        user.softDelete();
+
+        followRepository.getAllByFollowerUser(user).stream()
+                .map(Follow::getFollowingUser)
+                .forEach(User::decreaseFollowerCount);
+
+        followRepository.getAllByFollowingUser(user).stream()
+                .map(Follow::getFollowerUser)
+                .forEach(User::decreaseFollowingCount);
+
+        List<ListEntity> lists = listRepository.findAllCollectedListBy(userId);
+        lists.forEach(ListEntity::decreaseCollectCount);
+
     }
 }
