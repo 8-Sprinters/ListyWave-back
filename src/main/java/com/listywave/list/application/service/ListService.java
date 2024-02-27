@@ -241,7 +241,7 @@ public class ListService {
             historyRepository.save(history);
         }
         boolean hasCollaborator = !request.collaboratorIds().isEmpty();
-        list.update(loginUser, request.category(), new ListTitle(request.title()), new ListDescription(request.description()), request.isPublic(), request.backgroundColor(), hasCollaborator, updatedDate, labels, newItems);
+        list.update(request.category(), new ListTitle(request.title()), new ListDescription(request.description()), request.isPublic(), request.backgroundColor(), hasCollaborator, updatedDate, labels, newItems);
     }
 
     private void updateCollaborators(Collaborators beforeCollaborators, List<Long> collaboratorIds, ListEntity list) {
