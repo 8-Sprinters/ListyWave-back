@@ -9,12 +9,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface FollowRepository extends JpaRepository<Follow, Long>, CustomFollowRepository {
 
     List<Follow> getAllByFollowerUser(User followerUser);
-    
+
     List<Follow> getAllByFollowingUser(User followingUser);
 
     void deleteByFollowingUserAndFollowerUser(User following, User follower);
-
-    int countByFollowingUser(User user);
 
     boolean existsByFollowerUserAndFollowingUser(User followerUser, User followingUser);
 }

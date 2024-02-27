@@ -8,12 +8,12 @@ import lombok.Builder;
 @Builder
 public record FollowersResponse(
         List<FollowerInfo> followers,
-        int totalCount,
+        Long totalCount,
         String cursorId,
         boolean hasNext
 ) {
 
-    public static FollowersResponse of(List<User> users, int totalCount, boolean hasNext) {
+    public static FollowersResponse of(List<User> users, Long totalCount, boolean hasNext) {
         return FollowersResponse.builder()
                 .followers(FollowerInfo.toList(users))
                 .totalCount(totalCount)
@@ -25,7 +25,7 @@ public record FollowersResponse(
     public static FollowersResponse empty() {
         return FollowersResponse.builder()
                 .followers(Collections.emptyList())
-                .totalCount(0)
+                .totalCount(0L)
                 .hasNext(false)
                 .build();
     }

@@ -23,15 +23,16 @@ public class CustomFollowRepositoryImpl implements CustomFollowRepository {
             User followingUser,
             Pageable pageable,
             String search,
-            String cursorId
+            String cursorNickname
     ) {
-        List<User> fetch = queryFactory.selectFrom(user)
+        List<User> fetch = queryFactory
+                .selectFrom(user)
                 .join(follow).on(follow.followerUser.id.eq(user.id))
                 .where(
-                        followingUserNicknameGt(cursorId),
+                        followingUserNicknameGt(cursorNickname),
                         follow.followingUser.id.eq(followingUser.getId()),
                         follow.followerUser.nickname.value.contains(search),
-                        user.isDelete.eq(false)
+                        user.isDelete.isFalse()
                 )
                 .orderBy(follow.followerUser.nickname.value.asc())
                 .limit(pageable.getPageSize() + 1)
@@ -39,8 +40,23 @@ public class CustomFollowRepositoryImpl implements CustomFollowRepository {
         return checkEndPage(pageable, fetch);
     }
 
-    private BooleanExpression followingUserNicknameGt(String cursorId) {
-        return cursorId == null ? null : follow.followerUser.nickname.value.gt(cursorId);
+    private BooleanExpression followingUserNicknameGt(String cursorNickname) {
+        return cursorNickname == null ? null : follow.followerUser.nickname.value.gt(cursorNickname);
+    }
+
+    @Override
+    public Long countFollowerUserBy(User followingUser, String search, String cursorNickname) {
+        return queryFactory
+                .select(user.count())
+                .from(user)
+                .join(follow).on(follow.followerUser.id.eq(user.id))
+                .where(
+                        followingUserNicknameGt(cursorNickname),
+                        follow.followingUser.id.eq(followingUser.getId()),
+                        follow.followerUser.nickname.value.contains(search),
+                        user.isDelete.isFalse()
+                )
+                .fetchOne();
     }
 
     @Override

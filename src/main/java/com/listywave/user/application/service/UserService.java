@@ -103,17 +103,17 @@ public class UserService {
         followerUser.unfollow(followingUser);
     }
 
-    public FollowersResponse getFollowers(Long userId, Pageable pageable, String search, String cursorId) {
+    public FollowersResponse getFollowers(Long userId, Pageable pageable, String search, String cursorNickname) {
         User followingUser = userRepository.getById(userId);
 
         Slice<User> result =
-                followRepository.findAllFollowerUserBy(followingUser, pageable, search, cursorId);
+                followRepository.findAllFollowerUserBy(followingUser, pageable, search, cursorNickname);
         List<User> followerUserList = result.getContent();
 
         if (followerUserList.isEmpty()) {
             return FollowersResponse.empty();
         }
-        int totalCount = followRepository.countByFollowingUser(followingUser);
+        Long totalCount = followRepository.countFollowerUserBy(followingUser, search, cursorNickname);
 
         return FollowersResponse.of(followerUserList, totalCount, result.hasNext());
     }
