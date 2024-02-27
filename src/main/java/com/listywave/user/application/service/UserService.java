@@ -63,8 +63,8 @@ public class UserService {
     }
 
     private AllUserSearchResponse getAllUserSearchResponse(Long loginUserId, String search, Pageable pageable) {
-        Long count = userRepository.getCollaboratorCount(search, loginUserId);
-        Slice<UserSearchResponse> users = userRepository.getCollaborators(search, pageable, loginUserId);
+        Long count = userRepository.countBySearch(search, loginUserId);
+        Slice<UserSearchResponse> users = userRepository.findAllBySearch(search, pageable, loginUserId);
         return AllUserSearchResponse.of(users.getContent(), count, users.hasNext());
     }
 
@@ -163,12 +163,15 @@ public class UserService {
         user.softDelete();
 
         followRepository.getAllByFollowerUser(user).stream()
-                .map(Follow::getFollowingUser) // 탈퇴하는 회원이 팔로우 하는 회원들 모두 조회해서
+                .map(Follow::getFollowingUser)
                 .forEach(User::decreaseFollowerCount);
 
         followRepository.getAllByFollowingUser(user).stream()
                 .map(Follow::getFollowerUser)
                 .forEach(User::decreaseFollowingCount);
+
+        List<ListEntity> lists = listRepository.findAllCollectedListBy(userId);
+        lists.forEach(ListEntity::decreaseCollectCount);
     }
 
     public void updateListVisibility(Long loginUserId, Long listId, Boolean beforeIsPublic) {

@@ -10,7 +10,7 @@ public interface CustomUserRepository {
 
     List<User> getRecommendUsers(List<User> myFollowingUsers, User user);
 
-    Long getCollaboratorCount(String search, Long loginUserId);
+    Long countBySearch(String search, Long loginUserId);
 
-    Slice<UserSearchResponse> getCollaborators(String search, Pageable pageable, Long loginUserId);
+    Slice<UserSearchResponse> findAllBySearch(String search, Pageable pageable, Long loginUserId);
 }
