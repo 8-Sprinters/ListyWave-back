@@ -127,6 +127,12 @@ public class ListEntity {
         }
     }
 
+    public void validateNotOwner(User user) {
+        if (this.user.equals(user)) {
+            throw new CustomException(INVALID_ACCESS);
+        }
+    }
+
     public boolean isCategoryType(CategoryType category) {
         return category.equals(ENTIRE) || this.category.equals(category);
     }
