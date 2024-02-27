@@ -19,6 +19,7 @@ public enum CategoryType {
     MOVIE_DRAMA("5", "영화/드라마", "https://image.listywave.com/category/category_movie_drama.png"),
     BOOK("6", "도서", "https://image.listywave.com/category/category_book.png"),
     ANIMAL_PLANT("7", "동식물", "https://image.listywave.com/category/category_animal_plant.png"),
+    FOOD("9", "음식", "https://image.listywave.com/category/category_etc.png"),
     ETC("8", "기타", "https://image.listywave.com/category/category_etc.png"),
     ;
 
