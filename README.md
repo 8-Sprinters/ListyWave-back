@@ -1,6 +1,7 @@
 ## 이미지 흐름도
 
-<img width="758" alt="S3흐름도" src="https://github.com/8-Sprinters/ListyWave-back/assets/107859870/b099a3c7-7d67-45c3-9156-f4c62a6fc7ad">
+![image](https://github.com/8-Sprinters/ListyWave-back/assets/107859870/cf16fc70-6421-47cf-979a-8f8434f42032)
+
 
 ## 멤버
 
