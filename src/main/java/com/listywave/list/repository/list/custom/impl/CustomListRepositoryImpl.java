@@ -48,7 +48,7 @@ public class CustomListRepositoryImpl implements CustomListRepository {
     }
 
     @Override
-    public Slice<ListEntity> getRecentLists(Long cursorId, Pageable pageable) {
+    public Slice<ListEntity> getRecentLists(LocalDateTime cursorUpdatedDate, Pageable pageable) {
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
 
         List<ListEntity> fetch = queryFactory
@@ -58,7 +58,7 @@ public class CustomListRepositoryImpl implements CustomListRepository {
                 .leftJoin(item).on(listEntity.id.eq(item.list.id))
                 .where(
                         listEntity.updatedDate.goe(thirtyDaysAgo),
-                        listIdLt(cursorId),
+                        updatedDateLt(cursorUpdatedDate),
                         listEntity.user.isDelete.eq(false),
                         listEntity.isPublic.eq(true)
                 )
@@ -70,8 +70,19 @@ public class CustomListRepositoryImpl implements CustomListRepository {
         return checkEndPage(pageable, fetch);
     }
 
+    private BooleanExpression updatedDateLt(LocalDateTime cursorUpdatedDate) {
+        if (cursorUpdatedDate == null) {
+            return null;
+        }
+        return listEntity.updatedDate.lt(cursorUpdatedDate);
+    }
+
     @Override
-    public Slice<ListEntity> getRecentListsByFollowing(List<User> followingUsers, Long cursorId, Pageable pageable) {
+    public Slice<ListEntity> getRecentListsByFollowing(
+            List<User> followingUsers,
+            LocalDateTime cursorUpdatedDate,
+            Pageable pageable
+    ) {
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
 
         List<Long> followingUserIds = followingUsers.stream()
@@ -86,7 +97,7 @@ public class CustomListRepositoryImpl implements CustomListRepository {
                 .where(
                         listEntity.updatedDate.goe(thirtyDaysAgo),
                         listEntity.user.id.in(followingUserIds),
-                        listIdLt(cursorId),
+                        updatedDateLt(cursorUpdatedDate),
                         listEntity.isPublic.eq(true)
                 )
                 .distinct()
@@ -97,17 +108,13 @@ public class CustomListRepositoryImpl implements CustomListRepository {
         return checkEndPage(pageable, fetch);
     }
 
-    private BooleanExpression listIdLt(Long cursorId) {
-        return cursorId == null ? null : listEntity.id.lt(cursorId);
-    }
-
     @Override
     public Slice<ListEntity> findFeedLists(
             List<Collaborator> collaborators,
             Long userId,
             String type,
             CategoryType category,
-            Long cursorId,
+            LocalDateTime cursorUpdatedDate,
             Pageable pageable
     ) {
         List<ListEntity> fetch = queryFactory
@@ -115,10 +122,10 @@ public class CustomListRepositoryImpl implements CustomListRepository {
                 .leftJoin(item).on(listEntity.id.eq(item.list.id))
                 .where(
                         collaboEq(collaborators, type),
-                        userIdEq(userId, type),
+                        ownerIdEq(userId, type),
                         typeEq(type),
                         categoryEq(category),
-                        listIdLt(cursorId),
+                        updatedDateLt(cursorUpdatedDate),
                         listEntity.user.isDelete.isFalse()
                 )
                 .distinct()
@@ -138,7 +145,7 @@ public class CustomListRepositoryImpl implements CustomListRepository {
         return null;
     }
 
-    private BooleanExpression userIdEq(Long userId, String type) {
+    private BooleanExpression ownerIdEq(Long userId, String type) {
         if (type.equals("my")) {
             return userId == null ? null : listEntity.user.id.eq(userId);
         }
