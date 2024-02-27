@@ -34,7 +34,8 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .rightJoin(listEntity.user, user)
                 .where(
                         user.id.ne(me.getId()),
-                        user.id.notIn(myFollowingUserIds)
+                        user.id.notIn(myFollowingUserIds),
+                        user.isDelete.isFalse()
                 )
                 .groupBy(user)
                 .orderBy(listEntity.updatedDate.max().desc())
