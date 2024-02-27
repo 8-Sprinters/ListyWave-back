@@ -160,4 +160,26 @@ class CollaboratorsTest {
         assertThat(result.getCollaborators()).hasSize(2);
         assertThat(result.getCollaborators().stream().map(Collaborator::getUser)).containsOnly(userA, userC);
     }
+
+    @Test
+    void 콜라보레이터가_변경되기_전_후로_동일할_때_필터링_테스트() {
+        // given
+        User userA = User.init(1L, "aaaa@naver.com", "aaaa");
+        ListEntity list = new ListEntity(userA, ETC, new ListTitle("title"), new ListDescription("description"), true, "#123345", true, new Labels(List.of()), new Items(List.of(
+                Item.init(1, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
+                Item.init(2, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
+                Item.init(3, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1)))
+        )));
+
+        Collaborators beforeCollaborators = new Collaborators(List.of(Collaborator.init(userA, list)));
+        Collaborators afterCollaborators = new Collaborators(List.of(Collaborator.init(userA, list)));
+
+        // when
+        Collaborators removed = beforeCollaborators.filterRemovedCollaborators(afterCollaborators);
+        Collaborators added = beforeCollaborators.filterAddedCollaborators(afterCollaborators);
+
+        // then
+        assertThat(removed.getCollaborators()).hasSize(0);
+        assertThat(added.getCollaborators()).hasSize(0);
+    }
 }
