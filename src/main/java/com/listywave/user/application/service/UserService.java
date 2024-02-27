@@ -88,6 +88,8 @@ public class UserService {
 
         followRepository.save(new Follow(followingUser, followerUser));
         followerUser.follow(followingUser);
+        followerUser.increaseFollowingCount();
+        followingUser.increaseFollowerCount();
         applicationEventPublisher.publishEvent(AlarmEvent.follow(followerUser, followingUser));
     }
 
@@ -101,6 +103,8 @@ public class UserService {
 
         followRepository.deleteByFollowingUserAndFollowerUser(followingUser, followerUser);
         followerUser.unfollow(followingUser);
+        followingUser.decreaseFollowerCount();
+        followerUser.decreaseFollowingCount();
     }
 
     public FollowersResponse getFollowers(Long userId, Pageable pageable, String search, String cursorNickname) {
@@ -151,10 +155,13 @@ public class UserService {
     }
 
     public void deleteFollower(Long followerUserId, Long followingUserId) {
-        User targetUser = userRepository.getById(followerUserId);
-        User loginUser = userRepository.getById(followingUserId);
+        User followerUser = userRepository.getById(followerUserId);
+        User followingUser = userRepository.getById(followingUserId);
 
-        followRepository.deleteByFollowingUserAndFollowerUser(loginUser, targetUser);
+        followRepository.deleteByFollowingUserAndFollowerUser(followingUser, followerUser);
+
+        followingUser.decreaseFollowerCount();
+        followerUser.decreaseFollowingCount();
     }
 
     public void updateListVisibility(Long loginUserId, Long listId, Boolean beforeIsPublic) {
