@@ -1,6 +1,5 @@
 package com.listywave.collaborator.application.domain;
 
-import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 import static com.listywave.common.exception.ErrorCode.INVALID_COUNT;
 
 import com.listywave.common.exception.CustomException;
@@ -27,12 +26,6 @@ public class Collaborators {
         }
     }
 
-    public void validateListUpdateAuthority(User user) {
-        if (!collaborators.isEmpty() && !contains(user)) {
-            throw new CustomException(INVALID_ACCESS, "리스트 수정은 작성자 혹은 콜라보레이터만 가능합니다.");
-        }
-    }
-
     public Collaborators filterRemovedCollaborators(Collaborators newCollaborators) {
         Set<Collaborator> before = new HashSet<>(this.collaborators);
         newCollaborators.collaborators.forEach(before::remove);
@@ -48,6 +41,10 @@ public class Collaborators {
     public boolean contains(User user) {
         return collaborators.stream()
                 .anyMatch(collaborator -> collaborator.hasUser(user));
+    }
+
+    public boolean isEmpty() {
+        return this.collaborators.isEmpty();
     }
 
     public void add(Collaborator collaborator) {

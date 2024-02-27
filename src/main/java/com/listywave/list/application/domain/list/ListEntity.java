@@ -9,6 +9,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 import static jakarta.persistence.TemporalType.TIMESTAMP;
 import static lombok.AccessLevel.PROTECTED;
 
+import com.listywave.collaborator.application.domain.Collaborators;
 import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.category.CategoryTypeConverter;
@@ -225,5 +226,18 @@ public class ListEntity {
         if (this.user.getIsDelete()) {
             throw new CustomException(DELETED_USER_EXCEPTION, "탈퇴한 회원의 리스트입니다.");
         }
+    }
+
+    public void validateUpdateAuthority(User loginUser, Collaborators beforeCollaborators) {
+        if (this.user.equals(loginUser)) {
+            return;
+        }
+        if (beforeCollaborators.isEmpty()) {
+            return;
+        }
+        if (beforeCollaborators.contains(loginUser)) {
+            return;
+        }
+        throw new CustomException(INVALID_ACCESS);
     }
 }

@@ -80,29 +80,6 @@ class CollaboratorsTest {
     }
 
     @Test
-    void 리스트를_수정할_수_있는_사용자인지_검증한다() {
-        // given
-        User userA = User.init(1L, "aaaa@naver.com", "aaaa");
-        User userB = User.init(2L, "bbbb@naver.com", "bbbb");
-        ListEntity list = new ListEntity(userA, ETC, new ListTitle("title"), new ListDescription("description"), true, "#123345", true, new Labels(List.of()), new Items(List.of(
-                Item.init(1, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
-                Item.init(2, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
-                Item.init(3, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1)))
-        )));
-
-        Collaborators collaborators = new Collaborators(List.of(
-                Collaborator.init(userA, list),
-                Collaborator.init(userB, list)
-        ));
-
-        // then
-        User userC = User.init(3L, "cccc@naver.com", "cccc");
-        assertThrows(CustomException.class, () -> collaborators.validateListUpdateAuthority(userC));
-
-        assertDoesNotThrow(() -> collaborators.validateListUpdateAuthority(userA));
-    }
-
-    @Test
     void 삭제되는_콜라보레이터를_필터링한다() {
         // given
         User userA = User.init(1L, "aaaa@naver.com", "aaaa");

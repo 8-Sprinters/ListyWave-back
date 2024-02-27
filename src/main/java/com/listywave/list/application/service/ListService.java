@@ -226,8 +226,8 @@ public class ListService {
         User loginUser = userRepository.getById(loginUserId);
         ListEntity list = listRepository.getById(listId);
         Collaborators beforeCollaborators = new Collaborators(collaboratorRepository.findAllByList(list));
+        list.validateUpdateAuthority(loginUser, beforeCollaborators);
 
-        beforeCollaborators.validateListUpdateAuthority(loginUser);
         updateCollaborators(beforeCollaborators, request.collaboratorIds(), list);
 
         Labels labels = createLabels(request.labels());
@@ -251,7 +251,7 @@ public class ListService {
         collaboratorRepository.deleteAllInBatch(removedCollaborators.getCollaborators());
 
         Collaborators addedCollaborators = beforeCollaborators.filterAddedCollaborators(newCollaborators);
-        if (!addedCollaborators.contains(list.getUser())) {
+        if (!addedCollaborators.isEmpty() && !addedCollaborators.contains(list.getUser())) {
             addedCollaborators.add(Collaborator.init(list.getUser(), list));
         }
         collaboratorRepository.saveAll(addedCollaborators.getCollaborators());
