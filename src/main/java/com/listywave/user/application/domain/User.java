@@ -134,14 +134,19 @@ public class User extends BaseEntity {
         followingUser.decreaseFollowerCount();
     }
 
-    public void increaseFollowingCount() {
+    public void remove(User followerUser) {
+        this.decreaseFollowerCount();
+        followerUser.decreaseFollowingCount();
+    }
+
+    private void increaseFollowingCount() {
         if (this.followingCount >= MAX_FOLLOW_COUNT) {
             throw new CustomException(EXCEED_FOLLOW_COUNT_EXCEPTION, "팔로우는 최대 " + MAX_FOLLOW_COUNT + "명까지 가능합니다.");
         }
         this.followingCount++;
     }
 
-    public void increaseFollowerCount() {
+    private void increaseFollowerCount() {
         this.followerCount++;
     }
 
