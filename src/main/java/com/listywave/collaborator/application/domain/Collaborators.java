@@ -28,7 +28,7 @@ public class Collaborators {
     }
 
     public void validateListUpdateAuthority(User user) {
-        if (!contains(user)) {
+        if (!collaborators.isEmpty() && !contains(user)) {
             throw new CustomException(INVALID_ACCESS, "리스트 수정은 작성자 혹은 콜라보레이터만 가능합니다.");
         }
     }
