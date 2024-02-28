@@ -2,6 +2,10 @@
 
 ## 서비스 소개
 
+## 기술 스택
+
+![기술 스택](https://github.com/8-Sprinters/ListyWave-back/assets/66300965/ede73d1d-e3f7-4a21-9add-590dca23436a)
+
 ## Infra Architecture + CI/CD
 
 ![인프라 아키텍처 및 CI_CD](https://github.com/8-Sprinters/ListyWave-back/assets/66300965/1e5450ac-401c-43c6-b3a9-9caa3e36e184)
