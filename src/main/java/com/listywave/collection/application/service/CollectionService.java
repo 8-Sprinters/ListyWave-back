@@ -10,6 +10,7 @@ import com.listywave.list.application.dto.response.CategoryTypeResponse;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -69,7 +70,9 @@ public class CollectionService {
     public List<CategoryTypeResponse> getCategoriesOfCollection(Long loginUserId) {
         User user = userRepository.getById(loginUserId);
         List<CategoryType> categories = collectionRepository.getCategoriesByCollect(user);
-        return categories.stream()
+        categories.add(CategoryType.ENTIRE);
+        List<CategoryType> list = categories.stream().sorted(Comparator.comparing(CategoryType::getCode)).toList();
+        return list.stream()
                 .map(CategoryTypeResponse::of)
                 .toList();
     }
