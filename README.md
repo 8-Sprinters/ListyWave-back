@@ -1,7 +1,15 @@
+# ListyWave
+
+## 서비스 소개
+
+## Infra Architecture + CI/CD
+
+![인프라 아키텍처 및 CI_CD](https://github.com/8-Sprinters/ListyWave-back/assets/66300965/1e5450ac-401c-43c6-b3a9-9caa3e36e184)
+
+
 ## 이미지 흐름도
 
-![image](https://github.com/8-Sprinters/ListyWave-back/assets/107859870/8c22f209-292a-4376-89d7-06d0ac7c09a1)
-
+![이미지 요청 흐름도](https://github.com/8-Sprinters/ListyWave-back/assets/66300965/749ce6b8-55d0-45ff-b4ba-c4264bff8589)
 
 
 ## ERD
