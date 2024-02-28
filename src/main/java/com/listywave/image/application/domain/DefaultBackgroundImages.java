@@ -10,13 +10,13 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum DefaultBackgroundImages {
 
-    BACKGROUND_IMAGE_A("https://image.listywave.com/basic/listywave_background_a.png"),
-    BACKGROUND_IMAGE_B("https://image.listywave.com/basic/listywave_background_b.png"),
-    BACKGROUND_IMAGE_C("https://image.listywave.com/basic/listywave_background_c.png"),
-    BACKGROUND_IMAGE_D("https://image.listywave.com/basic/listywave_background_d.png"),
-    BACKGROUND_IMAGE_E("https://image.listywave.com/basic/listywave_background_e.png"),
-    BACKGROUND_IMAGE_F("https://image.listywave.com/basic/listywave_background_f.png"),
-    BACKGROUND_IMAGE_G("https://image.listywave.com/basic/listywave_background_g.png"),
+    BACKGROUND_IMAGE_A("https://image.listywave.com/basic/listywave_background_a.webp"),
+    BACKGROUND_IMAGE_B("https://image.listywave.com/basic/listywave_background_b.webp"),
+    BACKGROUND_IMAGE_C("https://image.listywave.com/basic/listywave_background_c.webp"),
+    BACKGROUND_IMAGE_D("https://image.listywave.com/basic/listywave_background_d.webp"),
+    BACKGROUND_IMAGE_E("https://image.listywave.com/basic/listywave_background_e.webp"),
+    BACKGROUND_IMAGE_F("https://image.listywave.com/basic/listywave_background_f.webp"),
+    BACKGROUND_IMAGE_G("https://image.listywave.com/basic/listywave_background_g.webp"),
     ;
 
     private final String value;
