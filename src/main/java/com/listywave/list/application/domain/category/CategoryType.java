@@ -19,7 +19,7 @@ public enum CategoryType {
     MOVIE_DRAMA("5", "영화/드라마", "https://image.listywave.com/category/muvie_drama.webp"),
     BOOK("6", "도서", "https://image.listywave.com/category/book.webp"),
     ANIMAL_PLANT("7", "동식물", "https://image.listywave.com/category/animal_plant.webp"),
-    FOOD("9", "음식", "https://image.listywave.com/category/etc.webp"),
+    FOOD("9", "음식", "https://image.listywave.com/category/food.webp"),
     ETC("8", "기타", "https://image.listywave.com/category/etc.webp"),
     ;
 
