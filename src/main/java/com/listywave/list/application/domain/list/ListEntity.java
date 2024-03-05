@@ -139,7 +139,12 @@ public class ListEntity {
     }
 
     public boolean isMatch(String keyword) {
-        return keyword.isBlank() || title.isMatch(keyword) || description.isMatch(keyword) || labels.anyMatch(keyword);
+        return keyword.isBlank() ||
+                title.isMatch(keyword) ||
+                description.isMatch(keyword) ||
+                labels.anyMatch(keyword) ||
+                items.anyMatchTitle(keyword) ||
+                items.anyMatchComment(keyword);
     }
 
     public int scoreRelation(String keyword) {
