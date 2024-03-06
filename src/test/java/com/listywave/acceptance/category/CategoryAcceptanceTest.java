@@ -27,7 +27,7 @@ public class CategoryAcceptanceTest extends AcceptanceTest {
 
         // then
         List<CategoryTypeResponse> expect = Arrays.stream(CategoryType.values())
-                .map(type -> new CategoryTypeResponse(type.getCodeValue(), type.name().toLowerCase(), type.getKorNameValue()))
+                .map(type -> new CategoryTypeResponse(type.getCode(), type.name().toLowerCase(), type.getViewName(), type.getImageUrl()))
                 .toList();
         assertThat(body).usingRecursiveAssertion()
                 .isEqualTo(expect);

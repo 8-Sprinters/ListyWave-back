@@ -18,7 +18,7 @@ class CategoryTypeTest {
         int code = 7;
 
         // when
-        CategoryType result = CategoryType.enumOf(String.valueOf(code));
+        CategoryType result = CategoryType.codeOf(String.valueOf(code));
 
         // then
         assertThat(result).isEqualTo(ANIMAL_PLANT);
@@ -30,8 +30,8 @@ class CategoryTypeTest {
         String korName = "movie_drama";
 
         // when
-        CategoryType result1 = CategoryType.fromString(korName);
-        CategoryType result2 = CategoryType.fromString(korName.toUpperCase(ENGLISH));
+        CategoryType result1 = CategoryType.nameOf(korName);
+        CategoryType result2 = CategoryType.nameOf(korName.toUpperCase(ENGLISH));
 
         // then
         assertThat(result1).isEqualTo(MOVIE_DRAMA);
