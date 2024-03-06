@@ -1,12 +1,24 @@
 package com.listywave.user.application.dto.search;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import java.util.List;
+import lombok.Builder;
 
-@Getter
-@NoArgsConstructor
-public class UserSearchResponse {
-    Long id;
-    String nickname;
-    String profileImageUrl;
+@Builder
+public record UserSearchResponse(
+        List<UserSearchResult> users,
+        Long totalCount,
+        Boolean hasNext
+) {
+
+    public static UserSearchResponse of(
+            List<UserSearchResult> users,
+            Long totalCount,
+            Boolean hasNext
+    ) {
+        return UserSearchResponse.builder()
+                .users(users)
+                .totalCount(totalCount)
+                .hasNext(hasNext)
+                .build();
+    }
 }

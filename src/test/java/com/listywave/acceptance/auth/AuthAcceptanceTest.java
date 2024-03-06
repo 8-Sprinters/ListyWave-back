@@ -4,7 +4,7 @@ import static com.listywave.acceptance.auth.AuthAcceptanceTestHelper.로그아�
 import static com.listywave.acceptance.auth.AuthAcceptanceTestHelper.로그인_요청;
 import static com.listywave.acceptance.auth.AuthAcceptanceTestHelper.카카오_로그인_페이지_요청;
 import static com.listywave.acceptance.auth.AuthAcceptanceTestHelper.회원탈퇴_요청;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.회원_정보_조회_요청;
+import static com.listywave.acceptance.user.UserAcceptanceTestHelper.비회원_회원_정보_조회_요청;
 import static com.listywave.common.exception.ErrorCode.DELETED_USER_EXCEPTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -133,7 +133,7 @@ public class AuthAcceptanceTest extends AcceptanceTest {
         회원탈퇴_요청(로그인_결과.accessToken());
 
         // when
-        ExtractableResponse<Response> response = 회원_정보_조회_요청(로그인_결과.id());
+        ExtractableResponse<Response> response = 비회원_회원_정보_조회_요청(로그인_결과.id());
         ErrorResponse result = response.as(ErrorResponse.class);
 
         // then

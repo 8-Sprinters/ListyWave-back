@@ -55,4 +55,20 @@ public class UserFixture {
                 .isDelete(false)
                 .build();
     }
+
+    public static User 유진() {
+        return User.builder()
+                .oauthId(4L)
+                .oauthEmail("eugene@github.com")
+                .nickname(new Nickname("eugene"))
+                .backgroundImageUrl(new BackgroundImageUrl(""))
+                .profileImageUrl(new ProfileImageUrl(""))
+                .description(new Description("유진유진"))
+                .followerCount(10)
+                .followingCount(20)
+                .allPrivate(false)
+                .kakaoAccessToken("KAKAO_ACCESS_TOKEN")
+                .isDelete(false)
+                .build();
+    }
 }

@@ -5,7 +5,7 @@ import static com.listywave.list.application.domain.list.QListEntity.listEntity;
 import static com.listywave.user.application.domain.QUser.user;
 
 import com.listywave.user.application.domain.User;
-import com.listywave.user.application.dto.search.UserSearchResponse;
+import com.listywave.user.application.dto.search.UserSearchResult;
 import com.listywave.user.repository.user.custom.CustomUserRepository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -64,12 +64,12 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     }
 
     @Override
-    public Slice<UserSearchResponse> findAllBySearch(String search, Pageable pageable, Long loginUserId) {
+    public Slice<UserSearchResult> findAllBySearch(String search, Pageable pageable, Long loginUserId) {
         if (search.isEmpty()) {
             return new SliceImpl<>(List.of(), pageable, false);
         }
-        List<UserSearchResponse> fetch = queryFactory
-                .select(Projections.fields(UserSearchResponse.class,
+        List<UserSearchResult> fetch = queryFactory
+                .select(Projections.fields(UserSearchResult.class,
                         user.id,
                         user.nickname.value.as("nickname"),
                         user.profileImageUrl.value.as("profileImageUrl")

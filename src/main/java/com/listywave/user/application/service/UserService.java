@@ -2,6 +2,7 @@ package com.listywave.user.application.service;
 
 import static com.listywave.common.exception.ErrorCode.ALREADY_FOLLOWED_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.ALREADY_NOT_FOLLOWED_EXCEPTION;
+import static com.listywave.common.exception.ErrorCode.DUPLICATE_NICKNAME_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 
 import com.listywave.alarm.application.domain.AlarmEvent;
@@ -15,8 +16,8 @@ import com.listywave.user.application.dto.FollowingsResponse;
 import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.dto.UserProflieUpdateCommand;
-import com.listywave.user.application.dto.search.AllUserSearchResponse;
 import com.listywave.user.application.dto.search.UserSearchResponse;
+import com.listywave.user.application.dto.search.UserSearchResult;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
@@ -54,18 +55,18 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public AllUserSearchResponse getUsersBySearch(Long loginUserId, String search, Pageable pageable) {
+    public UserSearchResponse searchUser(Long loginUserId, String search, Pageable pageable) {
         if (loginUserId == null) {
-            return getAllUserSearchResponse(null, search, pageable);
+            return createUserSearchResponse(null, search, pageable);
         }
         User user = userRepository.getById(loginUserId);
-        return getAllUserSearchResponse(user.getId(), search, pageable);
+        return createUserSearchResponse(user.getId(), search, pageable);
     }
 
-    private AllUserSearchResponse getAllUserSearchResponse(Long loginUserId, String search, Pageable pageable) {
+    private UserSearchResponse createUserSearchResponse(Long loginUserId, String search, Pageable pageable) {
         Long count = userRepository.countBySearch(search, loginUserId);
-        Slice<UserSearchResponse> users = userRepository.findAllBySearch(search, pageable, loginUserId);
-        return AllUserSearchResponse.of(users.getContent(), count, users.hasNext());
+        Slice<UserSearchResult> result = userRepository.findAllBySearch(search, pageable, loginUserId);
+        return UserSearchResponse.of(result.getContent(), count, result.hasNext());
     }
 
     public FollowingsResponse getFollowings(Long followerUserId, String search) {
@@ -134,19 +135,24 @@ public class UserService {
                 .toList();
     }
 
-    public void updateUserProfile(Long targetUserId, Long loginUserId, UserProflieUpdateCommand profile) {
+    public void updateUserProfile(Long targetUserId, Long loginUserId, UserProflieUpdateCommand command) {
         User targetUser = userRepository.getById(targetUserId);
+
         targetUser.validateUpdate(loginUserId);
+        if (isDuplicateNickname(command.nickname())) {
+            throw new CustomException(DUPLICATE_NICKNAME_EXCEPTION);
+        }
+
         targetUser.updateUserProfile(
-                profile.nickname(),
-                profile.description(),
-                profile.profileImageUrl(),
-                profile.backgroundImageUrl()
+                command.nickname(),
+                command.description(),
+                command.profileImageUrl(),
+                command.backgroundImageUrl()
         );
     }
 
     @Transactional(readOnly = true)
-    public Boolean checkNicknameDuplicate(String nickname) {
+    public Boolean isDuplicateNickname(String nickname) {
         return userRepository.existsByNicknameValue(nickname);
     }
 
