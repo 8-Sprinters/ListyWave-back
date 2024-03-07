@@ -5,32 +5,32 @@ import java.util.List;
 import lombok.Builder;
 
 public record FollowingsResponse(
-        List<FollowingUserInfo> followings
+        List<FollowingInfo> followings
 ) {
 
     public static FollowingsResponse of(List<User> users) {
-        return new FollowingsResponse(FollowingUserInfo.toList(users));
-    }
-}
-
-@Builder
-record FollowingUserInfo(
-        Long id,
-        String nickname,
-        String profileImageUrl
-) {
-
-    public static List<FollowingUserInfo> toList(List<User> users) {
-        return users.stream()
-                .map(FollowingUserInfo::of)
-                .toList();
+        return new FollowingsResponse(FollowingInfo.toList(users));
     }
 
-    public static FollowingUserInfo of(User user) {
-        return FollowingUserInfo.builder()
-                .id(user.getId())
-                .nickname(user.getNickname())
-                .profileImageUrl(user.getProfileImageUrl())
-                .build();
+    @Builder
+    public record FollowingInfo(
+            Long id,
+            String nickname,
+            String profileImageUrl
+    ) {
+
+        public static List<FollowingInfo> toList(List<User> users) {
+            return users.stream()
+                    .map(FollowingInfo::of)
+                    .toList();
+        }
+
+        public static FollowingInfo of(User user) {
+            return FollowingInfo.builder()
+                    .id(user.getId())
+                    .nickname(user.getNickname())
+                    .profileImageUrl(user.getProfileImageUrl())
+                    .build();
+        }
     }
 }
