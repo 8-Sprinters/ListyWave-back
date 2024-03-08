@@ -35,8 +35,8 @@ public class Nickname {
         if (value.length() > LENGTH_LIMIT) {
             throw new CustomException(NICKNAME_LENGTH_EXCEEDED_EXCEPTION, "닉네임은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
-        if (!value.matches("[가-힣a-zA-Z0-9]+")) {
-            throw new CustomException(NICKNAME_CONTAINS_SPECIAL_CHARACTERS, "닉네임에는 이모티콘 및 특수문자가 포함될 수 없습니다.");
+        if (!value.matches("[가-힣a-zA-Z]+")) {
+            throw new CustomException(NICKNAME_CONTAINS_SPECIAL_CHARACTERS, "닉네임에는 숫자, 이모티콘, 특수문자가 포함될 수 없습니다.");
         }
     }
 

@@ -38,6 +38,11 @@ class NicknameTest {
     }
 
     @Test
+    void 닉네임에_숫자가_포함될_수_없다() {
+        assertThatThrownBy(() -> new Nickname("z1존도적"));
+    }
+
+    @Test
     void OauthId가_닉네임_최대_길이보다_긴_경우_최대_길이만큼_잘라_초기화한다() {
         Nickname nickname = Nickname.oauthIdOf("일이삼사오육칠팔구십일이삼사오");
 
