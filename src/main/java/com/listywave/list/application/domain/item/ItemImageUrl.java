@@ -1,7 +1,8 @@
 package com.listywave.list.application.domain.item;
 
+import static com.listywave.common.exception.ErrorCode.NICKNAME_LENGTH_EXCEEDED_EXCEPTION;
+
 import com.listywave.common.exception.CustomException;
-import com.listywave.common.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -29,7 +30,7 @@ public class ItemImageUrl {
 
     private void validate(String value) {
         if (value != null && value.length() > LENGTH_LIMIT) {
-            throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "아이템의 이미지 URL은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
+            throw new CustomException(NICKNAME_LENGTH_EXCEEDED_EXCEPTION, "아이템의 이미지 URL은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
 
