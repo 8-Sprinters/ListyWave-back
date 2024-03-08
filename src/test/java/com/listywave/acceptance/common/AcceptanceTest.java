@@ -5,9 +5,11 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.auth.infra.kakao.KakaoOauthApiClient;
+import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
 import com.listywave.auth.infra.kakao.response.KakaoMember;
 import com.listywave.auth.infra.kakao.response.KakaoTokenResponse;
 import com.listywave.collaborator.application.domain.Collaborator;
@@ -90,6 +92,17 @@ public abstract class AcceptanceTest {
         return given()
                 .queryParam("code", "AuthCode")
                 .when().get("/auth/redirect/kakao")
+                .then().log().all()
+                .extract();
+    }
+
+    protected ExtractableResponse<Response> 회원_탈퇴(String accessToken) {
+        when(kakaoOauthApiClient.logout(anyString()))
+                .thenReturn(new KakaoLogoutResponse(55L));
+
+        return given()
+                .header(AUTHORIZATION, "Bearer " + accessToken)
+                .when().delete("/withdraw")
                 .then().log().all()
                 .extract();
     }

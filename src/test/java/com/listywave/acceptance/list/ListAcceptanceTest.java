@@ -32,11 +32,13 @@ import static com.listywave.list.fixture.ListFixture.가장_좋아하는_견종_
 import static com.listywave.list.fixture.ListFixture.좋아하는_라면_TOP3;
 import static com.listywave.list.fixture.ListFixture.지정된_개수만큼_리스트를_생성한다;
 import static com.listywave.user.fixture.UserFixture.동호;
+import static com.listywave.user.fixture.UserFixture.유진;
 import static com.listywave.user.fixture.UserFixture.정수;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -64,9 +66,11 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+@DisplayName("리스트 관련 인수테스트")
 public class ListAcceptanceTest extends AcceptanceTest {
 
     @Nested
@@ -187,6 +191,21 @@ public class ListAcceptanceTest extends AcceptanceTest {
             ListEntity 바뀐_리스트 = 가장_좋아하는_견종_TOP3_순위_변경(동호, List.of());
             ListDetailResponse expect = ListDetailResponse.of(바뀐_리스트, 동호, false, List.of(), 바뀐_리스트.getSortedItems().getValues());
             리스트_상세_조회를_검증한다(result, expect);
+        }
+
+        @Test
+        void 탈퇴한_회원의_리스트는_볼_수_없다() {
+            // given
+            User 동호 = 회원을_저장한다(동호());
+            ListEntity 동호_리스트 = 리스트를_저장한다(가장_좋아하는_견종_TOP3(동호, List.of()));
+            String 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
+            회원_탈퇴(동호_액세스_토큰);
+
+            // when
+            ExtractableResponse<Response> response = 비회원_리스트_상세_조회_API_호출(동호_리스트.getId());
+
+            // then
+            assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
         }
     }
 
