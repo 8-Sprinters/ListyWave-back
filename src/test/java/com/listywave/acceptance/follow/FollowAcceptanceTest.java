@@ -225,7 +225,7 @@ public class FollowAcceptanceTest extends AcceptanceTest {
     class 팔로잉_목록_조회 {
 
         @Test
-        void 성공적으로_팔로잉_목록을_조회한다() {
+        void 성공적으로_팔로잉_목록을_조회한다_닉네임으로_정렬이_되어있다() {
             // given
             User 동호 = 회원을_저장한다(동호());
             User 정수 = 회원을_저장한다(정수());
@@ -238,7 +238,7 @@ public class FollowAcceptanceTest extends AcceptanceTest {
             FollowingsResponse result = 팔로잉_목록_조회(동호.getId()).as(FollowingsResponse.class);
 
             // then
-            List<FollowingInfo> expect = List.of(FollowingInfo.of(정수), FollowingInfo.of(유진));
+            List<FollowingInfo> expect = List.of(FollowingInfo.of(유진), FollowingInfo.of(정수));
             assertThat(result.followings()).isEqualTo(expect);
         }
 
