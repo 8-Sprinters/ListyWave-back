@@ -24,7 +24,7 @@ import java.util.stream.IntStream;
 
 public abstract class ListFixture {
 
-    public static ListEntity 가장_좋아하는_동물_TOP3(User owner, List<Long> collaboratorIds) {
+    public static ListEntity 가장_좋아하는_견종_TOP3(User owner, List<Long> collaboratorIds) {
         ListCreateRequest request = 좋아하는_견종_TOP3_생성_요청_데이터(collaboratorIds);
         boolean hasCollaborators = !request.collaboratorIds().isEmpty();
 
@@ -49,7 +49,7 @@ public abstract class ListFixture {
         );
     }
 
-    public static ListEntity 가장_좋아하는_동물_TOP3_순위_변경(User owner, List<Long> collaboratorIds) {
+    public static ListEntity 가장_좋아하는_견종_TOP3_순위_변경(User owner, List<Long> collaboratorIds) {
         ListCreateRequest request = 아이템_순위가_바뀐_좋아하는_견종_TOP3_요청_데이터(collaboratorIds);
         boolean hasCollaborators = !request.collaboratorIds().isEmpty();
 
