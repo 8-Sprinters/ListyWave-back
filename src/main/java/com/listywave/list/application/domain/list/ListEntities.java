@@ -48,7 +48,7 @@ public record ListEntities(
                     .toList();
 
             case RELATED -> listEntities.stream()
-                    .sorted(comparingInt(list -> list.scoreRelation(keyword)))
+                    .sorted(comparingInt(list -> -list.scoreRelation(keyword)))
                     .toList();
         };
 
