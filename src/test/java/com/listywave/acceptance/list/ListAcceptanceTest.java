@@ -14,7 +14,7 @@ import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_�
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_카테고리_콜라보레이터_필터링_요청;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_카테고리_필터링_요청;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_콜라보레이터_필터링_요청;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.아이템_순위가_바뀐_좋아하는_견종_TOP3_요청_데이터;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.정렬기준을_포함한_검색_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.좋아하는_견종_TOP3_생성_요청_데이터;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.좋아하는_라면_TOP3_생성_요청_데이터;
@@ -180,7 +180,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             ListEntity 동호_리스트 = 리스트를_저장한다(가장_좋아하는_견종_TOP3(동호, List.of()));
             String 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
 
-            ListCreateRequest 리스트_수정_요청_데이터 = 아이템_순위가_바뀐_좋아하는_견종_TOP3_요청_데이터(List.of());
+            ListCreateRequest 리스트_수정_요청_데이터 = 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(List.of());
             리스트_수정_API_호출(리스트_수정_요청_데이터, 동호_액세스_토큰, 동호_리스트.getId());
 
             // when
@@ -220,7 +220,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             ListCreateResponse 동호_리스트_생성_결과 = 리스트_저장_API_호출(좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
 
             // when
-            ListCreateRequest 리스트_수정_요청_데이터 = 아이템_순위가_바뀐_좋아하는_견종_TOP3_요청_데이터(List.of());
+            ListCreateRequest 리스트_수정_요청_데이터 = 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(List.of());
             리스트_수정_API_호출(리스트_수정_요청_데이터, 동호_액세스_토큰, 동호_리스트_생성_결과.listId());
 
             // then
@@ -237,7 +237,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             ListEntity 동호_리스트 = 리스트를_저장한다(가장_좋아하는_견종_TOP3(동호, List.of()));
             String 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
 
-            ListCreateRequest 리스트_수정_요청_데이터 = 아이템_순위가_바뀐_좋아하는_견종_TOP3_요청_데이터(List.of());
+            ListCreateRequest 리스트_수정_요청_데이터 = 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(List.of());
             리스트_수정_API_호출(리스트_수정_요청_데이터, 동호_액세스_토큰, 동호_리스트.getId());
 
             // when
@@ -266,7 +266,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             ListCreateResponse 좋아하는_견종_TOP3_생성_결과 = 리스트_저장_API_호출(좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰).as(ListCreateResponse.class);
 
             // when
-            ListCreateRequest 수정_요청_데이터 = 아이템_순위가_바뀐_좋아하는_견종_TOP3_요청_데이터(List.of(정수.getId()));
+            ListCreateRequest 수정_요청_데이터 = 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(List.of(정수.getId()));
             ExtractableResponse<Response> 동호가_보낸_리스트_수정_API = 리스트_수정_API_호출(수정_요청_데이터, 동호_액세스_토큰, 좋아하는_견종_TOP3_생성_결과.listId());
             ExtractableResponse<Response> 정수가_보낸_리스트_수정_API = 리스트_수정_API_호출(수정_요청_데이터, 정수_액세스_토큰, 좋아하는_견종_TOP3_생성_결과.listId());
             ExtractableResponse<Response> 유진이_보낸_리스트_수정_API = 리스트_수정_API_호출(수정_요청_데이터, 유진_액세스_토큰, 좋아하는_견종_TOP3_생성_결과.listId());

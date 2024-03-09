@@ -72,10 +72,10 @@ public abstract class ListAcceptanceTestHelper {
         );
     }
 
-    public static ListCreateRequest 아이템_순위가_바뀐_좋아하는_견종_TOP3_요청_데이터(List<Long> collaboratorIds) {
+    public static ListCreateRequest 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(List<Long> collaboratorIds) {
         return new ListCreateRequest(
                 ANIMAL_PLANT,
-                List.of("동물", "최애 동물", "강아지"),
+                List.of("냐옹", "멍멍"),
                 collaboratorIds,
                 "좋아하는 견종 TOP 3",
                 "지극히 주관적인 내가 가장 좋아하는 견종 3위까지",

@@ -11,7 +11,7 @@ import com.listywave.list.application.domain.list.ListEntity;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.NoArgsConstructor;
@@ -73,13 +73,13 @@ public class Labels {
     }
 
     private void removeDeletedLabels(Labels newLabels) {
-        Set<Label> beforeLabels = new HashSet<>(this.values);
+        Set<Label> beforeLabels = new LinkedHashSet<>(this.values);
         newLabels.values.forEach(beforeLabels::remove);
         this.values.removeAll(beforeLabels);
     }
 
     private void addNewLabels(Labels newLabels, ListEntity list) {
-        Set<Label> newLabelsSet = new HashSet<>(newLabels.values);
+        Set<Label> newLabelsSet = new LinkedHashSet<>(newLabels.values);
         this.values.forEach(newLabelsSet::remove);
         newLabelsSet.forEach(newLabel -> newLabel.updateList(list));
         this.values.addAll(newLabelsSet);
