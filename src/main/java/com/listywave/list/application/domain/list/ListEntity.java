@@ -118,10 +118,6 @@ public class ListEntity {
         return items.getTop3();
     }
 
-    public String getFirstItemImageUrl() {
-        return items.getFirstImageUrl();
-    }
-
     public void validateOwner(User user) {
         if (!this.user.equals(user)) {
             throw new CustomException(INVALID_ACCESS);

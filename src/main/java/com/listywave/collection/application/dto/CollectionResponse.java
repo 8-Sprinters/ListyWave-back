@@ -58,7 +58,7 @@ public record CollectionResponse(
                     .ownerId(list.getUser().getId())
                     .ownerNickname(list.getUser().getNickname())
                     .ownerProfileImageUrl(list.getUser().getProfileImageUrl())
-                    .representativeImageUrl(list.getFirstItemImageUrl())
+                    .representativeImageUrl(list.getRepresentImageUrl())
                     .updatedDate(list.getUpdatedDate())
                     .listItems(toList(list.getTop3Items().getValues()))
                     .build();
