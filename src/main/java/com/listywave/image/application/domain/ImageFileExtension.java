@@ -7,6 +7,9 @@ import java.util.Arrays;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+// TODO: 정수씨 이 쪽 나중에 테스트 부탁해요~
+// TODO: ImageService 쪽에서 많이 쓰이고 있어서 쉽게 리팩터링 못하겠네요..
+// TODO: uploadExtension 필드 제거하고 `fromString`을 `ofName` 로 바꿔주세요!
 @Getter
 @AllArgsConstructor
 public enum ImageFileExtension {
