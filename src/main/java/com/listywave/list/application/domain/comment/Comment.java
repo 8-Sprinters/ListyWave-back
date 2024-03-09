@@ -33,7 +33,7 @@ public class Comment extends BaseEntity {
     private CommentContent commentContent;
 
     @Column(nullable = false, length = 5)
-    private Boolean isDeleted;
+    private boolean isDeleted;
 
     public static Comment create(ListEntity list, User user, CommentContent content) {
         return new Comment(list, user, content, false);
@@ -51,10 +51,6 @@ public class Comment extends BaseEntity {
         this.commentContent = content;
     }
 
-    public String getCommentContent() {
-        return commentContent.getValue();
-    }
-
     public boolean isDeleted() {
         return this.isDeleted;
     }
@@ -69,5 +65,9 @@ public class Comment extends BaseEntity {
 
     public String getUserProfileImageUrl() {
         return user.getProfileImageUrl();
+    }
+
+    public String getCommentContent() {
+        return commentContent.getValue();
     }
 }
