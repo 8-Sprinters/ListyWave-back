@@ -85,8 +85,8 @@ public class ListEntity {
     private Items items;
 
     @CreatedDate
-    @Column(updatable = false)
     @Temporal(TIMESTAMP)
+    @Column(updatable = false)
     private LocalDateTime createdDate;
 
     @Temporal(TIMESTAMP)
