@@ -40,10 +40,6 @@ public class Collaborator {
         return new Collaborator(null, user, list);
     }
 
-    public boolean hasUser(User other) {
-        return this.user.equals(other);
-    }
-
     public String getUserNickname() {
         return user.getNickname();
     }

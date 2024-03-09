@@ -41,6 +41,7 @@ public enum ErrorCode {
     NOT_SUPPORT_FILTER_ARGUMENT_EXCEPTION(BAD_REQUEST, "지원하지 않는 필터링 조건입니다."),
     ALREADY_LOGOUT_EXCEPTION(BAD_REQUEST, "이미 로그아웃 처리가 된 상태입니다."),
     DUPLICATE_NICKNAME_EXCEPTION(BAD_REQUEST, "중복된 닉네임입니다."),
+    DUPLICATE_COLLABORATOR_EXCEPTION(BAD_REQUEST, "이미 동일한 콜라보레이터가 존재합니다"),
 
     // S3
     S3_DELETE_OBJECTS_EXCEPTION(INTERNAL_SERVER_ERROR, "S3의 이미지를 삭제 요청하는 과정에서 에러가 발생했습니다."),

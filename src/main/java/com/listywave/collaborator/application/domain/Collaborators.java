@@ -1,5 +1,6 @@
 package com.listywave.collaborator.application.domain;
 
+import static com.listywave.common.exception.ErrorCode.DUPLICATE_COLLABORATOR_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.INVALID_COUNT;
 
 import com.listywave.common.exception.CustomException;
@@ -9,11 +10,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Collaborators {
+public record Collaborators(
+        List<Collaborator> collaborators
+) {
 
     private static final int MAX_SIZE = 20;
-
-    private final List<Collaborator> collaborators;
 
     public Collaborators(List<Collaborator> collaborators) {
         validateSize(collaborators);
@@ -40,7 +41,7 @@ public class Collaborators {
 
     public boolean contains(User user) {
         return collaborators.stream()
-                .anyMatch(collaborator -> collaborator.hasUser(user));
+                .anyMatch(collaborator -> collaborator.getUser().equals(user));
     }
 
     public boolean isEmpty() {
@@ -48,10 +49,13 @@ public class Collaborators {
     }
 
     public void add(Collaborator collaborator) {
+        if (collaborators.contains(collaborator)) {
+            throw new CustomException(DUPLICATE_COLLABORATOR_EXCEPTION);
+        }
         collaborators.add(collaborator);
     }
 
-    public List<Collaborator> getCollaborators() {
+    public List<Collaborator> collaborators() {
         return new ArrayList<>(collaborators);
     }
 }

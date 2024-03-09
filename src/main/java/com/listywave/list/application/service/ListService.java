@@ -93,7 +93,7 @@ public class ListService {
         if (hasCollaboration) {
             collaboratorIds.add(user.getId());
             Collaborators collaborators = createCollaborators(collaboratorIds, savedList);
-            collaboratorRepository.saveAll(collaborators.getCollaborators());
+            collaboratorRepository.saveAll(collaborators.collaborators());
         }
 
         return ListCreateResponse.of(savedList.getId());
@@ -248,13 +248,13 @@ public class ListService {
         Collaborators newCollaborators = createCollaborators(collaboratorIds, list);
 
         Collaborators removedCollaborators = beforeCollaborators.filterRemovedCollaborators(newCollaborators);
-        collaboratorRepository.deleteAllInBatch(removedCollaborators.getCollaborators());
+        collaboratorRepository.deleteAllInBatch(removedCollaborators.collaborators());
 
         Collaborators addedCollaborators = beforeCollaborators.filterAddedCollaborators(newCollaborators);
         if (!addedCollaborators.isEmpty() && !addedCollaborators.contains(list.getUser())) {
             addedCollaborators.add(Collaborator.init(list.getUser(), list));
         }
-        collaboratorRepository.saveAll(addedCollaborators.getCollaborators());
+        collaboratorRepository.saveAll(addedCollaborators.collaborators());
     }
 
     public void deleteLists(Long loginUserId, List<Long> listIds) {
