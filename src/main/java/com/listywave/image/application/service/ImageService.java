@@ -2,6 +2,7 @@ package com.listywave.image.application.service;
 
 import static com.listywave.common.exception.ErrorCode.S3_DELETE_OBJECTS_EXCEPTION;
 import static com.listywave.image.application.domain.ImageType.LISTS_ITEM;
+import static java.util.Locale.ENGLISH;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.HttpMethod;
@@ -312,7 +313,7 @@ public class ImageService {
     ) {
         return getCurrentProfile()
                 + "/"
-                + imageType.getValue()
+                + imageType.name().toLowerCase(ENGLISH)
                 + "/"
                 + targetId
                 + "/"
@@ -331,7 +332,7 @@ public class ImageService {
                 + "/"
                 + getCurrentProfile()
                 + "/"
-                + imageType.getValue()
+                + imageType.name().toLowerCase(ENGLISH)
                 + "/"
                 + targetId
                 + "/"
