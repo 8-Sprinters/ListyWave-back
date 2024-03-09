@@ -1,8 +1,8 @@
 package com.listywave.user.application.vo;
 
+import static com.listywave.common.exception.ErrorCode.LENGTH_EXCEEDED_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.NICKNAME_CONTAINS_SPECIAL_CHARACTERS;
 import static com.listywave.common.exception.ErrorCode.NICKNAME_CONTAINS_WHITESPACE_EXCEPTION;
-import static com.listywave.common.exception.ErrorCode.NICKNAME_LENGTH_EXCEEDED_EXCEPTION;
 
 import com.listywave.common.exception.CustomException;
 import jakarta.persistence.Column;
@@ -49,7 +49,7 @@ public class Nickname {
 
     private static void validateLength(String value) {
         if (value.length() > LENGTH_LIMIT) {
-            throw new CustomException(NICKNAME_LENGTH_EXCEEDED_EXCEPTION, "닉네임은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
+            throw new CustomException(LENGTH_EXCEEDED_EXCEPTION, "닉네임은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
 

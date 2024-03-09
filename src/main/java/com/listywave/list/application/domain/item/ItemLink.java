@@ -1,6 +1,6 @@
 package com.listywave.list.application.domain.item;
 
-import static com.listywave.common.exception.ErrorCode.NICKNAME_LENGTH_EXCEEDED_EXCEPTION;
+import static com.listywave.common.exception.ErrorCode.LENGTH_EXCEEDED_EXCEPTION;
 
 import com.listywave.common.exception.CustomException;
 import jakarta.persistence.Column;
@@ -30,7 +30,7 @@ public class ItemLink {
 
     private void validate(String value) {
         if (value != null && value.length() > LENGTH_LIMIT) {
-            throw new CustomException(NICKNAME_LENGTH_EXCEEDED_EXCEPTION, "첨부 link 길이는 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
+            throw new CustomException(LENGTH_EXCEEDED_EXCEPTION, "첨부 link 길이는 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
 }
