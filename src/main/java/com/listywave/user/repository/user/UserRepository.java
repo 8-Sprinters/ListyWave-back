@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long>, CustomUserRep
         Optional<User> result = findById(id);
         if (result.isPresent()) {
             User user = result.get();
-            if (user.getIsDelete()) {
+            if (user.isDelete()) {
                 throw new CustomException(DELETED_USER_EXCEPTION);
             }
             return user;

@@ -126,7 +126,7 @@ public class UserService {
 
         List<User> myFollowingUsers = follows.stream()
                 .map(Follow::getFollowingUser)
-                .filter(followingUser -> !followingUser.getIsDelete())
+                .filter(followingUser -> !followingUser.isDelete())
                 .toList();
 
         List<User> recommendUsers = userRepository.getRecommendUsers(myFollowingUsers, user);

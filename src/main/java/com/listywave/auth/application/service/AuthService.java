@@ -52,7 +52,7 @@ public class AuthService {
     }
 
     private LoginResult loginNonInit(User user, String kakaoAccessToken) {
-        if (user.getIsDelete()) {
+        if (user.isDelete()) {
             throw new CustomException(DELETED_USER_EXCEPTION);
         }
         user.updateKakaoAccessToken(kakaoAccessToken);

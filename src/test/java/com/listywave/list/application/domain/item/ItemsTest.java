@@ -61,6 +61,19 @@ class ItemsTest {
     }
 
     @Test
+    void 모든_아이템에_이미지가_없으면_빈_문자열을_응답한다() {
+        Items items = new Items(List.of(
+                Item.init(1, new ItemTitle("신라면"), new ItemComment("사나이 울리는 신라면"), new ItemLink(""), new ItemImageUrl("")),
+                Item.init(2, new ItemTitle("진매"), new ItemComment("진매 은근 맛있음"), new ItemLink(""), new ItemImageUrl("")),
+                Item.init(3, new ItemTitle("간짬뽕"), new ItemComment("대학 시절 먹었던 간짬뽕은 1위"), new ItemLink(""), new ItemImageUrl(""))
+        ));
+
+        String result = items.getRepresentImageUrl();
+
+        assertThat(result).isBlank();
+    }
+
+    @Test
     void 새로운_Items와_비교해서_변경_여부를_응답한다() {
         Items newItems = new Items(List.of(
                 Item.init(1, new ItemTitle("육개장 사발면"), new ItemComment("진리 아님?"), new ItemLink(""), new ItemImageUrl("")),

@@ -168,7 +168,9 @@ public class ListEntity {
     }
 
     public void decreaseCollectCount() {
-        this.collectCount--;
+        if (this.collectCount > 0) {
+            this.collectCount--;
+        }
     }
 
     public boolean canCreateHistory(Items newItems) {
@@ -217,11 +219,11 @@ public class ListEntity {
     }
 
     public boolean isDeletedUser() {
-        return user.getIsDelete();
+        return user.isDelete();
     }
 
     public void validateOwnerIsNotDelete() {
-        if (this.user.getIsDelete()) {
+        if (this.user.isDelete()) {
             throw new CustomException(DELETED_USER_EXCEPTION, "탈퇴한 회원의 리스트입니다.");
         }
     }

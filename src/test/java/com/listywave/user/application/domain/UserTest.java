@@ -59,12 +59,12 @@ class UserTest {
 
         @Test
         void 처음_객체를_생성하면_allPrivate은_false이다() {
-            assertThat(user.getAllPrivate()).isFalse();
+            assertThat(user.isAllPrivate()).isFalse();
         }
 
         @Test
         void 처음_객체를_생성하면_isDelete는_false이다() {
-            assertThat(user.getIsDelete()).isFalse();
+            assertThat(user.isDelete()).isFalse();
         }
     }
 
@@ -303,7 +303,7 @@ class UserTest {
     void 삭제_처리를_할_수_있다() {
         user.softDelete();
 
-        assertThat(user.getIsDelete()).isTrue();
+        assertThat(user.isDelete()).isTrue();
     }
 
     @Test

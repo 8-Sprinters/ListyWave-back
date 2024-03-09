@@ -58,13 +58,13 @@ public class User extends BaseEntity {
     private int followerCount;
 
     @Column(nullable = false, length = 5)
-    private Boolean allPrivate;
+    private boolean allPrivate;
 
     @Column(nullable = false)
     private String kakaoAccessToken;
 
     @Column(nullable = false, length = 5)
-    private Boolean isDelete;
+    private boolean isDelete;
 
     public static User init(Long oauthId, String oauthEmail, String kakaoAccessToken) {
         return new User(

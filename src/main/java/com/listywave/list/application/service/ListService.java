@@ -176,7 +176,7 @@ public class ListService {
 
             List<User> myFollowingUsers = follows.stream()
                     .map(Follow::getFollowingUser)
-                    .filter(followingUser -> !followingUser.getIsDelete())
+                    .filter(followingUser -> !followingUser.isDelete())
                     .toList();
 
             Slice<ListEntity> result =
