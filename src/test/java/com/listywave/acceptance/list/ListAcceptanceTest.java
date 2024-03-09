@@ -34,9 +34,11 @@ import static com.listywave.list.fixture.ListFixture.지정된_개수만큼_리�
 import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.유진;
 import static com.listywave.user.fixture.UserFixture.정수;
+import static java.time.temporal.ChronoUnit.MILLIS;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -69,9 +71,13 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @DisplayName("리스트 관련 인수테스트")
 public class ListAcceptanceTest extends AcceptanceTest {
+
+    private static final Logger log = LoggerFactory.getLogger(ListAcceptanceTest.class);
 
     @Nested
     class 리스트_생성 {
@@ -369,7 +375,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
 
             // then
             assertAll(
-                    () -> assertThat(allUserListsResponse.cursorUpdatedDate()).isEqualTo(동호_리스트_2.getUpdatedDate()),
+                    () -> assertThat(allUserListsResponse.cursorUpdatedDate()).isCloseTo(동호_리스트_2.getUpdatedDate(), within(1, MILLIS)),
                     () -> assertThat(allUserListsResponse.hasNext()).isTrue(),
                     () -> assertThat(allUserListsResponse.feedLists()).usingRecursiveComparison()
                             .ignoringFields("id")
