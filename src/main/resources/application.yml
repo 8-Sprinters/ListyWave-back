@@ -42,3 +42,9 @@ cloud:
 
 jwt:
   plain-secret-key:
+  issuer: "http://localhost.com"
+  access-token-valid-time-duration: 1
+  access-token-valid-time-unit: NANOSECONDS
+  refresh-token-valid-time-duration: 1
+  refresh-token-valid-time-unit: NANOSECONDS
+

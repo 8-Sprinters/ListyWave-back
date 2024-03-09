@@ -2,9 +2,9 @@ package com.listywave.auth.application.domain;
 
 import static com.listywave.common.exception.ErrorCode.REQUIRED_ACCESS_TOKEN;
 import static com.listywave.common.exception.ErrorCode.REQUIRED_REFRESH_TOKEN;
+import static com.listywave.common.util.TimeUtils.convertTimeUnit;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.concurrent.TimeUnit.DAYS;
-import static java.util.concurrent.TimeUnit.HOURS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import com.amazonaws.util.Base64;
 import com.listywave.common.exception.CustomException;
@@ -12,25 +12,35 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.time.Instant;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKey;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-@Component
 public class JwtManager {
 
     private static final String PREFIX = "Bearer ";
-    private static final String ISSUER = "https://dev.api.listywave.com";
-    //    private static final Long ACCESS_TOKEN_VALID_MILLISECOND = MINUTES.toMillis(30);
-    private static final Long ACCESS_TOKEN_VALID_MILLISECOND = HOURS.toMillis(8);
-    private static final Long REFRESH_TOKEN_VALID_MILLISECOND = DAYS.toMillis(14);
-    public static final Long REFRESH_TOKEN_VALID_SECOND = DAYS.toSeconds(14);
 
     private final SecretKey secretKey;
+    private final String issuer;
+    private final int accessTokenValidTimeDuration;
+    private final int refreshTokenValidTimeDuration;
+    private final TimeUnit accessTokenValidTimeUnit;
+    private final TimeUnit refreshTokenValidTimeUnit;
 
-    public JwtManager(@Value("${jwt.plain-secret-key}") String plainSecretKey) {
+    public JwtManager(
+            String plainSecretKey,
+            String issuer,
+            int accessTokenValidTimeDuration,
+            TimeUnit accessTokenValidTimeUnit,
+            int refreshTokenValidTimeDuration,
+            TimeUnit refreshTokenValidTimeUnit
+    ) {
         byte[] encoded = Base64.encode(plainSecretKey.getBytes(UTF_8));
-        secretKey = Keys.hmacShaKeyFor(encoded);
+        this.secretKey = Keys.hmacShaKeyFor(encoded);
+        this.issuer = issuer;
+        this.accessTokenValidTimeDuration = accessTokenValidTimeDuration;
+        this.accessTokenValidTimeUnit = accessTokenValidTimeUnit;
+        this.refreshTokenValidTimeDuration = refreshTokenValidTimeDuration;
+        this.refreshTokenValidTimeUnit = refreshTokenValidTimeUnit;
     }
 
     public String createAccessToken(Long userId) {
@@ -38,10 +48,10 @@ public class JwtManager {
         return Jwts.builder()
                 .header().type("jwt").and()
                 .signWith(secretKey)
-                .issuer(ISSUER)
+                .issuer(issuer)
                 .issuedAt(now)
                 .subject(String.valueOf(userId))
-                .expiration(new Date(now.getTime() + ACCESS_TOKEN_VALID_MILLISECOND))
+                .expiration(new Date(now.getTime() + convertTimeUnit(accessTokenValidTimeUnit, MILLISECONDS, accessTokenValidTimeDuration)))
                 .issuedAt(Date.from(Instant.now()))
                 .compact();
     }
@@ -51,15 +61,15 @@ public class JwtManager {
         return Jwts.builder()
                 .header().type("jwt").and()
                 .signWith(secretKey)
-                .issuer(ISSUER)
+                .issuer(issuer)
                 .issuedAt(now)
                 .subject(String.valueOf(userId))
-                .expiration(new Date(now.getTime() + REFRESH_TOKEN_VALID_MILLISECOND))
+                .expiration(new Date(now.getTime() + convertTimeUnit(refreshTokenValidTimeUnit, MILLISECONDS, refreshTokenValidTimeDuration)))
                 .issuedAt(Date.from(Instant.now()))
                 .compact();
     }
 
-    public Long read(String token) {
+    public Long readAccessToken(String token) {
         if (token == null || token.isBlank() || !token.startsWith(PREFIX)) {
             throw new CustomException(REQUIRED_ACCESS_TOKEN);
         }

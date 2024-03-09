@@ -1,6 +1,5 @@
 package com.listywave.auth.presentation;
 
-import static com.listywave.auth.application.domain.JwtManager.REFRESH_TOKEN_VALID_SECOND;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import com.listywave.auth.application.dto.LoginResult;
@@ -11,9 +10,7 @@ import com.listywave.auth.presentation.dto.UpdateTokenResponse;
 import com.listywave.common.auth.Auth;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.Duration;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,15 +46,15 @@ public class AuthController {
                 .body(response);
     }
 
-    private ResponseCookie createRefreshTokenCookie(String refreshToken) {
-        return ResponseCookie.from("RefreshToken")
-                .value(refreshToken)
-                .maxAge(Duration.ofSeconds(REFRESH_TOKEN_VALID_SECOND))
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
-                .build();
-    }
+//    private ResponseCookie createRefreshTokenCookie(String refreshToken) {
+//        return ResponseCookie.from("RefreshToken")
+//                .value(refreshToken)
+//                .maxAge(Duration.ofSeconds(REFRESH_TOKEN_VALID_SECOND))
+//                .httpOnly(true)
+//                .secure(true)
+//                .sameSite("None")
+//                .build();
+//    }
 
     @PatchMapping("/auth/kakao")
     ResponseEntity<Void> logout(@Auth Long loginUserId) {

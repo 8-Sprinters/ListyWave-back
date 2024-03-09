@@ -62,7 +62,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             return true;
         }
         String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        Long userId = jwtManager.read(accessToken);
+        Long userId = jwtManager.readAccessToken(accessToken);
         authContext.setUserId(userId);
         return true;
     }

@@ -37,6 +37,6 @@ public class OptionalAuthArgumentResolver implements HandlerMethodArgumentResolv
         if (accessToken == null || accessToken.isBlank()) {
             return null;
         }
-        return jwtManager.read(accessToken);
+        return jwtManager.readAccessToken(accessToken);
     }
 }
