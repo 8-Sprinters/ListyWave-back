@@ -308,11 +308,14 @@ class UserTest {
 
     @Test
     void 카카오_액세스_토큰을_갱신한다() {
+        // given
+        String kakaoAccessToken = "new.KakaoAccess.Token";
+
         // when
-        user.updateKakaoAccessToken("new.kakao.accessToken");
+        user.updateKakaoAccessToken(kakaoAccessToken);
 
         // then
-        assertThat(user.getKakaoAccessToken()).isEqualTo("new.kakao.accessToken");
+        assertThat(user.getKakaoAccessToken()).isEqualTo(kakaoAccessToken);
     }
 
     @Test

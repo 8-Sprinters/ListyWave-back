@@ -89,7 +89,7 @@ public class User extends BaseEntity {
             @Nullable String backgroundImageUrl
     ) {
         if (nickname != null) {
-            this.nickname = new Nickname(nickname);
+            this.nickname = Nickname.of(nickname);
         }
         if (description != null) {
             this.description = new Description(description);
