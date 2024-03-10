@@ -16,7 +16,7 @@ class TimeUtilsTest {
         TimeUnit from = HOURS;
         TimeUnit to = MILLISECONDS;
 
-        Long result = TimeUtils.convertTimeUnit(from, to, 2);
+        Long result = TimeUtils.convertTimeUnit(2, from, to);
 
         assertThat(result).isEqualTo(1000 * 60 * 60 * 2);
     }

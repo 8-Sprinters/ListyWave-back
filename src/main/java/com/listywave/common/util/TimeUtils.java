@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class TimeUtils {
 
-    public static Long convertTimeUnit(TimeUnit from, TimeUnit to, int duration) {
+    public static Long convertTimeUnit(int duration, TimeUnit from, TimeUnit to) {
         return switch (to) {
             case NANOSECONDS -> from.toNanos(duration);
             case MICROSECONDS -> from.toMicros(duration);

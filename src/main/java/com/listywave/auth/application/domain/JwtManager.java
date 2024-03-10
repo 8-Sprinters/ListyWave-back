@@ -51,7 +51,7 @@ public class JwtManager {
                 .issuer(issuer)
                 .issuedAt(now)
                 .subject(String.valueOf(userId))
-                .expiration(new Date(now.getTime() + convertTimeUnit(accessTokenValidTimeUnit, MILLISECONDS, accessTokenValidTimeDuration)))
+                .expiration(new Date(now.getTime() + convertTimeUnit(accessTokenValidTimeDuration, accessTokenValidTimeUnit, MILLISECONDS)))
                 .issuedAt(Date.from(Instant.now()))
                 .compact();
     }
@@ -64,7 +64,7 @@ public class JwtManager {
                 .issuer(issuer)
                 .issuedAt(now)
                 .subject(String.valueOf(userId))
-                .expiration(new Date(now.getTime() + convertTimeUnit(refreshTokenValidTimeUnit, MILLISECONDS, refreshTokenValidTimeDuration)))
+                .expiration(new Date(now.getTime() + convertTimeUnit(refreshTokenValidTimeDuration, refreshTokenValidTimeUnit, MILLISECONDS)))
                 .issuedAt(Date.from(Instant.now()))
                 .compact();
     }
