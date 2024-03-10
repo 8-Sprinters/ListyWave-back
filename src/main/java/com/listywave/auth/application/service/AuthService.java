@@ -52,7 +52,7 @@ public class AuthService {
     }
 
     private LoginResult loginNonInit(User user, String kakaoAccessToken) {
-        if (user.getIsDelete()) {
+        if (user.isDelete()) {
             throw new CustomException(DELETED_USER_EXCEPTION);
         }
         user.updateKakaoAccessToken(kakaoAccessToken);
@@ -78,7 +78,7 @@ public class AuthService {
 
     public UpdateTokenResult updateToken(String refreshToken) {
 //        Long userId = jwtManager.readRefreshToken(refreshToken);
-        Long userId = jwtManager.read(refreshToken);
+        Long userId = jwtManager.readAccessToken(refreshToken);
 
         User user = userRepository.getById(userId);
 

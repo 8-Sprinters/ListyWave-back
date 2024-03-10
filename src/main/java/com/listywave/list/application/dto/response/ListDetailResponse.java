@@ -31,7 +31,7 @@ public record ListDetailResponse(
 
     public static ListDetailResponse of(
             ListEntity list,
-            User user,
+            User owner,
             boolean isCollected,
             List<Collaborator> collaborators,
             List<Item> items
@@ -43,9 +43,9 @@ public record ListDetailResponse(
                 .description(list.getDescription().getValue())
                 .createdDate(list.getCreatedDate())
                 .lastUpdatedDate(list.getUpdatedDate())
-                .ownerId(user.getId())
-                .ownerNickname(user.getNickname())
-                .ownerProfileImageUrl(user.getProfileImageUrl())
+                .ownerId(owner.getId())
+                .ownerNickname(owner.getNickname())
+                .ownerProfileImageUrl(owner.getProfileImageUrl())
                 .collaborators(CollaboratorResponse.toList(collaborators))
                 .items(ItemResponse.toList(list.getSortedItems().getValues()))
                 .isCollected(isCollected)
@@ -55,69 +55,69 @@ public record ListDetailResponse(
                 .viewCount(list.getViewCount())
                 .build();
     }
-}
 
-record LabelResponse(
-        String name
-) {
+    public record LabelResponse(
+            String name
+    ) {
 
-    public static List<LabelResponse> toList(List<Label> labels) {
-        return labels.stream()
-                .map(LabelResponse::of)
-                .toList();
+        public static List<LabelResponse> toList(List<Label> labels) {
+            return labels.stream()
+                    .map(LabelResponse::of)
+                    .toList();
+        }
+
+        public static LabelResponse of(Label label) {
+            return new LabelResponse(label.getName());
+        }
     }
 
-    public static LabelResponse of(Label label) {
-        return new LabelResponse(label.getName());
-    }
-}
+    @Builder
+    public record CollaboratorResponse(
+            Long id,
+            String nickname,
+            String profileImageUrl
+    ) {
 
-@Builder
-record CollaboratorResponse(
-        Long id,
-        String nickname,
-        String profileImageUrl
-) {
+        public static List<CollaboratorResponse> toList(List<Collaborator> collaborators) {
+            return collaborators.stream()
+                    .map(CollaboratorResponse::of)
+                    .toList();
+        }
 
-    public static List<CollaboratorResponse> toList(List<Collaborator> collaborators) {
-        return collaborators.stream()
-                .map(CollaboratorResponse::of)
-                .toList();
-    }
-
-    public static CollaboratorResponse of(Collaborator collaborator) {
-        return CollaboratorResponse.builder()
-                .id(collaborator.getUser().getId())
-                .nickname(collaborator.getUserNickname())
-                .profileImageUrl(collaborator.getUserProfileImageUrl())
-                .build();
-    }
-}
-
-@Builder
-record ItemResponse(
-        Long id,
-        int rank,
-        String title,
-        String comment,
-        String link,
-        String imageUrl
-) {
-
-    public static List<ItemResponse> toList(List<Item> items) {
-        return items.stream()
-                .map(ItemResponse::of)
-                .toList();
+        public static CollaboratorResponse of(Collaborator collaborator) {
+            return CollaboratorResponse.builder()
+                    .id(collaborator.getUser().getId())
+                    .nickname(collaborator.getUserNickname())
+                    .profileImageUrl(collaborator.getUserProfileImageUrl())
+                    .build();
+        }
     }
 
-    public static ItemResponse of(Item item) {
-        return ItemResponse.builder()
-                .id(item.getId())
-                .rank(item.getRanking())
-                .title(item.getTitle().getValue())
-                .comment(item.getComment().getValue())
-                .link(item.getLink().getValue())
-                .imageUrl(item.getImageUrl().getValue())
-                .build();
+    @Builder
+    public record ItemResponse(
+            Long id,
+            int rank,
+            String title,
+            String comment,
+            String link,
+            String imageUrl
+    ) {
+
+        public static List<ItemResponse> toList(List<Item> items) {
+            return items.stream()
+                    .map(ItemResponse::of)
+                    .toList();
+        }
+
+        public static ItemResponse of(Item item) {
+            return ItemResponse.builder()
+                    .id(item.getId())
+                    .rank(item.getRanking())
+                    .title(item.getTitle().getValue())
+                    .comment(item.getComment().getValue())
+                    .link(item.getLink().getValue())
+                    .imageUrl(item.getImageUrl().getValue())
+                    .build();
+        }
     }
 }

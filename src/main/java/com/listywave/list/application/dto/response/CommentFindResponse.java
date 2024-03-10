@@ -39,70 +39,70 @@ public record CommentFindResponse(
                 .comments(CommentResponse.toList(comments))
                 .build();
     }
-}
 
-@Builder
-record CommentResponse(
-        Long id,
-        Long userId,
-        String userNickname,
-        String userProfileImageUrl,
-        String content,
-        LocalDateTime createdDate,
-        LocalDateTime updatedDate,
-        boolean isDeleted,
-        List<ReplyResponse> replies
-) {
+    @Builder
+    public record CommentResponse(
+            Long id,
+            Long userId,
+            String userNickname,
+            String userProfileImageUrl,
+            String content,
+            LocalDateTime createdDate,
+            LocalDateTime updatedDate,
+            boolean isDeleted,
+            List<ReplyResponse> replies
+    ) {
 
-    public static List<CommentResponse> toList(Map<Comment, List<Reply>> comments) {
-        return comments.keySet().stream()
-                .map(comment -> CommentResponse.of(comment, comments.get(comment)))
-                .toList();
+        public static List<CommentResponse> toList(Map<Comment, List<Reply>> comments) {
+            return comments.keySet().stream()
+                    .map(comment -> CommentResponse.of(comment, comments.get(comment)))
+                    .toList();
+        }
+
+        public static CommentResponse of(Comment comment, List<Reply> replies) {
+            return CommentResponse.builder()
+                    .id(comment.getId())
+                    .userId(comment.getUserId())
+                    .userNickname(comment.getUserNickname())
+                    .userProfileImageUrl(comment.getUserProfileImageUrl())
+                    .content(comment.getCommentContent())
+                    .createdDate(comment.getCreatedDate())
+                    .updatedDate(comment.getUpdatedDate())
+                    .isDeleted(comment.isDeleted())
+                    .replies(ReplyResponse.toList(replies))
+                    .build();
+        }
     }
 
-    public static CommentResponse of(Comment comment, List<Reply> replies) {
-        return CommentResponse.builder()
-                .id(comment.getId())
-                .userId(comment.getUserId())
-                .userNickname(comment.getUserNickname())
-                .userProfileImageUrl(comment.getUserProfileImageUrl())
-                .content(comment.getCommentContent())
-                .createdDate(comment.getCreatedDate())
-                .updatedDate(comment.getUpdatedDate())
-                .isDeleted(comment.isDeleted())
-                .replies(ReplyResponse.toList(replies))
-                .build();
-    }
-}
+    @Builder
+    public record ReplyResponse(
+            Long id,
+            Long commentId,
+            Long userId,
+            String userNickname,
+            String userProfileImageUrl,
+            String content,
+            LocalDateTime createdDate,
+            LocalDateTime updatedDate
+    ) {
 
-@Builder
-record ReplyResponse(
-        Long id,
-        Long commentId,
-        Long userId,
-        String userNickname,
-        String userProfileImageUrl,
-        String content,
-        LocalDateTime createdDate,
-        LocalDateTime updatedDate
-) {
+        public static List<ReplyResponse> toList(List<Reply> replies) {
+            return replies.stream()
+                    .map(ReplyResponse::of)
+                    .toList();
+        }
 
-    public static List<ReplyResponse> toList(List<Reply> replies) {
-        return replies.stream()
-                .map(ReplyResponse::of)
-                .toList();
-    }
-
-    public static ReplyResponse of(Reply reply) {
-        return ReplyResponse.builder()
-                .id(reply.getId())
-                .commentId(reply.getCommentId())
-                .userId(reply.getUserId())
-                .userNickname(reply.getUserNickname())
-                .userProfileImageUrl(reply.getUserProfileImageUrl())
-                .content(reply.getCommentContent())
-                .createdDate(reply.getCreatedDate())
-                .updatedDate(reply.getUpdatedDate())
-                .build();
+        public static ReplyResponse of(Reply reply) {
+            return ReplyResponse.builder()
+                    .id(reply.getId())
+                    .commentId(reply.getCommentId())
+                    .userId(reply.getUserId())
+                    .userNickname(reply.getUserNickname())
+                    .userProfileImageUrl(reply.getUserProfileImageUrl())
+                    .content(reply.getCommentContent())
+                    .createdDate(reply.getCreatedDate())
+                    .updatedDate(reply.getUpdatedDate())
+                    .build();
+        }
     }
 }

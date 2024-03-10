@@ -2,6 +2,7 @@ package com.listywave.image.application.service;
 
 import static com.listywave.common.exception.ErrorCode.S3_DELETE_OBJECTS_EXCEPTION;
 import static com.listywave.image.application.domain.ImageType.LISTS_ITEM;
+import static java.util.Locale.ENGLISH;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.HttpMethod;
@@ -147,20 +148,20 @@ public class ImageService {
 
         if (isExistProfileExtension(profileExtension, backgroundExtension)) {
             profileImageUrl = createReadImageUrl(ImageType.USER_PROFILE, user.getId(), user.getProfileImageUrl(), profileExtension);
-            user.updateUserImageUrl(profileImageUrl, backgroundImageUrl);
+            user.updateUserProfile(null, null, profileImageUrl, backgroundImageUrl);
             isBoth = false;
         }
 
         if (isExistBackgroundExtension(backgroundExtension, profileExtension)) {
             backgroundImageUrl = createReadImageUrl(ImageType.USER_BACKGROUND, user.getId(), user.getBackgroundImageUrl(), backgroundExtension);
-            user.updateUserImageUrl(profileImageUrl, backgroundImageUrl);
+            user.updateUserProfile(null, null, profileImageUrl, backgroundImageUrl);
             isBoth = false;
         }
 
         if (isBoth) {
             profileImageUrl = createReadImageUrl(ImageType.USER_PROFILE, user.getId(), user.getProfileImageUrl(), profileExtension);
             backgroundImageUrl = createReadImageUrl(ImageType.USER_BACKGROUND, user.getId(), user.getBackgroundImageUrl(), backgroundExtension);
-            user.updateUserImageUrl(profileImageUrl, backgroundImageUrl);
+            user.updateUserProfile(null, null, profileImageUrl, backgroundImageUrl);
         }
     }
 
@@ -312,7 +313,7 @@ public class ImageService {
     ) {
         return getCurrentProfile()
                 + "/"
-                + imageType.getValue()
+                + imageType.name().toLowerCase(ENGLISH)
                 + "/"
                 + targetId
                 + "/"
@@ -331,7 +332,7 @@ public class ImageService {
                 + "/"
                 + getCurrentProfile()
                 + "/"
-                + imageType.getValue()
+                + imageType.name().toLowerCase(ENGLISH)
                 + "/"
                 + targetId
                 + "/"
@@ -352,7 +353,7 @@ public class ImageService {
     }
 
     private void updateUserImageKey(User user, String profileImageKey, String backgroundImageKey) {
-        user.updateUserImageUrl(profileImageKey, backgroundImageKey);
+        user.updateUserProfile(null, null, profileImageKey, backgroundImageKey);
     }
 
     private GeneratePresignedUrlRequest createGeneratePreSignedUrlRequest(

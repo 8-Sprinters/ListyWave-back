@@ -1,6 +1,6 @@
 package com.listywave.history.application.domain;
 
-import static com.listywave.common.exception.ErrorCode.LENGTH_EXCEEDED;
+import static com.listywave.common.exception.ErrorCode.LENGTH_EXCEEDED_EXCEPTION;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.exception.CustomException;
@@ -26,7 +26,7 @@ public class HistoryItemTitle {
 
     private void validateLength(String value) {
         if (value.length() > MAX_LENGTH) {
-            throw new CustomException(LENGTH_EXCEEDED, "아이템 제목은 " + MAX_LENGTH + "자를 넘을 수 없습니다.");
+            throw new CustomException(LENGTH_EXCEEDED_EXCEPTION, "아이템 제목은 " + MAX_LENGTH + "자를 넘을 수 없습니다.");
         }
     }
 }

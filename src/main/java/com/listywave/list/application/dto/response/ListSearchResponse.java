@@ -27,60 +27,60 @@ public record ListSearchResponse(
                 .hasNext(hasNext)
                 .build();
     }
-}
 
-@Builder
-record ListInfo(
-        Long id,
-        String title,
-        List<ItemInfo> items,
-        boolean isPublic,
-        String backgroundColor,
-        LocalDateTime updatedDate,
-        Long ownerId,
-        String ownerNickname,
-        String ownerProfileImageUrl,
-        String representImageUrl
-) {
+    @Builder
+    public record ListInfo(
+            Long id,
+            String title,
+            List<ItemInfo> items,
+            boolean isPublic,
+            String backgroundColor,
+            LocalDateTime updatedDate,
+            Long ownerId,
+            String ownerNickname,
+            String ownerProfileImageUrl,
+            String representImageUrl
+    ) {
 
-    public static List<ListInfo> toList(List<ListEntity> lists) {
-        return lists.stream()
-                .map(ListInfo::of)
-                .toList();
+        public static List<ListInfo> toList(List<ListEntity> lists) {
+            return lists.stream()
+                    .map(ListInfo::of)
+                    .toList();
+        }
+
+        private static ListInfo of(ListEntity list) {
+            return ListInfo.builder()
+                    .id(list.getId())
+                    .title(list.getTitle().getValue())
+                    .items(ItemInfo.toList(list.getTop3Items().getValues()))
+                    .isPublic(list.isPublic())
+                    .backgroundColor(list.getBackgroundColor())
+                    .updatedDate(list.getUpdatedDate())
+                    .ownerId(list.getUser().getId())
+                    .ownerNickname(list.getUser().getNickname())
+                    .ownerProfileImageUrl(list.getUser().getProfileImageUrl())
+                    .representImageUrl(list.getRepresentImageUrl())
+                    .build();
+        }
     }
 
-    private static ListInfo of(ListEntity list) {
-        return ListInfo.builder()
-                .id(list.getId())
-                .title(list.getTitle().getValue())
-                .items(ItemInfo.toList(list.getTop3Items().getValues()))
-                .isPublic(list.isPublic())
-                .backgroundColor(list.getBackgroundColor())
-                .updatedDate(list.getUpdatedDate())
-                .ownerId(list.getUser().getId())
-                .ownerNickname(list.getUser().getNickname())
-                .ownerProfileImageUrl(list.getUser().getProfileImageUrl())
-                .representImageUrl(list.getRepresentImageUrl())
-                .build();
-    }
-}
+    @Builder
+    public record ItemInfo(
+            Long id,
+            String title
+    ) {
 
-@Builder
-record ItemInfo(
-        Long id,
-        String title
-) {
+        public static List<ItemInfo> toList(List<Item> items) {
+            return items.stream()
+                    .map(ItemInfo::of)
+                    .toList();
+        }
 
-    public static List<ItemInfo> toList(List<Item> items) {
-        return items.stream()
-                .map(ItemInfo::of)
-                .toList();
-    }
-
-    private static ItemInfo of(Item item) {
-        return ItemInfo.builder()
-                .id(item.getId())
-                .title(item.getTitle().getValue())
-                .build();
+        private static ItemInfo of(Item item) {
+            return ItemInfo.builder()
+                    .id(item.getId())
+                    .title(item.getTitle().getValue())
+                    .build();
+        }
     }
 }

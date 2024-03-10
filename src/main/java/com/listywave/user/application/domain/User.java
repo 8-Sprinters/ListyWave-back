@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 @Entity
 @Getter
@@ -57,19 +58,19 @@ public class User extends BaseEntity {
     private int followerCount;
 
     @Column(nullable = false, length = 5)
-    private Boolean allPrivate;
+    private boolean allPrivate;
 
     @Column(nullable = false)
     private String kakaoAccessToken;
 
     @Column(nullable = false, length = 5)
-    private Boolean isDelete;
+    private boolean isDelete;
 
     public static User init(Long oauthId, String oauthEmail, String kakaoAccessToken) {
         return new User(
                 oauthId,
                 oauthEmail,
-                Nickname.initialCreate(String.valueOf(oauthId)),
+                Nickname.oauthIdOf(String.valueOf(oauthId)),
                 new BackgroundImageUrl(DefaultBackgroundImages.getRandomImageUrl()),
                 new ProfileImageUrl(DefaultProfileImages.getRandomImageUrl()),
                 new Description(""),
@@ -82,13 +83,13 @@ public class User extends BaseEntity {
     }
 
     public void updateUserProfile(
-            String nickname,
-            String description,
-            String profileImageUrl,
-            String backgroundImageUrl
+            @Nullable String nickname,
+            @Nullable String description,
+            @Nullable String profileImageUrl,
+            @Nullable String backgroundImageUrl
     ) {
         if (nickname != null) {
-            this.nickname = new Nickname(nickname);
+            this.nickname = Nickname.of(nickname);
         }
         if (description != null) {
             this.description = new Description(description);
@@ -98,19 +99,6 @@ public class User extends BaseEntity {
         }
         if (backgroundImageUrl != null) {
             this.backgroundImageUrl = new BackgroundImageUrl(backgroundImageUrl);
-        }
-    }
-
-    public void updateUserImageUrl(String profileImage, String backgroundImage) {
-        if (!profileImage.isEmpty() && backgroundImage.isEmpty()) {
-            this.profileImageUrl = new ProfileImageUrl(profileImage);
-        }
-        if (!backgroundImage.isEmpty() && profileImage.isEmpty()) {
-            this.backgroundImageUrl = new BackgroundImageUrl(backgroundImage);
-        }
-        if (!backgroundImage.isEmpty() && !profileImage.isEmpty()) {
-            this.profileImageUrl = new ProfileImageUrl(profileImage);
-            this.backgroundImageUrl = new BackgroundImageUrl(backgroundImage);
         }
     }
 

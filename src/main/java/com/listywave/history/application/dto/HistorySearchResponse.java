@@ -26,21 +26,21 @@ public record HistorySearchResponse(
                 HistoryItemInfo.toList(history.getItems())
         );
     }
-}
 
-record HistoryItemInfo(
-        Long id,
-        int rank,
-        String title
-) {
+    public record HistoryItemInfo(
+            Long id,
+            int rank,
+            String title
+    ) {
 
-    public static List<HistoryItemInfo> toList(List<HistoryItem> historyItems) {
-        return historyItems.stream()
-                .map(HistoryItemInfo::of)
-                .toList();
-    }
+        public static List<HistoryItemInfo> toList(List<HistoryItem> historyItems) {
+            return historyItems.stream()
+                    .map(HistoryItemInfo::of)
+                    .toList();
+        }
 
-    private static HistoryItemInfo of(HistoryItem historyItem) {
-        return new HistoryItemInfo(historyItem.getId(), historyItem.getRank(), historyItem.getTitle().getValue());
+        private static HistoryItemInfo of(HistoryItem historyItem) {
+            return new HistoryItemInfo(historyItem.getId(), historyItem.getRank(), historyItem.getTitle().getValue());
+        }
     }
 }

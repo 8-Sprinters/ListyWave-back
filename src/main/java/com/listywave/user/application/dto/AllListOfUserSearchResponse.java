@@ -9,7 +9,7 @@ import lombok.Builder;
 public record AllListOfUserSearchResponse(
         LocalDateTime cursorUpdatedDate,
         Boolean hasNext,
-        List<FeedListsResponse> feedLists
+        List<FeedListInfo> feedLists
 ) {
 
     public static AllListOfUserSearchResponse of(boolean hasNext, LocalDateTime cursorUpdatedDate, List<ListEntity> feedLists) {
@@ -20,14 +20,14 @@ public record AllListOfUserSearchResponse(
         );
     }
 
-    public static List<FeedListsResponse> toList(List<ListEntity> feedLists) {
+    public static List<FeedListInfo> toList(List<ListEntity> feedLists) {
         return feedLists.stream()
-                .map(FeedListsResponse::of)
+                .map(FeedListInfo::of)
                 .toList();
     }
 
     @Builder
-    public record FeedListsResponse(
+    public record FeedListInfo(
             Long id,
             String title,
             Boolean isPublic,
@@ -35,8 +35,8 @@ public record AllListOfUserSearchResponse(
             List<ListItemsResponse> listItems
     ) {
 
-        public static FeedListsResponse of(ListEntity list) {
-            return FeedListsResponse.builder()
+        public static FeedListInfo of(ListEntity list) {
+            return FeedListInfo.builder()
                     .id(list.getId())
                     .title(list.getTitle().getValue())
                     .isPublic(list.isPublic())
@@ -47,7 +47,7 @@ public record AllListOfUserSearchResponse(
     }
 
     @Builder
-    record ListItemsResponse(
+    public record ListItemsResponse(
             Long id,
             int rank,
             String title,

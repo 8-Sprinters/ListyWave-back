@@ -6,7 +6,7 @@ import com.listywave.user.application.dto.FollowersResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
 import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
-import com.listywave.user.application.dto.search.AllUserSearchResponse;
+import com.listywave.user.application.dto.search.UserSearchResponse;
 import com.listywave.user.application.service.UserService;
 import com.listywave.user.presentation.dto.ListVisibilityUpdateRequest;
 import com.listywave.user.presentation.dto.UserProfileUpdateRequest;
@@ -35,18 +35,18 @@ public class UserController {
             @PathVariable(value = "userId") Long userId,
             @OptionalAuth Long loginUserId
     ) {
-        UserInfoResponse userInfoResponse = userService.getUserInfo(userId, loginUserId);
-        return ResponseEntity.ok(userInfoResponse);
+        UserInfoResponse response = userService.getUserInfo(userId, loginUserId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/users")
-    ResponseEntity<AllUserSearchResponse> getUsers(
+    ResponseEntity<UserSearchResponse> searchUser(
             @OptionalAuth Long loginUserId,
             @RequestParam(name = "search", defaultValue = "") String search,
             @PageableDefault(size = 10) Pageable pageable
     ) {
-        AllUserSearchResponse collaborators = userService.getUsersBySearch(loginUserId, search, pageable);
-        return ResponseEntity.ok(collaborators);
+        UserSearchResponse response = userService.searchUser(loginUserId, search, pageable);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/users/{userId}/followings")
@@ -95,7 +95,6 @@ public class UserController {
         return ResponseEntity.ok(recommendUsers);
     }
 
-
     @PatchMapping("/users/{userId}")
     ResponseEntity<Void> updateUserProfile(
             @PathVariable("userId") Long targetUserId,
@@ -110,7 +109,7 @@ public class UserController {
     ResponseEntity<Boolean> checkNicknameDuplicate(
             @RequestParam("nickname") String nickname
     ) {
-        return ResponseEntity.ok(userService.checkNicknameDuplicate(nickname));
+        return ResponseEntity.ok(userService.isDuplicateNickname(nickname));
     }
 
     @DeleteMapping("/followers/{userId}")

@@ -23,7 +23,7 @@ public record ListTrandingResponse(
                 .ownerProfileImageUrl(list.getUser().getProfileImageUrl())
                 .title(list.getTitle().getValue())
                 .description(list.getDescription().getValue())
-                .itemImageUrl(list.getFirstItemImageUrl())
+                .itemImageUrl(list.getRepresentImageUrl())
                 .backgroundColor(list.getBackgroundColor())
                 .build();
     }

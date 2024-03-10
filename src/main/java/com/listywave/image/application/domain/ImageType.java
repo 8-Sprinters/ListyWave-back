@@ -7,10 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ImageType {
 
-    LISTS_ITEM("lists_item"),
-    USER_PROFILE("user_profile"),
-    USER_BACKGROUND("user_background"),
+    LISTS_ITEM,
+    USER_PROFILE,
+    USER_BACKGROUND,
     ;
-
-    private final String value;
 }

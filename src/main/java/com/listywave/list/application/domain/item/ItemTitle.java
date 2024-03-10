@@ -1,6 +1,6 @@
 package com.listywave.list.application.domain.item;
 
-import static com.listywave.common.exception.ErrorCode.LENGTH_EXCEEDED;
+import static com.listywave.common.exception.ErrorCode.LENGTH_EXCEEDED_EXCEPTION;
 
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.util.StringUtils;
@@ -31,7 +31,7 @@ public class ItemTitle {
 
     private void validate(String value) {
         if (value.length() > MAX_LENGTH) {
-            throw new CustomException(LENGTH_EXCEEDED, "아이템 제목은 " + MAX_LENGTH + "자를 넘을 수 없습니다.");
+            throw new CustomException(LENGTH_EXCEEDED_EXCEPTION, "아이템 제목은 " + MAX_LENGTH + "자를 넘을 수 없습니다.");
         }
     }
 

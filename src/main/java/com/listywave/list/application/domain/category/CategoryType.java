@@ -1,8 +1,9 @@
 package com.listywave.list.application.domain.category;
 
+import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.listywave.common.exception.CustomException;
-import com.listywave.common.exception.ErrorCode;
 import java.util.Arrays;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,7 +32,7 @@ public enum CategoryType {
         return Arrays.stream(CategoryType.values())
                 .filter(t -> t.getCode().equals(code))
                 .findAny()
-                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "해당 카테고리코드는 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND, "해당 카테고리코드는 존재하지 않습니다."));
     }
 
     @JsonCreator
@@ -39,6 +40,6 @@ public enum CategoryType {
         return Arrays.stream(CategoryType.values())
                 .filter(categoryType -> categoryType.name().equalsIgnoreCase(name))
                 .findFirst()
-                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "해당 카테고리는 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND, "해당 카테고리는 존재하지 않습니다."));
     }
 }

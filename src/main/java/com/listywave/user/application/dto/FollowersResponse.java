@@ -29,26 +29,26 @@ public record FollowersResponse(
                 .hasNext(false)
                 .build();
     }
-}
 
-@Builder
-record FollowerInfo(
-        Long id,
-        String nickname,
-        String profileImageUrl
-) {
+    @Builder
+    public record FollowerInfo(
+            Long id,
+            String nickname,
+            String profileImageUrl
+    ) {
 
-    public static List<FollowerInfo> toList(List<User> users) {
-        return users.stream()
-                .map(FollowerInfo::of)
-                .toList();
-    }
+        public static List<FollowerInfo> toList(List<User> users) {
+            return users.stream()
+                    .map(FollowerInfo::of)
+                    .toList();
+        }
 
-    public static FollowerInfo of(User user) {
-        return FollowerInfo.builder()
-                .id(user.getId())
-                .nickname(user.getNickname())
-                .profileImageUrl(user.getProfileImageUrl())
-                .build();
+        public static FollowerInfo of(User user) {
+            return FollowerInfo.builder()
+                    .id(user.getId())
+                    .nickname(user.getNickname())
+                    .profileImageUrl(user.getProfileImageUrl())
+                    .build();
+        }
     }
 }

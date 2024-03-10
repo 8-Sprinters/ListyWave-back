@@ -29,9 +29,9 @@ public enum ErrorCode {
     RESOURCES_EMPTY(NOT_FOUND, "해당 대상들이 존재하지 않습니다."),
 
     // Validation
-    NICKNAME_CONTAINS_WHITESPACE(BAD_REQUEST, "닉네임의 처음과 마지막에 공백이 존재할 수 없습니다."),
+    NICKNAME_CONTAINS_WHITESPACE_EXCEPTION(BAD_REQUEST, "닉네임의 처음과 마지막에 공백이 존재할 수 없습니다."),
     NICKNAME_CONTAINS_SPECIAL_CHARACTERS(BAD_REQUEST, "이모티콘 및 특수문자가 포함될 수 없습니다."),
-    LENGTH_EXCEEDED(BAD_REQUEST, "최대 글자 길이를 초과하였습니다."),
+    LENGTH_EXCEEDED_EXCEPTION(BAD_REQUEST, "최대 글자 길이를 초과하였습니다."),
     INVALID_COUNT(BAD_REQUEST, "선택한 아이템 및 라벨 및 콜라보레이터의 수가 올바르지 않습니다."),
     DUPLICATE_USER(BAD_REQUEST, "중복된 사용자를 선택할 수 없습니다."),
     EXCEED_FOLLOW_COUNT_EXCEPTION(BAD_REQUEST, "요청할 수 있는 최대 사용자의 수를 초과했습니다."),
@@ -40,6 +40,8 @@ public enum ErrorCode {
     DELETED_USER_EXCEPTION(BAD_REQUEST, "탈퇴한 회원입니다."),
     NOT_SUPPORT_FILTER_ARGUMENT_EXCEPTION(BAD_REQUEST, "지원하지 않는 필터링 조건입니다."),
     ALREADY_LOGOUT_EXCEPTION(BAD_REQUEST, "이미 로그아웃 처리가 된 상태입니다."),
+    DUPLICATE_NICKNAME_EXCEPTION(BAD_REQUEST, "중복된 닉네임입니다."),
+    DUPLICATE_COLLABORATOR_EXCEPTION(BAD_REQUEST, "이미 동일한 콜라보레이터가 존재합니다"),
 
     // S3
     S3_DELETE_OBJECTS_EXCEPTION(INTERNAL_SERVER_ERROR, "S3의 이미지를 삭제 요청하는 과정에서 에러가 발생했습니다."),

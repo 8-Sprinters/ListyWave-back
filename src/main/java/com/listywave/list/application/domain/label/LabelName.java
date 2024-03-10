@@ -1,7 +1,8 @@
 package com.listywave.list.application.domain.label;
 
+import static com.listywave.common.exception.ErrorCode.LENGTH_EXCEEDED_EXCEPTION;
+
 import com.listywave.common.exception.CustomException;
-import com.listywave.common.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -29,7 +30,7 @@ public class LabelName {
 
     private void validate(String value) {
         if (value != null && value.length() > LENGTH_LIMIT) {
-            throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "라벨명은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
+            throw new CustomException(LENGTH_EXCEEDED_EXCEPTION, "라벨명은 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
 }

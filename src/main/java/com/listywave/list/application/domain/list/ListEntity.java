@@ -85,8 +85,8 @@ public class ListEntity {
     private Items items;
 
     @CreatedDate
-    @Column(updatable = false)
     @Temporal(TIMESTAMP)
+    @Column(updatable = false)
     private LocalDateTime createdDate;
 
     @Temporal(TIMESTAMP)
@@ -116,10 +116,6 @@ public class ListEntity {
 
     public Items getTop3Items() {
         return items.getTop3();
-    }
-
-    public String getFirstItemImageUrl() {
-        return items.getFirstImageUrl();
     }
 
     public void validateOwner(User user) {
@@ -172,7 +168,9 @@ public class ListEntity {
     }
 
     public void decreaseCollectCount() {
-        this.collectCount--;
+        if (this.collectCount > 0) {
+            this.collectCount--;
+        }
     }
 
     public boolean canCreateHistory(Items newItems) {
@@ -180,7 +178,6 @@ public class ListEntity {
     }
 
     public void update(
-            User owner,
             CategoryType category,
             ListTitle title,
             ListDescription description,
@@ -191,8 +188,6 @@ public class ListEntity {
             Labels newLabels,
             Items newItems
     ) {
-        validateOwner(owner);
-
         this.category = category;
         this.title = title;
         this.description = description;
@@ -224,11 +219,11 @@ public class ListEntity {
     }
 
     public boolean isDeletedUser() {
-        return user.getIsDelete();
+        return user.isDelete();
     }
 
     public void validateOwnerIsNotDelete() {
-        if (this.user.getIsDelete()) {
+        if (this.user.isDelete()) {
             throw new CustomException(DELETED_USER_EXCEPTION, "탈퇴한 회원의 리스트입니다.");
         }
     }

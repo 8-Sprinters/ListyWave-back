@@ -44,7 +44,7 @@ public record ListEntities(
                     .toList();
 
             case COLLECT -> listEntities.stream()
-                    .sorted(comparing(ListEntity::getCollectCount))
+                    .sorted(comparing(ListEntity::getCollectCount, reverseOrder()))
                     .toList();
 
             case RELATED -> listEntities.stream()

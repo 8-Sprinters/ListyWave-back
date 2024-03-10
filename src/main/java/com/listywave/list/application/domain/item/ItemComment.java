@@ -1,9 +1,9 @@
 package com.listywave.list.application.domain.item;
 
+import static com.listywave.common.exception.ErrorCode.LENGTH_EXCEEDED_EXCEPTION;
 import static java.util.Objects.requireNonNull;
 
 import com.listywave.common.exception.CustomException;
-import com.listywave.common.exception.ErrorCode;
 import com.listywave.common.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -33,7 +33,7 @@ public class ItemComment {
 
     private void validateLength(String value) {
         if (value.length() > LENGTH_LIMIT) {
-            throw new CustomException(ErrorCode.LENGTH_EXCEEDED, "아이템 comment는 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
+            throw new CustomException(LENGTH_EXCEEDED_EXCEPTION, "아이템 comment는 " + LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
 
