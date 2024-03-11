@@ -230,7 +230,7 @@ public class ListService {
 
         updateCollaborators(beforeCollaborators, request.collaboratorIds(), list);
 
-        Labels labels = createLabels(request.labels());
+        Labels newLabels = createLabels(request.labels());
         Items newItems = createItems(request.items());
 
         LocalDateTime updatedDate = LocalDateTime.now();
@@ -241,7 +241,7 @@ public class ListService {
             historyRepository.save(history);
         }
         boolean hasCollaborator = !request.collaboratorIds().isEmpty();
-        list.update(request.category(), new ListTitle(request.title()), new ListDescription(request.description()), request.isPublic(), request.backgroundColor(), hasCollaborator, updatedDate, labels, newItems);
+        list.update(request.category(), new ListTitle(request.title()), new ListDescription(request.description()), request.isPublic(), request.backgroundColor(), hasCollaborator, updatedDate, newLabels, newItems);
     }
 
     private void updateCollaborators(Collaborators beforeCollaborators, List<Long> collaboratorIds, ListEntity list) {
