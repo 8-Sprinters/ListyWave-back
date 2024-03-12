@@ -1,5 +1,6 @@
 package com.listywave.user.fixture;
 
+import com.listywave.image.application.domain.DefaultBackgroundImages;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.vo.BackgroundImageUrl;
 import com.listywave.user.application.vo.Description;
@@ -13,8 +14,8 @@ public class UserFixture {
                 .oauthId(2L)
                 .oauthEmail("kdkdhoho@github.com")
                 .nickname(Nickname.of("kdkdhoho"))
-                .backgroundImageUrl(new BackgroundImageUrl(""))
-                .profileImageUrl(new ProfileImageUrl(""))
+                .backgroundImageUrl(new BackgroundImageUrl(DefaultBackgroundImages.getRandomImageUrl()))
+                .profileImageUrl(new ProfileImageUrl(DefaultBackgroundImages.getRandomImageUrl()))
                 .description(new Description("동호동호"))
                 .followerCount(30)
                 .followingCount(40)
@@ -29,8 +30,8 @@ public class UserFixture {
                 .oauthId(3L)
                 .oauthEmail("pparkjs@github.com")
                 .nickname(Nickname.of("pparkjs"))
-                .backgroundImageUrl(new BackgroundImageUrl(""))
-                .profileImageUrl(new ProfileImageUrl(""))
+                .backgroundImageUrl(new BackgroundImageUrl(DefaultBackgroundImages.getRandomImageUrl()))
+                .profileImageUrl(new ProfileImageUrl(DefaultBackgroundImages.getRandomImageUrl()))
                 .description(new Description("정수정수"))
                 .followerCount(70)
                 .followingCount(80)
@@ -45,8 +46,8 @@ public class UserFixture {
                 .oauthId(4L)
                 .oauthEmail("eugene@github.com")
                 .nickname(Nickname.of("eugene"))
-                .backgroundImageUrl(new BackgroundImageUrl(""))
-                .profileImageUrl(new ProfileImageUrl(""))
+                .backgroundImageUrl(new BackgroundImageUrl(DefaultBackgroundImages.getRandomImageUrl()))
+                .profileImageUrl(new ProfileImageUrl(DefaultBackgroundImages.getRandomImageUrl()))
                 .description(new Description("유진유진"))
                 .followerCount(10)
                 .followingCount(20)

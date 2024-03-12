@@ -148,20 +148,20 @@ public class ImageService {
 
         if (isExistProfileExtension(profileExtension, backgroundExtension)) {
             profileImageUrl = createReadImageUrl(ImageType.USER_PROFILE, user.getId(), user.getProfileImageUrl(), profileExtension);
-            user.updateUserProfile(null, null, profileImageUrl, backgroundImageUrl);
+            user.updateUserImageUrl(profileImageUrl, backgroundImageUrl);
             isBoth = false;
         }
 
         if (isExistBackgroundExtension(backgroundExtension, profileExtension)) {
             backgroundImageUrl = createReadImageUrl(ImageType.USER_BACKGROUND, user.getId(), user.getBackgroundImageUrl(), backgroundExtension);
-            user.updateUserProfile(null, null, profileImageUrl, backgroundImageUrl);
+            user.updateUserImageUrl(profileImageUrl, backgroundImageUrl);
             isBoth = false;
         }
 
         if (isBoth) {
             profileImageUrl = createReadImageUrl(ImageType.USER_PROFILE, user.getId(), user.getProfileImageUrl(), profileExtension);
             backgroundImageUrl = createReadImageUrl(ImageType.USER_BACKGROUND, user.getId(), user.getBackgroundImageUrl(), backgroundExtension);
-            user.updateUserProfile(null, null, profileImageUrl, backgroundImageUrl);
+            user.updateUserImageUrl(profileImageUrl, backgroundImageUrl);
         }
     }
 
@@ -353,7 +353,7 @@ public class ImageService {
     }
 
     private void updateUserImageKey(User user, String profileImageKey, String backgroundImageKey) {
-        user.updateUserProfile(null, null, profileImageKey, backgroundImageKey);
+        user.updateUserImageUrl(profileImageKey, backgroundImageKey);
     }
 
     private GeneratePresignedUrlRequest createGeneratePreSignedUrlRequest(

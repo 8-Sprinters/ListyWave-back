@@ -2,6 +2,7 @@ package com.listywave.user.application.service;
 
 import static com.listywave.common.exception.ErrorCode.ALREADY_FOLLOWED_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.ALREADY_NOT_FOLLOWED_EXCEPTION;
+import static com.listywave.common.exception.ErrorCode.DUPLICATE_NICKNAME_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 
 import com.listywave.alarm.application.domain.AlarmEvent;
@@ -138,9 +139,18 @@ public class UserService {
         User targetUser = userRepository.getById(targetUserId);
 
         targetUser.validateUpdate(loginUserId);
+        String newNickname;
+        if (targetUser.getNickname().equals(command.nickname())) {
+            newNickname = null;
+        } else {
+            newNickname = command.nickname();
+            if (isDuplicateNickname(newNickname)) {
+                throw new CustomException(DUPLICATE_NICKNAME_EXCEPTION);
+            }
+        }
 
         targetUser.updateUserProfile(
-                command.nickname(),
+                newNickname,
                 command.description(),
                 command.profileImageUrl(),
                 command.backgroundImageUrl()
