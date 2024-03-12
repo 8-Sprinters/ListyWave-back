@@ -228,21 +228,15 @@ public class UserAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 수정한_닉네임이_중복인_경우_400_에러가_발생한다() {
+        void 수정한_닉네임이_이미_존재하는_닉네임인_경우_400_에러가_발생한다() {
             // given
             User 동호 = 회원을_저장한다(동호());
+            User 정수 = 회원을_저장한다(정수());
             String 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            UserProfileUpdateRequest 프로필_수정_요청_데이터 = 프로필_수정_요청_데이터(
-                    "사랑이형",
-                    null,
-                    null,
-                    null
-            );
-
-            프로필_수정_요청(동호_액세스_토큰, 동호.getId(), 프로필_수정_요청_데이터);
 
             // when
-            ExtractableResponse<Response> response = 프로필_수정_요청(동호_액세스_토큰, 동호.getId(), 프로필_수정_요청_데이터);
+            UserProfileUpdateRequest 닉네임_변경_요청 = 프로필_수정_요청_데이터(정수.getNickname(), null, null, null);
+            ExtractableResponse<Response> response = 프로필_수정_요청(동호_액세스_토큰, 동호.getId(), 닉네임_변경_요청);
 
             // then
             assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
