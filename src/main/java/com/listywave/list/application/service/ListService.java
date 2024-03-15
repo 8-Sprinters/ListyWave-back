@@ -6,6 +6,7 @@ import static com.listywave.common.exception.ErrorCode.RESOURCES_EMPTY;
 import com.listywave.alarm.repository.AlarmRepository;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.application.domain.Collaborators;
+import com.listywave.collaborator.application.service.CollaboratorService;
 import com.listywave.collaborator.repository.CollaboratorRepository;
 import com.listywave.collection.repository.CollectionRepository;
 import com.listywave.common.exception.CustomException;
@@ -74,6 +75,7 @@ public class ListService {
     private final CollectionRepository collectionRepository;
     private final CollaboratorRepository collaboratorRepository;
     private final AlarmRepository alarmRepository;
+    private final CollaboratorService collaboratorService;
 
     public ListCreateResponse listCreate(ListCreateRequest request, Long loginUserId) {
         User user = userRepository.getById(loginUserId);
@@ -91,11 +93,9 @@ public class ListService {
         ListEntity savedList = listRepository.save(list);
 
         if (hasCollaboration) {
-            collaboratorIds.add(user.getId());
-            Collaborators collaborators = createCollaborators(collaboratorIds, savedList);
-            collaboratorRepository.saveAll(collaborators.collaborators());
+            Collaborators collaborators = collaboratorService.createCollaborators(collaboratorIds, savedList);
+            collaboratorService.saveAll(collaborators);
         }
-
         return ListCreateResponse.of(savedList.getId());
     }
 

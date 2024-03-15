@@ -99,6 +99,24 @@ public class ListAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
+        void 콜라보레이터를_지정해_리스트를_생성할_수_있다() {
+            // given
+            User 동호 = 회원을_저장한다(동호());
+            User 정수 = 회원을_저장한다(정수());
+            String accessToken = 액세스_토큰을_발급한다(동호);
+            ListCreateRequest listCreateRequest = 좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId()));
+
+            // when
+            ExtractableResponse<Response> response = 리스트_저장_API_호출(listCreateRequest, accessToken);
+            ListCreateResponse result = response.as(ListCreateResponse.class);
+
+            // then
+            assertThat(result.listId()).isEqualTo(1L);
+            ListDetailResponse list = 비회원_리스트_상세_조회_API_호출(result.listId()).as(ListDetailResponse.class);
+            assertThat(list.collaborators().get(0).id()).isEqualTo(정수.getId());
+        }
+
+        @Test
         void 인증_정보가_없으면_401_에러가_발생한다() {
             // given
             ListCreateRequest listCreateRequest = 좋아하는_견종_TOP3_생성_요청_데이터(List.of());
