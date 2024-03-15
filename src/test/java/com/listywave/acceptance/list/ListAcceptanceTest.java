@@ -423,16 +423,17 @@ public class ListAcceptanceTest extends AcceptanceTest {
             User 동호 = 회원을_저장한다(동호());
             User 정수 = 회원을_저장한다(정수());
             String 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            액세스_토큰을_발급한다(정수);
-            리스트_저장_API_호출(좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
-            ListCreateResponse 동호_리스트_2 = 리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰).as(ListCreateResponse.class);
+            String 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            Long 리스트_1_ID = 리스트_저장_API_호출(좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰).as(ListCreateResponse.class).listId();
+            Long 리스트_2_ID = 리스트_저장_API_호출(좋아하는_견종_TOP3_생성_요청_데이터(List.of(동호.getId())), 정수_액세스_토큰).as(ListCreateResponse.class).listId();
 
             // when
             AllListOfUserSearchResponse result = 비회원이_피드_리스트_조회_콜라보레이터_필터링_요청(동호).as(AllListOfUserSearchResponse.class);
 
             // then
-            assertThat(result.feedLists()).hasSize(1);
-            assertThat(result.feedLists().get(0).id()).isEqualTo(동호_리스트_2.listId());
+            assertThat(result.feedLists()).hasSize(2);
+            assertThat(result.feedLists().get(0).id()).isEqualTo(리스트_2_ID);
+            assertThat(result.feedLists().get(1).id()).isEqualTo(리스트_1_ID);
         }
 
         @Test
