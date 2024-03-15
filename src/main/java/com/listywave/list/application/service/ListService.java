@@ -197,6 +197,7 @@ public class ListService {
         return ListRecentResponse.of(recentList, cursorUpdatedDate, result.hasNext());
     }
 
+    @Transactional(readOnly = true)
     public ListSearchResponse search(String keyword, SortType sortType, CategoryType category, int size, Long cursorId) {
         List<ListEntity> lists = listRepository.findAll().stream()
                 .filter(list -> !list.isDeletedUser() && list.isPublic())
