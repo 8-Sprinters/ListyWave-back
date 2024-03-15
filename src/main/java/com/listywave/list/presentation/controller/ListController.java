@@ -13,7 +13,7 @@ import com.listywave.list.application.service.ListService;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
 import com.listywave.list.presentation.dto.request.ListsDeleteRequest;
-import com.listywave.user.application.dto.AllListOfUserSearchResponse;
+import com.listywave.user.application.dto.FindFeedListResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -102,15 +102,15 @@ public class ListController {
     }
 
     @GetMapping("/users/{userId}/lists")
-    ResponseEntity<AllListOfUserSearchResponse> getAllListOfUser(
+    ResponseEntity<FindFeedListResponse> getAllListOfUser(
             @PathVariable("userId") Long targetUserId,
             @RequestParam(name = "type", defaultValue = "my") String type,
             @RequestParam(name = "category", defaultValue = "entire") CategoryType category,
             @RequestParam(name = "cursorUpdatedDate", required = false) LocalDateTime cursorUpdatedDate,
             @PageableDefault(size = 10) Pageable pageable
     ) {
-        AllListOfUserSearchResponse result
-                = listService.getAllListOfUser(targetUserId, type, category, cursorUpdatedDate, pageable);
+        FindFeedListResponse result
+                = listService.findFeedList(targetUserId, type, category, cursorUpdatedDate, pageable);
         return ResponseEntity.ok(result);
     }
 

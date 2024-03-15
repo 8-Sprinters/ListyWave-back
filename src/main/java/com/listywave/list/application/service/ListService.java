@@ -45,7 +45,7 @@ import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
-import com.listywave.user.application.dto.AllListOfUserSearchResponse;
+import com.listywave.user.application.dto.FindFeedListResponse;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import java.time.LocalDateTime;
@@ -284,7 +284,7 @@ public class ListService {
     }
 
     @Transactional(readOnly = true)
-    public AllListOfUserSearchResponse getAllListOfUser(
+    public FindFeedListResponse findFeedList(
             Long targetUserId,
             String type,
             CategoryType category,
@@ -302,6 +302,6 @@ public class ListService {
         if (!lists.isEmpty()) {
             cursorUpdatedDate = lists.get(lists.size() - 1).getUpdatedDate();
         }
-        return AllListOfUserSearchResponse.of(result.hasNext(), cursorUpdatedDate, lists);
+        return FindFeedListResponse.of(result.hasNext(), cursorUpdatedDate, lists);
     }
 }

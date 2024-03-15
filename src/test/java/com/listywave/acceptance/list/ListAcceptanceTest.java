@@ -60,9 +60,9 @@ import com.listywave.list.application.dto.response.ListSearchResponse;
 import com.listywave.list.application.dto.response.ListTrandingResponse;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.user.application.domain.User;
-import com.listywave.user.application.dto.AllListOfUserSearchResponse;
-import com.listywave.user.application.dto.AllListOfUserSearchResponse.FeedListInfo;
-import com.listywave.user.application.dto.AllListOfUserSearchResponse.ListItemsResponse;
+import com.listywave.user.application.dto.FindFeedListResponse;
+import com.listywave.user.application.dto.FindFeedListResponse.FeedListInfo;
+import com.listywave.user.application.dto.FindFeedListResponse.ListItemsResponse;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -360,7 +360,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             ListEntity 동호_리스트_2 = 리스트를_저장한다(좋아하는_라면_TOP3(동호, List.of()));
 
             // when
-            AllListOfUserSearchResponse result = 비회원_피드_리스트_조회(동호).as(AllListOfUserSearchResponse.class);
+            FindFeedListResponse result = 비회원_피드_리스트_조회(동호).as(FindFeedListResponse.class);
 
             // then
             assertThat(result.hasNext()).isFalse();
@@ -389,7 +389,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             String 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
 
             // when
-            AllListOfUserSearchResponse allUserListsResponse = 회원_피드_리스트_조회(동호, 정수_액세스_토큰).as(AllListOfUserSearchResponse.class);
+            FindFeedListResponse allUserListsResponse = 회원_피드_리스트_조회(동호, 정수_액세스_토큰).as(FindFeedListResponse.class);
 
             // then
             assertAll(
@@ -420,7 +420,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             리스트를_모두_저장한다(동호_리스트들);
 
             // when
-            AllListOfUserSearchResponse result = 비회원이_피드_리스트_조회_카테고리_필터링_요청(동호, "book").as(AllListOfUserSearchResponse.class);
+            FindFeedListResponse result = 비회원이_피드_리스트_조회_카테고리_필터링_요청(동호, "book").as(FindFeedListResponse.class);
 
             // then
             CategoryType 필터링_조건 = CategoryType.nameOf("book");
@@ -446,7 +446,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             Long 리스트_2_ID = 리스트_저장_API_호출(좋아하는_견종_TOP3_생성_요청_데이터(List.of(동호.getId())), 정수_액세스_토큰).as(ListCreateResponse.class).listId();
 
             // when
-            AllListOfUserSearchResponse result = 비회원이_피드_리스트_조회_콜라보레이터_필터링_요청(동호).as(AllListOfUserSearchResponse.class);
+            FindFeedListResponse result = 비회원이_피드_리스트_조회_콜라보레이터_필터링_요청(동호).as(FindFeedListResponse.class);
 
             // then
             assertThat(result.feedLists()).hasSize(2);
@@ -464,7 +464,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             ListCreateResponse 동호_리스트_2 = 리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰).as(ListCreateResponse.class);
 
             // when
-            AllListOfUserSearchResponse result = 비회원이_피드_리스트_조회_카테고리_콜라보레이터_필터링_요청(동호, "etc").as(AllListOfUserSearchResponse.class);
+            FindFeedListResponse result = 비회원이_피드_리스트_조회_카테고리_콜라보레이터_필터링_요청(동호, "etc").as(FindFeedListResponse.class);
 
             // then
             assertThat(result.feedLists()).hasSize(1);
@@ -490,8 +490,8 @@ public class ListAcceptanceTest extends AcceptanceTest {
             });
 
             // then
-            List<FeedListInfo> 동호_리스트 = 비회원_피드_리스트_조회(동호).as(AllListOfUserSearchResponse.class).feedLists();
-            List<FeedListInfo> 정수_리스트 = 비회원_피드_리스트_조회(정수).as(AllListOfUserSearchResponse.class).feedLists();
+            List<FeedListInfo> 동호_리스트 = 비회원_피드_리스트_조회(동호).as(FindFeedListResponse.class).feedLists();
+            List<FeedListInfo> 정수_리스트 = 비회원_피드_리스트_조회(정수).as(FindFeedListResponse.class).feedLists();
             List<FeedListInfo> 모든_리스트 = new ArrayList<>(동호_리스트);
             모든_리스트.addAll(정수_리스트);
 
@@ -550,8 +550,8 @@ public class ListAcceptanceTest extends AcceptanceTest {
             ListRecentResponse result = response.as(ListRecentResponse.class);
 
             // then
-            List<FeedListInfo> 동호_리스트 = 비회원_피드_리스트_조회(동호).as(AllListOfUserSearchResponse.class).feedLists();
-            List<FeedListInfo> 정수_리스트 = 비회원_피드_리스트_조회(정수).as(AllListOfUserSearchResponse.class).feedLists();
+            List<FeedListInfo> 동호_리스트 = 비회원_피드_리스트_조회(동호).as(FindFeedListResponse.class).feedLists();
+            List<FeedListInfo> 정수_리스트 = 비회원_피드_리스트_조회(정수).as(FindFeedListResponse.class).feedLists();
             List<FeedListInfo> 모든_리스트 = new ArrayList<>(동호_리스트);
             모든_리스트.addAll(정수_리스트);
             List<Long> expect = 모든_리스트.stream()
