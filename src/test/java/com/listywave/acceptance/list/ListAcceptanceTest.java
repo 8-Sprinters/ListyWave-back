@@ -48,6 +48,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import com.listywave.acceptance.common.AcceptanceTest;
+import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.history.application.dto.HistorySearchResponse;
 import com.listywave.history.application.dto.HistorySearchResponse.HistoryItemInfo;
 import com.listywave.list.application.domain.category.CategoryType;
@@ -240,17 +241,19 @@ public class ListAcceptanceTest extends AcceptanceTest {
         void 리스트를_성공적으로_수정한다() {
             // given
             User 동호 = 회원을_저장한다(동호());
+            User 정수 = 회원을_저장한다(정수());
+            User 유진 = 회원을_저장한다(유진());
             String 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            ListCreateResponse 동호_리스트_생성_결과 = 리스트_저장_API_호출(좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
+            ListCreateResponse 동호_리스트_생성_결과 = 리스트_저장_API_호출(좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰).as(ListCreateResponse.class);
 
             // when
-            ListCreateRequest 리스트_수정_요청_데이터 = 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(List.of());
+            ListCreateRequest 리스트_수정_요청_데이터 = 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(List.of(유진.getId()));
             리스트_수정_API_호출(리스트_수정_요청_데이터, 동호_액세스_토큰, 동호_리스트_생성_결과.listId());
 
             // then
             ListDetailResponse result = 회원용_리스트_상세_조회_API_호출(동호_액세스_토큰, 동호_리스트_생성_결과.listId());
             ListEntity 수정된_리스트 = 가장_좋아하는_견종_TOP3_순위_변경(동호, List.of());
-            ListDetailResponse expect = ListDetailResponse.of(수정된_리스트, 동호, false, List.of(), 수정된_리스트.getSortedItems().getValues());
+            ListDetailResponse expect = ListDetailResponse.of(수정된_리스트, 동호, false, List.of(Collaborator.init(유진, 수정된_리스트)), 수정된_리스트.getSortedItems().getValues());
             리스트_상세_조회를_검증한다(result, expect);
         }
 
