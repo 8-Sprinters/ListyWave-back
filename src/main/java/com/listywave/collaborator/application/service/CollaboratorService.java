@@ -27,6 +27,11 @@ public class CollaboratorService {
                 .toList());
     }
 
+    @Transactional(readOnly = true, propagation = REQUIRED)
+    public Collaborators findAllByList(ListEntity list) {
+        return new Collaborators(collaboratorRepository.findAllByList(list));
+    }
+
     @Transactional(propagation = REQUIRED)
     public void saveAll(Collaborators collaborators) {
         collaboratorRepository.saveAll(collaborators.collaborators());

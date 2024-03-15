@@ -10,8 +10,7 @@ import com.listywave.collaborator.application.service.CollaboratorService;
 import com.listywave.collaborator.repository.CollaboratorRepository;
 import com.listywave.collection.repository.CollectionRepository;
 import com.listywave.common.exception.CustomException;
-import com.listywave.history.application.domain.History;
-import com.listywave.history.application.domain.HistoryItem;
+import com.listywave.history.application.service.HistoryService;
 import com.listywave.history.repository.HistoryRepository;
 import com.listywave.image.application.service.ImageService;
 import com.listywave.list.application.domain.category.CategoryType;
@@ -76,6 +75,7 @@ public class ListService {
     private final CollaboratorRepository collaboratorRepository;
     private final AlarmRepository alarmRepository;
     private final CollaboratorService collaboratorService;
+    private final HistoryService historyService;
 
     public ListCreateResponse listCreate(ListCreateRequest request, Long loginUserId) {
         User user = userRepository.getById(loginUserId);
@@ -120,14 +120,6 @@ public class ListService {
                         new ItemTitle(it.title()), new ItemComment(it.comment()),
                         new ItemLink(it.link()), new ItemImageUrl(it.imageUrl()))
                 ).toList());
-    }
-
-    private Collaborators createCollaborators(List<Long> collaboratorIds, ListEntity list) {
-        List<Collaborator> collaborators = collaboratorIds.stream()
-                .map(userRepository::getById)
-                .map(user -> Collaborator.init(user, list))
-                .toList();
-        return new Collaborators(collaborators);
     }
 
     public ListDetailResponse getListDetail(Long listId, Long loginUserId) {
@@ -226,35 +218,28 @@ public class ListService {
 
         User loginUser = userRepository.getById(loginUserId);
         ListEntity list = listRepository.getById(listId);
-        Collaborators beforeCollaborators = new Collaborators(collaboratorRepository.findAllByList(list));
-        list.validateUpdateAuthority(loginUser, beforeCollaborators);
 
-        updateCollaborators(beforeCollaborators, request.collaboratorIds(), list);
+        Collaborators beforeCollaborators = collaboratorService.findAllByList(list);
+        list.validateUpdateAuthority(loginUser, beforeCollaborators);
+        Collaborators newCollaborators = collaboratorService.createCollaborators(request.collaboratorIds(), list);
+        updateCollaborators(beforeCollaborators, newCollaborators, list);
 
         Labels newLabels = createLabels(request.labels());
         Items newItems = createItems(request.items());
 
         LocalDateTime updatedDate = LocalDateTime.now();
         if (list.canCreateHistory(newItems)) {
-            Items beforeItems = list.getItems();
-            List<HistoryItem> historyItems = beforeItems.toHistoryItems();
-            History history = new History(list, historyItems, updatedDate, request.isPublic());
-            historyRepository.save(history);
+            historyService.saveHistory(list, updatedDate, request.isPublic());
         }
         boolean hasCollaborator = !request.collaboratorIds().isEmpty();
         list.update(request.category(), new ListTitle(request.title()), new ListDescription(request.description()), request.isPublic(), request.backgroundColor(), hasCollaborator, updatedDate, newLabels, newItems);
     }
 
-    private void updateCollaborators(Collaborators beforeCollaborators, List<Long> collaboratorIds, ListEntity list) {
-        Collaborators newCollaborators = createCollaborators(collaboratorIds, list);
-
+    private void updateCollaborators(Collaborators beforeCollaborators, Collaborators newCollaborators, ListEntity list) {
         Collaborators removedCollaborators = beforeCollaborators.filterRemovedCollaborators(newCollaborators);
         collaboratorRepository.deleteAllInBatch(removedCollaborators.collaborators());
 
         Collaborators addedCollaborators = beforeCollaborators.filterAddedCollaborators(newCollaborators);
-        if (!addedCollaborators.isEmpty() && !addedCollaborators.contains(list.getUser())) {
-            addedCollaborators.add(Collaborator.init(list.getUser(), list));
-        }
         collaboratorRepository.saveAll(addedCollaborators.collaborators());
     }
 
