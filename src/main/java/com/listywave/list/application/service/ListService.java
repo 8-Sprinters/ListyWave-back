@@ -293,9 +293,8 @@ public class ListService {
     ) {
         userRepository.getById(targetUserId);
 
-        List<Collaborator> collaborators = collaboratorRepository.findAllByUserId(targetUserId);
         Slice<ListEntity> result =
-                listRepository.findFeedLists(collaborators, targetUserId, type, category, cursorUpdatedDate, pageable);
+                listRepository.findFeedLists(targetUserId, type, category, cursorUpdatedDate, pageable);
         List<ListEntity> lists = result.getContent();
 
         cursorUpdatedDate = null;
