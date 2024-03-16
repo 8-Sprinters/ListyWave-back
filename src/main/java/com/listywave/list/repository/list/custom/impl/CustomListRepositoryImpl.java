@@ -134,7 +134,7 @@ public class CustomListRepositoryImpl implements CustomListRepository {
 
     private BooleanExpression typeEq(String type, Long userId) {
         if (type.equals("my")) {
-            return listEntity.user.id.eq(userId);
+            return listEntity.user.id.eq(userId).and(listEntity.hasCollaboration.isFalse());
         }
         if (type.equals("collabo")) {
             return collaborator.user.id.eq(userId)
