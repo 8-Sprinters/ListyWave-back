@@ -10,10 +10,13 @@ import org.springframework.data.repository.query.Param;
 
 public interface CollaboratorRepository extends JpaRepository<Collaborator, Long> {
 
+    @Query("""
+            select c from Collaborator  c
+            join fetch c.list l
+            join fetch c.user u
+            where c.list = :list and c.user.isDelete = false
+            """)
     List<Collaborator> findAllByList(ListEntity list);
-
-    @Query("select c from Collaborator c join fetch c.list l where c.user.id =:userId and c.user.isDelete = false")
-    List<Collaborator> findAllByUserId(Long userId);
 
     void deleteAllByList(ListEntity list);
 

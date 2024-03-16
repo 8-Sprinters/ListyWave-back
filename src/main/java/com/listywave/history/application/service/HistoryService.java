@@ -1,15 +1,19 @@
 package com.listywave.history.application.service;
 
 import static com.listywave.common.exception.ErrorCode.DELETED_USER_EXCEPTION;
+import static org.springframework.transaction.annotation.Propagation.REQUIRED;
 
 import com.listywave.common.exception.CustomException;
 import com.listywave.history.application.domain.History;
+import com.listywave.history.application.domain.HistoryItem;
 import com.listywave.history.application.dto.HistorySearchResponse;
 import com.listywave.history.repository.HistoryRepository;
+import com.listywave.list.application.domain.item.Items;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -48,5 +52,13 @@ public class HistoryService {
 
         history.validateOwner(user);
         historyRepository.delete(history);
+    }
+
+    @Transactional(propagation = REQUIRED)
+    public void saveHistory(ListEntity list, LocalDateTime updatedDate, boolean isPublic) {
+        Items beforeItems = list.getItems();
+        List<HistoryItem> historyItems = beforeItems.toHistoryItems();
+        History history = new History(list, historyItems, updatedDate, isPublic);
+        historyRepository.save(history);
     }
 }

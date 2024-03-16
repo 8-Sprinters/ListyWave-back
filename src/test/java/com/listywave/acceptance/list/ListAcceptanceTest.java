@@ -48,6 +48,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import com.listywave.acceptance.common.AcceptanceTest;
+import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.history.application.dto.HistorySearchResponse;
 import com.listywave.history.application.dto.HistorySearchResponse.HistoryItemInfo;
 import com.listywave.list.application.domain.category.CategoryType;
@@ -60,9 +61,9 @@ import com.listywave.list.application.dto.response.ListSearchResponse;
 import com.listywave.list.application.dto.response.ListTrandingResponse;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.user.application.domain.User;
-import com.listywave.user.application.dto.AllListOfUserSearchResponse;
-import com.listywave.user.application.dto.AllListOfUserSearchResponse.FeedListInfo;
-import com.listywave.user.application.dto.AllListOfUserSearchResponse.ListItemsResponse;
+import com.listywave.user.application.dto.FindFeedListResponse;
+import com.listywave.user.application.dto.FindFeedListResponse.FeedListInfo;
+import com.listywave.user.application.dto.FindFeedListResponse.ListItemsResponse;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -96,6 +97,24 @@ public class ListAcceptanceTest extends AcceptanceTest {
             // then
             assertThat(response.statusCode()).isEqualTo(CREATED.value());
             assertThat(result.listId()).isEqualTo(1L);
+        }
+
+        @Test
+        void 콜라보레이터를_지정해_리스트를_생성할_수_있다() {
+            // given
+            User 동호 = 회원을_저장한다(동호());
+            User 정수 = 회원을_저장한다(정수());
+            String accessToken = 액세스_토큰을_발급한다(동호);
+            ListCreateRequest listCreateRequest = 좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId()));
+
+            // when
+            ExtractableResponse<Response> response = 리스트_저장_API_호출(listCreateRequest, accessToken);
+            ListCreateResponse result = response.as(ListCreateResponse.class);
+
+            // then
+            assertThat(result.listId()).isEqualTo(1L);
+            ListDetailResponse list = 비회원_리스트_상세_조회_API_호출(result.listId()).as(ListDetailResponse.class);
+            assertThat(list.collaborators().get(0).id()).isEqualTo(정수.getId());
         }
 
         @Test
@@ -222,17 +241,19 @@ public class ListAcceptanceTest extends AcceptanceTest {
         void 리스트를_성공적으로_수정한다() {
             // given
             User 동호 = 회원을_저장한다(동호());
+            User 정수 = 회원을_저장한다(정수());
+            User 유진 = 회원을_저장한다(유진());
             String 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            ListCreateResponse 동호_리스트_생성_결과 = 리스트_저장_API_호출(좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
+            ListCreateResponse 동호_리스트_생성_결과 = 리스트_저장_API_호출(좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰).as(ListCreateResponse.class);
 
             // when
-            ListCreateRequest 리스트_수정_요청_데이터 = 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(List.of());
+            ListCreateRequest 리스트_수정_요청_데이터 = 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(List.of(유진.getId()));
             리스트_수정_API_호출(리스트_수정_요청_데이터, 동호_액세스_토큰, 동호_리스트_생성_결과.listId());
 
             // then
             ListDetailResponse result = 회원용_리스트_상세_조회_API_호출(동호_액세스_토큰, 동호_리스트_생성_결과.listId());
             ListEntity 수정된_리스트 = 가장_좋아하는_견종_TOP3_순위_변경(동호, List.of());
-            ListDetailResponse expect = ListDetailResponse.of(수정된_리스트, 동호, false, List.of(), 수정된_리스트.getSortedItems().getValues());
+            ListDetailResponse expect = ListDetailResponse.of(수정된_리스트, 동호, false, List.of(Collaborator.init(유진, 수정된_리스트)), 수정된_리스트.getSortedItems().getValues());
             리스트_상세_조회를_검증한다(result, expect);
         }
 
@@ -342,7 +363,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             ListEntity 동호_리스트_2 = 리스트를_저장한다(좋아하는_라면_TOP3(동호, List.of()));
 
             // when
-            AllListOfUserSearchResponse result = 비회원_피드_리스트_조회(동호).as(AllListOfUserSearchResponse.class);
+            FindFeedListResponse result = 비회원_피드_리스트_조회(동호).as(FindFeedListResponse.class);
 
             // then
             assertThat(result.hasNext()).isFalse();
@@ -371,7 +392,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             String 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
 
             // when
-            AllListOfUserSearchResponse allUserListsResponse = 회원_피드_리스트_조회(동호, 정수_액세스_토큰).as(AllListOfUserSearchResponse.class);
+            FindFeedListResponse allUserListsResponse = 회원_피드_리스트_조회(동호, 정수_액세스_토큰).as(FindFeedListResponse.class);
 
             // then
             assertAll(
@@ -402,7 +423,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             리스트를_모두_저장한다(동호_리스트들);
 
             // when
-            AllListOfUserSearchResponse result = 비회원이_피드_리스트_조회_카테고리_필터링_요청(동호, "book").as(AllListOfUserSearchResponse.class);
+            FindFeedListResponse result = 비회원이_피드_리스트_조회_카테고리_필터링_요청(동호, "book").as(FindFeedListResponse.class);
 
             // then
             CategoryType 필터링_조건 = CategoryType.nameOf("book");
@@ -423,16 +444,17 @@ public class ListAcceptanceTest extends AcceptanceTest {
             User 동호 = 회원을_저장한다(동호());
             User 정수 = 회원을_저장한다(정수());
             String 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            액세스_토큰을_발급한다(정수);
-            리스트_저장_API_호출(좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
-            ListCreateResponse 동호_리스트_2 = 리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰).as(ListCreateResponse.class);
+            String 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            Long 리스트_1_ID = 리스트_저장_API_호출(좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰).as(ListCreateResponse.class).listId();
+            Long 리스트_2_ID = 리스트_저장_API_호출(좋아하는_견종_TOP3_생성_요청_데이터(List.of(동호.getId())), 정수_액세스_토큰).as(ListCreateResponse.class).listId();
 
             // when
-            AllListOfUserSearchResponse result = 비회원이_피드_리스트_조회_콜라보레이터_필터링_요청(동호).as(AllListOfUserSearchResponse.class);
+            FindFeedListResponse result = 비회원이_피드_리스트_조회_콜라보레이터_필터링_요청(동호).as(FindFeedListResponse.class);
 
             // then
-            assertThat(result.feedLists()).hasSize(1);
-            assertThat(result.feedLists().get(0).id()).isEqualTo(동호_리스트_2.listId());
+            assertThat(result.feedLists()).hasSize(2);
+            assertThat(result.feedLists().get(0).id()).isEqualTo(리스트_2_ID);
+            assertThat(result.feedLists().get(1).id()).isEqualTo(리스트_1_ID);
         }
 
         @Test
@@ -445,7 +467,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             ListCreateResponse 동호_리스트_2 = 리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰).as(ListCreateResponse.class);
 
             // when
-            AllListOfUserSearchResponse result = 비회원이_피드_리스트_조회_카테고리_콜라보레이터_필터링_요청(동호, "etc").as(AllListOfUserSearchResponse.class);
+            FindFeedListResponse result = 비회원이_피드_리스트_조회_카테고리_콜라보레이터_필터링_요청(동호, "etc").as(FindFeedListResponse.class);
 
             // then
             assertThat(result.feedLists()).hasSize(1);
@@ -471,8 +493,8 @@ public class ListAcceptanceTest extends AcceptanceTest {
             });
 
             // then
-            List<FeedListInfo> 동호_리스트 = 비회원_피드_리스트_조회(동호).as(AllListOfUserSearchResponse.class).feedLists();
-            List<FeedListInfo> 정수_리스트 = 비회원_피드_리스트_조회(정수).as(AllListOfUserSearchResponse.class).feedLists();
+            List<FeedListInfo> 동호_리스트 = 비회원_피드_리스트_조회(동호).as(FindFeedListResponse.class).feedLists();
+            List<FeedListInfo> 정수_리스트 = 비회원_피드_리스트_조회(정수).as(FindFeedListResponse.class).feedLists();
             List<FeedListInfo> 모든_리스트 = new ArrayList<>(동호_리스트);
             모든_리스트.addAll(정수_리스트);
 
@@ -531,8 +553,8 @@ public class ListAcceptanceTest extends AcceptanceTest {
             ListRecentResponse result = response.as(ListRecentResponse.class);
 
             // then
-            List<FeedListInfo> 동호_리스트 = 비회원_피드_리스트_조회(동호).as(AllListOfUserSearchResponse.class).feedLists();
-            List<FeedListInfo> 정수_리스트 = 비회원_피드_리스트_조회(정수).as(AllListOfUserSearchResponse.class).feedLists();
+            List<FeedListInfo> 동호_리스트 = 비회원_피드_리스트_조회(동호).as(FindFeedListResponse.class).feedLists();
+            List<FeedListInfo> 정수_리스트 = 비회원_피드_리스트_조회(정수).as(FindFeedListResponse.class).feedLists();
             List<FeedListInfo> 모든_리스트 = new ArrayList<>(동호_리스트);
             모든_리스트.addAll(정수_리스트);
             List<Long> expect = 모든_리스트.stream()

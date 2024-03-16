@@ -6,11 +6,11 @@ import static com.listywave.common.exception.ErrorCode.RESOURCES_EMPTY;
 import com.listywave.alarm.repository.AlarmRepository;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.application.domain.Collaborators;
+import com.listywave.collaborator.application.service.CollaboratorService;
 import com.listywave.collaborator.repository.CollaboratorRepository;
 import com.listywave.collection.repository.CollectionRepository;
 import com.listywave.common.exception.CustomException;
-import com.listywave.history.application.domain.History;
-import com.listywave.history.application.domain.HistoryItem;
+import com.listywave.history.application.service.HistoryService;
 import com.listywave.history.repository.HistoryRepository;
 import com.listywave.image.application.service.ImageService;
 import com.listywave.list.application.domain.category.CategoryType;
@@ -44,7 +44,7 @@ import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
-import com.listywave.user.application.dto.AllListOfUserSearchResponse;
+import com.listywave.user.application.dto.FindFeedListResponse;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import java.time.LocalDateTime;
@@ -74,6 +74,8 @@ public class ListService {
     private final CollectionRepository collectionRepository;
     private final CollaboratorRepository collaboratorRepository;
     private final AlarmRepository alarmRepository;
+    private final CollaboratorService collaboratorService;
+    private final HistoryService historyService;
 
     public ListCreateResponse listCreate(ListCreateRequest request, Long loginUserId) {
         User user = userRepository.getById(loginUserId);
@@ -91,11 +93,9 @@ public class ListService {
         ListEntity savedList = listRepository.save(list);
 
         if (hasCollaboration) {
-            collaboratorIds.add(user.getId());
-            Collaborators collaborators = createCollaborators(collaboratorIds, savedList);
-            collaboratorRepository.saveAll(collaborators.collaborators());
+            Collaborators collaborators = collaboratorService.createCollaborators(collaboratorIds, savedList);
+            collaboratorService.saveAll(collaborators);
         }
-
         return ListCreateResponse.of(savedList.getId());
     }
 
@@ -120,14 +120,6 @@ public class ListService {
                         new ItemTitle(it.title()), new ItemComment(it.comment()),
                         new ItemLink(it.link()), new ItemImageUrl(it.imageUrl()))
                 ).toList());
-    }
-
-    private Collaborators createCollaborators(List<Long> collaboratorIds, ListEntity list) {
-        List<Collaborator> collaborators = collaboratorIds.stream()
-                .map(userRepository::getById)
-                .map(user -> Collaborator.init(user, list))
-                .toList();
-        return new Collaborators(collaborators);
     }
 
     public ListDetailResponse getListDetail(Long listId, Long loginUserId) {
@@ -197,6 +189,7 @@ public class ListService {
         return ListRecentResponse.of(recentList, cursorUpdatedDate, result.hasNext());
     }
 
+    @Transactional(readOnly = true)
     public ListSearchResponse search(String keyword, SortType sortType, CategoryType category, int size, Long cursorId) {
         List<ListEntity> lists = listRepository.findAll().stream()
                 .filter(list -> !list.isDeletedUser() && list.isPublic())
@@ -225,35 +218,28 @@ public class ListService {
 
         User loginUser = userRepository.getById(loginUserId);
         ListEntity list = listRepository.getById(listId);
-        Collaborators beforeCollaborators = new Collaborators(collaboratorRepository.findAllByList(list));
-        list.validateUpdateAuthority(loginUser, beforeCollaborators);
 
-        updateCollaborators(beforeCollaborators, request.collaboratorIds(), list);
+        Collaborators beforeCollaborators = collaboratorService.findAllByList(list);
+        list.validateUpdateAuthority(loginUser, beforeCollaborators);
+        Collaborators newCollaborators = collaboratorService.createCollaborators(request.collaboratorIds(), list);
+        updateCollaborators(beforeCollaborators, newCollaborators, list);
 
         Labels newLabels = createLabels(request.labels());
         Items newItems = createItems(request.items());
 
         LocalDateTime updatedDate = LocalDateTime.now();
         if (list.canCreateHistory(newItems)) {
-            Items beforeItems = list.getItems();
-            List<HistoryItem> historyItems = beforeItems.toHistoryItems();
-            History history = new History(list, historyItems, updatedDate, request.isPublic());
-            historyRepository.save(history);
+            historyService.saveHistory(list, updatedDate, request.isPublic());
         }
         boolean hasCollaborator = !request.collaboratorIds().isEmpty();
         list.update(request.category(), new ListTitle(request.title()), new ListDescription(request.description()), request.isPublic(), request.backgroundColor(), hasCollaborator, updatedDate, newLabels, newItems);
     }
 
-    private void updateCollaborators(Collaborators beforeCollaborators, List<Long> collaboratorIds, ListEntity list) {
-        Collaborators newCollaborators = createCollaborators(collaboratorIds, list);
-
+    private void updateCollaborators(Collaborators beforeCollaborators, Collaborators newCollaborators, ListEntity list) {
         Collaborators removedCollaborators = beforeCollaborators.filterRemovedCollaborators(newCollaborators);
         collaboratorRepository.deleteAllInBatch(removedCollaborators.collaborators());
 
         Collaborators addedCollaborators = beforeCollaborators.filterAddedCollaborators(newCollaborators);
-        if (!addedCollaborators.isEmpty() && !addedCollaborators.contains(list.getUser())) {
-            addedCollaborators.add(Collaborator.init(list.getUser(), list));
-        }
         collaboratorRepository.saveAll(addedCollaborators.collaborators());
     }
 
@@ -283,7 +269,7 @@ public class ListService {
     }
 
     @Transactional(readOnly = true)
-    public AllListOfUserSearchResponse getAllListOfUser(
+    public FindFeedListResponse findFeedList(
             Long targetUserId,
             String type,
             CategoryType category,
@@ -292,15 +278,14 @@ public class ListService {
     ) {
         userRepository.getById(targetUserId);
 
-        List<Collaborator> collaborators = collaboratorRepository.findAllByUserId(targetUserId);
         Slice<ListEntity> result =
-                listRepository.findFeedLists(collaborators, targetUserId, type, category, cursorUpdatedDate, pageable);
+                listRepository.findFeedLists(targetUserId, type, category, cursorUpdatedDate, pageable);
         List<ListEntity> lists = result.getContent();
 
         cursorUpdatedDate = null;
         if (!lists.isEmpty()) {
             cursorUpdatedDate = lists.get(lists.size() - 1).getUpdatedDate();
         }
-        return AllListOfUserSearchResponse.of(result.hasNext(), cursorUpdatedDate, lists);
+        return FindFeedListResponse.of(result.hasNext(), cursorUpdatedDate, lists);
     }
 }

@@ -11,6 +11,7 @@ import static com.listywave.user.fixture.UserFixture.유진;
 import static com.listywave.user.fixture.UserFixture.정수;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.listywave.collaborator.application.domain.Collaborator;
@@ -224,17 +225,22 @@ class ListEntityTest {
 
     @Test
     void 리스트는_작성자_또는_콜라보레이터에_포함된_유저만이_수정할_수_있다() {
-        User collaborator = 정수();
+        // given
+        User collaboratorUser = 정수();
+        Collaborator collaborator = Collaborator.init(collaboratorUser, list);
         User notCollaborator = 유진();
 
-        Collaborators collaborators = new Collaborators(List.of(
-                Collaborator.init(collaborator, list)
-        ));
+        Collaborators collaborators = new Collaborators(List.of(collaborator));
 
-        assertThatNoException().isThrownBy(() -> list.validateUpdateAuthority(user, collaborators));
-        assertThatNoException().isThrownBy(() -> list.validateUpdateAuthority(collaborator, collaborators));
-
-        CustomException exception = assertThrows(CustomException.class, () -> list.validateUpdateAuthority(notCollaborator, collaborators));
-        assertThat(exception.getErrorCode()).isEqualTo(INVALID_ACCESS);
+        // when
+        // then
+        assertAll(
+                () -> assertThatNoException().isThrownBy(() -> list.validateUpdateAuthority(user, collaborators)),
+                () -> assertThatNoException().isThrownBy(() -> list.validateUpdateAuthority(collaboratorUser, collaborators)),
+                () -> {
+                    CustomException exception = assertThrows(CustomException.class, () -> list.validateUpdateAuthority(notCollaborator, collaborators));
+                    assertThat(exception.getErrorCode()).isEqualTo(INVALID_ACCESS);
+                }
+        );
     }
 }

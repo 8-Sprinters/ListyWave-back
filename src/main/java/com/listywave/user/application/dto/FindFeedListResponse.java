@@ -6,14 +6,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 
-public record AllListOfUserSearchResponse(
+public record FindFeedListResponse(
         LocalDateTime cursorUpdatedDate,
         Boolean hasNext,
         List<FeedListInfo> feedLists
 ) {
 
-    public static AllListOfUserSearchResponse of(boolean hasNext, LocalDateTime cursorUpdatedDate, List<ListEntity> feedLists) {
-        return new AllListOfUserSearchResponse(
+    public static FindFeedListResponse of(boolean hasNext, LocalDateTime cursorUpdatedDate, List<ListEntity> feedLists) {
+        return new FindFeedListResponse(
                 cursorUpdatedDate,
                 hasNext,
                 toList(feedLists)
