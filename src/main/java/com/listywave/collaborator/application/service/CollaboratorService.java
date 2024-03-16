@@ -1,6 +1,7 @@
 package com.listywave.collaborator.application.service;
 
 import static org.springframework.transaction.annotation.Propagation.REQUIRED;
+import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.application.domain.Collaborators;
@@ -19,7 +20,7 @@ public class CollaboratorService {
     private final UserRepository userRepository;
     private final CollaboratorRepository collaboratorRepository;
 
-    @Transactional(readOnly = true, propagation = REQUIRED)
+    @Transactional(readOnly = true, propagation = REQUIRES_NEW)
     public Collaborators createCollaborators(List<Long> userIds, ListEntity list) {
         return new Collaborators(userIds.stream()
                 .map(userRepository::getById)
