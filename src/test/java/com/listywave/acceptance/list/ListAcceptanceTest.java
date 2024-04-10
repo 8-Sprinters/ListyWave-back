@@ -268,7 +268,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             리스트_수정_API_호출(리스트_수정_요청_데이터, 동호_액세스_토큰, 동호_리스트.getId());
 
             // when
-            List<HistorySearchResponse> 히스토리_조회_결과 = 비회원_히스토리_조회_API_호출(동호_리스트);
+            List<HistorySearchResponse> 히스토리_조회_결과 = 비회원_히스토리_조회_API_호출(동호_리스트.getId());
             ListDetailResponse 수정된_리스트_상세_조회_결과 = 비회원_리스트_상세_조회_API_호출(동호_리스트.getId()).as(ListDetailResponse.class);
 
             // then
