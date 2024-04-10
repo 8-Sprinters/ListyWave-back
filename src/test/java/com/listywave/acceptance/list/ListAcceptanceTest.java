@@ -72,13 +72,9 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @DisplayName("리스트 관련 인수테스트")
 public class ListAcceptanceTest extends AcceptanceTest {
-
-    private static final Logger log = LoggerFactory.getLogger(ListAcceptanceTest.class);
 
     @Nested
     class 리스트_생성 {
@@ -131,6 +127,27 @@ public class ListAcceptanceTest extends AcceptanceTest {
 
             // then
             assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
+        }
+
+        @Test
+        void 리스트_생성_시_히스토리도_함께_생성된다() {
+            // given
+            User 동호 = 회원을_저장한다(동호());
+            String accessToken = 액세스_토큰을_발급한다(동호);
+            ListCreateRequest listCreateRequest = 좋아하는_견종_TOP3_생성_요청_데이터(List.of());
+
+            ListCreateResponse 리스트_저장_API_응답 = 리스트_저장_API_호출(listCreateRequest, accessToken).as(ListCreateResponse.class);
+            Long 생성된_리스트_ID = 리스트_저장_API_응답.listId();
+
+            // when
+            List<HistorySearchResponse> 비회원_히스토리_조회_API_응답 = 비회원_히스토리_조회_API_호출(생성된_리스트_ID);
+
+            // then
+            HistorySearchResponse 첫_히스토리 = 비회원_히스토리_조회_API_응답.get(0);
+            assertThat(첫_히스토리.isPublic()).isTrue();
+            assertThat(첫_히스토리.items()).usingRecursiveComparison()
+                    .comparingOnlyFields("rank", "title")
+                    .isEqualTo(listCreateRequest.items());
         }
     }
 
