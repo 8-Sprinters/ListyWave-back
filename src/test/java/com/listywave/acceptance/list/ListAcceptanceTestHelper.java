@@ -113,9 +113,9 @@ public abstract class ListAcceptanceTestHelper {
                 .isEqualTo(expect);
     }
 
-    public static List<HistorySearchResponse> 비회원_히스토리_조회_API_호출(ListEntity list) {
+    public static List<HistorySearchResponse> 비회원_히스토리_조회_API_호출(Long listId) {
         var response = given()
-                .when().get("/lists/{listId}/histories", list.getId())
+                .when().get("/lists/{listId}/histories", listId)
                 .then().log().all()
                 .extract();
         return response.as(new TypeRef<>() {

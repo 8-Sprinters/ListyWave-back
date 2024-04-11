@@ -92,6 +92,8 @@ public class ListService {
                 request.backgroundColor(), hasCollaboration, labels, items);
         ListEntity savedList = listRepository.save(list);
 
+        historyService.saveHistory(savedList, LocalDateTime.now(), true);
+
         if (hasCollaboration) {
             Collaborators collaborators = collaboratorService.createCollaborators(collaboratorIds, savedList);
             collaboratorService.saveAll(collaborators);
