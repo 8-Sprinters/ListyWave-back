@@ -48,6 +48,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import com.listywave.acceptance.common.AcceptanceTest;
+import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.history.application.dto.HistorySearchResponse;
 import com.listywave.history.application.dto.HistorySearchResponse.HistoryItemInfo;
@@ -241,7 +242,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             User 동호 = 회원을_저장한다(동호());
             ListEntity 동호_리스트 = 리스트를_저장한다(가장_좋아하는_견종_TOP3(동호, List.of()));
             String 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            회원_탈퇴(동호_액세스_토큰);
+            회원_탈퇴(new KakaoLogoutResponse(1L), 동호_액세스_토큰);
 
             // when
             ExtractableResponse<Response> response = 비회원_리스트_상세_조회_API_호출(동호_리스트.getId());

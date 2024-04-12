@@ -79,20 +79,17 @@ public abstract class AcceptanceTest {
         return userRepository.save(user);
     }
 
-    protected ExtractableResponse<Response> 로그인을_시도한다() {
-        KakaoTokenResponse kakaoTokenResponse = new KakaoTokenResponse("Bearer", "AccessToken", Integer.MAX_VALUE, "RefreshToken", Integer.MAX_VALUE, "email");
+    protected ExtractableResponse<Response> 로그인을_시도한다(KakaoTokenResponse expectedKakaoTokenResponse, KakaoMember expectedKakaoMember) {
         when(kakaoOauthApiClient.requestToken(any()))
-                .thenReturn(kakaoTokenResponse);
-        KakaoMember kakaoMember = new KakaoMember(1L, new KakaoMember.KakaoAccount(true, true, true, "listywave@kakao.com"));
+                .thenReturn(expectedKakaoTokenResponse);
         when(kakaoOauthApiClient.fetchKakaoMember(anyString()))
-                .thenReturn(kakaoMember);
-
+                .thenReturn(expectedKakaoMember);
         return AuthAcceptanceTestHelper.로그인_요청();
     }
 
-    protected ExtractableResponse<Response> 회원_탈퇴(String accessToken) {
+    protected ExtractableResponse<Response> 회원_탈퇴(KakaoLogoutResponse expectedKakaoLogoutResponse, String accessToken) {
         when(kakaoOauthApiClient.logout(anyString()))
-                .thenReturn(new KakaoLogoutResponse(55L));
+                .thenReturn(expectedKakaoLogoutResponse);
         return AuthAcceptanceTestHelper.회원탈퇴_요청(accessToken);
     }
 
