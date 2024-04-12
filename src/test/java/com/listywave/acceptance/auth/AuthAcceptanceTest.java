@@ -76,8 +76,8 @@ public class AuthAcceptanceTest extends AcceptanceTest {
             assertAll(
                     () -> assertThat(response.statusCode()).isEqualTo(OK.value()),
                     () -> assertThat(result.isFirst()).isEqualTo(true),
-                    () -> assertThat(jwtManager.readAccessToken("Bearer " + result.accessToken())).isEqualTo(1L),
-                    () -> assertThat(jwtManager.readRefreshToken(result.refreshToken())).isEqualTo(1L),
+                    () -> assertThat(jwtManager.readTokenWithPrefix("Bearer " + result.accessToken())).isEqualTo(1L),
+                    () -> assertThat(jwtManager.readTokenWithoutPrefix(result.refreshToken())).isEqualTo(1L),
                     () -> assertThat(result.profileImageUrl()).isIn(defaultProfileImages),
                     () -> assertThat(result.backgroundImageUrl()).isIn(defaultBackgroundImages),
                     () -> assertThat(result.followingCount()).isEqualTo(0),

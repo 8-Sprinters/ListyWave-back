@@ -71,7 +71,7 @@ public class JwtManager {
                 .compact();
     }
 
-    public Long readAccessToken(String token) {
+    public Long readTokenWithPrefix(String token) {
         if (token == null || token.isBlank() || !token.startsWith(PREFIX)) {
             throw new CustomException(REQUIRED_ACCESS_TOKEN);
         }
@@ -86,15 +86,15 @@ public class JwtManager {
         return Long.valueOf(subject);
     }
 
-    public Long readRefreshToken(String refreshToken) {
-        if (refreshToken == null || refreshToken.isBlank()) {
+    public Long readTokenWithoutPrefix(String token) {
+        if (token == null || token.isBlank()) {
             throw new CustomException(REQUIRED_REFRESH_TOKEN);
         }
 
         String subject = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
-                .parseSignedClaims(refreshToken)
+                .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
         return Long.valueOf(subject);

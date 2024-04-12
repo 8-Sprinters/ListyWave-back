@@ -1,14 +1,14 @@
 package com.listywave.common.auth;
 
+import static com.listywave.common.exception.ErrorCode.REQUIRED_ACCESS_TOKEN;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.OPTIONS;
 
-import com.listywave.auth.application.domain.JwtManager;
+import com.listywave.common.exception.CustomException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,8 +41,8 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             new UriAndMethod("/users/basic-background-image", GET),
     };
 
-    private final JwtManager jwtManager;
     private final AuthContext authContext;
+    private final TokenReader tokenReader;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -52,17 +52,14 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
-
-        HandlerMethod handlerMethod = (HandlerMethod) handler;
-        RequestMapping requestMapping = handlerMethod.getMethodAnnotation(RequestMapping.class);
-        String mappingUri = requestMapping.value()[0];
-        HttpMethod mappingMethod = requestMapping.method()[0].asHttpMethod();
-
-        if (isNonRequiredAuthentication(mappingUri, mappingMethod)) {
+        if (isNonRequiredAuthentication(handler)) {
             return true;
         }
-        String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        Long userId = jwtManager.readAccessToken(accessToken);
+
+        Long userId = tokenReader.readAccessToken(request);
+        if (userId == null) {
+            throw new CustomException(REQUIRED_ACCESS_TOKEN);
+        }
         authContext.setUserId(userId);
         return true;
     }
@@ -71,7 +68,12 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         return request.getMethod().equals(OPTIONS.name());
     }
 
-    private boolean isNonRequiredAuthentication(String mappingUri, HttpMethod mappingMethod) {
+    private boolean isNonRequiredAuthentication(Object handler) {
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        RequestMapping requestMapping = handlerMethod.getMethodAnnotation(RequestMapping.class);
+        String mappingUri = requestMapping.value()[0];
+        HttpMethod mappingMethod = requestMapping.method()[0].asHttpMethod();
+
         return Arrays.stream(whiteList)
                 .anyMatch(it -> it.isMatch(mappingUri, mappingMethod));
     }

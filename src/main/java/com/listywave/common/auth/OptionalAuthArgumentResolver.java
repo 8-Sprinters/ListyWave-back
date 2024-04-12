@@ -1,8 +1,5 @@
 package com.listywave.common.auth;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-
-import com.listywave.auth.application.domain.JwtManager;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
@@ -16,7 +13,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @RequiredArgsConstructor
 public class OptionalAuthArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final JwtManager jwtManager;
+    private final TokenReader tokenReader;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -32,11 +29,6 @@ public class OptionalAuthArgumentResolver implements HandlerMethodArgumentResolv
             WebDataBinderFactory binderFactory
     ) throws Exception {
         HttpServletRequest httpRequest = webRequest.getNativeRequest(HttpServletRequest.class);
-        String accessToken = httpRequest.getHeader(AUTHORIZATION);
-
-        if (accessToken == null || accessToken.isBlank()) {
-            return null;
-        }
-        return jwtManager.readAccessToken(accessToken);
+        return tokenReader.readAccessToken(httpRequest);
     }
 }

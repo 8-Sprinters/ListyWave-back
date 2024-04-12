@@ -96,7 +96,7 @@ public class AuthService {
 
     public UpdateTokenResult updateToken(String refreshToken) {
 //        Long userId = jwtManager.readRefreshToken(refreshToken);
-        Long userId = jwtManager.readAccessToken(refreshToken);
+        Long userId = jwtManager.readTokenWithPrefix(refreshToken);
 
         User user = userRepository.getById(userId);
 
