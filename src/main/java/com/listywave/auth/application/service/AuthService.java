@@ -94,15 +94,20 @@ public class AuthService {
         user.updateKakaoAccessToken("");
     }
 
-    public UpdateTokenResult updateToken(String refreshToken) {
-//        Long userId = jwtManager.readRefreshToken(refreshToken);
-        Long userId = jwtManager.readTokenWithPrefix(refreshToken);
-
+    @Transactional(readOnly = true)
+    public UpdateTokenResult updateToken(Long userId) {
         User user = userRepository.getById(userId);
 
         String accessToken = jwtManager.createAccessToken(user.getId());
         String newRefreshToken = jwtManager.createRefreshToken(user.getId());
-        return new UpdateTokenResult(accessToken, newRefreshToken);
+        return new UpdateTokenResult(
+                accessToken,
+                newRefreshToken,
+                jwtManager.getAccessTokenValidTimeDuration(),
+                jwtManager.getRefreshTokenValidTimeDuration(),
+                jwtManager.getAccessTokenValidTimeUnit(),
+                jwtManager.getRefreshTokenValidTimeUnit()
+        );
     }
 
     public void withdraw(Long userId) {

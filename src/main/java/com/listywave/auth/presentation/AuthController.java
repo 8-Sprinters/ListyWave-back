@@ -1,6 +1,6 @@
 package com.listywave.auth.presentation;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
 import com.listywave.auth.application.dto.LoginResult;
@@ -13,14 +13,12 @@ import com.listywave.common.util.TimeUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,11 +47,8 @@ public class AuthController {
                 Duration.ofSeconds(
                         TimeUtils.convertTimeUnit(loginResult.accessTokenValidTimeDuration(),
                                 loginResult.accessTokenValidTimeUnit(),
-                                TimeUnit.SECONDS)
-                ),
-                true,
-                true,
-                "sameSite"
+                                SECONDS)
+                ), true, true, "sameSite"
         );
         ResponseCookie refreshTokenCookie = createCookie(
                 "refreshToken",
@@ -61,11 +56,8 @@ public class AuthController {
                 Duration.ofSeconds(
                         TimeUtils.convertTimeUnit(loginResult.refreshTokenValidTimeDuration(),
                                 loginResult.refreshTokenValidTimeUnit(),
-                                TimeUnit.SECONDS)
-                ),
-                true,
-                true,
-                "sameSite"
+                                SECONDS)
+                ), true, true, "sameSite"
         );
         LoginResponse response = LoginResponse.of(loginResult);
 
@@ -93,14 +85,22 @@ public class AuthController {
 
     @GetMapping("/auth/token")
     ResponseEntity<UpdateTokenResponse> updateToken(
-//            @CookieValue("RefreshToken") String refreshToken
-            @RequestHeader(AUTHORIZATION) String refreshToken
+            @Auth Long userId
     ) {
-        UpdateTokenResult result = authService.updateToken(refreshToken);
-//        ResponseCookie refreshTokenCookie = createRefreshTokenCookie(result.refreshToken());
+        UpdateTokenResult result = authService.updateToken(userId);
+
+        ResponseCookie accessTokenCookie = createCookie(
+                "accessToken",
+                result.accessToken(),
+                Duration.ofSeconds(
+                        TimeUtils.convertTimeUnit(result.accessTokenValidTimeDuration(),
+                                result.accessTokenValidTimeUnit(),
+                                SECONDS)
+                ), true, true, "sameSite"
+        );
 
         return ResponseEntity.ok()
-//                .header(SET_COOKIE, refreshTokenCookie.toString())
+                .header(SET_COOKIE, accessTokenCookie.toString())
                 .body(new UpdateTokenResponse(result.accessToken()));
     }
 

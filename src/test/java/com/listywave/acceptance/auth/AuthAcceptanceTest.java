@@ -1,5 +1,7 @@
 package com.listywave.acceptance.auth;
 
+import static com.listywave.acceptance.auth.AuthAcceptanceTestHelper.Authorization_헤더에_리프레시_토큰을_담아_액세스_토큰_재발급_요청;
+import static com.listywave.acceptance.auth.AuthAcceptanceTestHelper.Cookie에_리프레시_토큰을_담아_액세스_토큰_재발급_요청;
 import static com.listywave.acceptance.auth.AuthAcceptanceTestHelper.로그아웃_요청;
 import static com.listywave.acceptance.auth.AuthAcceptanceTestHelper.로그인_요청;
 import static com.listywave.acceptance.auth.AuthAcceptanceTestHelper.카카오_로그인_페이지_요청;
@@ -22,6 +24,7 @@ import com.listywave.auth.infra.kakao.response.KakaoMember;
 import com.listywave.auth.infra.kakao.response.KakaoMember.KakaoAccount;
 import com.listywave.auth.infra.kakao.response.KakaoTokenResponse;
 import com.listywave.auth.presentation.dto.LoginResponse;
+import com.listywave.auth.presentation.dto.UpdateTokenResponse;
 import com.listywave.common.exception.ErrorResponse;
 import com.listywave.image.application.domain.DefaultBackgroundImages;
 import com.listywave.image.application.domain.DefaultProfileImages;
@@ -116,6 +119,38 @@ public class AuthAcceptanceTest extends AcceptanceTest {
                     () -> assertThat(body.refreshToken()).isNotNull(),
                     () -> assertThat(body.refreshToken()).isNotBlank()
             );
+        }
+
+        @Test
+        void Authorization_헤더에_리프레시_토큰을_담아_액세스_토큰을_재발급한다() {
+            // given
+            ExtractableResponse<Response> 로그인_응답 = 로그인을_시도한다(expectedKakaoTokenResponse, expectedKakaoMember);
+            Long userId = 로그인_응답.as(LoginResponse.class).id();
+            String refreshToken = jwtManager.createRefreshToken(userId);
+
+            // when
+            ExtractableResponse<Response> 재발급_응답 = Authorization_헤더에_리프레시_토큰을_담아_액세스_토큰_재발급_요청(refreshToken);
+            String 재발급된_액세스_토큰 = 재발급_응답.as(UpdateTokenResponse.class).accessToken();
+
+            // then
+            assertThat(jwtManager.readTokenWithoutPrefix(재발급_응답.cookie("accessToken"))).isEqualTo(userId);
+            assertThat(jwtManager.readTokenWithoutPrefix(재발급된_액세스_토큰)).isEqualTo(userId);
+        }
+
+        @Test
+        void Cookie에_리프레시_토큰을_담아_액세스_토큰을_재발급한다() {
+            // given
+            ExtractableResponse<Response> 로그인_응답 = 로그인을_시도한다(expectedKakaoTokenResponse, expectedKakaoMember);
+            Long userId = 로그인_응답.as(LoginResponse.class).id();
+            String refreshToken = jwtManager.createRefreshToken(userId);
+
+            // when
+            ExtractableResponse<Response> 재발급_응답 = Cookie에_리프레시_토큰을_담아_액세스_토큰_재발급_요청(refreshToken);
+            String 재발급된_액세스_토큰 = 재발급_응답.as(UpdateTokenResponse.class).accessToken();
+
+            // then
+            assertThat(jwtManager.readTokenWithoutPrefix(재발급_응답.cookie("accessToken"))).isEqualTo(userId);
+            assertThat(jwtManager.readTokenWithoutPrefix(재발급된_액세스_토큰)).isEqualTo(userId);
         }
     }
 
