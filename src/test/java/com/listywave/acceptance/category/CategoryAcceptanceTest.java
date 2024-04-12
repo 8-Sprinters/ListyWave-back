@@ -9,8 +9,10 @@ import com.listywave.list.application.dto.response.CategoryTypeResponse;
 import io.restassured.common.mapper.TypeRef;
 import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+@DisplayName("카테고리 관련 인수 테스트")
 public class CategoryAcceptanceTest extends AcceptanceTest {
 
     @Test
