@@ -25,11 +25,11 @@ public class TokenReader {
         }
 
         Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
+        if (cookies == null || cookies.length == 0) {
             return null;
         }
         Optional<Cookie> cookieValue = Arrays.stream(cookies)
-                .filter(cookie -> cookie.getName().equals("accessToken"))
+                .filter(cookie -> cookie.getName().equals("accessToken") || cookie.getName().equals("refreshToken"))
                 .findFirst();
         return cookieValue.map(cookie -> jwtManager.readTokenWithoutPrefix(cookie.getValue())).orElse(null);
     }

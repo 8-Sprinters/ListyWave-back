@@ -1,10 +1,8 @@
 package com.listywave.common.auth;
 
-import static com.listywave.common.exception.ErrorCode.REQUIRED_ACCESS_TOKEN;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.OPTIONS;
 
-import com.listywave.common.exception.CustomException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
@@ -20,7 +18,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
     private static final UriAndMethod[] whiteList = {
-            new UriAndMethod("/lists", GET),
             new UriAndMethod("/lists/{listId}", GET),
             new UriAndMethod("/lists/explore", GET),
             new UriAndMethod("/lists/search", GET),
@@ -28,8 +25,6 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             new UriAndMethod("/lists/upload-url", GET),
             new UriAndMethod("/lists/upload-complete", GET),
             new UriAndMethod("/lists/{listId}/histories", GET),
-            new UriAndMethod("/users", GET),
-            new UriAndMethod("/users/{userId}", GET),
             new UriAndMethod("/users/{userId}/lists", GET),
             new UriAndMethod("/users/{userId}/followers", GET),
             new UriAndMethod("/users/{userId}/followings", GET),
@@ -57,9 +52,6 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         }
 
         Long userId = tokenReader.readAccessToken(request);
-        if (userId == null) {
-            throw new CustomException(REQUIRED_ACCESS_TOKEN);
-        }
         authContext.setUserId(userId);
         return true;
     }

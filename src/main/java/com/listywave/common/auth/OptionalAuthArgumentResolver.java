@@ -1,6 +1,5 @@
 package com.listywave.common.auth;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -13,7 +12,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @RequiredArgsConstructor
 public class OptionalAuthArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final TokenReader tokenReader;
+    private final AuthContext authContext;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -27,8 +26,7 @@ public class OptionalAuthArgumentResolver implements HandlerMethodArgumentResolv
             ModelAndViewContainer mavContainer,
             NativeWebRequest webRequest,
             WebDataBinderFactory binderFactory
-    ) throws Exception {
-        HttpServletRequest httpRequest = webRequest.getNativeRequest(HttpServletRequest.class);
-        return tokenReader.readAccessToken(httpRequest);
+    ) {
+        return authContext.getUserId();
     }
 }

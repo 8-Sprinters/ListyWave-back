@@ -1,8 +1,6 @@
 package com.listywave.common.auth;
 
-import static com.listywave.common.exception.ErrorCode.REQUIRED_ACCESS_TOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -10,7 +8,6 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.OPTIONS;
 
 import com.listywave.auth.application.domain.JwtManager;
-import com.listywave.common.exception.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,6 +40,25 @@ class AuthorizationInterceptorTest {
     }
 
     @Test
+    void 인증이_필요하지_않은_리소스에_접근할_때는_아무_처리를_하지_않는다() throws Exception {
+        // given
+        when(httpServletRequest.getMethod()).thenReturn(GET.name());
+        HandlerMethod handler = mock(HandlerMethod.class);
+
+        RequestMapping requestMapping = mock(RequestMapping.class);
+        when(handler.getMethodAnnotation(RequestMapping.class)).thenReturn(requestMapping);
+        when(requestMapping.value()).thenReturn(new String[]{"/auth/kakao"});
+        when(requestMapping.method()).thenReturn(new RequestMethod[]{RequestMethod.GET});
+
+        // when
+        boolean result = authorizationInterceptor.preHandle(httpServletRequest, httpServletResponse, handler);
+
+        // then
+        assertThat(result).isTrue();
+        assertThat(authContext.getUserId()).isNull();
+    }
+
+    @Test
     void Authorization_헤더에_담긴_액세스_토큰을_읽어_AuthContext에_userId를_저장한다() throws Exception {
         // given
         when(httpServletRequest.getMethod()).thenReturn(GET.name());
@@ -65,7 +81,7 @@ class AuthorizationInterceptorTest {
     }
 
     @Test
-    void 액세스_토큰이_Authorization_헤더가_아닌_Cookie에_담기면_쿠키값을_읽는다() throws Exception {
+    void 액세스_토큰이_Authorization_헤더가_아닌_Cookie에_담기면_쿠키값을_읽어_AuthContext에_userId를_저장한다() throws Exception {
         // given
         when(httpServletRequest.getMethod()).thenReturn(GET.name());
         HandlerMethod handler = mock(HandlerMethod.class);
@@ -86,32 +102,6 @@ class AuthorizationInterceptorTest {
 
         // then
         assertThat(authContext.getUserId()).isEqualTo(1L);
-    }
-
-    @Test
-    void 인증이_필요한_리소스에_접근하지만_인증_정보가_없으면_예외가_발생한다() throws Exception {
-        // given
-        authorizationInterceptor = new AuthorizationInterceptor(authContext, tokenReader);
-
-        when(httpServletRequest.getMethod()).thenReturn(GET.name());
-        HandlerMethod handler = mock(HandlerMethod.class);
-
-        RequestMapping requestMapping = mock(RequestMapping.class);
-        when(handler.getMethodAnnotation(RequestMapping.class)).thenReturn(requestMapping);
-        when(requestMapping.value()).thenReturn(new String[]{"my"});
-        when(requestMapping.method()).thenReturn(new RequestMethod[]{RequestMethod.GET});
-
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(null);
-        when(httpServletRequest.getCookies()).thenReturn(new Cookie[]{});
-
-        // when
-        CustomException exception = assertThrows(
-                CustomException.class,
-                () -> authorizationInterceptor.preHandle(httpServletRequest, httpServletResponse, handler)
-        );
-
-        // then
-        assertThat(exception.getErrorCode()).isEqualTo(REQUIRED_ACCESS_TOKEN);
     }
 
     @Test
