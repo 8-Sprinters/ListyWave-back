@@ -21,6 +21,7 @@ import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
 import com.listywave.auth.infra.kakao.response.KakaoMember;
 import com.listywave.auth.infra.kakao.response.KakaoMember.KakaoAccount;
 import com.listywave.auth.infra.kakao.response.KakaoTokenResponse;
+import com.listywave.auth.presentation.dto.LoginResponse;
 import com.listywave.common.exception.ErrorResponse;
 import com.listywave.image.application.domain.DefaultBackgroundImages;
 import com.listywave.image.application.domain.DefaultProfileImages;
@@ -96,6 +97,25 @@ public class AuthAcceptanceTest extends AcceptanceTest {
             // then
             assertThat(response.statusCode()).isEqualTo(OK.value());
             assertThat(result.isFirst()).isFalse();
+        }
+
+        @Test
+        void 로그인에_성공하면_Http_Body와_Cookie에_액세스_토큰과_리프레시_토큰을_담아_응답한다() {
+            // when
+            ExtractableResponse<Response> 응답 = 로그인을_시도한다(expectedKakaoTokenResponse, expectedKakaoMember);
+            LoginResponse body = 응답.as(LoginResponse.class);
+
+            // then
+            assertAll(
+                    () -> assertThat(응답.cookie("accessToken")).isNotNull(),
+                    () -> assertThat(응답.cookie("accessToken")).isNotBlank(),
+                    () -> assertThat(응답.cookie("refreshToken")).isNotNull(),
+                    () -> assertThat(응답.cookie("refreshToken")).isNotBlank(),
+                    () -> assertThat(body.accessToken()).isNotNull(),
+                    () -> assertThat(body.accessToken()).isNotBlank(),
+                    () -> assertThat(body.refreshToken()).isNotNull(),
+                    () -> assertThat(body.refreshToken()).isNotBlank()
+            );
         }
     }
 

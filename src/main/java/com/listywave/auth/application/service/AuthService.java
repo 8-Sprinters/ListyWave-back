@@ -58,7 +58,16 @@ public class AuthService {
         user.updateKakaoAccessToken(kakaoAccessToken);
         String accessToken = jwtManager.createAccessToken(user.getId());
         String refreshToken = jwtManager.createRefreshToken(user.getId());
-        return LoginResult.of(user, false, accessToken, refreshToken);
+        return LoginResult.of(
+                user,
+                false,
+                accessToken,
+                refreshToken,
+                jwtManager.getAccessTokenValidTimeDuration(),
+                jwtManager.getRefreshTokenValidTimeDuration(),
+                jwtManager.getAccessTokenValidTimeUnit(),
+                jwtManager.getRefreshTokenValidTimeUnit()
+        );
     }
 
     private LoginResult loginInit(Long kakaoId, String kakaoEmail, String kakaoAccessToken) {
@@ -66,7 +75,16 @@ public class AuthService {
         User createdUser = userRepository.save(user);
         String accessToken = jwtManager.createAccessToken(user.getId());
         String refreshToken = jwtManager.createRefreshToken(user.getId());
-        return LoginResult.of(createdUser, true, accessToken, refreshToken);
+        return LoginResult.of(
+                createdUser,
+                true,
+                accessToken,
+                refreshToken,
+                jwtManager.getAccessTokenValidTimeDuration(),
+                jwtManager.getRefreshTokenValidTimeDuration(),
+                jwtManager.getAccessTokenValidTimeUnit(),
+                jwtManager.getRefreshTokenValidTimeUnit()
+        );
     }
 
     public void logout(Long userId) {

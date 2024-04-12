@@ -1,6 +1,7 @@
 package com.listywave.auth.application.dto;
 
 import com.listywave.user.application.domain.User;
+import java.util.concurrent.TimeUnit;
 
 public record LoginResult(
         Long id,
@@ -12,10 +13,23 @@ public record LoginResult(
         int followerCount,
         boolean isFirst,
         String accessToken,
-        String refreshToken
+        String refreshToken,
+        int accessTokenValidTimeDuration,
+        int refreshTokenValidTimeDuration,
+        TimeUnit accessTokenValidTimeUnit,
+        TimeUnit refreshTokenValidTimeUnit
 ) {
 
-    public static LoginResult of(User user, boolean isFirst, String accessToken, String refreshToken) {
+    public static LoginResult of(
+            User user,
+            boolean isFirst,
+            String accessToken,
+            String refreshToken,
+            int accessTokenValidTimeDuration,
+            int refreshTokenValidTimeDuration,
+            TimeUnit accessTokenValidTimeUnit,
+            TimeUnit refreshTokenValidTimeUnit
+    ) {
         return new LoginResult(
                 user.getId(),
                 user.getProfileImageUrl(),
@@ -26,7 +40,11 @@ public record LoginResult(
                 user.getFollowerCount(),
                 isFirst,
                 accessToken,
-                refreshToken
+                refreshToken,
+                accessTokenValidTimeDuration,
+                refreshTokenValidTimeDuration,
+                accessTokenValidTimeUnit,
+                refreshTokenValidTimeUnit
         );
     }
 }
