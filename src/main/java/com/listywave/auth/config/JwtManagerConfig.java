@@ -34,8 +34,8 @@ public class JwtManagerConfig {
                 plainSecretKey,
                 issuer,
                 accessTokenValidTimeDuration,
-                valueOf(accessTokenValidTimeUnit),
                 refreshTokenValidTimeDuration,
+                valueOf(accessTokenValidTimeUnit),
                 valueOf(refreshTokenValidTimeUnit)
         );
     }

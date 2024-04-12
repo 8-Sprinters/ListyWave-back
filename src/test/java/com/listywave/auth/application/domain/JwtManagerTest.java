@@ -41,8 +41,8 @@ class JwtManagerTest {
                 plainSecretKey,
                 issuer,
                 accessTokenValidTimeDuration,
-                accessTokenValidTimeUnit,
                 refreshTokenValidTimeDuration,
+                accessTokenValidTimeUnit,
                 refreshTokenValidTimeUnit
         );
     }
@@ -104,7 +104,7 @@ class JwtManagerTest {
 
         @Test
         void 유효기간이_지난_액세스_토큰인_경우_예외가_발생한다() {
-            JwtManager jwtManager = new JwtManager(plainSecretKey, issuer, accessTokenValidTimeDuration, NANOSECONDS, refreshTokenValidTimeDuration, refreshTokenValidTimeUnit);
+            JwtManager jwtManager = new JwtManager(plainSecretKey, issuer, accessTokenValidTimeDuration, refreshTokenValidTimeDuration, NANOSECONDS, refreshTokenValidTimeUnit);
             String accessToken = jwtManager.createAccessToken(userId);
 
             assertThatThrownBy(() -> jwtManager.readAccessToken("Bearer " + accessToken))
@@ -115,7 +115,7 @@ class JwtManagerTest {
         void SecretKey가_다른_액세스_토큰인_경우_예외가_발생한다() {
             String accessToken = jwtManager.createAccessToken(userId);
 
-            JwtManager differentSecretKeyJwtManager = new JwtManager("sfaksdlhfdsakjfhasdkfuhcasknfuhsabkdvajnfcgsankzdjhfc", issuer, 1, NANOSECONDS, 1, NANOSECONDS);
+            JwtManager differentSecretKeyJwtManager = new JwtManager("sfaksdlhfdsakjfhasdkfuhcasknfuhsabkdvajnfcgsankzdjhfc", issuer, 1, 1, NANOSECONDS, NANOSECONDS);
 
             assertThatThrownBy(() -> differentSecretKeyJwtManager.readAccessToken("Bearer " + accessToken))
                     .isInstanceOf(SignatureException.class);
@@ -137,7 +137,7 @@ class JwtManagerTest {
 
         @Test
         void 유효기간이_지난_리프레시_토큰인_경우_예외가_발생한다() {
-            JwtManager jwtManager = new JwtManager(plainSecretKey, issuer, 1, NANOSECONDS, 1, NANOSECONDS);
+            JwtManager jwtManager = new JwtManager(plainSecretKey, issuer, 1, 1, NANOSECONDS, NANOSECONDS);
             String refreshToken = jwtManager.createRefreshToken(userId);
 
             assertThatThrownBy(() -> jwtManager.readRefreshToken(refreshToken))
@@ -150,7 +150,7 @@ class JwtManagerTest {
 
             JwtManager otherSecretKeyJwtManager = new JwtManager(
                     "sdfklasdhfisdhfisadfhsicalndufhasdukhxaukdsadfuhsakcnfsajfhasdjkfhx",
-                    issuer, 1, MINUTES, 1, MINUTES);
+                    issuer, 1, 1, MINUTES, MINUTES);
 
             assertThatThrownBy(() -> otherSecretKeyJwtManager.readRefreshToken(refreshToken))
                     .isInstanceOf(SignatureException.class);

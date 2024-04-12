@@ -14,7 +14,9 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKey;
+import lombok.Getter;
 
+@Getter
 public class JwtManager {
 
     private static final String PREFIX = "Bearer ";
@@ -30,16 +32,16 @@ public class JwtManager {
             String plainSecretKey,
             String issuer,
             int accessTokenValidTimeDuration,
-            TimeUnit accessTokenValidTimeUnit,
             int refreshTokenValidTimeDuration,
+            TimeUnit accessTokenValidTimeUnit,
             TimeUnit refreshTokenValidTimeUnit
     ) {
         byte[] encoded = Base64.encode(plainSecretKey.getBytes(UTF_8));
         this.secretKey = Keys.hmacShaKeyFor(encoded);
         this.issuer = issuer;
         this.accessTokenValidTimeDuration = accessTokenValidTimeDuration;
-        this.accessTokenValidTimeUnit = accessTokenValidTimeUnit;
         this.refreshTokenValidTimeDuration = refreshTokenValidTimeDuration;
+        this.accessTokenValidTimeUnit = accessTokenValidTimeUnit;
         this.refreshTokenValidTimeUnit = refreshTokenValidTimeUnit;
     }
 
