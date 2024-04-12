@@ -1,12 +1,11 @@
 package com.listywave.acceptance.common;
 
-import static com.listywave.acceptance.common.CommonAcceptanceSteps.given;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+import com.listywave.acceptance.auth.AuthAcceptanceTestHelper;
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.auth.infra.kakao.KakaoOauthApiClient;
 import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
@@ -84,27 +83,17 @@ public abstract class AcceptanceTest {
         KakaoTokenResponse kakaoTokenResponse = new KakaoTokenResponse("Bearer", "AccessToken", Integer.MAX_VALUE, "RefreshToken", Integer.MAX_VALUE, "email");
         when(kakaoOauthApiClient.requestToken(any()))
                 .thenReturn(kakaoTokenResponse);
-
         KakaoMember kakaoMember = new KakaoMember(1L, new KakaoMember.KakaoAccount(true, true, true, "listywave@kakao.com"));
         when(kakaoOauthApiClient.fetchKakaoMember(anyString()))
                 .thenReturn(kakaoMember);
 
-        return given()
-                .queryParam("code", "AuthCode")
-                .when().get("/auth/redirect/kakao")
-                .then().log().all()
-                .extract();
+        return AuthAcceptanceTestHelper.로그인_요청();
     }
 
     protected ExtractableResponse<Response> 회원_탈퇴(String accessToken) {
         when(kakaoOauthApiClient.logout(anyString()))
                 .thenReturn(new KakaoLogoutResponse(55L));
-
-        return given()
-                .header(AUTHORIZATION, "Bearer " + accessToken)
-                .when().delete("/withdraw")
-                .then().log().all()
-                .extract();
+        return AuthAcceptanceTestHelper.회원탈퇴_요청(accessToken);
     }
 
     protected String 액세스_토큰을_발급한다(User user) {
