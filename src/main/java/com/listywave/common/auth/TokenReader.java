@@ -6,7 +6,6 @@ import com.listywave.auth.application.domain.JwtManager;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -28,9 +27,10 @@ public class TokenReader {
         if (cookies == null || cookies.length == 0) {
             return null;
         }
-        Optional<Cookie> cookieValue = Arrays.stream(cookies)
+        return Arrays.stream(cookies)
                 .filter(cookie -> cookie.getName().equals("accessToken") || cookie.getName().equals("refreshToken"))
-                .findFirst();
-        return cookieValue.map(cookie -> jwtManager.readTokenWithoutPrefix(cookie.getValue())).orElse(null);
+                .findFirst()
+                .map(cookie -> jwtManager.readTokenWithoutPrefix(cookie.getValue()))
+                .orElse(null);
     }
 }
