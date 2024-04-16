@@ -58,7 +58,16 @@ public class AuthService {
         user.updateKakaoAccessToken(kakaoAccessToken);
         String accessToken = jwtManager.createAccessToken(user.getId());
         String refreshToken = jwtManager.createRefreshToken(user.getId());
-        return LoginResult.of(user, false, accessToken, refreshToken);
+        return LoginResult.of(
+                user,
+                false,
+                accessToken,
+                refreshToken,
+                jwtManager.getAccessTokenValidTimeDuration(),
+                jwtManager.getRefreshTokenValidTimeDuration(),
+                jwtManager.getAccessTokenValidTimeUnit(),
+                jwtManager.getRefreshTokenValidTimeUnit()
+        );
     }
 
     private LoginResult loginInit(Long kakaoId, String kakaoEmail, String kakaoAccessToken) {
@@ -66,7 +75,16 @@ public class AuthService {
         User createdUser = userRepository.save(user);
         String accessToken = jwtManager.createAccessToken(user.getId());
         String refreshToken = jwtManager.createRefreshToken(user.getId());
-        return LoginResult.of(createdUser, true, accessToken, refreshToken);
+        return LoginResult.of(
+                createdUser,
+                true,
+                accessToken,
+                refreshToken,
+                jwtManager.getAccessTokenValidTimeDuration(),
+                jwtManager.getRefreshTokenValidTimeDuration(),
+                jwtManager.getAccessTokenValidTimeUnit(),
+                jwtManager.getRefreshTokenValidTimeUnit()
+        );
     }
 
     public void logout(Long userId) {
@@ -76,15 +94,20 @@ public class AuthService {
         user.updateKakaoAccessToken("");
     }
 
-    public UpdateTokenResult updateToken(String refreshToken) {
-//        Long userId = jwtManager.readRefreshToken(refreshToken);
-        Long userId = jwtManager.readAccessToken(refreshToken);
-
+    @Transactional(readOnly = true)
+    public UpdateTokenResult updateToken(Long userId) {
         User user = userRepository.getById(userId);
 
         String accessToken = jwtManager.createAccessToken(user.getId());
         String newRefreshToken = jwtManager.createRefreshToken(user.getId());
-        return new UpdateTokenResult(accessToken, newRefreshToken);
+        return new UpdateTokenResult(
+                accessToken,
+                newRefreshToken,
+                jwtManager.getAccessTokenValidTimeDuration(),
+                jwtManager.getRefreshTokenValidTimeDuration(),
+                jwtManager.getAccessTokenValidTimeUnit(),
+                jwtManager.getRefreshTokenValidTimeUnit()
+        );
     }
 
     public void withdraw(Long userId) {

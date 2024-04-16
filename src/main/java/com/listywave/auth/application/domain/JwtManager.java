@@ -14,7 +14,9 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKey;
+import lombok.Getter;
 
+@Getter
 public class JwtManager {
 
     private static final String PREFIX = "Bearer ";
@@ -30,16 +32,16 @@ public class JwtManager {
             String plainSecretKey,
             String issuer,
             int accessTokenValidTimeDuration,
-            TimeUnit accessTokenValidTimeUnit,
             int refreshTokenValidTimeDuration,
+            TimeUnit accessTokenValidTimeUnit,
             TimeUnit refreshTokenValidTimeUnit
     ) {
         byte[] encoded = Base64.encode(plainSecretKey.getBytes(UTF_8));
         this.secretKey = Keys.hmacShaKeyFor(encoded);
         this.issuer = issuer;
         this.accessTokenValidTimeDuration = accessTokenValidTimeDuration;
-        this.accessTokenValidTimeUnit = accessTokenValidTimeUnit;
         this.refreshTokenValidTimeDuration = refreshTokenValidTimeDuration;
+        this.accessTokenValidTimeUnit = accessTokenValidTimeUnit;
         this.refreshTokenValidTimeUnit = refreshTokenValidTimeUnit;
     }
 
@@ -69,7 +71,7 @@ public class JwtManager {
                 .compact();
     }
 
-    public Long readAccessToken(String token) {
+    public Long readTokenWithPrefix(String token) {
         if (token == null || token.isBlank() || !token.startsWith(PREFIX)) {
             throw new CustomException(REQUIRED_ACCESS_TOKEN);
         }
@@ -84,15 +86,15 @@ public class JwtManager {
         return Long.valueOf(subject);
     }
 
-    public Long readRefreshToken(String refreshToken) {
-        if (refreshToken == null || refreshToken.isBlank()) {
+    public Long readTokenWithoutPrefix(String token) {
+        if (token == null || token.isBlank()) {
             throw new CustomException(REQUIRED_REFRESH_TOKEN);
         }
 
         String subject = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
-                .parseSignedClaims(refreshToken)
+                .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
         return Long.valueOf(subject);

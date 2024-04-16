@@ -3,12 +3,10 @@ package com.listywave.common.auth;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.OPTIONS;
 
-import com.listywave.auth.application.domain.JwtManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +18,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
     private static final UriAndMethod[] whiteList = {
-            new UriAndMethod("/lists", GET),
             new UriAndMethod("/lists/{listId}", GET),
             new UriAndMethod("/lists/explore", GET),
             new UriAndMethod("/lists/search", GET),
@@ -28,8 +25,6 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             new UriAndMethod("/lists/upload-url", GET),
             new UriAndMethod("/lists/upload-complete", GET),
             new UriAndMethod("/lists/{listId}/histories", GET),
-            new UriAndMethod("/users", GET),
-            new UriAndMethod("/users/{userId}", GET),
             new UriAndMethod("/users/{userId}/lists", GET),
             new UriAndMethod("/users/{userId}/followers", GET),
             new UriAndMethod("/users/{userId}/followings", GET),
@@ -41,8 +36,8 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             new UriAndMethod("/users/basic-background-image", GET),
     };
 
-    private final JwtManager jwtManager;
     private final AuthContext authContext;
+    private final TokenReader tokenReader;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -52,17 +47,11 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
-
-        HandlerMethod handlerMethod = (HandlerMethod) handler;
-        RequestMapping requestMapping = handlerMethod.getMethodAnnotation(RequestMapping.class);
-        String mappingUri = requestMapping.value()[0];
-        HttpMethod mappingMethod = requestMapping.method()[0].asHttpMethod();
-
-        if (isNonRequiredAuthentication(mappingUri, mappingMethod)) {
+        if (isNonRequiredAuthentication(handler)) {
             return true;
         }
-        String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        Long userId = jwtManager.readAccessToken(accessToken);
+
+        Long userId = tokenReader.readAccessToken(request);
         authContext.setUserId(userId);
         return true;
     }
@@ -71,7 +60,12 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         return request.getMethod().equals(OPTIONS.name());
     }
 
-    private boolean isNonRequiredAuthentication(String mappingUri, HttpMethod mappingMethod) {
+    private boolean isNonRequiredAuthentication(Object handler) {
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        RequestMapping requestMapping = handlerMethod.getMethodAnnotation(RequestMapping.class);
+        String mappingUri = requestMapping.value()[0];
+        HttpMethod mappingMethod = requestMapping.method()[0].asHttpMethod();
+
         return Arrays.stream(whiteList)
                 .anyMatch(it -> it.isMatch(mappingUri, mappingMethod));
     }
