@@ -128,14 +128,13 @@ public class ListService {
         ListEntity list = listRepository.getById(listId);
         list.validateOwnerIsNotDelete();
         List<Collaborator> collaborators = collaboratorRepository.findAllByList(list);
-        Items sortedItems = list.getSortedItems();
 
         boolean isCollected = false;
         if (loginUserId != null) {
             User user = userRepository.getById(loginUserId);
             isCollected = collectionRepository.existsByListAndUserId(list, user.getId());
         }
-        return ListDetailResponse.of(list, list.getUser(), isCollected, collaborators, sortedItems.getValues());
+        return ListDetailResponse.of(list, list.getUser(), isCollected, collaborators);
     }
 
     @Transactional(readOnly = true)

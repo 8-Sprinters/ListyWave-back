@@ -166,7 +166,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             ListDetailResponse result = response.as(ListDetailResponse.class);
 
             // then
-            ListDetailResponse expect = ListDetailResponse.of(동호_리스트, 동호, false, List.of(), 동호_리스트.getSortedItems().getValues());
+            ListDetailResponse expect = ListDetailResponse.of(동호_리스트, 동호, false, List.of());
             리스트_상세_조회를_검증한다(result, expect);
         }
 
@@ -187,8 +187,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
                     동호_리스트,
                     동호,
                     collectionRepository.existsByListAndUserId(동호_리스트, 정수.getId()),
-                    collaboratorRepository.findAllByList(동호_리스트),
-                    동호_리스트.getSortedItems().getValues()
+                    collaboratorRepository.findAllByList(동호_리스트)
             );
             리스트_상세_조회를_검증한다(result, expect);
         }
@@ -210,8 +209,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
                     동호_리스트,
                     동호,
                     false,
-                    collaboratorRepository.findAllByList(동호_리스트),
-                    동호_리스트.getSortedItems().getValues()
+                    collaboratorRepository.findAllByList(동호_리스트)
             );
             리스트_상세_조회를_검증한다(result, expect);
         }
@@ -232,7 +230,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
 
             // then
             ListEntity 바뀐_리스트 = 가장_좋아하는_견종_TOP3_순위_변경(동호, List.of());
-            ListDetailResponse expect = ListDetailResponse.of(바뀐_리스트, 동호, false, List.of(), 바뀐_리스트.getSortedItems().getValues());
+            ListDetailResponse expect = ListDetailResponse.of(바뀐_리스트, 동호, false, List.of());
             리스트_상세_조회를_검증한다(result, expect);
         }
 
@@ -271,7 +269,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             // then
             ListDetailResponse result = 회원용_리스트_상세_조회_API_호출(동호_액세스_토큰, 동호_리스트_생성_결과.listId());
             ListEntity 수정된_리스트 = 가장_좋아하는_견종_TOP3_순위_변경(동호, List.of());
-            ListDetailResponse expect = ListDetailResponse.of(수정된_리스트, 동호, false, List.of(Collaborator.init(유진, 수정된_리스트)), 수정된_리스트.getSortedItems().getValues());
+            ListDetailResponse expect = ListDetailResponse.of(수정된_리스트, 동호, false, List.of(Collaborator.init(유진, 수정된_리스트)));
             리스트_상세_조회를_검증한다(result, expect);
         }
 
