@@ -33,8 +33,7 @@ public record ListDetailResponse(
             ListEntity list,
             User owner,
             boolean isCollected,
-            List<Collaborator> collaborators,
-            List<Item> items
+            List<Collaborator> collaborators
     ) {
         return ListDetailResponse.builder()
                 .category(list.getCategory().getViewName())

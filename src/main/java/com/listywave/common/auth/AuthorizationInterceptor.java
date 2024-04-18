@@ -18,7 +18,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
     private static final UriAndMethod[] whiteList = {
-            new UriAndMethod("/lists/{listId}", GET),
             new UriAndMethod("/lists/explore", GET),
             new UriAndMethod("/lists/search", GET),
             new UriAndMethod("/lists/{listId}/comments", GET),
@@ -40,7 +39,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     private final TokenReader tokenReader;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (isPreflight(request)) {
             return true;
         }
