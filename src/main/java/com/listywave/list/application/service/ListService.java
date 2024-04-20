@@ -3,6 +3,7 @@ package com.listywave.list.application.service;
 import static com.listywave.common.exception.ErrorCode.DUPLICATE_USER;
 import static com.listywave.common.exception.ErrorCode.RESOURCES_EMPTY;
 
+import com.listywave.alarm.application.domain.AlarmEvent;
 import com.listywave.alarm.repository.AlarmRepository;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.application.domain.Collaborators;
@@ -52,6 +53,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -76,6 +78,7 @@ public class ListService {
     private final AlarmRepository alarmRepository;
     private final CollaboratorService collaboratorService;
     private final HistoryService historyService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public ListCreateResponse listCreate(ListCreateRequest request, Long loginUserId) {
         User user = userRepository.getById(loginUserId);
@@ -96,7 +99,8 @@ public class ListService {
 
         if (hasCollaboration) {
             Collaborators collaborators = collaboratorService.createCollaborators(collaboratorIds, savedList);
-            collaboratorService.saveAll(collaborators);
+            List<Collaborator> saved = collaboratorService.saveAll(collaborators);
+            saved.forEach(it -> applicationEventPublisher.publishEvent(AlarmEvent.collaborator(it, user)));
         }
         return ListCreateResponse.of(savedList.getId());
     }

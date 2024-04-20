@@ -34,7 +34,7 @@ public class CollaboratorService {
     }
 
     @Transactional(propagation = REQUIRED)
-    public void saveAll(Collaborators collaborators) {
-        collaboratorRepository.saveAll(collaborators.collaborators());
+    public List<Collaborator> saveAll(Collaborators collaborators) {
+        return collaboratorRepository.saveAll(collaborators.collaborators());
     }
 }

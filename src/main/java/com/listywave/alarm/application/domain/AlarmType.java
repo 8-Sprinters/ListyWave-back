@@ -9,6 +9,7 @@ public enum AlarmType {
     COLLECT("collect"),
     COMMENT("comment"),
     REPLY("reply"),
+    COLLABORATOR("collaborator"),
     ;
 
     private final String value;
