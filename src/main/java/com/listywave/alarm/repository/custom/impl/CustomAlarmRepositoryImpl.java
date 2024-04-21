@@ -49,7 +49,7 @@ public class CustomAlarmRepositoryImpl implements CustomAlarmRepository {
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
 
         queryFactory.delete(alarm)
-                .where(alarm.createdDate.loe(thirtyDaysAgo))
+                .where(alarm.createdDate.lt(thirtyDaysAgo))
                 .execute();
     }
 }
