@@ -5,11 +5,10 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum AlarmType {
 
-    FOLLOW("follow"),
-    COLLECT("collect"),
-    COMMENT("comment"),
-    REPLY("reply"),
+    FOLLOW,
+    COLLECT,
+    COMMENT,
+    REPLY,
+    COLLABORATOR,
     ;
-
-    private final String value;
 }

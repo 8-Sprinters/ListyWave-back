@@ -1,11 +1,13 @@
 package com.listywave.alarm.application.domain;
 
+import static com.listywave.alarm.application.domain.AlarmType.COLLABORATOR;
 import static com.listywave.alarm.application.domain.AlarmType.COLLECT;
 import static com.listywave.alarm.application.domain.AlarmType.COMMENT;
 import static com.listywave.alarm.application.domain.AlarmType.FOLLOW;
 import static com.listywave.alarm.application.domain.AlarmType.REPLY;
 import static com.listywave.common.exception.ErrorCode.CANNOT_SEND_OWN_ALARM;
 
+import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.list.ListEntity;
@@ -69,6 +71,16 @@ public record AlarmEvent(
                 .listId(comment.getList().getId())
                 .commentId(comment.getId())
                 .alarmType(REPLY)
+                .build();
+    }
+
+    public static AlarmEvent collaborator(Collaborator collaborator, User publisher) {
+        return AlarmEvent.builder()
+                .publisher(publisher)
+                .listenerId(collaborator.getUser().getId())
+                .listId(collaborator.getList().getId())
+                .commentId(null)
+                .alarmType(COLLABORATOR)
                 .build();
     }
 
