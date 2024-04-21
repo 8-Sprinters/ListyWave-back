@@ -13,17 +13,16 @@ import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.유진;
 import static com.listywave.user.fixture.UserFixture.정수;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.listywave.acceptance.common.AcceptanceTest;
 import com.listywave.alarm.application.dto.AlarmListResponse;
-import com.listywave.alarm.application.dto.AlarmResponse;
+import com.listywave.alarm.application.dto.FindAlarmResponse;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.list.presentation.dto.request.ReplyCreateRequest;
 import com.listywave.list.presentation.dto.request.comment.CommentCreateRequest;
 import com.listywave.user.application.domain.User;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,21 +43,20 @@ public class AlarmAcceptanceTest extends AcceptanceTest {
         리스트_저장_API_호출(listCreateRequest, 정수_엑세스_토큰);
 
         // when
-        ExtractableResponse<Response> response_동호 = 알람_조회_API_호출(동호_엑세스_토큰);
-        ExtractableResponse<Response> response_유진 = 알람_조회_API_호출(유진_엑세스_토큰);
-        AlarmListResponse result_동호 = response_동호.as(AlarmListResponse.class);
-        AlarmListResponse result_유진 = response_유진.as(AlarmListResponse.class);
+        AlarmListResponse 동호_알람_조회_결과 = 알람_조회_API_호출(동호_엑세스_토큰).as(AlarmListResponse.class);
+        AlarmListResponse 유진_알람_조회_결과 = 알람_조회_API_호출(유진_엑세스_토큰).as(AlarmListResponse.class);
 
         // then
-        assertThat(result_동호.alarmList()).hasSize(1);
-        assertThat(result_동호.alarmList().get(0))
-                .extracting(AlarmResponse::getType, AlarmResponse::getSendUserId)
-                .containsExactly("COLLABORATOR", 정수.getId());
-
-        assertThat(result_유진.alarmList()).hasSize(1);
-        assertThat(result_유진.alarmList().get(0))
-                .extracting(AlarmResponse::getType, AlarmResponse::getSendUserId)
-                .containsExactly("COLLABORATOR", 정수.getId());
+        assertAll(
+                () -> assertThat(동호_알람_조회_결과.alarmList()).hasSize(1),
+                () -> assertThat(동호_알람_조회_결과.alarmList().get(0))
+                        .extracting(FindAlarmResponse::getType, FindAlarmResponse::getSendUserId)
+                        .containsExactly("COLLABORATOR", 정수.getId()),
+                () -> assertThat(유진_알람_조회_결과.alarmList()).hasSize(1),
+                () -> assertThat(유진_알람_조회_결과.alarmList().get(0))
+                        .extracting(FindAlarmResponse::getType, FindAlarmResponse::getSendUserId)
+                        .containsExactly("COLLABORATOR", 정수.getId())
+        );
     }
 
     @Test
@@ -71,13 +69,12 @@ public class AlarmAcceptanceTest extends AcceptanceTest {
         팔로우_요청(정수_엑세스_토큰, 동호.getId());
 
         // when
-        ExtractableResponse<Response> response = 알람_조회_API_호출(동호_엑세스_토큰);
-        AlarmListResponse result = response.as(AlarmListResponse.class);
+        AlarmListResponse 동호_알람_조회_결과 = 알람_조회_API_호출(동호_엑세스_토큰).as(AlarmListResponse.class);
 
         // then
-        assertThat(result.alarmList()).hasSize(1);
-        assertThat(result.alarmList().get(0))
-                .extracting(AlarmResponse::getType, AlarmResponse::getSendUserId)
+        assertThat(동호_알람_조회_결과.alarmList()).hasSize(1);
+        assertThat(동호_알람_조회_결과.alarmList().get(0))
+                .extracting(FindAlarmResponse::getType, FindAlarmResponse::getSendUserId)
                 .containsExactly("FOLLOW", 정수.getId());
     }
 
@@ -93,13 +90,12 @@ public class AlarmAcceptanceTest extends AcceptanceTest {
         댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_엑세스_토큰, 정수_리스트.getId(), 댓글_생성요청));
 
         // when
-        ExtractableResponse<Response> response = 알람_조회_API_호출(정수_엑세스_토큰);
-        AlarmListResponse result = response.as(AlarmListResponse.class);
+        AlarmListResponse 정수_알람_조회_결과 = 알람_조회_API_호출(정수_엑세스_토큰).as(AlarmListResponse.class);
 
         // then
-        assertThat(result.alarmList()).hasSize(1);
-        assertThat(result.alarmList().get(0))
-                .extracting(AlarmResponse::getType, AlarmResponse::getSendUserId)
+        assertThat(정수_알람_조회_결과.alarmList()).hasSize(1);
+        assertThat(정수_알람_조회_결과.alarmList().get(0))
+                .extracting(FindAlarmResponse::getType, FindAlarmResponse::getSendUserId)
                 .containsExactly("COMMENT", 동호.getId());
     }
 
@@ -113,11 +109,10 @@ public class AlarmAcceptanceTest extends AcceptanceTest {
         댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(정수_엑세스_토큰, 정수_리스트.getId(), 댓글_생성요청));
 
         // when
-        ExtractableResponse<Response> response = 알람_조회_API_호출(정수_엑세스_토큰);
-        AlarmListResponse result = response.as(AlarmListResponse.class);
+        AlarmListResponse 정수_알람_조회_결과 = 알람_조회_API_호출(정수_엑세스_토큰).as(AlarmListResponse.class);
 
         // then
-        assertThat(result.alarmList()).hasSize(0);
+        assertThat(정수_알람_조회_결과.alarmList()).hasSize(0);
     }
 
     @Test
@@ -137,13 +132,12 @@ public class AlarmAcceptanceTest extends AcceptanceTest {
         답글_등록_API_호출(유진_엑세스_토큰, 답글_생성_요청_데이터, 정수_리스트.getId(), 1L);
 
         // when
-        ExtractableResponse<Response> response = 알람_조회_API_호출(동호_엑세스_토큰);
-        AlarmListResponse result = response.as(AlarmListResponse.class);
+        AlarmListResponse 동호_알람_조회_결과 = 알람_조회_API_호출(동호_엑세스_토큰).as(AlarmListResponse.class);
 
         // then
-        assertThat(result.alarmList()).hasSize(1);
-        assertThat(result.alarmList().get(0))
-                .extracting(AlarmResponse::getType, AlarmResponse::getSendUserId)
+        assertThat(동호_알람_조회_결과.alarmList()).hasSize(1);
+        assertThat(동호_알람_조회_결과.alarmList().get(0))
+                .extracting(FindAlarmResponse::getType, FindAlarmResponse::getSendUserId)
                 .containsExactly("REPLY", 유진.getId());
     }
 
@@ -162,12 +156,11 @@ public class AlarmAcceptanceTest extends AcceptanceTest {
         알람_읽기_API_호출(정수_엑세스_토큰, 1L);
 
         // then
-        ExtractableResponse<Response> response = 알람_조회_API_호출(정수_엑세스_토큰);
-        AlarmListResponse result = response.as(AlarmListResponse.class);
+        AlarmListResponse 정수_알람_조회_결과 = 알람_조회_API_호출(정수_엑세스_토큰).as(AlarmListResponse.class);
 
-        assertThat(result.alarmList()).hasSize(1);
-        assertThat(result.alarmList().get(0))
-                .extracting(AlarmResponse::getType, AlarmResponse::getSendUserId, AlarmResponse::isChecked)
+        assertThat(정수_알람_조회_결과.alarmList()).hasSize(1);
+        assertThat(정수_알람_조회_결과.alarmList().get(0))
+                .extracting(FindAlarmResponse::getType, FindAlarmResponse::getSendUserId, FindAlarmResponse::isChecked)
                 .containsExactly("COMMENT", 동호.getId(), true);
     }
 }

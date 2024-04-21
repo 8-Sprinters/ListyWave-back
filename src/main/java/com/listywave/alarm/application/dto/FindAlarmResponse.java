@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class AlarmResponse {
+public class FindAlarmResponse {
 
     private Long id;
     private Long sendUserId;

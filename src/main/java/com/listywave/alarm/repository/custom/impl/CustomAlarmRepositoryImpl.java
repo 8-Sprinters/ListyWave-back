@@ -3,7 +3,7 @@ package com.listywave.alarm.repository.custom.impl;
 import static com.listywave.alarm.application.domain.QAlarm.alarm;
 import static com.listywave.list.application.domain.list.QListEntity.listEntity;
 
-import com.listywave.alarm.application.dto.AlarmResponse;
+import com.listywave.alarm.application.dto.FindAlarmResponse;
 import com.listywave.alarm.repository.custom.CustomAlarmRepository;
 import com.listywave.user.application.domain.User;
 import com.querydsl.core.types.Projections;
@@ -18,11 +18,11 @@ public class CustomAlarmRepositoryImpl implements CustomAlarmRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<AlarmResponse> getAlarms(User user) {
+    public List<FindAlarmResponse> getAlarms(User user) {
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
 
         return queryFactory
-                .select(Projections.fields(AlarmResponse.class,
+                .select(Projections.fields(FindAlarmResponse.class,
                         alarm.id,
                         alarm.user.id.as("sendUserId"),
                         alarm.user.nickname.value.as("nickname"),
