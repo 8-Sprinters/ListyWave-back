@@ -2,6 +2,7 @@ package com.listywave.alarm.repository;
 
 import com.listywave.alarm.application.domain.Alarm;
 import com.listywave.alarm.repository.custom.CustomAlarmRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,14 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long>, CustomAlarm
     @Modifying
     @Query("delete from Alarm a where a.listId in :listIds")
     void deleteAllByListIdIn(@Param("listIds") List<Long> listIds);
+
+    @Modifying(clearAutomatically = true)
+    @Query("""
+            update Alarm a
+            set a.isChecked = true
+            where a.receiveUserId = :receiveUserId
+            and a.isChecked = false
+            and a.createdDate >= :thirtyDaysAgo
+            """)
+    void readAllAlarm(Long receiveUserId, LocalDateTime thirtyDaysAgo);
 }

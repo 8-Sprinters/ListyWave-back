@@ -10,6 +10,7 @@ import com.listywave.alarm.repository.AlarmRepository;
 import com.listywave.common.exception.CustomException;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -45,5 +46,11 @@ public class AlarmService {
     public AlarmCheckResponse checkAllAlarmsRead(Long loginUserId) {
         User user = userRepository.getById(loginUserId);
         return new AlarmCheckResponse(alarmRepository.hasCheckedAlarmsByReceiveUserId(user.getId()));
+    }
+
+    public void readAllAlarm(Long loginUserId) {
+        User user = userRepository.getById(loginUserId);
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+        alarmRepository.readAllAlarm(user.getId(), thirtyDaysAgo);
     }
 }

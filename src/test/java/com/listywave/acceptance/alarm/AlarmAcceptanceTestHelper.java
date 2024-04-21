@@ -23,4 +23,12 @@ public abstract class AlarmAcceptanceTestHelper {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 알람_전체_읽기_API_호출(String accessToken) {
+        return given()
+                .header(AUTHORIZATION, "Bearer " + accessToken)
+                .when().patch("/alarms")
+                .then().log().all()
+                .extract();
+    }
 }
