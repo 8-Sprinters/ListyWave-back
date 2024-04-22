@@ -18,7 +18,7 @@ public class AlarmSchedulerService {
     @Async
     @Transactional
     @Scheduled(cron = "0 0 0 * * *")
-    public void alarmDeleteScheduler() {
+    public void deleteAlarmByScheduler() {
         log.info("\n ============== alarmDeleteScheduler start ================ \n");
         alarmRepository.deleteAlarmThirtyDaysAgo();
         log.info("\n ============== alarmDeleteScheduler end ================ \n");
