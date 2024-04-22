@@ -40,4 +40,12 @@ public class AlarmController {
     ) {
         return ResponseEntity.ok().body(alarmService.checkAllAlarmsRead(loginUserId));
     }
+
+    @PatchMapping("/alarms")
+    ResponseEntity<Void> readAllAlarm(
+            @Auth Long loginUserId
+    ) {
+        alarmService.readAllAlarm(loginUserId);
+        return ResponseEntity.noContent().build();
+    }
 }

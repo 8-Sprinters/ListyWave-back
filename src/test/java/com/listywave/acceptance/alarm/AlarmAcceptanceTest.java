@@ -1,6 +1,7 @@
 package com.listywave.acceptance.alarm;
 
 import static com.listywave.acceptance.alarm.AlarmAcceptanceTestHelper.알람_읽기_API_호출;
+import static com.listywave.acceptance.alarm.AlarmAcceptanceTestHelper.알람_전체_읽기_API_호출;
 import static com.listywave.acceptance.alarm.AlarmAcceptanceTestHelper.알람_조회_API_호출;
 import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.n개의_댓글_생성_요청;
 import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.댓글_저장_API_호출;
@@ -162,5 +163,28 @@ public class AlarmAcceptanceTest extends AcceptanceTest {
         assertThat(정수_알람_조회_결과.alarmList().get(0))
                 .extracting(FindAlarmResponse::getType, FindAlarmResponse::getSendUserId, FindAlarmResponse::isChecked)
                 .containsExactly("COMMENT", 동호.getId(), true);
+    }
+
+    @Test
+    void 나에게_온_모든_알람을_읽는다() {
+        // given
+        User 정수 = 회원을_저장한다(정수());
+        User 동호 = 회원을_저장한다(동호());
+        String 정수_엑세스_토큰 = 액세스_토큰을_발급한다(정수);
+        String 동호_엑세스_토큰 = 액세스_토큰을_발급한다(동호);
+        ListEntity 정수_리스트 = 리스트를_저장한다(가장_좋아하는_견종_TOP3(정수, List.of()));
+
+        List<CommentCreateRequest> 댓글_생성_요청들 = n개의_댓글_생성_요청(10);
+        댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_엑세스_토큰, 정수_리스트.getId(), 댓글_생성요청));
+
+        // when
+        알람_전체_읽기_API_호출(정수_엑세스_토큰);
+
+        // then
+        AlarmListResponse 정수_알람_조회_결과 = 알람_조회_API_호출(정수_엑세스_토큰).as(AlarmListResponse.class);
+
+        assertThat(정수_알람_조회_결과.alarmList()).hasSize(10);
+        assertThat(정수_알람_조회_결과.alarmList())
+                .allMatch(alarmResponse -> alarmResponse.isChecked() == true);
     }
 }

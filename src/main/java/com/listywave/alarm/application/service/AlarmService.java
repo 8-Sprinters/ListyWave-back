@@ -46,4 +46,9 @@ public class AlarmService {
         User user = userRepository.getById(loginUserId);
         return new AlarmCheckResponse(alarmRepository.hasCheckedAlarmsByReceiveUserId(user.getId()));
     }
+
+    public void readAllAlarm(Long loginUserId) {
+        User user = userRepository.getById(loginUserId);
+        alarmRepository.readAllAlarm(user.getId());
+    }
 }
