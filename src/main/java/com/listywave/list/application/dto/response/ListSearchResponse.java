@@ -54,7 +54,7 @@ public record ListSearchResponse(
                     .title(list.getTitle().getValue())
                     .items(ItemInfo.toList(list.getTop3Items().getValues()))
                     .isPublic(list.isPublic())
-                    .backgroundColor(list.getBackgroundColor())
+                    .backgroundColor(list.getBackgroundColor().name())
                     .updatedDate(list.getUpdatedDate())
                     .ownerId(list.getUser().getId())
                     .ownerNickname(list.getUser().getNickname())

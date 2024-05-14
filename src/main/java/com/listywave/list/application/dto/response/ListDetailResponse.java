@@ -24,6 +24,7 @@ public record ListDetailResponse(
         List<ItemResponse> items,
         boolean isCollected,
         boolean isPublic,
+        String backgroundPalette,
         String backgroundColor,
         int collectCount,
         int viewCount
@@ -49,7 +50,8 @@ public record ListDetailResponse(
                 .items(ItemResponse.toList(list.getSortedItems().getValues()))
                 .isCollected(isCollected)
                 .isPublic(list.isPublic())
-                .backgroundColor(list.getBackgroundColor())
+                .backgroundColor(list.getBackgroundColor().name())
+                .backgroundPalette(list.getBackgroundPalette().name())
                 .collectCount(list.getCollectCount())
                 .viewCount(list.getViewCount())
                 .build();

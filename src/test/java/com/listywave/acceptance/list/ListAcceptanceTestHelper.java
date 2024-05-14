@@ -8,11 +8,14 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import com.listywave.history.application.dto.HistorySearchResponse;
 import com.listywave.history.application.dto.HistorySearchResponse.HistoryItemInfo;
 import com.listywave.list.application.domain.category.CategoryType;
+import com.listywave.list.application.domain.list.BackgroundColor;
+import com.listywave.list.application.domain.list.BackgroundPalette;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse.ItemResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
+import com.listywave.list.presentation.dto.request.ListUpdateRequest;
 import com.listywave.user.application.domain.User;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
@@ -46,7 +49,7 @@ public abstract class ListAcceptanceTestHelper {
                 .as(ListDetailResponse.class);
     }
 
-    public static ExtractableResponse<Response> 리스트_수정_API_호출(ListCreateRequest request, String accessToken, Long listId) {
+    public static ExtractableResponse<Response> 리스트_수정_API_호출(ListUpdateRequest request, String accessToken, Long listId) {
         return given()
                 .header(AUTHORIZATION, "Bearer " + accessToken)
                 .body(request)
@@ -63,7 +66,8 @@ public abstract class ListAcceptanceTestHelper {
                 "좋아하는 견종 TOP 3",
                 "지극히 주관적인 내가 가장 좋아하는 견종 3위까지",
                 true,
-                "green",
+                BackgroundPalette.PASTEL,
+                BackgroundColor.PASTEL_GREEN,
                 List.of(
                         new ItemCreateRequest(1, "말티즈", "", "", ""),
                         new ItemCreateRequest(2, "불독", "", "", ""),
@@ -72,15 +76,16 @@ public abstract class ListAcceptanceTestHelper {
         );
     }
 
-    public static ListCreateRequest 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(List<Long> collaboratorIds) {
-        return new ListCreateRequest(
+    public static ListUpdateRequest 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(List<Long> collaboratorIds) {
+        return new ListUpdateRequest(
                 ANIMAL_PLANT,
                 List.of("냐옹", "멍멍"),
                 collaboratorIds,
                 "좋아하는 견종 TOP 3",
                 "지극히 주관적인 내가 가장 좋아하는 견종 3위까지",
                 true,
-                "green",
+                BackgroundPalette.PASTEL,
+                BackgroundColor.PASTEL_GREEN,
                 List.of(
                         new ItemCreateRequest(1, "불독", "", "", ""),
                         new ItemCreateRequest(2, "골든 리트리버", "", "", ""),
@@ -97,7 +102,8 @@ public abstract class ListAcceptanceTestHelper {
                 "좋아하는 라면 TOP 3",
                 "신라면, 육개장 사발면, 김치 사발면 진리",
                 true,
-                "RED",
+                BackgroundPalette.PASTEL,
+                BackgroundColor.PASTEL_GREEN,
                 List.of(
                         new ItemCreateRequest(1, "신라면", "", "", ""),
                         new ItemCreateRequest(2, "육개장 사발면", "", "", ""),
