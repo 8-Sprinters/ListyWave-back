@@ -22,6 +22,8 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -67,7 +69,12 @@ public class ListEntity {
     private boolean isPublic;
 
     @Column(nullable = false)
-    private String backgroundColor;
+    @Enumerated(value = EnumType.STRING)
+    private BackgroundPalette backgroundPalette;
+
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private BackgroundColor backgroundColor;
 
     @Column(nullable = false)
     private boolean hasCollaboration;
@@ -93,16 +100,23 @@ public class ListEntity {
     private LocalDateTime updatedDate;
 
     public ListEntity(
-            User user, CategoryType category, ListTitle title,
-            ListDescription description, boolean isPublic,
-            String backgroundColor, boolean hasCollaboration,
-            Labels labels, Items items
+            User user,
+            CategoryType category,
+            ListTitle title,
+            ListDescription description,
+            boolean isPublic,
+            BackgroundPalette backgroundPalette,
+            BackgroundColor backgroundColor,
+            boolean hasCollaboration,
+            Labels labels,
+            Items items
     ) {
         this.user = user;
         this.category = category;
         this.title = title;
         this.description = description;
         this.isPublic = isPublic;
+        this.backgroundPalette = backgroundPalette;
         this.backgroundColor = backgroundColor;
         this.hasCollaboration = hasCollaboration;
         this.labels = labels.updateList(this);
@@ -182,7 +196,8 @@ public class ListEntity {
             ListTitle title,
             ListDescription description,
             boolean isPublic,
-            String backgroundColor,
+            BackgroundPalette backgroundPalette,
+            BackgroundColor backgroundColor,
             boolean hasCollaboration,
             LocalDateTime updatedDate,
             Labels newLabels,
@@ -192,6 +207,7 @@ public class ListEntity {
         this.title = title;
         this.description = description;
         this.isPublic = isPublic;
+        this.backgroundPalette = backgroundPalette;
         this.backgroundColor = backgroundColor;
         this.hasCollaboration = hasCollaboration;
         this.updatedDate = updatedDate;

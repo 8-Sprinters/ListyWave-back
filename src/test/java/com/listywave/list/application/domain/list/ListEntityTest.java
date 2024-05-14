@@ -42,7 +42,8 @@ class ListEntityTest {
     private final ListTitle title = new ListTitle("칼국수 맛집 TOP 10");
     private final ListDescription description = new ListDescription("박박우기는 칼국수 맛집");
     private final boolean isPublic = true;
-    private final String backgroundColor = "RED";
+    private final BackgroundPalette backGroundPalette = BackgroundPalette.GRAY;
+    private final BackgroundColor backgroundColor = BackgroundColor.GRAY_LIGHT;
     private final boolean hasCollaboration = false;
     private final Labels labels = new Labels(List.of(
             Label.init(new LabelName("대전")),
@@ -56,7 +57,7 @@ class ListEntityTest {
             Item.init(4, new ItemTitle("전주집"), new ItemComment("전주집 맛집임"), new ItemLink(""), new ItemImageUrl("")),
             Item.init(5, new ItemTitle("경주집"), new ItemComment("경주 여행가고 싶다"), new ItemLink(""), new ItemImageUrl(""))
     ));
-    private final ListEntity list = new ListEntity(user, categoryType, title, description, isPublic, backgroundColor, hasCollaboration, labels, items);
+    private final ListEntity list = new ListEntity(user, categoryType, title, description, isPublic, backGroundPalette, backgroundColor, hasCollaboration, labels, items);
 
     @Test
     void 아이템을_순위대로_정렬해서_반환한다() {
@@ -194,7 +195,7 @@ class ListEntityTest {
                 Item.init(2, new ItemTitle("동호집"), new ItemComment("동호집 칼국수가 젤 맛있음ㅋㅋ"), new ItemLink(""), new ItemImageUrl("")),
                 Item.init(3, new ItemTitle("정수집"), new ItemComment("정수네가 꼴찌"), new ItemLink(""), new ItemImageUrl("https://naver.com"))
         ));
-        ListEntity list = new ListEntity(user, categoryType, title, description, isPublic, backgroundColor, hasCollaboration, labels, items);
+        ListEntity list = new ListEntity(user, categoryType, title, description, isPublic, backGroundPalette, backgroundColor, hasCollaboration, labels, items);
 
         String result = list.getRepresentImageUrl();
 
