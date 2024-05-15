@@ -279,21 +279,23 @@ public class ListAcceptanceTest extends AcceptanceTest {
             // given
             User 동호 = 회원을_저장한다(동호());
             String 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            ListEntity 동호_리스트 = 리스트를_저장한다(가장_좋아하는_견종_TOP3(동호, List.of()));
+            Long 생성된_리스트의_ID = 리스트_저장_API_호출(좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
 
             ListUpdateRequest 리스트_수정_요청_데이터 = 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(List.of());
-            리스트_수정_API_호출(리스트_수정_요청_데이터, 동호_액세스_토큰, 동호_리스트.getId());
+            리스트_수정_API_호출(리스트_수정_요청_데이터, 동호_액세스_토큰, 생성된_리스트의_ID);
 
             // when
-            List<HistorySearchResponse> 히스토리_조회_결과 = 비회원_히스토리_조회_API_호출(동호_리스트.getId());
-            ListDetailResponse 수정된_리스트_상세_조회_결과 = 비회원_리스트_상세_조회_API_호출(동호_리스트.getId()).as(ListDetailResponse.class);
+            List<HistorySearchResponse> 히스토리_조회_결과 = 비회원_히스토리_조회_API_호출(생성된_리스트의_ID);
+            ListDetailResponse 수정된_리스트_상세_조회_결과 = 비회원_리스트_상세_조회_API_호출(생성된_리스트의_ID).as(ListDetailResponse.class);
 
             // then
             List<ItemResponse> 수정된_리스트의_아이템_정보들 = 수정된_리스트_상세_조회_결과.items();
-            List<HistoryItemInfo> 히스토리의_아이템_정보들 = 히스토리_조회_결과.get(0).items();
+            List<HistoryItemInfo> 히스토리의_아이템_정보들 = 히스토리_조회_결과.get(히스토리_조회_결과.size() - 1).items();
             assertAll(
-                    () -> assertThat(히스토리_조회_결과.size()).isOne(),
-                    () -> assertThat(히스토리_조회_결과.get(0).createdDate()).isEqualTo(수정된_리스트_상세_조회_결과.lastUpdatedDate()),
+                    () -> assertThat(히스토리_조회_결과.size()).isEqualTo(2),
+                    () -> assertThat(히스토리_조회_결과.get(히스토리_조회_결과.size() - 1).createdDate()).isEqualTo(수정된_리스트_상세_조회_결과.lastUpdatedDate()),
                     () -> 리스트의_아이템_순위와_히스토리의_아이템_순위를_검증한다(수정된_리스트의_아이템_정보들, 히스토리의_아이템_정보들)
             );
         }

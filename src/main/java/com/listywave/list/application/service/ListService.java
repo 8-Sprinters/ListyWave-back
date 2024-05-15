@@ -236,15 +236,14 @@ public class ListService {
         Collaborators beforeCollaborators = collaboratorService.findAllByList(list);
         list.validateUpdateAuthority(loginUser, beforeCollaborators);
         Collaborators newCollaborators = collaboratorService.createCollaborators(request.collaboratorIds(), list);
-        updateCollaborators(beforeCollaborators, newCollaborators, list);
+        updateCollaborators(beforeCollaborators, newCollaborators);
 
         Labels newLabels = createLabels(request.labels());
         Items newItems = createItems(request.items());
 
+        boolean doesChangedAnyItemRank = list.canCreateHistory(newItems);
+
         LocalDateTime updatedDate = LocalDateTime.now();
-        if (list.canCreateHistory(newItems)) {
-            historyService.saveHistory(list, updatedDate, request.isPublic());
-        }
         boolean hasCollaborator = !request.collaboratorIds().isEmpty();
         list.update(
                 request.category(),
@@ -258,9 +257,13 @@ public class ListService {
                 newLabels,
                 newItems
         );
+
+        if (doesChangedAnyItemRank) {
+            historyService.saveHistory(list, updatedDate, true);
+        }
     }
 
-    private void updateCollaborators(Collaborators beforeCollaborators, Collaborators newCollaborators, ListEntity list) {
+    private void updateCollaborators(Collaborators beforeCollaborators, Collaborators newCollaborators) {
         Collaborators removedCollaborators = beforeCollaborators.filterRemovedCollaborators(newCollaborators);
         collaboratorRepository.deleteAllInBatch(removedCollaborators.collaborators());
 
