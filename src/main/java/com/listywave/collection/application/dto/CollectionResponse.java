@@ -53,7 +53,7 @@ public record CollectionResponse(
         public static ListsResponse of(ListEntity list) {
             return ListsResponse.builder()
                     .id(list.getId())
-                    .backgroundColor(list.getBackgroundColor())
+                    .backgroundColor(list.getBackgroundColor().name())
                     .title(list.getTitle().getValue())
                     .ownerId(list.getUser().getId())
                     .ownerNickname(list.getUser().getNickname())

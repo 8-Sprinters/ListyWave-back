@@ -24,7 +24,7 @@ public record ListTrandingResponse(
                 .title(list.getTitle().getValue())
                 .description(list.getDescription().getValue())
                 .itemImageUrl(list.getRepresentImageUrl())
-                .backgroundColor(list.getBackgroundColor())
+                .backgroundColor(list.getBackgroundColor().name())
                 .build();
     }
 }

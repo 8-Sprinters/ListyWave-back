@@ -46,7 +46,7 @@ public record ListRecentResponse(
             return ListResponse.builder()
                     .id(list.getId())
                     .category(list.getCategory().getViewName())
-                    .backgroundColor(list.getBackgroundColor())
+                    .backgroundColor(list.getBackgroundColor().name())
                     .ownerId(list.getUser().getId())
                     .ownerNickname(list.getUser().getNickname())
                     .ownerProfileImage(list.getUser().getProfileImageUrl())

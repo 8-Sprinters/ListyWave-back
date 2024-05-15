@@ -40,7 +40,7 @@ public record FindFeedListResponse(
                     .id(list.getId())
                     .title(list.getTitle().getValue())
                     .isPublic(list.isPublic())
-                    .backgroundColor(list.getBackgroundColor())
+                    .backgroundColor(list.getBackgroundColor().name())
                     .listItems(ListItemsResponse.toList(list.getSortedItems().getValues()))
                     .build();
         }

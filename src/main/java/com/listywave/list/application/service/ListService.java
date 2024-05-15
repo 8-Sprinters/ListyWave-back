@@ -90,9 +90,18 @@ public class ListService {
         Labels labels = createLabels(request.labels());
         Items items = createItems(request.items());
 
-        ListEntity list = new ListEntity(user, request.category(), new ListTitle(request.title()),
-                new ListDescription(request.description()), request.isPublic(),
-                request.backgroundColor(), hasCollaboration, labels, items);
+        ListEntity list = new ListEntity(
+                user,
+                request.category(),
+                new ListTitle(request.title()),
+                new ListDescription(request.description()),
+                request.isPublic(),
+                request.backgroundPalette(),
+                request.backgroundColor(),
+                hasCollaboration,
+                labels,
+                items
+        );
         ListEntity savedList = listRepository.save(list);
 
         historyService.saveHistory(savedList, LocalDateTime.now(), true);
@@ -237,7 +246,18 @@ public class ListService {
             historyService.saveHistory(list, updatedDate, request.isPublic());
         }
         boolean hasCollaborator = !request.collaboratorIds().isEmpty();
-        list.update(request.category(), new ListTitle(request.title()), new ListDescription(request.description()), request.isPublic(), request.backgroundColor(), hasCollaborator, updatedDate, newLabels, newItems);
+        list.update(
+                request.category(),
+                new ListTitle(request.title()),
+                new ListDescription(request.description()),
+                request.isPublic(),
+                request.backgroundPalette(),
+                request.backgroundColor(),
+                hasCollaborator,
+                updatedDate,
+                newLabels,
+                newItems
+        );
     }
 
     private void updateCollaborators(Collaborators beforeCollaborators, Collaborators newCollaborators, ListEntity list) {

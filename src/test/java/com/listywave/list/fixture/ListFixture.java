@@ -14,10 +14,13 @@ import com.listywave.list.application.domain.item.Items;
 import com.listywave.list.application.domain.label.Label;
 import com.listywave.list.application.domain.label.LabelName;
 import com.listywave.list.application.domain.label.Labels;
+import com.listywave.list.application.domain.list.BackgroundColor;
+import com.listywave.list.application.domain.list.BackgroundPalette;
 import com.listywave.list.application.domain.list.ListDescription;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.domain.list.ListTitle;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
+import com.listywave.list.presentation.dto.request.ListUpdateRequest;
 import com.listywave.user.application.domain.User;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -43,14 +46,21 @@ public abstract class ListFixture {
                 )).toList());
 
         return new ListEntity(
-                owner, request.category(), new ListTitle(request.title()),
-                new ListDescription(request.description()), request.isPublic(),
-                request.backgroundColor(), hasCollaborators, labels, items
+                owner,
+                request.category(),
+                new ListTitle(request.title()),
+                new ListDescription(request.description()),
+                request.isPublic(),
+                request.backgroundPalette(),
+                request.backgroundColor(),
+                hasCollaborators,
+                labels,
+                items
         );
     }
 
     public static ListEntity 가장_좋아하는_견종_TOP3_순위_변경(User owner, List<Long> collaboratorIds) {
-        ListCreateRequest request = 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(collaboratorIds);
+        ListUpdateRequest request = 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(collaboratorIds);
         boolean hasCollaborators = !request.collaboratorIds().isEmpty();
 
         Labels labels = new Labels(request.labels().stream()
@@ -68,9 +78,16 @@ public abstract class ListFixture {
                 )).toList());
 
         return new ListEntity(
-                owner, request.category(), new ListTitle(request.title()),
-                new ListDescription(request.description()), request.isPublic(),
-                request.backgroundColor(), hasCollaborators, labels, items
+                owner,
+                request.category(),
+                new ListTitle(request.title()),
+                new ListDescription(request.description()),
+                request.isPublic(),
+                request.backgroundPalette(),
+                request.backgroundColor(),
+                hasCollaborators,
+                labels,
+                items
         );
     }
 
@@ -93,9 +110,16 @@ public abstract class ListFixture {
                 )).toList());
 
         return new ListEntity(
-                owner, request.category(), new ListTitle(request.title()),
-                new ListDescription(request.description()), request.isPublic(),
-                request.backgroundColor(), hasCollaborators, labels, items
+                owner,
+                request.category(),
+                new ListTitle(request.title()),
+                new ListDescription(request.description()),
+                request.isPublic(),
+                request.backgroundPalette(),
+                request.backgroundColor(),
+                hasCollaborators,
+                labels,
+                items
         );
     }
 
@@ -107,7 +131,8 @@ public abstract class ListFixture {
                         new ListTitle(i + "번째 리스트"),
                         new ListDescription(i + "번째 리스트"),
                         true,
-                        "#123456",
+                        BackgroundPalette.GRAY,
+                        BackgroundColor.PASTEL_GREEN,
                         false,
                         new Labels(List.of()),
                         new Items(List.of(

@@ -15,6 +15,8 @@ import com.listywave.list.application.domain.item.ItemLink;
 import com.listywave.list.application.domain.item.ItemTitle;
 import com.listywave.list.application.domain.item.Items;
 import com.listywave.list.application.domain.label.Labels;
+import com.listywave.list.application.domain.list.BackgroundColor;
+import com.listywave.list.application.domain.list.BackgroundPalette;
 import com.listywave.list.application.domain.list.ListDescription;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.domain.list.ListTitle;
@@ -41,7 +43,8 @@ class CollaboratorsTest {
                 new ListTitle("리스트 제목"),
                 new ListDescription("리스트 설명"),
                 true,
-                "#ab34df",
+                BackgroundPalette.PASTEL,
+                BackgroundColor.PASTEL_GREEN,
                 false,
                 new Labels(List.of()),
                 new Items(List.of(
@@ -83,11 +86,24 @@ class CollaboratorsTest {
             User userC = User.init(3L, "cccc@naver.com", "cccc");
             User userD = User.init(4L, "dddd@naver.com", "dddd");
 
-            ListEntity list = new ListEntity(userA, ETC, new ListTitle("title"), new ListDescription("description"), true, "#123345", true, new Labels(List.of()), new Items(List.of(
-                    Item.init(1, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
-                    Item.init(2, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
-                    Item.init(3, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1)))
-            )));
+            ListEntity list = new ListEntity(
+                    userA,
+                    ETC,
+                    new ListTitle("title"),
+                    new ListDescription("description"),
+                    true,
+                    BackgroundPalette.PASTEL,
+                    BackgroundColor.PASTEL_GREEN,
+                    true,
+                    new Labels(List.of()),
+                    new Items(
+                            List.of(
+                                    Item.init(1, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
+                                    Item.init(2, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
+                                    Item.init(3, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1)))
+                            )
+                    )
+            );
 
             Collaborators beforeCollaborators = new Collaborators(List.of(
                     Collaborator.init(userA, list),
@@ -112,11 +128,24 @@ class CollaboratorsTest {
             User userA = User.init(1L, "aaaa@naver.com", "aaaa");
             User userC = User.init(3L, "cccc@naver.com", "cccc");
 
-            ListEntity list = new ListEntity(userA, ETC, new ListTitle("title"), new ListDescription("description"), true, "#123345", true, new Labels(List.of()), new Items(List.of(
-                    Item.init(1, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
-                    Item.init(2, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
-                    Item.init(3, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1)))
-            )));
+            ListEntity list = new ListEntity(
+                    userA,
+                    ETC,
+                    new ListTitle("title"),
+                    new ListDescription("description"),
+                    true,
+                    BackgroundPalette.GRAY,
+                    BackgroundColor.GRAY_LIGHT,
+                    true,
+                    new Labels(List.of()),
+                    new Items(
+                            List.of(
+                                    Item.init(1, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
+                                    Item.init(2, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
+                                    Item.init(3, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1)))
+                            )
+                    )
+            );
 
             Collaborators beforeCollaborators = new Collaborators(List.of(
             ));
@@ -136,11 +165,24 @@ class CollaboratorsTest {
         void 콜라보레이터가_변경되기_전_후로_동일할_때_필터링_테스트() {
             // given
             User userA = User.init(1L, "aaaa@naver.com", "aaaa");
-            ListEntity list = new ListEntity(userA, ETC, new ListTitle("title"), new ListDescription("description"), true, "#123345", true, new Labels(List.of()), new Items(List.of(
-                    Item.init(1, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
-                    Item.init(2, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
-                    Item.init(3, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1)))
-            )));
+            ListEntity list = new ListEntity(
+                    userA,
+                    ETC,
+                    new ListTitle("title"),
+                    new ListDescription("description"),
+                    true,
+                    BackgroundPalette.GRAY,
+                    BackgroundColor.GRAY_LIGHT,
+                    true,
+                    new Labels(List.of()),
+                    new Items(
+                            List.of(
+                                    Item.init(1, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
+                                    Item.init(2, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1))),
+                                    Item.init(3, new ItemTitle(String.valueOf(1)), new ItemComment(String.valueOf(1)), new ItemLink(String.valueOf(1)), new ItemImageUrl(String.valueOf(1)))
+                            )
+                    )
+            );
 
             Collaborators beforeCollaborators = new Collaborators(List.of(Collaborator.init(userA, list)));
             Collaborators afterCollaborators = new Collaborators(List.of(Collaborator.init(userA, list)));
@@ -210,14 +252,17 @@ class CollaboratorsTest {
                             new ListTitle(String.valueOf(i)),
                             new ListDescription(String.valueOf(i)),
                             true,
-                            String.valueOf(i),
+                            BackgroundPalette.LISTY,
+                            BackgroundColor.LISTY_BLUE,
                             false,
                             new Labels(List.of()),
-                            new Items(List.of(
-                                    Item.init((int) i, new ItemTitle(String.valueOf(i)), new ItemComment(String.valueOf(i)), new ItemLink(String.valueOf(i)), new ItemImageUrl(String.valueOf(i))),
-                                    Item.init((int) i + 1, new ItemTitle(String.valueOf(i)), new ItemComment(String.valueOf(i)), new ItemLink(String.valueOf(i)), new ItemImageUrl(String.valueOf(i))),
-                                    Item.init((int) i + 2, new ItemTitle(String.valueOf(i)), new ItemComment(String.valueOf(i)), new ItemLink(String.valueOf(i)), new ItemImageUrl(String.valueOf(i)))
-                            ))
+                            new Items(
+                                    List.of(
+                                            Item.init((int) i, new ItemTitle(String.valueOf(i)), new ItemComment(String.valueOf(i)), new ItemLink(String.valueOf(i)), new ItemImageUrl(String.valueOf(i))),
+                                            Item.init((int) i + 1, new ItemTitle(String.valueOf(i)), new ItemComment(String.valueOf(i)), new ItemLink(String.valueOf(i)), new ItemImageUrl(String.valueOf(i))),
+                                            Item.init((int) i + 2, new ItemTitle(String.valueOf(i)), new ItemComment(String.valueOf(i)), new ItemLink(String.valueOf(i)), new ItemImageUrl(String.valueOf(i)))
+                                    )
+                            )
                     );
                     return Collaborator.init(user, list);
                 }).toList();
