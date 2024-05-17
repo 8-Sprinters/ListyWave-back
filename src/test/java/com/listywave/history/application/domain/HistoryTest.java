@@ -22,9 +22,9 @@ class HistoryTest {
     private final User user = 동호();
     private final ListEntity list = 가장_좋아하는_견종_TOP3(user, List.of());
     private final List<HistoryItem> historyItems = List.of(
-            new HistoryItem(1, new HistoryItemTitle("1등")),
+            new HistoryItem(2, new HistoryItemTitle("1등")),
             new HistoryItem(1, new HistoryItemTitle("2등")),
-            new HistoryItem(1, new HistoryItemTitle("3등"))
+            new HistoryItem(3, new HistoryItemTitle("3등"))
     );
 
     @Test
@@ -45,5 +45,20 @@ class HistoryTest {
 
         history.updatePublic();
         assertThat(history.isPublic()).isTrue();
+    }
+
+    @Test
+    void 히스토리_아이템의_순위대로_정렬하여_반환한다() {
+        // given
+        History history = new History(list, historyItems, now(), true);
+
+        // when
+        List<HistoryItem> result = history.sortedItems();
+
+        // then
+        assertThat(result.stream()
+                .map(HistoryItem::getRank)
+                .toList()
+        ).isEqualTo(List.of(1, 2, 3));
     }
 }

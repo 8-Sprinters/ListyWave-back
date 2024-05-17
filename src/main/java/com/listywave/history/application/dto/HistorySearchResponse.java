@@ -23,7 +23,7 @@ public record HistorySearchResponse(
                 history.getId(),
                 history.getCreatedDate(),
                 history.isPublic(),
-                HistoryItemInfo.toList(history.getItems())
+                HistoryItemInfo.toList(history.sortedItems())
         );
     }
 
