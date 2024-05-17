@@ -3,27 +3,13 @@ package com.listywave.acceptance.list;
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.given;
 import static com.listywave.list.application.domain.category.CategoryType.ANIMAL_PLANT;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.history.application.dto.HistorySearchResponse;
 import com.listywave.history.application.dto.HistorySearchResponse.HistoryItemInfo;
 import com.listywave.list.application.domain.category.CategoryType;
-import com.listywave.list.application.domain.item.Item;
-import com.listywave.list.application.domain.item.ItemComment;
-import com.listywave.list.application.domain.item.ItemImageUrl;
-import com.listywave.list.application.domain.item.ItemLink;
-import com.listywave.list.application.domain.item.ItemTitle;
-import com.listywave.list.application.domain.item.Items;
-import com.listywave.list.application.domain.label.Label;
-import com.listywave.list.application.domain.label.LabelName;
-import com.listywave.list.application.domain.label.Labels;
 import com.listywave.list.application.domain.list.BackgroundColor;
 import com.listywave.list.application.domain.list.BackgroundPalette;
-import com.listywave.list.application.domain.list.ListDescription;
-import com.listywave.list.application.domain.list.ListEntity;
-import com.listywave.list.application.domain.list.ListTitle;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse.ItemResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
@@ -125,73 +111,11 @@ public abstract class ListAcceptanceTestHelper {
         );
     }
 
-    /**
-     * 콜라보레이터가 없는 리스트의 경우 사용을 추천
-     */
     public static void 리스트_상세_조회를_검증한다(ListDetailResponse 결과값, ListDetailResponse 기대값) {
         assertThat(결과값).usingRecursiveComparison()
                 .ignoringFieldsOfTypes(Long.class)
                 .ignoringFields("createdDate", "lastUpdatedDate")
                 .isEqualTo(기대값);
-    }
-
-    public static void 리스트_상세_조회를_검증한다(
-            ListDetailResponse 결과,
-            CategoryType 카테고리,
-            Long 작성자_ID,
-            int 콜렉트_수,
-            boolean 공개_여부,
-            String 제목,
-            String 설명,
-            List<Label> 라벨,
-            List<Item> 아이템,
-            List<Collaborator> 콜라보레이터
-    ) {
-        assertAll(
-                () -> assertThat(결과.category()).isEqualTo(카테고리),
-                () -> assertThat(결과.ownerId()).isEqualTo(작성자_ID),
-                () -> assertThat(결과.collectCount()).isEqualTo(콜렉트_수),
-                () -> assertThat(결과.isPublic()).isEqualTo(공개_여부),
-                () -> assertThat(결과.title()).isEqualTo(제목),
-                () -> assertThat(결과.description()).isEqualTo(설명),
-                () -> assertThat(결과.labels()).usingRecursiveComparison()
-                        .comparingOnlyFields("name")
-                        .isEqualTo(라벨),
-                () -> assertThat(결과.items()).usingRecursiveComparison()
-                        .comparingOnlyFields("rank", "title")
-                        .isEqualTo(아이템),
-                () -> assertThat(결과.collaborators()).usingRecursiveComparison()
-                        .comparingOnlyFields("nickname")
-                        .isEqualTo(콜라보레이터)
-        );
-    }
-
-    /**
-     * 콜라보레이터가 있는 리스트의 경우 사용을 추천
-     */
-    public static void 리스트_상세_조회를_검증한다(ListDetailResponse 결과, ListEntity 기대_리스트, User 작성자, boolean 콜렉트_여부, List<Collaborator> 콜라보레이터) {
-        ListDetailResponse 기댓값 = ListDetailResponse.of(기대_리스트, 작성자, 콜렉트_여부, 콜라보레이터);
-
-        assertThat(결과).usingRecursiveComparison()
-                .ignoringFields("id", "createdDate", "lastUpdatedDate")
-                .isEqualTo(기댓값);
-    }
-
-    public static ListEntity toListEntity(ListCreateRequest request, User user) {
-        return ListEntity.builder()
-                .user(user)
-                .category(request.category())
-                .title(new ListTitle(request.title()))
-                .description(new ListDescription(request.description()))
-                .isPublic(request.isPublic())
-                .backgroundPalette(request.backgroundPalette())
-                .backgroundColor(request.backgroundColor())
-                .hasCollaboration(!request.collaboratorIds().isEmpty())
-                .viewCount(0)
-                .collectCount(0)
-                .labels(new Labels(request.labels().stream().map(it -> Label.init(new LabelName(it))).toList()))
-                .items(new Items(request.items().stream().map(it -> Item.init(it.rank(), new ItemTitle(it.title()), new ItemComment(it.comment()), new ItemLink(it.link()), new ItemImageUrl(it.imageUrl()))).toList()))
-                .build();
     }
 
     public static List<HistorySearchResponse> 비회원_히스토리_조회_API_호출(Long listId) {
