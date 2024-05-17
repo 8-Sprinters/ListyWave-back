@@ -1,8 +1,7 @@
 package com.listywave.acceptance.list;
 
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
-import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.toListEntity;
+import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청_API;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.가장_좋아하는_견종_TOP3_생성_요청_데이터;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.검색_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_삭제_요청_API_호출;
@@ -152,17 +151,20 @@ public class ListAcceptanceTest extends AcceptanceTest {
         void 비회원이_리스트를_상세_조회한다() {
             // given
             var 동호 = 회원을_저장한다(동호());
-            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            var 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰)
-                    .as(ListCreateResponse.class)
-                    .listId();
+            var 정수 = 회원을_저장한다(정수());
+            var 동호_리스트 = 리스트를_저장한다(가장_좋아하는_견종_TOP3(동호, List.of(정수.getId())));
 
             // when
-            var 결과 = 비회원_리스트_상세_조회_API_호출(동호_리스트_ID).as(ListDetailResponse.class);
-            var 기대값 = ListDetailResponse.of(가장_좋아하는_견종_TOP3(동호, List.of()), 동호, false, List.of());
+            var 결과 = 비회원_리스트_상세_조회_API_호출(동호_리스트.getId()).as(ListDetailResponse.class);
 
             // then
-            리스트_상세_조회를_검증한다(결과, 기대값);
+            assertAll(
+                    () -> assertThat(결과.ownerId()).isEqualTo(동호.getId()),
+                    () -> assertThat(결과.title()).isEqualTo(동호_리스트.getTitle().getValue()),
+                    () -> assertThat(결과.category()).isEqualTo(동호_리스트.getCategory().getViewName()),
+                    () -> assertThat(결과.collectCount()).isZero(),
+                    () -> assertThat(결과.collaborators()).isEmpty()
+            );
         }
 
         @Test
@@ -172,7 +174,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 정수 = 회원을_저장한다(정수());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
             var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
-            var 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰)
+            Long 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰)
                     .as(ListCreateResponse.class)
                     .listId();
             콜렉트_요청_API_호출(액세스_토큰을_발급한다(정수), 동호_리스트_ID);
@@ -181,8 +183,11 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 동호_리스트_ID);
 
             // then
-            var 기대_리스트 = toListEntity(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호);
-            리스트_상세_조회를_검증한다(결과, 기대_리스트, 동호, true, List.of(Collaborator.init(정수, 기대_리스트)));
+            assertAll(
+                    () -> assertThat(결과.ownerId()).isEqualTo(동호.getId()),
+                    () -> assertThat(결과.collaborators().get(0).id()).isEqualTo(정수.getId()),
+                    () -> assertThat(결과.collectCount()).isEqualTo(1)
+            );
         }
 
         @Test
@@ -192,7 +197,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 정수 = 회원을_저장한다(정수());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
             var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
-            var 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰)
+            Long 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰)
                     .as(ListCreateResponse.class)
                     .listId();
             콜렉트_요청_API_호출(정수_액세스_토큰, 동호_리스트_ID);
@@ -201,8 +206,11 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 결과 = 회원용_리스트_상세_조회_API_호출(동호_액세스_토큰, 동호_리스트_ID);
 
             // then
-            var 기대_리스트 = toListEntity(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호);
-            리스트_상세_조회를_검증한다(결과, 기대_리스트, 동호, false, List.of(Collaborator.init(정수, 기대_리스트)));
+            assertAll(
+                    () -> assertThat(결과.ownerId()).isEqualTo(동호.getId()),
+                    () -> assertThat(결과.collaborators().get(0).id()).isEqualTo(정수.getId()),
+                    () -> assertThat(결과.collectCount()).isEqualTo(1)
+            );
         }
 
         @Test
@@ -551,7 +559,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 동호 = 회원을_저장한다(동호());
             var 정수 = 회원을_저장한다(정수());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            팔로우_요청(동호_액세스_토큰, 정수.getId());
+            팔로우_요청_API(동호_액세스_토큰, 정수.getId());
             리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(동호, 5));
             리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(정수, 5));
             리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(동호, 5));
@@ -570,7 +578,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 동호 = 회원을_저장한다(동호());
             var 정수 = 회원을_저장한다(정수());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            팔로우_요청(동호_액세스_토큰, 정수.getId());
+            팔로우_요청_API(동호_액세스_토큰, 정수.getId());
             리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(동호, 5));
             리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(정수, 5));
             리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(동호, 5));

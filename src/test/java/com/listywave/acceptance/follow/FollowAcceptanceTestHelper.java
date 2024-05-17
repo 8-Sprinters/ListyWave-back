@@ -8,7 +8,7 @@ import io.restassured.response.Response;
 
 public abstract class FollowAcceptanceTestHelper {
 
-    public static ExtractableResponse<Response> 팔로우_요청(String accessToken, Long userId) {
+    public static ExtractableResponse<Response> 팔로우_요청_API(String accessToken, Long userId) {
         return given()
                 .header(AUTHORIZATION, "Bearer " + accessToken)
                 .when().post("/follow/{userId}", userId)
@@ -16,7 +16,7 @@ public abstract class FollowAcceptanceTestHelper {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 팔로우_취소(String accessToken, Long userId) {
+    public static ExtractableResponse<Response> 팔로우_취소_API(String accessToken, Long userId) {
         return given()
                 .header(AUTHORIZATION, "Bearer " + accessToken)
                 .when().delete("/follow/{userId}", userId)
@@ -24,14 +24,14 @@ public abstract class FollowAcceptanceTestHelper {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 팔로워_목록_조회(Long userId) {
+    public static ExtractableResponse<Response> 팔로워_목록_조회_API(Long userId) {
         return given()
                 .when().get("/users/{userId}/followers", userId)
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 팔로워_검색(Long userId, String search) {
+    public static ExtractableResponse<Response> 팔로워_검색_API(Long userId, String search) {
         return given()
                 .queryParam("search", search)
                 .when().get("/users/{userId}/followers", userId)
@@ -39,14 +39,14 @@ public abstract class FollowAcceptanceTestHelper {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 팔로잉_목록_조회(Long userId) {
+    public static ExtractableResponse<Response> 팔로잉_목록_조회_API(Long userId) {
         return given()
                 .when().get("/users/{userId}/followings", userId)
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 팔로잉_검색(Long userId, String search) {
+    public static ExtractableResponse<Response> 팔로잉_검색_API(Long userId, String search) {
         return given()
                 .queryParam("search", search)
                 .when().get("/users/{userId}/followings", userId)
@@ -54,7 +54,7 @@ public abstract class FollowAcceptanceTestHelper {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 팔로워_삭제(String accessToken, Long followerId) {
+    public static ExtractableResponse<Response> 팔로워_삭제_API(String accessToken, Long followerId) {
         return given()
                 .header(AUTHORIZATION, "Bearer " + accessToken)
                 .when().delete("/followers/{userId}", followerId)

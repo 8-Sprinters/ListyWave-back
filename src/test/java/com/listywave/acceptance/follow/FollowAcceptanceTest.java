@@ -1,13 +1,13 @@
 package com.listywave.acceptance.follow;
 
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
-import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청;
-import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_취소;
-import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로워_검색;
-import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로워_목록_조회;
-import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로워_삭제;
-import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로잉_검색;
-import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로잉_목록_조회;
+import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청_API;
+import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_취소_API;
+import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로워_검색_API;
+import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로워_목록_조회_API;
+import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로워_삭제_API;
+import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로잉_검색_API;
+import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로잉_목록_조회_API;
 import static com.listywave.acceptance.user.UserAcceptanceTestHelper.비회원_회원_정보_조회_요청;
 import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.유진;
@@ -43,10 +43,17 @@ public class FollowAcceptanceTest extends AcceptanceTest {
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
 
             // when
-            var 응답 = 팔로우_요청(동호_액세스_토큰, 정수.getId());
+            var 응답 = 팔로우_요청_API(동호_액세스_토큰, 정수.getId());
 
             // then
             HTTP_상태_코드를_검증한다(응답, NO_CONTENT);
+
+            // TODO: User 객체의 followerCount, followingCount가 오르는 걸 검증해야 함
+//            assertAll(
+//                    () -> HTTP_상태_코드를_검증한다(응답, NO_CONTENT),
+//                    () -> assertThat(동호.getFollowingCount()).isEqualTo(동호().getFollowingCount() + 1),
+//                    () -> assertThat(정수.getFollowerCount()).isEqualTo(정수().getFollowerCount() + 1)
+//            );
         }
 
         @Test
@@ -56,7 +63,7 @@ public class FollowAcceptanceTest extends AcceptanceTest {
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
 
             // when
-            var 응답 = 팔로우_요청(동호_액세스_토큰, 동호.getId());
+            var 응답 = 팔로우_요청_API(동호_액세스_토큰, 동호.getId());
 
             // then
             HTTP_상태_코드를_검증한다(응답, FORBIDDEN);
@@ -69,10 +76,10 @@ public class FollowAcceptanceTest extends AcceptanceTest {
             var 정수 = 회원을_저장한다(정수());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
 
-            팔로우_요청(동호_액세스_토큰, 정수.getId());
+            팔로우_요청_API(동호_액세스_토큰, 정수.getId());
 
             // when
-            var 응답 = 팔로우_요청(동호_액세스_토큰, 정수.getId());
+            var 응답 = 팔로우_요청_API(동호_액세스_토큰, 정수.getId());
 
             // then
             HTTP_상태_코드를_검증한다(응답, BAD_REQUEST);
@@ -84,7 +91,7 @@ public class FollowAcceptanceTest extends AcceptanceTest {
             var 동호 = 회원을_저장한다(동호());
             var 정수 = 회원을_저장한다(정수());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            팔로우_요청(동호_액세스_토큰, 정수.getId());
+            팔로우_요청_API(동호_액세스_토큰, 정수.getId());
 
             // when
             var 동호_정보 = 비회원_회원_정보_조회_요청(동호.getId()).as(UserInfoResponse.class);
@@ -109,10 +116,10 @@ public class FollowAcceptanceTest extends AcceptanceTest {
             var 동호 = 회원을_저장한다(동호());
             var 정수 = 회원을_저장한다(정수());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            팔로우_요청(동호_액세스_토큰, 정수.getId());
+            팔로우_요청_API(동호_액세스_토큰, 정수.getId());
 
             // when
-            var 응답 = 팔로우_취소(동호_액세스_토큰, 정수.getId());
+            var 응답 = 팔로우_취소_API(동호_액세스_토큰, 정수.getId());
 
             // then
             HTTP_상태_코드를_검증한다(응답, NO_CONTENT);
@@ -126,7 +133,7 @@ public class FollowAcceptanceTest extends AcceptanceTest {
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
 
             // when
-            var 응답 = 팔로우_취소(동호_액세스_토큰, 정수.getId());
+            var 응답 = 팔로우_취소_API(동호_액세스_토큰, 정수.getId());
 
             // then
             HTTP_상태_코드를_검증한다(응답, BAD_REQUEST);
@@ -138,10 +145,10 @@ public class FollowAcceptanceTest extends AcceptanceTest {
             var 동호 = 회원을_저장한다(동호());
             var 정수 = 회원을_저장한다(정수());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            팔로우_요청(동호_액세스_토큰, 정수.getId());
+            팔로우_요청_API(동호_액세스_토큰, 정수.getId());
 
             // when
-            팔로우_취소(동호_액세스_토큰, 정수.getId());
+            팔로우_취소_API(동호_액세스_토큰, 정수.getId());
 
             // then
             var 동호_정보 = 비회원_회원_정보_조회_요청(동호.getId()).as(UserInfoResponse.class);
@@ -166,13 +173,13 @@ public class FollowAcceptanceTest extends AcceptanceTest {
             var 정수 = 회원을_저장한다(정수());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
             var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
-            팔로우_요청(동호_액세스_토큰, 정수.getId());
+            팔로우_요청_API(동호_액세스_토큰, 정수.getId());
 
             // when
-            팔로워_삭제(정수_액세스_토큰, 동호.getId());
+            팔로워_삭제_API(정수_액세스_토큰, 동호.getId());
 
             // then
-            var 정수_팔로워_목록 = 팔로워_목록_조회(정수.getId()).as(FollowersResponse.class);
+            var 정수_팔로워_목록 = 팔로워_목록_조회_API(정수.getId()).as(FollowersResponse.class);
             assertThat(정수_팔로워_목록.followers()).isEmpty();
         }
     }
@@ -188,11 +195,11 @@ public class FollowAcceptanceTest extends AcceptanceTest {
             var 유진 = 회원을_저장한다(유진());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
             var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
-            팔로우_요청(동호_액세스_토큰, 유진.getId());
-            팔로우_요청(정수_액세스_토큰, 유진.getId());
+            팔로우_요청_API(동호_액세스_토큰, 유진.getId());
+            팔로우_요청_API(정수_액세스_토큰, 유진.getId());
 
             // when
-            var 결과 = 팔로워_목록_조회(유진.getId()).as(FollowersResponse.class);
+            var 결과 = 팔로워_목록_조회_API(유진.getId()).as(FollowersResponse.class);
 
             // then
             var 기댓값 = List.of(FollowerInfo.of(동호), FollowerInfo.of(정수));
@@ -207,11 +214,11 @@ public class FollowAcceptanceTest extends AcceptanceTest {
             var 유진 = 회원을_저장한다(유진());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
             var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
-            팔로우_요청(동호_액세스_토큰, 유진.getId());
-            팔로우_요청(정수_액세스_토큰, 유진.getId());
+            팔로우_요청_API(동호_액세스_토큰, 유진.getId());
+            팔로우_요청_API(정수_액세스_토큰, 유진.getId());
 
             // when
-            var 결과 = 팔로워_검색(유진.getId(), 동호.getNickname()).as(FollowersResponse.class);
+            var 결과 = 팔로워_검색_API(유진.getId(), 동호.getNickname()).as(FollowersResponse.class);
 
             // then
             var 기댓값 = List.of(FollowerInfo.of(동호));
@@ -229,11 +236,11 @@ public class FollowAcceptanceTest extends AcceptanceTest {
             var 정수 = 회원을_저장한다(정수());
             var 유진 = 회원을_저장한다(유진());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            팔로우_요청(동호_액세스_토큰, 정수.getId());
-            팔로우_요청(동호_액세스_토큰, 유진.getId());
+            팔로우_요청_API(동호_액세스_토큰, 정수.getId());
+            팔로우_요청_API(동호_액세스_토큰, 유진.getId());
 
             // when
-            var 결과 = 팔로잉_목록_조회(동호.getId()).as(FollowingsResponse.class);
+            var 결과 = 팔로잉_목록_조회_API(동호.getId()).as(FollowingsResponse.class);
 
             // then
             var 기댓값 = List.of(FollowingInfo.of(유진), FollowingInfo.of(정수));
@@ -247,11 +254,11 @@ public class FollowAcceptanceTest extends AcceptanceTest {
             var 정수 = 회원을_저장한다(정수());
             var 유진 = 회원을_저장한다(유진());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            팔로우_요청(동호_액세스_토큰, 정수.getId());
-            팔로우_요청(동호_액세스_토큰, 유진.getId());
+            팔로우_요청_API(동호_액세스_토큰, 정수.getId());
+            팔로우_요청_API(동호_액세스_토큰, 유진.getId());
 
             // when
-            var 결과 = 팔로잉_검색(동호.getId(), 유진.getNickname()).as(FollowingsResponse.class);
+            var 결과 = 팔로잉_검색_API(동호.getId(), 유진.getNickname()).as(FollowingsResponse.class);
 
             // then
             var 기댓값 = List.of(FollowingInfo.of(유진));

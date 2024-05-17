@@ -51,7 +51,7 @@ public class AuthAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 최초_로그인_한다() {
+        void 로그인을_한다() {
             // given
             var kakaoTokenResponse = new KakaoTokenResponse("Bearer", "AccessToken", Integer.MAX_VALUE, "RefreshToken", Integer.MAX_VALUE, "email");
             when(kakaoOauthApiClient.requestToken(any()))

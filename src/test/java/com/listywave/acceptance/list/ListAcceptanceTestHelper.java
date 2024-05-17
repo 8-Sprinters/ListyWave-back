@@ -3,6 +3,7 @@ package com.listywave.acceptance.list;
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.given;
 import static com.listywave.list.application.domain.category.CategoryType.ANIMAL_PLANT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import com.listywave.collaborator.application.domain.Collaborator;
@@ -132,6 +133,37 @@ public abstract class ListAcceptanceTestHelper {
                 .ignoringFieldsOfTypes(Long.class)
                 .ignoringFields("createdDate", "lastUpdatedDate")
                 .isEqualTo(기대값);
+    }
+
+    public static void 리스트_상세_조회를_검증한다(
+            ListDetailResponse 결과,
+            CategoryType 카테고리,
+            Long 작성자_ID,
+            int 콜렉트_수,
+            boolean 공개_여부,
+            String 제목,
+            String 설명,
+            List<Label> 라벨,
+            List<Item> 아이템,
+            List<Collaborator> 콜라보레이터
+    ) {
+        assertAll(
+                () -> assertThat(결과.category()).isEqualTo(카테고리),
+                () -> assertThat(결과.ownerId()).isEqualTo(작성자_ID),
+                () -> assertThat(결과.collectCount()).isEqualTo(콜렉트_수),
+                () -> assertThat(결과.isPublic()).isEqualTo(공개_여부),
+                () -> assertThat(결과.title()).isEqualTo(제목),
+                () -> assertThat(결과.description()).isEqualTo(설명),
+                () -> assertThat(결과.labels()).usingRecursiveComparison()
+                        .comparingOnlyFields("name")
+                        .isEqualTo(라벨),
+                () -> assertThat(결과.items()).usingRecursiveComparison()
+                        .comparingOnlyFields("rank", "title")
+                        .isEqualTo(아이템),
+                () -> assertThat(결과.collaborators()).usingRecursiveComparison()
+                        .comparingOnlyFields("nickname")
+                        .isEqualTo(콜라보레이터)
+        );
     }
 
     /**

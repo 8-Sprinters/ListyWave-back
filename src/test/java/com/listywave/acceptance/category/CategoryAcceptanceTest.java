@@ -8,6 +8,7 @@ import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.dto.response.CategoryTypeResponse;
 import io.restassured.common.mapper.TypeRef;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +24,7 @@ public class CategoryAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         // when
-        var 결과 = response.as(new TypeRef<>() {
+        List<CategoryTypeResponse> 결과 = response.as(new TypeRef<>() {
         });
 
         // then

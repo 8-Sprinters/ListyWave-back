@@ -5,7 +5,7 @@ import static com.listywave.acceptance.alarm.AlarmAcceptanceTestHelper.알람_�
 import static com.listywave.acceptance.alarm.AlarmAcceptanceTestHelper.알람_조회_API_호출;
 import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.n개의_댓글_생성_요청;
 import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.댓글_저장_API_호출;
-import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청;
+import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청_API;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.가장_좋아하는_견종_TOP3_생성_요청_데이터;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_저장_API_호출;
 import static com.listywave.acceptance.reply.ReplyAcceptanceTestHelper.답글_등록_API_호출;
@@ -63,7 +63,7 @@ public class AlarmAcceptanceTest extends AcceptanceTest {
         var 동호 = 회원을_저장한다(동호());
         var 정수_엑세스_토큰 = 액세스_토큰을_발급한다(정수);
         var 동호_엑세스_토큰 = 액세스_토큰을_발급한다(동호);
-        팔로우_요청(정수_엑세스_토큰, 동호.getId());
+        팔로우_요청_API(정수_엑세스_토큰, 동호.getId());
 
         // when
         var 동호_알람_조회_결과 = 알람_조회_API_호출(동호_엑세스_토큰).as(AlarmListResponse.class);

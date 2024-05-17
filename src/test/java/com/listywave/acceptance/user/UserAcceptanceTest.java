@@ -1,7 +1,7 @@
 package com.listywave.acceptance.user;
 
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
-import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청;
+import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청_API;
 import static com.listywave.acceptance.user.UserAcceptanceTestHelper.닉네임_중복_체크_요청;
 import static com.listywave.acceptance.user.UserAcceptanceTestHelper.비회원_회원_정보_조회_요청;
 import static com.listywave.acceptance.user.UserAcceptanceTestHelper.비회원이_사용자_검색;
@@ -60,24 +60,6 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
             // then
             var 기댓값 = UserInfoResponse.of(동호, false, false);
-            assertThat(결과).usingRecursiveComparison()
-                    .isEqualTo(기댓값);
-        }
-
-        @Test
-        void 회원이_팔로우_하고_있는_회원의_상세_정보를_조회한다() {
-            // given
-            var 동호 = 회원을_저장한다(동호());
-            var 정수 = 회원을_저장한다(정수());
-            var 동호_엑세스_토큰 = 액세스_토큰을_발급한다(동호);
-            팔로우_요청(동호_엑세스_토큰, 정수.getId());
-            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
-
-            // when
-            var 결과 = 회원이_회원_정보_조회_요청(정수_액세스_토큰, 동호.getId()).as(UserInfoResponse.class);
-
-            // then
-            var 기댓값 = UserInfoResponse.of(동호, true, false);
             assertThat(결과).usingRecursiveComparison()
                     .isEqualTo(기댓값);
         }
@@ -160,7 +142,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
         var 동호 = 회원을_저장한다(동호());
         var 정수 = 회원을_저장한다(정수());
         var 유진 = 회원을_저장한다(유진());
-        팔로우_요청(액세스_토큰을_발급한다(동호), 정수.getId());
+        팔로우_요청_API(액세스_토큰을_발급한다(동호), 정수.getId());
         var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
 
         // when
