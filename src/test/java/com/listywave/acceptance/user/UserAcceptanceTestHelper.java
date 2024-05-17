@@ -1,6 +1,6 @@
 package com.listywave.acceptance.user;
 
-import static com.listywave.acceptance.common.CommonAcceptanceSteps.given;
+import static com.listywave.acceptance.common.CommonAcceptanceHelper.given;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import com.listywave.user.presentation.dto.UserProfileUpdateRequest;

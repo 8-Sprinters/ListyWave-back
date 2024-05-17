@@ -1,16 +1,28 @@
 package com.listywave.acceptance.list;
 
-import static com.listywave.acceptance.common.CommonAcceptanceSteps.given;
+import static com.listywave.acceptance.common.CommonAcceptanceHelper.given;
 import static com.listywave.list.application.domain.category.CategoryType.ANIMAL_PLANT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.history.application.dto.HistorySearchResponse;
 import com.listywave.history.application.dto.HistorySearchResponse.HistoryItemInfo;
 import com.listywave.list.application.domain.category.CategoryType;
+import com.listywave.list.application.domain.item.Item;
+import com.listywave.list.application.domain.item.ItemComment;
+import com.listywave.list.application.domain.item.ItemImageUrl;
+import com.listywave.list.application.domain.item.ItemLink;
+import com.listywave.list.application.domain.item.ItemTitle;
+import com.listywave.list.application.domain.item.Items;
+import com.listywave.list.application.domain.label.Label;
+import com.listywave.list.application.domain.label.LabelName;
+import com.listywave.list.application.domain.label.Labels;
 import com.listywave.list.application.domain.list.BackgroundColor;
 import com.listywave.list.application.domain.list.BackgroundPalette;
+import com.listywave.list.application.domain.list.ListDescription;
 import com.listywave.list.application.domain.list.ListEntity;
+import com.listywave.list.application.domain.list.ListTitle;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse.ItemResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
@@ -58,7 +70,7 @@ public abstract class ListAcceptanceTestHelper {
                 .extract();
     }
 
-    public static ListCreateRequest 좋아하는_견종_TOP3_생성_요청_데이터(List<Long> collaboratorIds) {
+    public static ListCreateRequest 가장_좋아하는_견종_TOP3_생성_요청_데이터(List<Long> collaboratorIds) {
         return new ListCreateRequest(
                 ANIMAL_PLANT,
                 List.of("동물", "최애 동물", "강아지"),
@@ -76,7 +88,7 @@ public abstract class ListAcceptanceTestHelper {
         );
     }
 
-    public static ListUpdateRequest 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(List<Long> collaboratorIds) {
+    public static ListUpdateRequest 아이템_순위와_라벨을_바꾼_좋아하는_견종_TOP3_요청_데이터(List<Long> collaboratorIds) {
         return new ListUpdateRequest(
                 ANIMAL_PLANT,
                 List.of("냐옹", "멍멍"),
@@ -112,11 +124,42 @@ public abstract class ListAcceptanceTestHelper {
         );
     }
 
-    public static void 리스트_상세_조회를_검증한다(ListDetailResponse result, ListDetailResponse expect) {
-        assertThat(result).usingRecursiveComparison()
+    /**
+     * 콜라보레이터가 없는 리스트의 경우 사용을 추천
+     */
+    public static void 리스트_상세_조회를_검증한다(ListDetailResponse 결과값, ListDetailResponse 기대값) {
+        assertThat(결과값).usingRecursiveComparison()
                 .ignoringFieldsOfTypes(Long.class)
                 .ignoringFields("createdDate", "lastUpdatedDate")
-                .isEqualTo(expect);
+                .isEqualTo(기대값);
+    }
+
+    /**
+     * 콜라보레이터가 있는 리스트의 경우 사용을 추천
+     */
+    public static void 리스트_상세_조회를_검증한다(ListDetailResponse 결과, ListEntity 기대_리스트, User 작성자, boolean 콜렉트_여부, List<Collaborator> 콜라보레이터) {
+        ListDetailResponse 기댓값 = ListDetailResponse.of(기대_리스트, 작성자, 콜렉트_여부, 콜라보레이터);
+
+        assertThat(결과).usingRecursiveComparison()
+                .ignoringFields("id", "createdDate", "lastUpdatedDate")
+                .isEqualTo(기댓값);
+    }
+
+    public static ListEntity toListEntity(ListCreateRequest request, User user) {
+        return ListEntity.builder()
+                .user(user)
+                .category(request.category())
+                .title(new ListTitle(request.title()))
+                .description(new ListDescription(request.description()))
+                .isPublic(request.isPublic())
+                .backgroundPalette(request.backgroundPalette())
+                .backgroundColor(request.backgroundColor())
+                .hasCollaboration(!request.collaboratorIds().isEmpty())
+                .viewCount(0)
+                .collectCount(0)
+                .labels(new Labels(request.labels().stream().map(it -> Label.init(new LabelName(it))).toList()))
+                .items(new Items(request.items().stream().map(it -> Item.init(it.rank(), new ItemTitle(it.title()), new ItemComment(it.comment()), new ItemLink(it.link()), new ItemImageUrl(it.imageUrl()))).toList()))
+                .build();
     }
 
     public static List<HistorySearchResponse> 비회원_히스토리_조회_API_호출(Long listId) {
@@ -134,10 +177,10 @@ public abstract class ListAcceptanceTestHelper {
                 .isEqualTo(히스토리_아이템);
     }
 
-    public static ExtractableResponse<Response> 리스트_삭제_요청_API_호출(String accessToken, ListEntity list) {
+    public static ExtractableResponse<Response> 리스트_삭제_요청_API_호출(String accessToken, Long listId) {
         return given()
                 .header(AUTHORIZATION, "Bearer " + accessToken)
-                .when().delete("/lists/{listId}", list.getId())
+                .when().delete("/lists/{listId}", listId)
                 .then().log().all()
                 .extract();
     }
