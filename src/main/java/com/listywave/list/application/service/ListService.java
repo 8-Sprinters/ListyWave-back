@@ -252,6 +252,7 @@ public class ListService {
                 request.backgroundColor(),
                 hasCollaborator,
                 updatedDate,
+                doesChangedAnyItemRank,
                 newLabels,
                 newItems
         );

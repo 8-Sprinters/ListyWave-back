@@ -52,12 +52,16 @@ import com.listywave.acceptance.common.AcceptanceTest;
 import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.list.application.domain.category.CategoryType;
+import com.listywave.list.application.domain.list.BackgroundColor;
+import com.listywave.list.application.domain.list.BackgroundPalette;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListRecentResponse;
 import com.listywave.list.application.dto.response.ListSearchResponse;
 import com.listywave.list.application.dto.response.ListTrandingResponse;
+import com.listywave.list.presentation.dto.request.ItemCreateRequest;
+import com.listywave.list.presentation.dto.request.ListUpdateRequest;
 import com.listywave.user.application.dto.FindFeedListResponse;
 import com.listywave.user.application.dto.FindFeedListResponse.FeedListInfo;
 import com.listywave.user.application.dto.FindFeedListResponse.ListItemsResponse;
@@ -277,7 +281,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 아이템_순위에_변동이_있으면_히스토리로_기록된다() {
+        void 아이템_순위에_변동이_있으면_히스토리로_기록되고_lastUpdatedDate가_갱신된다() {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
@@ -285,20 +289,25 @@ public class ListAcceptanceTest extends AcceptanceTest {
                     .as(ListCreateResponse.class)
                     .listId();
 
+            var 수정_전_lastUpdatedDate = 비회원_리스트_상세_조회_API_호출(동호_리스트_ID)
+                    .as(ListDetailResponse.class)
+                    .lastUpdatedDate();
+
+            // when
             var 리스트_수정_요청_데이터 = 아이템_순위와_라벨을_바꾼_좋아하는_견종_TOP3_요청_데이터(List.of());
             리스트_수정_API_호출(리스트_수정_요청_데이터, 동호_액세스_토큰, 동호_리스트_ID);
 
-            // when
+            // then
             var 히스토리_조회_결과 = 비회원_히스토리_조회_API_호출(동호_리스트_ID);
             var 수정된_리스트_상세_조회_결과 = 비회원_리스트_상세_조회_API_호출(동호_리스트_ID).as(ListDetailResponse.class);
 
-            // then
             var 수정된_리스트의_아이템_정보들 = 수정된_리스트_상세_조회_결과.items();
             var 히스토리의_아이템_정보들 = 히스토리_조회_결과.get(0).items();
             assertAll(
                     () -> assertThat(히스토리_조회_결과.size()).isEqualTo(2),
                     () -> assertThat(히스토리_조회_결과.get(히스토리_조회_결과.size() - 1).createdDate()).isEqualTo(수정된_리스트_상세_조회_결과.lastUpdatedDate()),
-                    () -> 리스트의_아이템_순위와_히스토리의_아이템_순위를_검증한다(수정된_리스트의_아이템_정보들, 히스토리의_아이템_정보들)
+                    () -> 리스트의_아이템_순위와_히스토리의_아이템_순위를_검증한다(수정된_리스트의_아이템_정보들, 히스토리의_아이템_정보들),
+                    () -> assertThat(수정된_리스트_상세_조회_결과.lastUpdatedDate()).isNotEqualTo(수정_전_lastUpdatedDate)
             );
         }
 
@@ -325,6 +334,43 @@ public class ListAcceptanceTest extends AcceptanceTest {
             HTTP_상태_코드를_검증한다(동호가_보낸_리스트_수정_API, NO_CONTENT);
             HTTP_상태_코드를_검증한다(정수가_보낸_리스트_수정_API, NO_CONTENT);
             HTTP_상태_코드를_검증한다(유진이_보낸_리스트_수정_API, FORBIDDEN);
+        }
+
+        @Test
+        void 아이템의_순위_변동이_일어나지_않으면_updatedDate가_갱신되지_않는다() {
+            // given
+            var 동호 = 회원을_저장한다(동호());
+            var 정수 = 회원을_저장한다(정수());
+            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
+            var 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+
+            var 수정_전_lastUpdatedDate = 비회원_리스트_상세_조회_API_호출(동호_리스트_ID)
+                    .as(ListDetailResponse.class)
+                    .lastUpdatedDate();
+
+            // when
+            var 아이템을_제외한_리스트_수정_요청_데이터 = new ListUpdateRequest(
+                    CategoryType.CULTURE,
+                    List.of("라벨이", "바뀌면", "갱신안됨"),
+                    List.of(정수.getId()),
+                    "제목 바꿨어요",
+                    "설명도 바꿨어요",
+                    false,
+                    BackgroundPalette.GRAY,
+                    BackgroundColor.GRAY_LIGHT,
+                    List.of(
+                            new ItemCreateRequest(1, "말티즈", "", "", ""),
+                            new ItemCreateRequest(2, "불독", "", "", ""),
+                            new ItemCreateRequest(3, "골든 리트리버", "", "", "")
+                    )
+            );
+            리스트_수정_API_호출(아이템을_제외한_리스트_수정_요청_데이터, 동호_액세스_토큰, 동호_리스트_ID);
+
+            // then
+            var 리스트_상세_조회_결과 = 비회원_리스트_상세_조회_API_호출(동호_리스트_ID).as(ListDetailResponse.class);
+            assertThat(리스트_상세_조회_결과.lastUpdatedDate()).isEqualTo(수정_전_lastUpdatedDate);
         }
     }
 
