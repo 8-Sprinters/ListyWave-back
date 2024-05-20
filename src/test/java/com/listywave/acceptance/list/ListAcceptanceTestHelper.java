@@ -1,6 +1,6 @@
 package com.listywave.acceptance.list;
 
-import static com.listywave.acceptance.common.CommonAcceptanceSteps.given;
+import static com.listywave.acceptance.common.CommonAcceptanceHelper.given;
 import static com.listywave.list.application.domain.category.CategoryType.ANIMAL_PLANT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -10,7 +10,6 @@ import com.listywave.history.application.dto.HistorySearchResponse.HistoryItemIn
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.BackgroundColor;
 import com.listywave.list.application.domain.list.BackgroundPalette;
-import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse.ItemResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
@@ -58,7 +57,7 @@ public abstract class ListAcceptanceTestHelper {
                 .extract();
     }
 
-    public static ListCreateRequest 좋아하는_견종_TOP3_생성_요청_데이터(List<Long> collaboratorIds) {
+    public static ListCreateRequest 가장_좋아하는_견종_TOP3_생성_요청_데이터(List<Long> collaboratorIds) {
         return new ListCreateRequest(
                 ANIMAL_PLANT,
                 List.of("동물", "최애 동물", "강아지"),
@@ -76,7 +75,7 @@ public abstract class ListAcceptanceTestHelper {
         );
     }
 
-    public static ListUpdateRequest 아이템_순위와_라벨이_바뀐_좋아하는_견종_TOP3_요청_데이터(List<Long> collaboratorIds) {
+    public static ListUpdateRequest 아이템_순위와_라벨을_바꾼_좋아하는_견종_TOP3_요청_데이터(List<Long> collaboratorIds) {
         return new ListUpdateRequest(
                 ANIMAL_PLANT,
                 List.of("냐옹", "멍멍"),
@@ -112,11 +111,11 @@ public abstract class ListAcceptanceTestHelper {
         );
     }
 
-    public static void 리스트_상세_조회를_검증한다(ListDetailResponse result, ListDetailResponse expect) {
-        assertThat(result).usingRecursiveComparison()
+    public static void 리스트_상세_조회를_검증한다(ListDetailResponse 결과값, ListDetailResponse 기대값) {
+        assertThat(결과값).usingRecursiveComparison()
                 .ignoringFieldsOfTypes(Long.class)
                 .ignoringFields("createdDate", "lastUpdatedDate")
-                .isEqualTo(expect);
+                .isEqualTo(기대값);
     }
 
     public static List<HistorySearchResponse> 비회원_히스토리_조회_API_호출(Long listId) {
@@ -134,10 +133,10 @@ public abstract class ListAcceptanceTestHelper {
                 .isEqualTo(히스토리_아이템);
     }
 
-    public static ExtractableResponse<Response> 리스트_삭제_요청_API_호출(String accessToken, ListEntity list) {
+    public static ExtractableResponse<Response> 리스트_삭제_요청_API_호출(String accessToken, Long listId) {
         return given()
                 .header(AUTHORIZATION, "Bearer " + accessToken)
-                .when().delete("/lists/{listId}", list.getId())
+                .when().delete("/lists/{listId}", listId)
                 .then().log().all()
                 .extract();
     }

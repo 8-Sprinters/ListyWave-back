@@ -1,6 +1,6 @@
 package com.listywave.acceptance.category;
 
-import static com.listywave.acceptance.common.CommonAcceptanceSteps.given;
+import static com.listywave.acceptance.common.CommonAcceptanceHelper.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.listywave.acceptance.common.AcceptanceTest;
@@ -24,14 +24,14 @@ public class CategoryAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         // when
-        List<CategoryTypeResponse> body = response.as(new TypeRef<>() {
+        List<CategoryTypeResponse> 결과 = response.as(new TypeRef<>() {
         });
 
         // then
-        List<CategoryTypeResponse> expect = Arrays.stream(CategoryType.values())
+        var 기대값 = Arrays.stream(CategoryType.values())
                 .map(type -> new CategoryTypeResponse(type.getCode(), type.name().toLowerCase(), type.getViewName(), type.getImageUrl()))
                 .toList();
-        assertThat(body).usingRecursiveAssertion()
-                .isEqualTo(expect);
+        assertThat(결과).usingRecursiveAssertion()
+                .isEqualTo(기대값);
     }
 }
