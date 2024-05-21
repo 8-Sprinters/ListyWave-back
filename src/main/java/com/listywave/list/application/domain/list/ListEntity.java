@@ -200,6 +200,7 @@ public class ListEntity {
             BackgroundColor backgroundColor,
             boolean hasCollaboration,
             LocalDateTime updatedDate,
+            boolean doesChangedAnyItemRank,
             Labels newLabels,
             Items newItems
     ) {
@@ -210,8 +211,10 @@ public class ListEntity {
         this.backgroundPalette = backgroundPalette;
         this.backgroundColor = backgroundColor;
         this.hasCollaboration = hasCollaboration;
-        this.updatedDate = updatedDate;
 
+        if (doesChangedAnyItemRank) {
+            this.updatedDate = updatedDate;
+        }
         if (this.labels.isChange(newLabels)) {
             this.labels.updateAll(newLabels, this);
         }
