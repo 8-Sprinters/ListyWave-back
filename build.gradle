@@ -52,6 +52,9 @@ dependencies {
 
     // RestAssured
     testImplementation 'io.rest-assured:rest-assured'
+
+    // for Remove "warning: unknown enum constant When.MAYBE"
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
 tasks.named('test') {
