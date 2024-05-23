@@ -54,7 +54,7 @@ public class Alarm {
     private AlarmType type;
 
     @Column(nullable = false)
-    private boolean isChecked = false;
+    private boolean isChecked;
 
     @CreatedDate
     @Temporal(TIMESTAMP)
