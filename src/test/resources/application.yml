@@ -17,6 +17,9 @@ spring:
   sql:
     init:
       mode: always
+  elasticsearch:
+    rest:
+      uris: "http://localhost:9200"
 
 logging:
   level:
