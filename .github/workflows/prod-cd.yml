@@ -17,15 +17,15 @@ jobs:
           cd /src/main/resources/
           
           cat <<EOF > application-prod.yml
-          ${{ APPLICATION_PROD_YML }}
+          ${{ secrets.APPLICATION_PROD_YML }}
           EOF
           
           cat <<EOF > application-oauth.yml
-          ${{ APPLICATION_OAUTH_YML }}
+          ${{ secrets.APPLICATION_OAUTH_YML }}
           EOF
           
           cat <<EOF > application-storage.yml
-          ${{ APPLICATION_STORAGE_YML }}
+          ${{ secrets.APPLICATION_STORAGE_YML }}
           EOF
 
       - name: 애플리케이션 빌드
