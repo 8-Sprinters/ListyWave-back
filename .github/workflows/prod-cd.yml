@@ -1,0 +1,58 @@
+name: Deploy to PROD
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "prod" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 Checkout
+        uses: actions/checkout@v4
+
+      - name: 설정 파일 추가
+        run: |
+          cd /src/main/resources/
+          
+          cat <<EOF > application-prod.yml
+          ${{ secrets.APPLICATION_PROD_YML }}
+          EOF
+          
+          cat <<EOF > application-oauth.yml
+          ${{ secrets.APPLICATION_OAUTH_YML }}
+          EOF
+          
+          cat <<EOF > application-storage.yml
+          ${{ secrets.APPLICATION_STORAGE_YML }}
+          EOF
+
+      - name: 애플리케이션 빌드
+        run: ./gradlew bootJar
+
+      - name: 도커 이미지 빌드
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.PROD_TAG }} ./
+
+      - name: 도커 허브에 로그인
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: 도커 허브에 Push
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.PROD_TAG }}
+
+      - name: 인스턴스 접속 및 배포 스크립트 실행
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_EC2_HOST }}
+          username: ${{ secrets.PROD_EC2_USERNAME }}
+          password: ${{ secrets.PROD_EC2_PASSWORD }}
+          port: ${{ secrets.PROD_EC2_PORT }}
+          script: |
+            docker stop ${{ secrets.PROD_CONTAINER_NAME }}
+            docker rm -f ${{ secrets.PROD_CONTAINER_NAME }}
+            docker rmi ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.PROD_TAG }}
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.PROD_TAG }}
+            docker run -d -p 8080:8080 --name ${{ secrets.PROD_CONTAINER_NAME }} ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.PROD_TAG }}
