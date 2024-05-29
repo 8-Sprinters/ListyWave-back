@@ -54,6 +54,16 @@ jobs:
           ${{ secrets.APPLICATION_STORAGE_YML }}
           EOF
 
+      - name: Gradle 캐싱
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: 애플리케이션 빌드
         run: |
           cd /home/runner/work/ListyWave-back/ListyWave-back/
