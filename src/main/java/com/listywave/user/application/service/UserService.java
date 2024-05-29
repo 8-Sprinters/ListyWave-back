@@ -17,18 +17,17 @@ import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.dto.UserProflieUpdateCommand;
 import com.listywave.user.application.dto.search.UserElasticSearchResponse;
-import com.listywave.user.application.dto.search.UserElasticSearchResult;
 import com.listywave.user.application.dto.search.UserSearchResponse;
 import com.listywave.user.application.dto.search.UserSearchResult;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import com.listywave.user.repository.user.elastic.UserElasticRepository;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -185,18 +184,11 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserElasticSearchResponse searchUserByElastic(Long loginUserId, String search, Pageable pageable) {
+    public UserElasticSearchResponse searchUserByElastic(@Nullable Long loginUserId, String keyword, Pageable pageable) {
         if (loginUserId == null) {
-            return createUserSearchResponseByElastic(null, search, pageable);
+            return userElasticRepository.findAll(-1L, keyword, pageable);
         }
         User user = userRepository.getById(loginUserId);
-        return createUserSearchResponseByElastic(user.getId(), search, pageable);
-    }
-
-    private UserElasticSearchResponse createUserSearchResponseByElastic(Long loginUserId, String search, Pageable pageable) {
-        Map<String, Object> resultMap = userElasticRepository.findAllByElasticSearch(search, pageable, loginUserId);
-        Long totalCount = (Long) resultMap.get("totalCount");
-        Slice<UserElasticSearchResult> result = (Slice) resultMap.get("result");
-        return UserElasticSearchResponse.of(result.getContent(), totalCount, result.hasNext());
+        return userElasticRepository.findAll(user.getId(), keyword, pageable);
     }
 }

@@ -134,10 +134,10 @@ public class UserController {
     @GetMapping("/v2/users")
     ResponseEntity<UserElasticSearchResponse> searchUserByElastic(
             @OptionalAuth Long loginUserId,
-            @RequestParam(name = "search", defaultValue = "") String search,
+            @RequestParam(name = "keyword", defaultValue = "") String keyword,
             @PageableDefault(size = 10) Pageable pageable
     ) {
-        UserElasticSearchResponse response = userService.searchUserByElastic(loginUserId, search, pageable);
+        UserElasticSearchResponse response = userService.searchUserByElastic(loginUserId, keyword, pageable);
         return ResponseEntity.ok(response);
     }
 }
