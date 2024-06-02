@@ -14,7 +14,6 @@ import com.listywave.common.exception.CustomException;
 import com.listywave.user.application.domain.UserDocument;
 import com.listywave.user.application.dto.search.UserElasticSearchResponse;
 import com.listywave.user.application.dto.search.UserElasticSearchResult;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,6 +28,7 @@ public class UserElasticRepository {
 
     private static final float NGRAM_BOOST = 2.0f;
     private static final float JASO_BOOST = 1.5f;
+
     private final ElasticsearchClient esClient;
 
     public UserElasticSearchResponse findAll(Long loginUserId, String keyword, Pageable pageable) {
@@ -72,8 +72,8 @@ public class UserElasticRepository {
                 .index("users_sync_idx")
                 .query(q -> q.bool(
                                 b -> b.mustNot(excludeUserIdQuery)
-                                .should(s -> s.bool(bb -> bb.must(nicknameNgramQuery, isNotDeletedQuery)))
-                                .should(s -> s.bool(bb -> bb.must(nicknameJasoQuery, isNotDeletedQuery)))
+                                        .should(s -> s.bool(bb -> bb.must(nicknameNgramQuery, isNotDeletedQuery)))
+                                        .should(s -> s.bool(bb -> bb.must(nicknameJasoQuery, isNotDeletedQuery)))
                         )
                 )
                 .from(offset)
