@@ -19,6 +19,9 @@ spring:
   sql:
     init:
       mode: always
+  elasticsearch:
+    rest:
+      uris:
 
 cors:
   allowedOrigins:
@@ -48,4 +51,3 @@ jwt:
   access-token-valid-time-unit: MINUTES
   refresh-token-valid-time-duration: 2
   refresh-token-valid-time-unit: HOURS
-
