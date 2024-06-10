@@ -54,20 +54,13 @@ jobs:
           ${{ secrets.APPLICATION_STORAGE_YML }}
           EOF
 
-      - name: Gradle 캐싱
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+      - name: 디렉터리 이동
+        run: cd /home/runner/work/ListyWave-back/ListyWave-back/
 
-      - name: 애플리케이션 빌드
-        run: |
-          cd /home/runner/work/ListyWave-back/ListyWave-back/
-          ./gradlew bootJar
+      - name: Gradle 셋업, 빌드, 캐싱
+        uses: burrunan/gradle-cache-action@3bf23b8dd95e7d2bacf2470132454fe893a178a1
+        with:
+          arguments: bootJar
 
       - name: 도커 이미지 빌드
         run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.DEV_TAG }} ./
