@@ -11,8 +11,8 @@ import lombok.Builder;
 
 @Builder
 public record ListDetailResponse(
-        String categoryName,
-        String categoryViewName,
+        String categoryEngName,
+        String categoryKorName,
         List<LabelResponse> labels,
         String title,
         String description,
@@ -38,8 +38,8 @@ public record ListDetailResponse(
             List<Collaborator> collaborators
     ) {
         return ListDetailResponse.builder()
-                .categoryName(list.getCategory().name().toLowerCase())
-                .categoryViewName(list.getCategory().getViewName())
+                .categoryEngName(list.getCategory().name().toLowerCase())
+                .categoryKorName(list.getCategory().getViewName())
                 .labels(LabelResponse.toList(list.getLabels().getValues()))
                 .title(list.getTitle().getValue())
                 .description(list.getDescription().getValue())

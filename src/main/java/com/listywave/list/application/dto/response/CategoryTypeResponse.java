@@ -4,8 +4,8 @@ import com.listywave.list.application.domain.category.CategoryType;
 
 public record CategoryTypeResponse(
         String code,
-        String name,
-        String viewName,
+        String engName,
+        String korName,
         String categoryImageUrl
 ) {
 
