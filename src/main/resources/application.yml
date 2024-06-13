@@ -4,6 +4,7 @@ spring:
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: create
@@ -13,12 +14,18 @@ spring:
         highlight_sql: true
         default_batch_fetch_size: 100
     defer-datasource-initialization: true
+
   h2:
     console:
       enabled: true
+
   sql:
     init:
       mode: always
+
+  elasticsearch:
+    rest:
+      uris: http://localhost
 
 cors:
   allowedOrigins:
@@ -49,3 +56,15 @@ jwt:
   refresh-token-valid-time-duration: 2
   refresh-token-valid-time-unit: HOURS
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true

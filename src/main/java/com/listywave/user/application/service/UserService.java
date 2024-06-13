@@ -16,15 +16,18 @@ import com.listywave.user.application.dto.FollowingsResponse;
 import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.dto.UserProflieUpdateCommand;
+import com.listywave.user.application.dto.search.UserElasticSearchResponse;
 import com.listywave.user.application.dto.search.UserSearchResponse;
 import com.listywave.user.application.dto.search.UserSearchResult;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
+import com.listywave.user.repository.user.elastic.UserElasticRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +39,7 @@ public class UserService {
     private final ListRepository listRepository;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
+    private final UserElasticRepository userElasticRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
@@ -177,5 +181,14 @@ public class UserService {
         list.validateOwner(user);
 
         list.updateVisibility(!beforeIsPublic);
+    }
+
+    @Transactional(readOnly = true)
+    public UserElasticSearchResponse searchUserByElastic(@Nullable Long loginUserId, String keyword, Pageable pageable) {
+        if (loginUserId == null) {
+            return userElasticRepository.findAll(-1L, keyword, pageable);
+        }
+        User user = userRepository.getById(loginUserId);
+        return userElasticRepository.findAll(user.getId(), keyword, pageable);
     }
 }

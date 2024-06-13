@@ -26,6 +26,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.4'
@@ -50,11 +51,16 @@ dependencies {
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
+    // elasticsearch
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
     // RestAssured
     testImplementation 'io.rest-assured:rest-assured'
 
     // for Remove "warning: unknown enum constant When.MAYBE"
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
+
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
 tasks.named('test') {

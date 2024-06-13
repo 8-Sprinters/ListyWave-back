@@ -1,0 +1,59 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "nickname": {
+      "type": "text",
+      "fields": {
+        "ngram": {
+          "type": "text",
+          "analyzer": "my_ngram_analyzer"
+        },
+        "jaso": {
+          "type": "text",
+          "analyzer": "suggest_index_analyzer",
+          "search_analyzer": "suggest_search_analyzer"
+        }
+      }
+    },
+    "is_delete": {
+      "type": "boolean"
+    },
+    "background_image_url": {
+      "type": "text"
+    },
+    "profile_image_url": {
+      "type": "text"
+    },
+    "description": {
+      "type": "text"
+    },
+    "follower_count": {
+      "type": "long"
+    },
+    "following_count": {
+      "type": "long"
+    },
+    "all_private": {
+      "type": "boolean"
+    },
+    "oauth_id": {
+      "type": "long"
+    },
+    "oauth_email": {
+      "type": "text"
+    },
+    "kakao_access_token": {
+      "type": "text"
+    },
+    "updated_date": {
+      "type": "date",
+      "format": "uuuu-MM-dd'T'HH:mm:ss.SSSXXX"
+    },
+    "created_date": {
+      "type": "date",
+      "format": "uuuu-MM-dd'T'HH:mm:ss.SSSXXX"
+    }
+  }
+}

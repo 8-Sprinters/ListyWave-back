@@ -22,7 +22,7 @@ jobs:
 
       - name: IP 허용
         run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SECURITY_GROUP_ID }} --protocol "tcp" --port "${{ secrets.PROD_EC2_PORT }}" --cidr "${{ steps.ip.outputs.ipv4 }}/32"
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SECURITY_GROUP_ID }} --protocol "tcp" --port "${{ secrets.EC2_PORT }}" --cidr "${{ steps.ip.outputs.ipv4 }}/32"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -54,20 +54,13 @@ jobs:
           ${{ secrets.APPLICATION_STORAGE_YML }}
           EOF
 
-      - name: Gradle 캐싱
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+      - name: 디렉터리 이동
+        run: cd /home/runner/work/ListyWave-back/ListyWave-back/
 
-      - name: 애플리케이션 빌드
-        run: |
-          cd /home/runner/work/ListyWave-back/ListyWave-back/
-          ./gradlew bootJar
+      - name: Gradle 셋업, 빌드, 캐싱
+        uses: burrunan/gradle-cache-action@3bf23b8dd95e7d2bacf2470132454fe893a178a1
+        with:
+          arguments: bootJar
 
       - name: 도커 이미지 빌드
         run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.PROD_TAG }} ./
@@ -85,19 +78,19 @@ jobs:
         uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262
         with:
           host: ${{ secrets.PROD_EC2_HOST }}
-          username: ${{ secrets.PROD_EC2_USERNAME }}
+          username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.PROD_EC2_PRIVATE_KEY }}
           script: |
-            docker stop "${{ secrets.PROD_CONTAINER_NAME }}"
-            docker rm -f "${{ secrets.PROD_CONTAINER_NAME }}"
+            docker stop "${{ secrets.CONTAINER_NAME }}"
+            docker rm -f "${{ secrets.CONTAINER_NAME }}"
             docker rmi "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.PROD_TAG }}"
             docker pull "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.PROD_TAG }}"
-            docker run -d -p 8080:8080 --name "${{ secrets.PROD_CONTAINER_NAME }}" "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.PROD_TAG }}"
+            docker run -d -p 8080:8080 -p ${{ secrets.METRIC_PORT }}:${{ secrets.METRIC_PORT }} --name "${{ secrets.CONTAINER_NAME }}" -e "SPRING_PROFILES_ACTIVE=prod,oauth,storage" "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.PROD_TAG }}"
 
       - name: IP 제거
         if: ${{ always() }}
         run: |
-          aws ec2 revoke-security-group-ingress --group-id "${{ secrets.AWS_SECURITY_GROUP_ID }}" --protocol "tcp" --port "${{ secrets.PROD_EC2_PORT }}" --cidr "${{ steps.ip.outputs.ipv4 }}/32"
+          aws ec2 revoke-security-group-ingress --group-id "${{ secrets.AWS_SECURITY_GROUP_ID }}" --protocol "tcp" --port "${{ secrets.EC2_PORT }}" --cidr "${{ steps.ip.outputs.ipv4 }}/32"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

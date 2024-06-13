@@ -6,6 +6,7 @@ import com.listywave.user.application.dto.FollowersResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
 import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
+import com.listywave.user.application.dto.search.UserElasticSearchResponse;
 import com.listywave.user.application.dto.search.UserSearchResponse;
 import com.listywave.user.application.service.UserService;
 import com.listywave.user.presentation.dto.ListVisibilityUpdateRequest;
@@ -128,5 +129,15 @@ public class UserController {
     ) {
         userService.updateListVisibility(loginUserId, request.listId(), request.isPublic());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/v2/users")
+    ResponseEntity<UserElasticSearchResponse> searchUserByElastic(
+            @OptionalAuth Long loginUserId,
+            @RequestParam(name = "keyword", defaultValue = "") String keyword,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        UserElasticSearchResponse response = userService.searchUserByElastic(loginUserId, keyword, pageable);
+        return ResponseEntity.ok(response);
     }
 }

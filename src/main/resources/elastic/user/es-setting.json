@@ -1,0 +1,48 @@
+{
+  "index": {
+    "number_of_replicas": "0",
+    "max_ngram_diff": 50,
+    "analysis": {
+      "filter": {
+        "suggest_filter": {
+          "type": "ngram",
+          "min_gram": 1,
+          "max_gram": 50
+        }
+      },
+      "analyzer": {
+        "my_ngram_analyzer": {
+          "tokenizer": "my_ngram_tokenizer"
+        },
+        "suggest_search_analyzer": {
+          "type": "custom",
+          "tokenizer": "jaso_search_tokenizer"
+        },
+        "suggest_index_analyzer": {
+          "type": "custom",
+          "tokenizer": "jaso_index_tokenizer",
+          "filter": [
+            "suggest_filter"
+          ]
+        }
+      },
+      "tokenizer": {
+        "jaso_search_tokenizer": {
+          "type": "jaso_tokenizer",
+          "mistype": true,
+          "chosung": false
+        },
+        "jaso_index_tokenizer": {
+          "type": "jaso_tokenizer",
+          "mistype": true,
+          "chosung": true
+        },
+        "my_ngram_tokenizer": {
+          "type": "ngram",
+          "min_gram": "1",
+          "max_gram": "10"
+        }
+      }
+    }
+  }
+}

@@ -5,14 +5,94 @@ on:
   push:
     branches: [ "dev" ]
 
-permissions:
-  contents: read
-    
 jobs:
   deploy:
-      runs-on: self-hosted
+    runs-on: ubuntu-latest
+    steps:
+      - name: Github Actions 호스트 IP 가져오기
+        id: ip
+        uses: haythem/public-ip@bdddd92c198b0955f0b494a8ebeac529754262ff
 
-      steps:
-        - name: Run Deploy script
-          working-directory: /home/ubuntu
-          run: sudo ./listywave.sh deploy
+      - name: AWS 로그인
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: IP 허용
+        run: |
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SECURITY_GROUP_ID }} --protocol "tcp" --port "${{ secrets.EC2_PORT }}" --cidr "${{ steps.ip.outputs.ipv4 }}/32"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: 저장소 Checkout
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29
+
+      - name: 자바 17 셋업
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9
+        with:
+          java-version: '17'
+          cache: 'gradle'
+          distribution: 'corretto'
+
+      - name: 설정 파일 추가
+        run: |
+          cd ./src/main/resources/
+
+          cat <<EOF > application-dev.yml
+          ${{ secrets.APPLICATION_DEV_YML }}
+          EOF
+
+          cat <<EOF > application-oauth.yml
+          ${{ secrets.APPLICATION_OAUTH_YML }}
+          EOF
+
+          cat <<EOF > application-storage.yml
+          ${{ secrets.APPLICATION_STORAGE_YML }}
+          EOF
+
+      - name: 디렉터리 이동
+        run: cd /home/runner/work/ListyWave-back/ListyWave-back/
+
+      - name: Gradle 셋업, 빌드, 캐싱
+        uses: burrunan/gradle-cache-action@3bf23b8dd95e7d2bacf2470132454fe893a178a1
+        with:
+          arguments: bootJar
+
+      - name: 도커 이미지 빌드
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.DEV_TAG }} ./
+
+      - name: 도커 허브에 로그인
+        uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: 도커 허브에 Push
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.DEV_TAG }}
+
+      - name: 인스턴스 접속 및 배포 스크립트 실행
+        uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262
+        with:
+          host: ${{ secrets.DEV_EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.DEV_EC2_PRIVATE_KEY }}
+          script: |
+            docker stop "${{ secrets.CONTAINER_NAME }}"
+            docker rm -f "${{ secrets.CONTAINER_NAME }}"
+            docker rmi "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.DEV_TAG }}"
+            docker pull "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.DEV_TAG }}"
+            docker run -d -p 8080:8080 -p ${{ secrets.METRIC_PORT }}:${{ secrets.METRIC_PORT }} --name "${{ secrets.CONTAINER_NAME }}" -e "SPRING_PROFILES_ACTIVE=dev,oauth,storage" --network=monitoring_default "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.DEV_TAG }}"
+
+      - name: IP 제거
+        if: ${{ always() }}
+        run: |
+          aws ec2 revoke-security-group-ingress --group-id "${{ secrets.AWS_SECURITY_GROUP_ID }}" --protocol "tcp" --port "${{ secrets.EC2_PORT }}" --cidr "${{ steps.ip.outputs.ipv4 }}/32"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
