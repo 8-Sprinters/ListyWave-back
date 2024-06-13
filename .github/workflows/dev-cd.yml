@@ -85,7 +85,7 @@ jobs:
             docker rm -f "${{ secrets.CONTAINER_NAME }}"
             docker rmi "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.DEV_TAG }}"
             docker pull "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.DEV_TAG }}"
-            docker run -d -p 8080:8080 -p ${{ secrets.METRIC_PORT }}:${{ secrets.METRIC_PORT }} --name "${{ secrets.CONTAINER_NAME }}" "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.DEV_TAG }}"
+            docker run -d -p 8080:8080 -p ${{ secrets.METRIC_PORT }}:${{ secrets.METRIC_PORT }} --name "${{ secrets.CONTAINER_NAME }}" -e "SPRING_PROFILES_ACTIVE=dev,oauth,storage" "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.DEV_TAG }}"
 
       - name: IP 제거
         if: ${{ always() }}
