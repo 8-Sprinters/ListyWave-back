@@ -54,3 +54,7 @@ jwt:
   access-token-valid-time-unit: HOURS
   refresh-token-valid-time-duration: 1
   refresh-token-valid-time-unit: HOURS
+
+local-login:
+  id:
+  password:
