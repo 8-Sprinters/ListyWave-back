@@ -134,6 +134,9 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
         회원을_저장한다(동호());
         assertThat(닉네임_중복_체크_요청(동호().getNickname()).as(Boolean.class)).isTrue();
+
+        // 영어 대소문자를 구분한다.
+        assertThat(닉네임_중복_체크_요청("Kdkdhoho").as(Boolean.class)).isFalse();
     }
 
     @Test
