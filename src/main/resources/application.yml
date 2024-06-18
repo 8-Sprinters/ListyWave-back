@@ -68,3 +68,7 @@ server:
   tomcat:
     mbeanregistry:
       enabled: true
+
+local-login:
+  id:
+  password:
