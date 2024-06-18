@@ -14,6 +14,7 @@ import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.유진;
 import static com.listywave.user.fixture.UserFixture.정수;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -130,13 +131,20 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     @Test
     void 닉네임_중복을_체크한다() {
-        assertThat(닉네임_중복_체크_요청(동호().getNickname()).as(Boolean.class)).isFalse();
+        assertAll(
+                () -> assertThat(닉네임_중복_체크_요청(동호().getNickname()).as(Boolean.class)).isFalse(),
 
-        회원을_저장한다(동호());
-        assertThat(닉네임_중복_체크_요청(동호().getNickname()).as(Boolean.class)).isTrue();
+                () -> {
+                    회원을_저장한다(동호());
+                    assertThat(닉네임_중복_체크_요청(동호().getNickname()).as(Boolean.class)).isTrue();
+                },
 
-        // 영어 대소문자를 구분한다.
-        assertThat(닉네임_중복_체크_요청("Kdkdhoho").as(Boolean.class)).isFalse();
+                // 대소문자 구분없이 중복 체크
+                () -> assertThat(닉네임_중복_체크_요청("kdkdhoho").as(Boolean.class)).isTrue(),
+                () -> assertThat(닉네임_중복_체크_요청("KDKDHOHO").as(Boolean.class)).isTrue(),
+                () -> assertThat(닉네임_중복_체크_요청("KdkdHoho").as(Boolean.class)).isTrue()
+        );
+        ;
     }
 
     @Test
