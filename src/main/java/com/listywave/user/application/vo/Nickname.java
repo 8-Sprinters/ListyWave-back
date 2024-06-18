@@ -1,5 +1,6 @@
 package com.listywave.user.application.vo;
 
+import static com.listywave.common.exception.ErrorCode.ILLEGAL_NICKNAME_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.LENGTH_EXCEEDED_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.NICKNAME_CONTAINS_SPECIAL_CHARACTERS;
 import static com.listywave.common.exception.ErrorCode.NICKNAME_CONTAINS_WHITESPACE_EXCEPTION;
@@ -7,6 +8,8 @@ import static com.listywave.common.exception.ErrorCode.NICKNAME_CONTAINS_WHITESP
 import com.listywave.common.exception.CustomException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import java.util.Locale;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,6 +22,9 @@ import lombok.NoArgsConstructor;
 public class Nickname {
 
     private static final int LENGTH_LIMIT = 10;
+    private static final Set<String> BLACK_LIST = Set.of(
+            "운영자", "관리자", "admin", "listy", "L1sty", "에잇", "eight", "리스티"
+    );
 
     @Column(name = "nickname", unique = true, length = LENGTH_LIMIT, nullable = false)
     private final String value;
@@ -31,6 +37,7 @@ public class Nickname {
         validateBlank(value);
         validateLength(value);
         validateWord(value);
+        validateRelatedWithAdmin(value);
         return new Nickname(value);
     }
 
@@ -56,6 +63,15 @@ public class Nickname {
     private static void validateWord(String value) {
         if (!value.matches("[가-힣a-zA-Z]+")) {
             throw new CustomException(NICKNAME_CONTAINS_SPECIAL_CHARACTERS, "닉네임에는 숫자, 이모티콘, 특수문자가 포함될 수 없습니다.");
+        }
+    }
+
+    private static void validateRelatedWithAdmin(String value) {
+        value = value.toLowerCase(Locale.ENGLISH);
+        for (String word : BLACK_LIST) {
+            if (value.contains(word)) {
+                throw new CustomException(ILLEGAL_NICKNAME_EXCEPTION);
+            }
         }
     }
 }
