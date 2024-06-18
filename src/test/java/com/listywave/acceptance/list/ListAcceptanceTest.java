@@ -1,5 +1,8 @@
 package com.listywave.acceptance.list;
 
+import static com.listywave.acceptance.collection.CollectionAcceptanceTestHelper.콜렉트_또는_콜렉트취소_API_호출;
+import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.n개의_댓글_생성_요청;
+import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.댓글_저장_API_호출;
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
 import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청_API;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.가장_좋아하는_견종_TOP3_생성_요청_데이터;
@@ -11,7 +14,7 @@ import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_�
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트의_아이템_순위와_히스토리의_아이템_순위를_검증한다;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_리스트_상세_조회_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_최신_리스트_10개_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_피드_리스트_조회;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_피드_리스트_조회_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_히스토리_조회_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_카테고리_콜라보레이터_필터링_요청;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_카테고리_필터링_요청;
@@ -28,6 +31,7 @@ import static com.listywave.acceptance.list.ListAcceptanceTestHelper.트랜딩_�
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원_최신_리스트_10개_조회_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원_피드_리스트_조회;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원용_리스트_상세_조회_API_호출;
+import static com.listywave.acceptance.reply.ReplyAcceptanceTestHelper.답글_등록_API_호출;
 import static com.listywave.list.fixture.ListFixture.가장_좋아하는_견종_TOP3;
 import static com.listywave.list.fixture.ListFixture.가장_좋아하는_견종_TOP3_순위_변경;
 import static com.listywave.list.fixture.ListFixture.좋아하는_라면_TOP3;
@@ -62,11 +66,13 @@ import com.listywave.list.application.dto.response.ListSearchResponse;
 import com.listywave.list.application.dto.response.ListTrandingResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
+import com.listywave.list.presentation.dto.request.ReplyCreateRequest;
 import com.listywave.user.application.dto.FindFeedListResponse;
 import com.listywave.user.application.dto.FindFeedListResponse.FeedListInfo;
 import com.listywave.user.application.dto.FindFeedListResponse.ListItemsResponse;
 import io.restassured.common.mapper.TypeRef;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -441,7 +447,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 동호_리스트_2 = 리스트를_저장한다(좋아하는_라면_TOP3(동호, List.of()));
 
             // when
-            var 결과 = 비회원_피드_리스트_조회(동호).as(FindFeedListResponse.class);
+            var 결과 = 비회원_피드_리스트_조회_API_호출(동호).as(FindFeedListResponse.class);
             var 기대값 = List.of(FeedListInfo.of(동호_리스트_2), FeedListInfo.of(동호_리스트_1));
 
             // then
@@ -565,17 +571,30 @@ public class ListAcceptanceTest extends AcceptanceTest {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 정수 = 회원을_저장한다(정수());
+            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
             리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(동호, 5));
             리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(정수, 5));
             리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(동호, 5));
+
+            var 댓글_생성_요청들 = n개의_댓글_생성_요청(4);
+            var 댓글_생성_요청들2 = n개의_댓글_생성_요청(8);
+            댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 2L, 댓글_생성요청));
+            댓글_생성_요청들2.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 4L, 댓글_생성요청));
+
+            var 답글_생성_요청들 = Arrays.asList(new ReplyCreateRequest("답글1"), new ReplyCreateRequest("답글2"));
+            답글_생성_요청들.forEach(답글_생성요청 -> 답글_등록_API_호출(동호_액세스_토큰, 답글_생성요청, 2L, 2L));
+
+            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 2L);
+            콜렉트_또는_콜렉트취소_API_호출(동호_액세스_토큰, 7L);
 
             // when
             List<ListTrandingResponse> 결과 = 트랜딩_리스트_조회_API_호출().as(new TypeRef<>() {
             });
 
             // then
-            var 동호_리스트 = 비회원_피드_리스트_조회(동호).as(FindFeedListResponse.class).feedLists();
-            var 정수_리스트 = 비회원_피드_리스트_조회(정수).as(FindFeedListResponse.class).feedLists();
+            var 동호_리스트 = 비회원_피드_리스트_조회_API_호출(동호).as(FindFeedListResponse.class).feedLists();
+            var 정수_리스트 = 비회원_피드_리스트_조회_API_호출(정수).as(FindFeedListResponse.class).feedLists();
             var 모든_리스트 = new ArrayList<>(동호_리스트);
             모든_리스트.addAll(정수_리스트);
 
@@ -589,14 +608,14 @@ public class ListAcceptanceTest extends AcceptanceTest {
                             .orElse(""))
                     .toList();
 
-            assertThat(결과.stream().map(ListTrandingResponse::id)).isEqualTo(모든_리스트.stream()
-                    .sorted(comparing(FeedListInfo::id, reverseOrder()))
-                    .map(FeedListInfo::id)
-                    .limit(10)
-                    .toList());
-            assertThat(결과).usingRecursiveComparison()
-                    .comparingOnlyFields("itemImageUrl")
-                    .isEqualTo(대표_이미지들);
+            assertAll(
+                    () -> assertThat(결과).usingRecursiveComparison()
+                            .comparingOnlyFields("itemImageUrl")
+                            .isEqualTo(대표_이미지들),
+                    () -> assertThat(결과.get(0).trandingScore()).isEqualTo(16),
+                    () -> assertThat(결과.get(1).trandingScore()).isEqualTo(15),
+                    () -> assertThat(결과.get(2).trandingScore()).isEqualTo(3)
+            );
         }
 
         @Test
@@ -633,8 +652,8 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 결과 = 비회원_최신_리스트_10개_조회_API_호출().as(ListRecentResponse.class);
 
             // then
-            var 동호_리스트 = 비회원_피드_리스트_조회(동호).as(FindFeedListResponse.class).feedLists();
-            var 정수_리스트 = 비회원_피드_리스트_조회(정수).as(FindFeedListResponse.class).feedLists();
+            var 동호_리스트 = 비회원_피드_리스트_조회_API_호출(동호).as(FindFeedListResponse.class).feedLists();
+            var 정수_리스트 = 비회원_피드_리스트_조회_API_호출(정수).as(FindFeedListResponse.class).feedLists();
             var 모든_리스트 = new ArrayList<>(동호_리스트);
             모든_리스트.addAll(정수_리스트);
 
