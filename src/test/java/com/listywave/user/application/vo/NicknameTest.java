@@ -46,7 +46,7 @@ class NicknameTest {
     @ValueSource(strings = {
             "listy", "ListyWave Official", "관리자", "운영자", "Admin", "시스템관리자", "Listywave관리자", "Listywave운영자",
             "ListyWaveOfficial", "리스티", "리스티웨이브관리자", "리스티웨이브운영자", "ADMIN", "admin", "팀 에잇", "EightOfficial",
-            "eight", "EIGHT"
+            "eight", "EIGHT", "관리인", "운영인", "관ㄹi자", "관ㄹI자", "관리ㅈr", "운영ㅈr", "관ㄹ1자", "adm1n", "관리요원"
     })
     void 관리자와_헷갈릴만한_닉네임은_생성할_수_없다(String input) {
         assertThatThrownBy(() -> Nickname.of(input));
