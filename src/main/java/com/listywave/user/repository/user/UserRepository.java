@@ -27,7 +27,7 @@ public interface UserRepository extends JpaRepository<User, Long>, CustomUserRep
         throw new CustomException(RESOURCE_NOT_FOUND);
     }
 
-    Boolean existsByNicknameValue(String nickname);
+    Boolean existsByNicknameValueIgnoreCase(String nickname);
 
     @Override
     @Query("""
