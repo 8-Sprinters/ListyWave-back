@@ -163,7 +163,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Boolean isDuplicateNickname(String nickname) {
-        return userRepository.existsByNicknameValue(nickname);
+        return userRepository.existsByNicknameValueIgnoreCase(nickname);
     }
 
     public void deleteFollower(Long followerUserId, Long followingUserId) {
