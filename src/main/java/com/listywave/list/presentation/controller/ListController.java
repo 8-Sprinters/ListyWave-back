@@ -55,8 +55,8 @@ public class ListController {
     }
 
     @GetMapping("/lists/explore")
-    ResponseEntity<List<ListTrandingResponse>> getTrandingList() {
-        List<ListTrandingResponse> trandingList = listService.getTrandingList();
+    ResponseEntity<List<ListTrandingResponse>> fetchTrandingLists() {
+        List<ListTrandingResponse> trandingList = listService.fetchTrandingLists();
         return ResponseEntity.ok().body(trandingList);
     }
 

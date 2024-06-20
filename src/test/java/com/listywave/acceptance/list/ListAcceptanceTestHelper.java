@@ -141,7 +141,7 @@ public abstract class ListAcceptanceTestHelper {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 비회원_피드_리스트_조회(User user) {
+    public static ExtractableResponse<Response> 비회원_피드_리스트_조회_API_호출(User user) {
         return given()
                 .when().get("/users/{userId}/lists", user.getId())
                 .then().log().all()
@@ -249,4 +249,3 @@ public abstract class ListAcceptanceTestHelper {
                 .extract();
     }
 }
-

@@ -1,9 +1,7 @@
 package com.listywave.list.application.dto.response;
 
-import com.listywave.list.application.domain.list.ListEntity;
-import lombok.Builder;
+import com.listywave.list.application.domain.list.BackgroundColor;
 
-@Builder
 public record ListTrandingResponse(
         Long id,
         Long ownerId,
@@ -11,20 +9,25 @@ public record ListTrandingResponse(
         String ownerProfileImageUrl,
         String title,
         String description,
-        String itemImageUrl,
-        String backgroundColor
+        BackgroundColor backgroundColor,
+        Long trandingScore,
+        String itemImageUrl
 ) {
 
-    public static ListTrandingResponse of(ListEntity list) {
-        return ListTrandingResponse.builder()
-                .id(list.getId())
-                .ownerId(list.getUser().getId())
-                .ownerNickname(list.getUser().getNickname())
-                .ownerProfileImageUrl(list.getUser().getProfileImageUrl())
-                .title(list.getTitle().getValue())
-                .description(list.getDescription().getValue())
-                .itemImageUrl(list.getRepresentImageUrl())
-                .backgroundColor(list.getBackgroundColor().name())
-                .build();
+    public ListTrandingResponse(
+            Long id,
+            Long ownerId,
+            String ownerNickname,
+            String ownerProfileImageUrl,
+            String title,
+            String description,
+            BackgroundColor backgroundColor,
+            Long trandingScore
+    ) {
+        this(id, ownerId, ownerNickname, ownerProfileImageUrl, title, description, backgroundColor, trandingScore, "");
+    }
+
+    public ListTrandingResponse with(String imageUrl) {
+        return new ListTrandingResponse(id, ownerId, ownerNickname, ownerProfileImageUrl, title, description, backgroundColor, trandingScore, imageUrl);
     }
 }
