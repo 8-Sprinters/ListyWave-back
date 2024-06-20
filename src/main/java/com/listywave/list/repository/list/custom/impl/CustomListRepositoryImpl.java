@@ -38,27 +38,11 @@ public class CustomListRepositoryImpl implements CustomListRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<ListTrandingResponse> findTrandingLists() {
+    public List<ListTrandingResponse> fetchTrandingLists() {
         List<ListTrandingResponse> responses = getTrandingResponses();
         return responses.stream()
                 .map(t -> t.with(getRepresentImageUrl(t.id())))
                 .collect(Collectors.toList());
-    }
-
-    private String getRepresentImageUrl(Long id) {
-        String imageUrl = queryFactory
-                .select(item.imageUrl.value)
-                .from(item)
-                .where(
-                        item.list.id.eq(id).and(
-                                item.imageUrl.value.ne("")
-                        )
-                )
-                .orderBy(item.ranking.asc())
-                .limit(1)
-                .fetchOne();
-
-        return imageUrl != null ? imageUrl : "";
     }
 
     private List<ListTrandingResponse> getTrandingResponses() {
@@ -95,6 +79,22 @@ public class CustomListRepositoryImpl implements CustomListRepository {
                 .orderBy(trandingScoreAlias.desc())
                 .limit(10)
                 .fetch();
+    }
+
+    private String getRepresentImageUrl(Long id) {
+        String imageUrl = queryFactory
+                .select(item.imageUrl.value)
+                .from(item)
+                .where(
+                        item.list.id.eq(id).and(
+                                item.imageUrl.value.ne("")
+                        )
+                )
+                .orderBy(item.ranking.asc())
+                .limit(1)
+                .fetchOne();
+
+        return imageUrl != null ? imageUrl : "";
     }
 
     @Override

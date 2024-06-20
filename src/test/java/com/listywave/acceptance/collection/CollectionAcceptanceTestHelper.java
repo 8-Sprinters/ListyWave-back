@@ -26,10 +26,4 @@ public abstract class CollectionAcceptanceTestHelper {
                 .then().log().all()
                 .extract();
     }
-
-    public static List<ExtractableResponse<Response>> 콜렉트_취소하기(String accessToken, Long listId) {
-        return IntStream.range(0, 2)
-                .mapToObj(i -> 콜렉트_또는_콜렉트취소_API_호출(accessToken, listId))
-                .collect(Collectors.toList());
-    }
 }

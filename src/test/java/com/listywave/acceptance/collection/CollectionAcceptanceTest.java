@@ -2,7 +2,6 @@ package com.listywave.acceptance.collection;
 
 import static com.listywave.acceptance.collection.CollectionAcceptanceTestHelper.나의_콜렉션_조회_API_호출;
 import static com.listywave.acceptance.collection.CollectionAcceptanceTestHelper.콜렉트_또는_콜렉트취소_API_호출;
-import static com.listywave.acceptance.collection.CollectionAcceptanceTestHelper.콜렉트_취소하기;
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.가장_좋아하는_견종_TOP3_생성_요청_데이터;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_저장_API_호출;
@@ -43,7 +42,7 @@ public class CollectionAcceptanceTest extends AcceptanceTest {
 
         // then
         HTTP_상태_코드를_검증한다(응답, NO_CONTENT);
-        assertThat(정수_리스트_콜렉트수).isEqualTo(1);
+        assertThat(정수_리스트_콜렉트수).isOne();
     }
 
     @Test
@@ -60,11 +59,11 @@ public class CollectionAcceptanceTest extends AcceptanceTest {
 
         // then
         HTTP_상태_코드를_검증한다(응답, FORBIDDEN);
-        assertThat(정수_리스트_콜렉트수).isEqualTo(0);
+        assertThat(정수_리스트_콜렉트수).isZero();
     }
 
     @Test
-    void 콜렉트션에_담긴_리스트를_콜렉트_취소한다() {
+    void 콜렉션에_담긴_리스트를_콜렉트_취소한다() {
         // given
         var 동호 = 회원을_저장한다(동호());
         var 정수 = 회원을_저장한다(정수());
@@ -74,11 +73,13 @@ public class CollectionAcceptanceTest extends AcceptanceTest {
         리스트_저장_API_호출(리스트_생성_요청_데이터, 정수_엑세스_토큰).as(ListCreateResponse.class);
 
         // when
-        var 응답_리스트 = 콜렉트_취소하기(동호_엑세스_토큰, 1L);
+        var 콜렉트_하기_응답 = 콜렉트_또는_콜렉트취소_API_호출(동호_엑세스_토큰, 1L);
+        var 콜렉트_취소_응답 = 콜렉트_또는_콜렉트취소_API_호출(동호_엑세스_토큰, 1L);
         var 정수_리스트_콜렉트수 = 회원용_리스트_상세_조회_API_호출(정수_엑세스_토큰, 1L).collectCount();
 
         // then
-        응답_리스트.forEach(응답 -> HTTP_상태_코드를_검증한다(응답, NO_CONTENT));
+        HTTP_상태_코드를_검증한다(콜렉트_하기_응답, NO_CONTENT);
+        HTTP_상태_코드를_검증한다(콜렉트_취소_응답, NO_CONTENT);
         assertThat(정수_리스트_콜렉트수).isEqualTo(0);
     }
 
@@ -88,7 +89,6 @@ public class CollectionAcceptanceTest extends AcceptanceTest {
         var 동호 = 회원을_저장한다(동호());
         var 정수 = 회원을_저장한다(정수());
         var 정수_엑세스_토큰 = 액세스_토큰을_발급한다(정수);
-        var 동호_엑세스_토큰 = 액세스_토큰을_발급한다(동호);
         var 생성한_리스트 = 지정된_개수만큼_리스트를_생성한다(동호, 2);
         리스트를_모두_저장한다(생성한_리스트);
 

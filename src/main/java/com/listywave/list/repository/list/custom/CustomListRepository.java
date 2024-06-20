@@ -11,7 +11,7 @@ import org.springframework.data.domain.Slice;
 
 public interface CustomListRepository {
 
-    List<ListTrandingResponse> findTrandingLists();
+    List<ListTrandingResponse> fetchTrandingLists();
 
     Slice<ListEntity> getRecentLists(LocalDateTime cursorUpdatedDate, Pageable pageable);
 
