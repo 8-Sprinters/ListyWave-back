@@ -149,11 +149,8 @@ public class ListService {
     }
 
     @Transactional(readOnly = true)
-    public List<ListTrandingResponse> getTrandingList() {
-        List<ListEntity> lists = listRepository.findTrandingLists();
-        return lists.stream()
-                .map(ListTrandingResponse::of)
-                .toList();
+    public List<ListTrandingResponse> fetchTrandingLists() {
+        return listRepository.fetchTrandingLists();
     }
 
     public void deleteList(Long listId, Long loginUserId) {

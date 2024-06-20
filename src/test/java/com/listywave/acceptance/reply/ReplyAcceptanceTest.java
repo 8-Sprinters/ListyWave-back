@@ -38,8 +38,8 @@ public class ReplyAcceptanceTest extends AcceptanceTest {
         댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 동호_리스트.getId(), 댓글_생성요청));
 
         // when
-        var 답글_수정_요청 = new ReplyCreateRequest("답글 달아요! 😀 ");
-        답글_등록_API_호출(동호_액세스_토큰, 답글_수정_요청, 동호_리스트.getId(), 2L);
+        var 답글_생성_요청 = new ReplyCreateRequest("답글 달아요! 😀 ");
+        답글_등록_API_호출(동호_액세스_토큰, 답글_생성_요청, 동호_리스트.getId(), 2L);
 
         // then
         var 결과 = 댓글_조회_API_호출(동호_리스트.getId()).as(CommentFindResponse.class);
@@ -163,7 +163,7 @@ public class ReplyAcceptanceTest extends AcceptanceTest {
 
             // then
             var 결과 = 댓글_조회_API_호출(동호_리스트.getId()).as(CommentFindResponse.class);
-            
+
             assertThat(결과.totalCount()).isEqualTo(2);
             assertThat(결과.comments().get(0).id()).isEqualTo(1);
             assertThat(결과.comments().get(1).id()).isEqualTo(3);
