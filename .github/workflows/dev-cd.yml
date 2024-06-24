@@ -47,7 +47,7 @@ jobs:
           EOF
 
           cat <<EOF > application-oauth.yml
-          ${{ secrets.APPLICATION_OAUTH_YML }}
+          ${{ secrets.DEV_APPLICATION_OAUTH_YML }}
           EOF
 
           cat <<EOF > application-storage.yml
