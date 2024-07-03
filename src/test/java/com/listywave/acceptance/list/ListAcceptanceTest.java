@@ -171,7 +171,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             assertAll(
                     () -> assertThat(결과.ownerId()).isEqualTo(동호.getId()),
                     () -> assertThat(결과.title()).isEqualTo(동호_리스트.getTitle().getValue()),
-                    () -> assertThat(결과.category()).isEqualTo(동호_리스트.getCategory().getViewName()),
+                    () -> assertThat(결과.categoryKorName()).isEqualTo(동호_리스트.getCategory().getViewName()),
                     () -> assertThat(결과.collectCount()).isZero(),
                     () -> assertThat(결과.collaborators()).isEmpty()
             );
