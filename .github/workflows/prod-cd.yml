@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Github Actions 호스트 IP 가져오기
         id: ip
-        uses: haythem/public-ip@bdddd92c198b0955f0b494a8ebeac529754262ff
+        uses: candidob/get-runner-ip@2e5406f1492227920ba96df909e648be5e8b8cb2
 
       - name: AWS 로그인
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
@@ -63,7 +63,7 @@ jobs:
           arguments: bootJar
 
       - name: 도커 이미지 빌드
-        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.PROD_TAG }} ./
+        run: docker build --platform linux/arm64 -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.PROD_TAG }} ./
 
       - name: 도커 허브에 로그인
         uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446
