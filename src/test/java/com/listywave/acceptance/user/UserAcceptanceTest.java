@@ -2,27 +2,22 @@ package com.listywave.acceptance.user;
 
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
 import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청_API;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.닉네임_중복_체크_요청;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.비회원_회원_정보_조회_요청;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.비회원이_사용자_검색;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.추천_사용자_조회;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.프로필_수정_요청;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.프로필_수정_요청_데이터;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.회원이_사용자_검색;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.회원이_회원_정보_조회_요청;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.*;
+import static com.listywave.acceptance.user.UserAcceptanceTestHelper.*;
+import static com.listywave.acceptance.user.UserAcceptanceTestHelper.내_피드_리스트_공개_여부_설정_API_호출;
 import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.유진;
 import static com.listywave.user.fixture.UserFixture.정수;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.*;
 
 import com.listywave.acceptance.common.AcceptanceTest;
+import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.dto.search.UserSearchResponse;
+import com.listywave.user.presentation.dto.ListVisibilityUpdateRequest;
 import io.restassured.common.mapper.TypeRef;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -236,6 +231,70 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
             // when
             var 응답 = 프로필_수정_요청(정수_액세스_토큰, 동호.getId(), 프로필_수정_요청_데이터);
+
+            // then
+            HTTP_상태_코드를_검증한다(응답, FORBIDDEN);
+        }
+    }
+
+    @Nested
+    class 피드에서_내_리스트_공개_여부_설정 {
+
+        @Test
+        void 내_피드의_공개_리스트_비공개로_설정() {
+            // given
+            var 정수 = 회원을_저장한다(정수());
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 정수_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 정수_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+            var 내_피드_비공개_설정_데이터 = 내_피드_공개_여부_설정_데이터(정수_리스트_ID, false);
+
+            // when
+            var 응답 = 내_피드_리스트_공개_여부_설정_API_호출(정수_액세스_토큰, 내_피드_비공개_설정_데이터);
+            var 수정_이후_리스트_공개_여부_조회_결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+
+            // then
+            HTTP_상태_코드를_검증한다(응답, OK);
+            assertThat(수정_이후_리스트_공개_여부_조회_결과.isPublic()).isFalse();
+        }
+
+        @Test
+        void 내_피드의_비공개_리스트_공개로_설정() {
+            // given
+            var 정수 = 회원을_저장한다(정수());
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 정수_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 정수_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+            var 내_피드_비공개_설정_데이터 = 내_피드_공개_여부_설정_데이터(정수_리스트_ID, false);
+            내_피드_리스트_공개_여부_설정_API_호출(정수_액세스_토큰, 내_피드_비공개_설정_데이터);
+
+            var 내_피드_공개_설정_데이터 = 내_피드_공개_여부_설정_데이터(정수_리스트_ID, true);
+
+            // when
+            var 응답 = 내_피드_리스트_공개_여부_설정_API_호출(정수_액세스_토큰, 내_피드_공개_설정_데이터);
+            var 수정_이후_리스트_공개_여부_조회_결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+
+            // then
+            HTTP_상태_코드를_검증한다(응답, OK);
+            assertThat(수정_이후_리스트_공개_여부_조회_결과.isPublic()).isTrue();
+        }
+
+        @Test
+        void 내_피드가_아닌_리스트는_공개_여부_설정을_할_수_없다() {
+            // given
+            var 정수 = 회원을_저장한다(정수());
+            var 동호 = 회원을_저장한다(동호());
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
+            var 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+            var 내_피드_비공개_설정_데이터 = 내_피드_공개_여부_설정_데이터(동호_리스트_ID, false);
+
+            // when
+            var 응답 = 내_피드_리스트_공개_여부_설정_API_호출(정수_액세스_토큰, 내_피드_비공개_설정_데이터);
 
             // then
             HTTP_상태_코드를_검증한다(응답, FORBIDDEN);

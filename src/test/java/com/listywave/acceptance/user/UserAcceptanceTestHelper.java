@@ -3,6 +3,7 @@ package com.listywave.acceptance.user;
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.given;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+import com.listywave.user.presentation.dto.ListVisibilityUpdateRequest;
 import com.listywave.user.presentation.dto.UserProfileUpdateRequest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -85,5 +86,24 @@ public abstract class UserAcceptanceTestHelper {
                 .when().patch("/users/{userId}", userId)
                 .then().log().all()
                 .extract();
+    }
+
+    public static ExtractableResponse<Response> 내_피드_리스트_공개_여부_설정_API_호출(
+            String accessToken,
+            ListVisibilityUpdateRequest request
+    ) {
+        return given()
+                .header(AUTHORIZATION, "Bearer " + accessToken)
+                .body(request)
+                .when().patch("/users/list-visibility")
+                .then().log().all()
+                .extract();
+    }
+
+    public static ListVisibilityUpdateRequest 내_피드_공개_여부_설정_데이터(Long listId, boolean isPublic) {
+        return new ListVisibilityUpdateRequest(
+                listId,
+                isPublic
+        );
     }
 }
