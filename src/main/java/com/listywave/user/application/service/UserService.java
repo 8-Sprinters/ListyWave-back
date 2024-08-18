@@ -175,12 +175,12 @@ public class UserService {
         followingUser.remove(followerUser);
     }
 
-    public void updateListVisibility(Long loginUserId, Long listId, Boolean beforeIsPublic) {
+    public void updateListVisibility(Long loginUserId, Long listId, Boolean isPublic) {
         User user = userRepository.getById(loginUserId);
         ListEntity list = listRepository.getById(listId);
         list.validateOwner(user);
 
-        list.updateVisibility(!beforeIsPublic);
+        list.updateVisibility(isPublic);
     }
 
     @Transactional(readOnly = true)
