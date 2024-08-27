@@ -184,17 +184,17 @@ public abstract class ListAcceptanceTestHelper {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 비회원_최신_리스트_10개_조회_API_호출() {
+    public static ExtractableResponse<Response> 최신_리스트_10개_조회_카테고리_필터링_API_호출(String category) {
         return given()
-                .when().get("/lists")
+                .when().get("/lists?category={category}", category)
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 회원_최신_리스트_10개_조회_API_호출(String accessToken) {
+    public static ExtractableResponse<Response> 팔로우한_사용자의_최신_리스트_10개_조회_API_호출(String accessToken) {
         return given()
                 .header(AUTHORIZATION, "Bearer " + accessToken)
-                .when().get("/lists")
+                .when().get("/lists/following")
                 .then().log().all()
                 .extract();
     }
