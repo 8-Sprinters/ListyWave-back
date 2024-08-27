@@ -170,21 +170,23 @@ public class ListService {
     }
 
     @Transactional(readOnly = true)
-    public ListRecentResponse getRecentLists(Long loginUserId, LocalDateTime cursorUpdatedDate, Pageable pageable) {
-        if (loginUserId != null) {
-            User user = userRepository.getById(loginUserId);
-            List<Follow> follows = followRepository.getAllByFollowerUser(user);
+    public ListRecentResponse getRecentLists(LocalDateTime cursorUpdatedDate, CategoryType category, Pageable pageable) {
+        Slice<ListEntity> result = listRepository.getRecentLists(cursorUpdatedDate, category, pageable);
+        return getListRecentResponse(result);
+    }
 
-            List<User> myFollowingUsers = follows.stream()
-                    .map(Follow::getFollowingUser)
-                    .filter(followingUser -> !followingUser.isDelete())
-                    .toList();
+    @Transactional(readOnly = true)
+    public ListRecentResponse getRecentListsByFollowing(Long loginUserId, LocalDateTime cursorUpdatedDate, Pageable pageable) {
+        User user = userRepository.getById(loginUserId);
+        List<Follow> follows = followRepository.getAllByFollowerUser(user);
 
-            Slice<ListEntity> result =
-                    listRepository.getRecentListsByFollowing(myFollowingUsers, cursorUpdatedDate, pageable);
-            return getListRecentResponse(result);
-        }
-        Slice<ListEntity> result = listRepository.getRecentLists(cursorUpdatedDate, pageable);
+        List<User> myFollowingUsers = follows.stream()
+                .map(Follow::getFollowingUser)
+                .filter(followingUser -> !followingUser.isDelete())
+                .toList();
+
+        Slice<ListEntity> result =
+                listRepository.getRecentListsByFollowing(myFollowingUsers, cursorUpdatedDate, pageable);
         return getListRecentResponse(result);
     }
 
@@ -255,6 +257,7 @@ public class ListService {
         );
 
         if (doesChangedAnyItemRank) {
+            list.increaseUpdateCount();
             historyService.saveHistory(list, updatedDate, true);
         }
     }

@@ -24,6 +24,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             new UriAndMethod("/lists/upload-url", GET),
             new UriAndMethod("/lists/upload-complete", GET),
             new UriAndMethod("/lists/{listId}/histories", GET),
+            new UriAndMethod("/lists", GET),
             new UriAndMethod("/users/{userId}/lists", GET),
             new UriAndMethod("/users/{userId}/followers", GET),
             new UriAndMethod("/users/{userId}/followings", GET),

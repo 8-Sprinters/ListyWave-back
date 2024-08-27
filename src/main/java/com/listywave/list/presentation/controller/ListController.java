@@ -71,11 +71,21 @@ public class ListController {
 
     @GetMapping("/lists")
     ResponseEntity<ListRecentResponse> getRecentLists(
-            @OptionalAuth Long loginUserId,
+            @RequestParam(name = "cursorUpdatedDate", required = false) LocalDateTime cursorUpdatedDate,
+            @RequestParam(name = "category", defaultValue = "entire") CategoryType category,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        ListRecentResponse recentLists = listService.getRecentLists(cursorUpdatedDate, category, pageable);
+        return ResponseEntity.ok(recentLists);
+    }
+
+    @GetMapping("/lists/following")
+    ResponseEntity<ListRecentResponse> getRecentListsByFollowing(
+            @Auth Long loginUserId,
             @RequestParam(name = "cursorUpdatedDate", required = false) LocalDateTime cursorUpdatedDate,
             @PageableDefault(size = 10) Pageable pageable
     ) {
-        ListRecentResponse recentLists = listService.getRecentLists(loginUserId, cursorUpdatedDate, pageable);
+        ListRecentResponse recentLists = listService.getRecentListsByFollowing(loginUserId, cursorUpdatedDate, pageable);
         return ResponseEntity.ok(recentLists);
     }
 

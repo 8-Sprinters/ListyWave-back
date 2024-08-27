@@ -91,6 +91,9 @@ public class ListEntity {
     @Embedded
     private Items items;
 
+    @Column(nullable = false)
+    private int updateCount;
+
     @CreatedDate
     @Temporal(TIMESTAMP)
     @Column(updatable = false)
@@ -258,5 +261,9 @@ public class ListEntity {
             return;
         }
         throw new CustomException(INVALID_ACCESS);
+    }
+
+    public void increaseUpdateCount(){
+        this.updateCount++;
     }
 }
