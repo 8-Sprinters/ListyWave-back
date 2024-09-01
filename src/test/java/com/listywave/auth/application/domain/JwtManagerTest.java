@@ -52,10 +52,13 @@ class JwtManagerTest {
 
         @Test
         void userId로_액세스_토큰을_발급한다() {
+            // given
             Long userId = 312321L;
 
+            // when
             String result = jwtManager.createAccessToken(userId);
 
+            // then
             assertThat(result).isNotNull();
             assertThat(result).isNotBlank();
         }
@@ -77,81 +80,85 @@ class JwtManagerTest {
         private final Long userId = 1L;
 
         @Test
-        void PREFIX로_BEARER가_없는_경우_예외가_발생한다() {
+        void PREFIX로_BEARER가_있는_경우와_없는_경우_모두_읽을_수_있다() {
+            // given
             String accessToken = jwtManager.createAccessToken(userId);
 
-            CustomException exception = assertThrows(CustomException.class, () -> jwtManager.readTokenWithPrefix(accessToken));
+            // when
+            Long result1 = jwtManager.readTokenWithPrefix("Bearer " + accessToken);
+            Long result2 = jwtManager.readTokenWithoutPrefix(accessToken);
 
-            assertThat(exception.getErrorCode()).isEqualTo(REQUIRED_ACCESS_TOKEN);
+            // then
+            assertThat(result1).isEqualTo(result2).isEqualTo(userId);
         }
 
         @ParameterizedTest
         @NullAndEmptySource
         void AccessToken_값이_빈_공백이거나_null이면_예외가_발생한다(String accessToken) {
+            // when
             CustomException exception = assertThrows(CustomException.class, () -> jwtManager.readTokenWithPrefix(accessToken));
 
+            // then
             assertThat(exception.getErrorCode()).isEqualTo(REQUIRED_ACCESS_TOKEN);
         }
 
         @Test
-        void 액세스_토큰을_읽고_userId를_반환한다() {
-            String accessToken = jwtManager.createAccessToken(userId);
-
-            Long result = jwtManager.readTokenWithPrefix("Bearer " + accessToken);
-
-            assertThat(result).isEqualTo(userId);
-        }
-
-        @Test
         void 유효기간이_지난_액세스_토큰인_경우_예외가_발생한다() {
+            // given
             JwtManager jwtManager = new JwtManager(plainSecretKey, issuer, accessTokenValidTimeDuration, refreshTokenValidTimeDuration, NANOSECONDS, refreshTokenValidTimeUnit);
             String accessToken = jwtManager.createAccessToken(userId);
 
+            // when
+            // then
             assertThatThrownBy(() -> jwtManager.readTokenWithPrefix("Bearer " + accessToken))
                     .isInstanceOf(ExpiredJwtException.class);
         }
 
         @Test
         void SecretKey가_다른_액세스_토큰인_경우_예외가_발생한다() {
+            // given
             String accessToken = jwtManager.createAccessToken(userId);
 
+            // when
             JwtManager differentSecretKeyJwtManager = new JwtManager("sfaksdlhfdsakjfhasdkfuhcasknfuhsabkdvajnfcgsankzdjhfc", issuer, 1, 1, NANOSECONDS, NANOSECONDS);
 
+            // then
             assertThatThrownBy(() -> differentSecretKeyJwtManager.readTokenWithPrefix("Bearer " + accessToken))
                     .isInstanceOf(SignatureException.class);
-        }
-
-        @Test
-        void 리프레시_토큰을_읽고_userId를_반환한다() {
-            String refreshToken = jwtManager.createRefreshToken(userId);
-
-            assertThat(refreshToken).isNotNull();
-            assertThat(refreshToken).isNotBlank();
         }
 
         @ParameterizedTest
         @NullAndEmptySource
         void 리프레시_토큰이_null이거나_공백이면_예외를_발생한다(String refreshToken) {
+            // when
+            // then
             assertThatThrownBy(() -> jwtManager.readTokenWithoutPrefix(refreshToken));
         }
 
         @Test
         void 유효기간이_지난_리프레시_토큰인_경우_예외가_발생한다() {
+            // given
             JwtManager jwtManager = new JwtManager(plainSecretKey, issuer, 1, 1, NANOSECONDS, NANOSECONDS);
+
+            // when
             String refreshToken = jwtManager.createRefreshToken(userId);
 
+            // then
             assertThatThrownBy(() -> jwtManager.readTokenWithoutPrefix(refreshToken))
                     .isInstanceOf(ExpiredJwtException.class);
         }
 
         @Test
         void SecretKey가_다른_리프레시_토큰인_경우_예외가_발생한다() {
+            // given
             String refreshToken = jwtManager.createRefreshToken(userId);
 
+            // when
             JwtManager otherSecretKeyJwtManager = new JwtManager(
                     "sdfklasdhfisdhfisadfhsicalndufhasdukhxaukdsadfuhsakcnfsajfhasdjkfhx",
                     issuer, 1, 1, MINUTES, MINUTES);
 
+            // then
             assertThatThrownBy(() -> otherSecretKeyJwtManager.readTokenWithoutPrefix(refreshToken))
                     .isInstanceOf(SignatureException.class);
         }

@@ -1,4 +1,4 @@
-package com.listywave.auth.presentation.dto;
+package com.listywave.auth.application.dto;
 
 public record UpdateTokenResponse(
         String accessToken
