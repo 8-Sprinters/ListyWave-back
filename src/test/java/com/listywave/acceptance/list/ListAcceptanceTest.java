@@ -539,7 +539,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
     }
 
     @Nested
-    class 리스트_홈 {
+    class 리스트_팀섹 {
 
         @Test
         void 트랜딩_리스트를_조회한다() {

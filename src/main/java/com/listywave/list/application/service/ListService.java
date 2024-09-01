@@ -172,7 +172,7 @@ public class ListService {
     @Transactional(readOnly = true)
     public ListRecentResponse getRecentLists(LocalDateTime cursorUpdatedDate, CategoryType category, Pageable pageable) {
         Slice<ListEntity> result = listRepository.getRecentLists(cursorUpdatedDate, category, pageable);
-        return getListRecentResponse(result);
+        return toListRecentResponse(result);
     }
 
     @Transactional(readOnly = true)
@@ -187,10 +187,10 @@ public class ListService {
 
         Slice<ListEntity> result =
                 listRepository.getRecentListsByFollowing(myFollowingUsers, cursorUpdatedDate, pageable);
-        return getListRecentResponse(result);
+        return toListRecentResponse(result);
     }
 
-    private ListRecentResponse getListRecentResponse(Slice<ListEntity> result) {
+    private ListRecentResponse toListRecentResponse(Slice<ListEntity> result) {
         List<ListEntity> recentList = result.getContent();
 
         LocalDateTime cursorUpdatedDate = null;
