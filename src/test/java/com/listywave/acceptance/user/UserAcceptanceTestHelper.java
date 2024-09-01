@@ -87,23 +87,4 @@ public abstract class UserAcceptanceTestHelper {
                 .then().log().all()
                 .extract();
     }
-
-    public static ExtractableResponse<Response> 내_피드_리스트_공개_여부_설정_API_호출(
-            String accessToken,
-            ListVisibilityUpdateRequest request
-    ) {
-        return given()
-                .header(AUTHORIZATION, "Bearer " + accessToken)
-                .body(request)
-                .when().patch("/users/list-visibility")
-                .then().log().all()
-                .extract();
-    }
-
-    public static ListVisibilityUpdateRequest 내_피드_공개_여부_설정_데이터(Long listId, boolean isPublic) {
-        return new ListVisibilityUpdateRequest(
-                listId,
-                isPublic
-        );
-    }
 }

@@ -183,7 +183,7 @@ class ListEntityTest {
     void 공개_여부를_수정할_수_있다() {
         assertThat(list.isPublic()).isTrue();
 
-        list.updateVisibility(false);
+        list.updateVisibility();
 
         assertThat(list.isPublic()).isFalse();
     }

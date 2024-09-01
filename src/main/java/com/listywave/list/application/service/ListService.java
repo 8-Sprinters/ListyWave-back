@@ -304,4 +304,11 @@ public class ListService {
         }
         return FindFeedListResponse.of(result.hasNext(), cursorUpdatedDate, lists);
     }
+
+    public void changeVisibility(Long loginUserId, Long listId) {
+        User user = userRepository.getById(loginUserId);
+        ListEntity list = listRepository.getById(listId);
+        list.validateOwner(user);
+        list.updateVisibility();
+    }
 }

@@ -5,32 +5,7 @@ import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.n개�
 import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.댓글_저장_API_호출;
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
 import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청_API;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.가장_좋아하는_견종_TOP3_생성_요청_데이터;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_삭제_요청_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_상세_조회를_검증한다;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_수정_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_저장_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트의_아이템_순위와_히스토리의_아이템_순위를_검증한다;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_리스트_상세_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_최신_리스트_10개_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_피드_리스트_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_히스토리_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_카테고리_콜라보레이터_필터링_요청;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_카테고리_필터링_요청;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_콜라보레이터_필터링_요청;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.아이템_순위와_라벨을_바꾼_좋아하는_견종_TOP3_요청_데이터;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.정렬기준을_포함한_검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.좋아하는_라면_TOP3_생성_요청_데이터;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리로_검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리와_키워드로_검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.콜렉트_요청_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.키워드로_검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.키워드와_정렬기준을_포함한_검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.트랜딩_리스트_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원_최신_리스트_10개_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원_피드_리스트_조회;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원용_리스트_상세_조회_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.*;
 import static com.listywave.acceptance.reply.ReplyAcceptanceTestHelper.답글_등록_API_호출;
 import static com.listywave.list.fixture.ListFixture.가장_좋아하는_견종_TOP3;
 import static com.listywave.list.fixture.ListFixture.가장_좋아하는_견종_TOP3_순위_변경;
@@ -45,12 +20,8 @@ import static java.util.Comparator.reverseOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.OK;
 
 import com.listywave.acceptance.common.AcceptanceTest;
 import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
@@ -815,6 +786,65 @@ public class ListAcceptanceTest extends AcceptanceTest {
                     () -> assertThat(결과.resultLists()).hasSize(1),
                     () -> assertThat(결과.resultLists().get(0).id()).isEqualTo(좋아하는_라면_TOP3_생성_결과.listId())
             );
+        }
+    }
+
+    @Nested
+    class 피드에서_내_리스트_공개_여부_설정 {
+
+        @Test
+        void 내_피드의_공개_리스트_비공개로_설정() {
+            // given
+            var 정수 = 회원을_저장한다(정수());
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 정수_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 정수_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+
+            // when
+            var 응답 = 리스트_공개_여부_변경_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+            var 수정_이후_리스트_공개_여부_조회_결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+
+            // then
+            HTTP_상태_코드를_검증한다(응답, OK);
+            assertThat(수정_이후_리스트_공개_여부_조회_결과.isPublic()).isFalse();
+        }
+
+        @Test
+        void 내_피드의_비공개_리스트_공개로_설정() {
+            // given
+            var 정수 = 회원을_저장한다(정수());
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 정수_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 정수_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+            리스트_공개_여부_변경_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+
+            // when
+            var 응답 = 리스트_공개_여부_변경_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+            var 수정_이후_리스트_공개_여부_조회_결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+
+            // then
+            HTTP_상태_코드를_검증한다(응답, OK);
+            assertThat(수정_이후_리스트_공개_여부_조회_결과.isPublic()).isTrue();
+        }
+
+        @Test
+        void 내_피드가_아닌_리스트는_공개_여부_설정을_할_수_없다() {
+            // given
+            var 정수 = 회원을_저장한다(정수());
+            var 동호 = 회원을_저장한다(동호());
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
+            var 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+
+            // when
+            var 응답 = 리스트_공개_여부_변경_API_호출(정수_액세스_토큰, 동호_리스트_ID);
+
+            // then
+            HTTP_상태_코드를_검증한다(응답, FORBIDDEN);
         }
     }
 }

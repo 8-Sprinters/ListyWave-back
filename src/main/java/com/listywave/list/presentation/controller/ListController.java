@@ -122,4 +122,13 @@ public class ListController {
         listService.deleteLists(userId, request.listId());
         return ResponseEntity.ok().build();
     }
+
+    @PatchMapping("/lists/{listId}/visibility")
+    ResponseEntity<Void> changeVisibility(
+            @Auth Long loginUserId,
+            @PathVariable("listId") Long listId
+    ) {
+        listService.changeVisibility(loginUserId, listId);
+        return ResponseEntity.ok().build();
+    }
 }

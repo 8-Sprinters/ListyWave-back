@@ -36,7 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final ListRepository listRepository;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final UserElasticRepository userElasticRepository;
@@ -173,14 +172,6 @@ public class UserService {
         followRepository.deleteByFollowingUserAndFollowerUser(followingUser, followerUser);
 
         followingUser.remove(followerUser);
-    }
-
-    public void updateListVisibility(Long loginUserId, Long listId, Boolean isPublic) {
-        User user = userRepository.getById(loginUserId);
-        ListEntity list = listRepository.getById(listId);
-        list.validateOwner(user);
-
-        list.updateVisibility(isPublic);
     }
 
     @Transactional(readOnly = true)
