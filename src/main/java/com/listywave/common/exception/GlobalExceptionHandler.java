@@ -29,9 +29,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<Void> handleException(Exception e) {
+    protected ResponseEntity<String> handleException(Exception e) {
         log.error("[InternalServerError] : {}", e.getMessage(), e);
-        return ResponseEntity.status(INTERNAL_SERVER_ERROR).build();
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
