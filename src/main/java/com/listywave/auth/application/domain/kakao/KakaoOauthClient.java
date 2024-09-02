@@ -1,7 +1,6 @@
 package com.listywave.auth.application.domain.kakao;
 
 import com.listywave.auth.infra.kakao.KakaoOauthApiClient;
-import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
 import com.listywave.auth.infra.kakao.response.KakaoMember;
 import com.listywave.auth.infra.kakao.response.KakaoTokenResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,7 @@ import org.springframework.util.MultiValueMap;
 @RequiredArgsConstructor
 public class KakaoOauthClient {
 
+    private static final String TOKEN_PREFIX = "Bearer ";
     private final KakaoOauthConfig kakaoOauthConfig;
     private final KakaoOauthApiClient apiClient;
 
@@ -29,12 +29,11 @@ public class KakaoOauthClient {
     }
 
     public KakaoMember fetchMember(String accessToken) {
-        return apiClient.fetchKakaoMember("Bearer " + accessToken);
+        return apiClient.fetchKakaoMember(TOKEN_PREFIX + accessToken);
     }
 
-    public Long logout(String oauthAccessToken) {
-        String accessToken = "Bearer " + oauthAccessToken;
-        KakaoLogoutResponse response = apiClient.logout(accessToken);
-        return response.id();
+    public void logout(String oauthAccessToken) {
+        String accessToken = TOKEN_PREFIX + oauthAccessToken;
+        apiClient.logout(accessToken);
     }
 }

@@ -48,7 +48,7 @@ public class JwtManager {
     public String createAccessToken(Long userId) {
         Date now = new Date();
         return Jwts.builder()
-                .header().type("jwt").and()
+                .header().type("accessToken").and()
                 .signWith(secretKey)
                 .issuer(issuer)
                 .issuedAt(now)
@@ -61,7 +61,7 @@ public class JwtManager {
     public String createRefreshToken(Long userId) {
         Date now = new Date();
         return Jwts.builder()
-                .header().type("jwt").and()
+                .header().type("refreshToken").and()
                 .signWith(secretKey)
                 .issuer(issuer)
                 .issuedAt(now)
