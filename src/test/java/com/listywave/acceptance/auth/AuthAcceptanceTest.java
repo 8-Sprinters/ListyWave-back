@@ -97,7 +97,7 @@ public class AuthAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 로그인에_성공하면_Body와_Authorization헤더에_액세스_토큰과_리프레시_토큰을_담아_응답한다() {
+        void 로그인에_성공하면_Body에_액세스_토큰과_리프레시_토큰을_담아_응답한다() {
             // when
             var 로그인_응답 = 로그인(EXPECTED_KAKAO_TOKEN_RESPONSE, EXPECTED_KAKAO_MEMBER);
             var 로그인_결과 = 로그인_응답.as(LoginResponse.class);
