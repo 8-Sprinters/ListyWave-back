@@ -11,13 +11,9 @@ import com.listywave.auth.infra.kakao.KakaoOauthApiClient;
 import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
 import com.listywave.auth.infra.kakao.response.KakaoMember;
 import com.listywave.auth.infra.kakao.response.KakaoTokenResponse;
-import com.listywave.collaborator.repository.CollaboratorRepository;
-import com.listywave.collection.repository.CollectionRepository;
 import com.listywave.list.application.domain.list.ListEntity;
-import com.listywave.list.repository.ItemRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.user.application.domain.User;
-import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -52,14 +48,6 @@ public abstract class AcceptanceTest {
     protected ListRepository listRepository;
     @Autowired
     protected JwtManager jwtManager;
-    @Autowired
-    protected CollectionRepository collectionRepository;
-    @Autowired
-    protected CollaboratorRepository collaboratorRepository;
-    @Autowired
-    protected ItemRepository itemRepository;
-    @Autowired
-    protected FollowRepository followRepository;
 
     @BeforeAll
     void beforeAll(@Autowired JdbcTemplate jdbcTemplate) {
@@ -76,18 +64,18 @@ public abstract class AcceptanceTest {
         return userRepository.save(user);
     }
 
-    protected ExtractableResponse<Response> 로그인을_시도한다(KakaoTokenResponse expectedKakaoTokenResponse, KakaoMember expectedKakaoMember) {
+    protected ExtractableResponse<Response> 로그인(KakaoTokenResponse expectedKakaoTokenResponse, KakaoMember expectedKakaoMember) {
         when(kakaoOauthApiClient.requestToken(any()))
                 .thenReturn(expectedKakaoTokenResponse);
         when(kakaoOauthApiClient.fetchKakaoMember(anyString()))
                 .thenReturn(expectedKakaoMember);
-        return AuthAcceptanceTestHelper.로그인_요청();
+        return AuthAcceptanceTestHelper.로그인_API();
     }
 
     protected ExtractableResponse<Response> 회원_탈퇴(KakaoLogoutResponse expectedKakaoLogoutResponse, String accessToken) {
         when(kakaoOauthApiClient.logout(anyString()))
                 .thenReturn(expectedKakaoLogoutResponse);
-        return AuthAcceptanceTestHelper.회원탈퇴_요청(accessToken);
+        return AuthAcceptanceTestHelper.회원탈퇴_API(accessToken);
     }
 
     protected String 액세스_토큰을_발급한다(User user) {

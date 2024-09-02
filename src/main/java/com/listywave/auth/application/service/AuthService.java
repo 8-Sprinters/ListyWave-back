@@ -5,8 +5,8 @@ import static com.listywave.common.exception.ErrorCode.DELETED_USER_EXCEPTION;
 import com.listywave.auth.application.domain.JwtManager;
 import com.listywave.auth.application.domain.kakao.KakaoOauthClient;
 import com.listywave.auth.application.domain.kakao.KakaoRedirectUriProvider;
-import com.listywave.auth.application.dto.LoginResult;
-import com.listywave.auth.application.dto.UpdateTokenResult;
+import com.listywave.auth.application.dto.LoginResponse;
+import com.listywave.auth.application.dto.UpdateTokenResponse;
 import com.listywave.auth.infra.kakao.response.KakaoMember;
 import com.listywave.auth.infra.kakao.response.KakaoTokenResponse;
 import com.listywave.common.exception.CustomException;
@@ -38,7 +38,7 @@ public class AuthService {
         return kakaoRedirectUriProvider.provide();
     }
 
-    public LoginResult login(String authCode) {
+    public LoginResponse login(String authCode) {
         KakaoTokenResponse kakaoTokenResponse = kakaoOauthClient.requestToken(authCode);
         KakaoMember kakaoMember = kakaoOauthClient.fetchMember(kakaoTokenResponse.accessToken());
 
@@ -51,40 +51,22 @@ public class AuthService {
                 );
     }
 
-    private LoginResult loginNonInit(User user, String kakaoAccessToken) {
+    private LoginResponse loginNonInit(User user, String kakaoAccessToken) {
         if (user.isDelete()) {
             throw new CustomException(DELETED_USER_EXCEPTION);
         }
         user.updateKakaoAccessToken(kakaoAccessToken);
         String accessToken = jwtManager.createAccessToken(user.getId());
         String refreshToken = jwtManager.createRefreshToken(user.getId());
-        return LoginResult.of(
-                user,
-                false,
-                accessToken,
-                refreshToken,
-                jwtManager.getAccessTokenValidTimeDuration(),
-                jwtManager.getRefreshTokenValidTimeDuration(),
-                jwtManager.getAccessTokenValidTimeUnit(),
-                jwtManager.getRefreshTokenValidTimeUnit()
-        );
+        return LoginResponse.of(user, accessToken, refreshToken, false);
     }
 
-    private LoginResult loginInit(Long kakaoId, String kakaoEmail, String kakaoAccessToken) {
+    private LoginResponse loginInit(Long kakaoId, String kakaoEmail, String kakaoAccessToken) {
         User user = User.init(kakaoId, kakaoEmail, kakaoAccessToken);
-        User createdUser = userRepository.save(user);
+        userRepository.save(user);
         String accessToken = jwtManager.createAccessToken(user.getId());
         String refreshToken = jwtManager.createRefreshToken(user.getId());
-        return LoginResult.of(
-                createdUser,
-                true,
-                accessToken,
-                refreshToken,
-                jwtManager.getAccessTokenValidTimeDuration(),
-                jwtManager.getRefreshTokenValidTimeDuration(),
-                jwtManager.getAccessTokenValidTimeUnit(),
-                jwtManager.getRefreshTokenValidTimeUnit()
-        );
+        return LoginResponse.of(user, accessToken, refreshToken, true);
     }
 
     public void logout(Long userId) {
@@ -95,19 +77,10 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public UpdateTokenResult updateToken(Long userId) {
+    public UpdateTokenResponse updateToken(Long userId) {
         User user = userRepository.getById(userId);
-
         String accessToken = jwtManager.createAccessToken(user.getId());
-        String newRefreshToken = jwtManager.createRefreshToken(user.getId());
-        return new UpdateTokenResult(
-                accessToken,
-                newRefreshToken,
-                jwtManager.getAccessTokenValidTimeDuration(),
-                jwtManager.getRefreshTokenValidTimeDuration(),
-                jwtManager.getAccessTokenValidTimeUnit(),
-                jwtManager.getRefreshTokenValidTimeUnit()
-        );
+        return new UpdateTokenResponse(accessToken);
     }
 
     public void withdraw(Long userId) {

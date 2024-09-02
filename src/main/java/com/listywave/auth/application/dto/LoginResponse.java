@@ -1,6 +1,5 @@
-package com.listywave.auth.presentation.dto;
+package com.listywave.auth.application.dto;
 
-import com.listywave.auth.application.dto.LoginResult;
 import com.listywave.user.application.domain.User;
 import lombok.Builder;
 
@@ -18,22 +17,7 @@ public record LoginResponse(
         String refreshToken
 ) {
 
-    public static LoginResponse of(LoginResult result) {
-        return LoginResponse.builder()
-                .id(result.id())
-                .profileImageUrl(result.profileImageUrl())
-                .backgroundImageUrl(result.backgroundImageUrl())
-                .nickname(result.nickname())
-                .description(result.description())
-                .followerCount(result.followerCount())
-                .followingCount(result.followingCount())
-                .isFirst(result.isFirst())
-                .accessToken(result.accessToken())
-                .refreshToken(result.refreshToken())
-                .build();
-    }
-
-    public static LoginResponse of(User user, String accessToken, String refreshToken) {
+    public static LoginResponse of(User user, String accessToken, String refreshToken, boolean isFirst) {
         return LoginResponse.builder()
                 .id(user.getId())
                 .profileImageUrl(user.getProfileImageUrl())
@@ -42,7 +26,7 @@ public record LoginResponse(
                 .description(user.getDescription())
                 .followerCount(user.getFollowerCount())
                 .followingCount(user.getFollowingCount())
-                .isFirst(false)
+                .isFirst(isFirst)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();

@@ -8,7 +8,6 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.OPTIONS;
 
 import com.listywave.auth.application.domain.JwtManager;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +23,6 @@ class AuthorizationInterceptorTest {
 
     private JwtManager jwtManager;
     private AuthContext authContext;
-    private TokenReader tokenReader;
     private AuthorizationInterceptor authorizationInterceptor;
     private HttpServletRequest httpServletRequest;
     private HttpServletResponse httpServletResponse;
@@ -33,14 +31,13 @@ class AuthorizationInterceptorTest {
     void setUp() {
         jwtManager = mock(JwtManager.class);
         authContext = new AuthContext();
-        tokenReader = new TokenReader(jwtManager);
-        authorizationInterceptor = new AuthorizationInterceptor(authContext, tokenReader);
+        authorizationInterceptor = new AuthorizationInterceptor(jwtManager, authContext);
         httpServletRequest = mock(HttpServletRequest.class);
         httpServletResponse = mock(HttpServletResponse.class);
     }
 
     @Test
-    void 인증이_필요하지_않은_리소스에_접근할_때는_아무_처리를_하지_않는다() throws Exception {
+    void 인증이_필요하지_않은_리소스에_접근할_때는_아무_처리를_하지_않는다() {
         // given
         when(httpServletRequest.getMethod()).thenReturn(GET.name());
         HandlerMethod handler = mock(HandlerMethod.class);
@@ -59,7 +56,7 @@ class AuthorizationInterceptorTest {
     }
 
     @Test
-    void Authorization_헤더에_담긴_액세스_토큰을_읽어_AuthContext에_userId를_저장한다() throws Exception {
+    void Authorization_헤더에_담긴_액세스_토큰을_읽어_AuthContext에_userId를_저장한다() {
         // given
         when(httpServletRequest.getMethod()).thenReturn(GET.name());
         HandlerMethod handler = mock(HandlerMethod.class);
@@ -81,31 +78,7 @@ class AuthorizationInterceptorTest {
     }
 
     @Test
-    void 액세스_토큰이_Authorization_헤더가_아닌_Cookie에_담기면_쿠키값을_읽어_AuthContext에_userId를_저장한다() throws Exception {
-        // given
-        when(httpServletRequest.getMethod()).thenReturn(GET.name());
-        HandlerMethod handler = mock(HandlerMethod.class);
-
-        RequestMapping requestMapping = mock(RequestMapping.class);
-        when(handler.getMethodAnnotation(RequestMapping.class)).thenReturn(requestMapping);
-        when(requestMapping.value()).thenReturn(new String[]{"my"});
-        when(requestMapping.method()).thenReturn(new RequestMethod[]{RequestMethod.GET});
-
-        String accessToken = "dufhaslndckhfksdjhkscjghacs.dkjfhnxasjdfhsjh.snvkjghc";
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(null);
-        Cookie[] cookies = {new Cookie("accessToken", accessToken)};
-        when(httpServletRequest.getCookies()).thenReturn(cookies);
-        when(jwtManager.readTokenWithoutPrefix(accessToken)).thenReturn(1L);
-
-        // when
-        authorizationInterceptor.preHandle(httpServletRequest, httpServletResponse, handler);
-
-        // then
-        assertThat(authContext.getUserId()).isEqualTo(1L);
-    }
-
-    @Test
-    void 요청_메서드가_OPTIONS_이면_값을_읽지_않는다() throws Exception {
+    void 요청_메서드가_OPTIONS이면_값을_읽지_않는다() {
         // given
         when(httpServletRequest.getMethod()).thenReturn(OPTIONS.name());
 
@@ -117,7 +90,7 @@ class AuthorizationInterceptorTest {
     }
 
     @Test
-    void 핸들러_타입이_HandlerMethod가_아니면_값을_읽지_않는다() throws Exception {
+    void 핸들러_타입이_HandlerMethod가_아니면_값을_읽지_않는다() {
         // given
         when(httpServletRequest.getMethod()).thenReturn(GET.name());
 
