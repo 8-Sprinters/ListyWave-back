@@ -98,17 +98,17 @@ public class CustomListRepositoryImpl implements CustomListRepository {
     }
 
     @Override
-    public Slice<ListEntity> getRecentLists(LocalDateTime cursorUpdatedDate, Pageable pageable) {
+    public Slice<ListEntity> getRecentLists(LocalDateTime cursorUpdatedDate, CategoryType category, Pageable pageable) {
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
 
         List<ListEntity> fetch = queryFactory
                 .selectFrom(listEntity)
                 .join(listEntity.user, user).fetchJoin()
-                .leftJoin(label).on(listEntity.id.eq(label.list.id))
                 .leftJoin(item).on(listEntity.id.eq(item.list.id))
                 .where(
                         listEntity.updatedDate.goe(thirtyDaysAgo),
                         updatedDateLt(cursorUpdatedDate),
+                        categoryEq(category),
                         listEntity.user.isDelete.eq(false),
                         listEntity.isPublic.eq(true)
                 )
@@ -142,7 +142,6 @@ public class CustomListRepositoryImpl implements CustomListRepository {
         List<ListEntity> fetch = queryFactory
                 .selectFrom(listEntity)
                 .join(listEntity.user, user).fetchJoin()
-                .leftJoin(label).on(listEntity.id.eq(label.list.id))
                 .leftJoin(item).on(listEntity.id.eq(item.list.id))
                 .where(
                         listEntity.updatedDate.goe(thirtyDaysAgo),

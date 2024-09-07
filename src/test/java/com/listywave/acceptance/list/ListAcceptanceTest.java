@@ -5,32 +5,7 @@ import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.n개�
 import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.댓글_저장_API_호출;
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
 import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청_API;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.가장_좋아하는_견종_TOP3_생성_요청_데이터;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_삭제_요청_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_상세_조회를_검증한다;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_수정_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_저장_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트의_아이템_순위와_히스토리의_아이템_순위를_검증한다;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_리스트_상세_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_최신_리스트_10개_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_피드_리스트_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_히스토리_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_카테고리_콜라보레이터_필터링_요청;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_카테고리_필터링_요청;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_콜라보레이터_필터링_요청;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.아이템_순위와_라벨을_바꾼_좋아하는_견종_TOP3_요청_데이터;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.정렬기준을_포함한_검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.좋아하는_라면_TOP3_생성_요청_데이터;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리로_검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리와_키워드로_검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.콜렉트_요청_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.키워드로_검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.키워드와_정렬기준을_포함한_검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.트랜딩_리스트_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원_최신_리스트_10개_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원_피드_리스트_조회;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원용_리스트_상세_조회_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.*;
 import static com.listywave.acceptance.reply.ReplyAcceptanceTestHelper.답글_등록_API_호출;
 import static com.listywave.list.fixture.ListFixture.가장_좋아하는_견종_TOP3;
 import static com.listywave.list.fixture.ListFixture.가장_좋아하는_견종_TOP3_순위_변경;
@@ -287,7 +262,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 아이템_순위에_변동이_있으면_히스토리로_기록되고_lastUpdatedDate가_갱신된다() {
+        void 아이템_순위에_변동이_있으면_히스토리로_기록되고_lastUpdatedDate가_갱신되고_updateCount가_증가한다() {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
@@ -343,7 +318,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 아이템의_순위_변동이_일어나지_않으면_updatedDate가_갱신되지_않는다() {
+        void 아이템의_순위_변동이_일어나지_않으면_updatedDate와_updateCount가_갱신되지_않는다() {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 정수 = 회원을_저장한다(정수());
@@ -564,7 +539,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
     }
 
     @Nested
-    class 리스트_탐색 {
+    class 리스트_팀섹 {
 
         @Test
         void 트랜딩_리스트를_조회한다() {
@@ -619,7 +594,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 회원이_최신_리스트_10개를_조회하면_팔로우한_사용자의_최신_리스트_10개가_반환된다() {
+        void 팔로우한_사용자의_최신_리스트_10개를_조회한다() {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 정수 = 회원을_저장한다(정수());
@@ -630,7 +605,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(동호, 5));
 
             // when
-            var response = 회원_최신_리스트_10개_조회_API_호출(동호_액세스_토큰);
+            var response = 팔로우한_사용자의_최신_리스트_10개_조회_API_호출(동호_액세스_토큰);
             var result = response.as(ListRecentResponse.class);
 
             // then
@@ -638,7 +613,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 비회원이_최신_리스트_10개를_조회한다() {
+        void 최신_리스트_10개를_조회한다() {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 정수 = 회원을_저장한다(정수());
@@ -649,10 +624,11 @@ public class ListAcceptanceTest extends AcceptanceTest {
             리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(동호, 5));
 
             // when
-            var 결과 = 비회원_최신_리스트_10개_조회_API_호출().as(ListRecentResponse.class);
+            var 결과 = 최신_리스트_10개_조회_카테고리_필터링_API_호출(CategoryType.ENTIRE.name().toLowerCase())
+                    .as(ListRecentResponse.class);
 
             // then
-            var 동호_리스트 = 비회원_피드_리스트_조회_API_호출(동호).as(FindFeedListResponse.class).feedLists();
+            var 동호_리스트 = 비회원_피드_리스트_조회_API_호출(동호 ).as(FindFeedListResponse.class).feedLists();
             var 정수_리스트 = 비회원_피드_리스트_조회_API_호출(정수).as(FindFeedListResponse.class).feedLists();
             var 모든_리스트 = new ArrayList<>(동호_리스트);
             모든_리스트.addAll(정수_리스트);
