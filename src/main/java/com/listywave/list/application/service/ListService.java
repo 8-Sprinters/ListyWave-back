@@ -170,25 +170,27 @@ public class ListService {
     }
 
     @Transactional(readOnly = true)
-    public ListRecentResponse getRecentLists(Long loginUserId, LocalDateTime cursorUpdatedDate, Pageable pageable) {
-        if (loginUserId != null) {
-            User user = userRepository.getById(loginUserId);
-            List<Follow> follows = followRepository.getAllByFollowerUser(user);
-
-            List<User> myFollowingUsers = follows.stream()
-                    .map(Follow::getFollowingUser)
-                    .filter(followingUser -> !followingUser.isDelete())
-                    .toList();
-
-            Slice<ListEntity> result =
-                    listRepository.getRecentListsByFollowing(myFollowingUsers, cursorUpdatedDate, pageable);
-            return getListRecentResponse(result);
-        }
-        Slice<ListEntity> result = listRepository.getRecentLists(cursorUpdatedDate, pageable);
-        return getListRecentResponse(result);
+    public ListRecentResponse getRecentLists(LocalDateTime cursorUpdatedDate, CategoryType category, Pageable pageable) {
+        Slice<ListEntity> result = listRepository.getRecentLists(cursorUpdatedDate, category, pageable);
+        return toListRecentResponse(result);
     }
 
-    private ListRecentResponse getListRecentResponse(Slice<ListEntity> result) {
+    @Transactional(readOnly = true)
+    public ListRecentResponse getRecentListsByFollowing(Long loginUserId, LocalDateTime cursorUpdatedDate, Pageable pageable) {
+        User user = userRepository.getById(loginUserId);
+        List<Follow> follows = followRepository.getAllByFollowerUser(user);
+
+        List<User> myFollowingUsers = follows.stream()
+                .map(Follow::getFollowingUser)
+                .filter(followingUser -> !followingUser.isDelete())
+                .toList();
+
+        Slice<ListEntity> result =
+                listRepository.getRecentListsByFollowing(myFollowingUsers, cursorUpdatedDate, pageable);
+        return toListRecentResponse(result);
+    }
+
+    private ListRecentResponse toListRecentResponse(Slice<ListEntity> result) {
         List<ListEntity> recentList = result.getContent();
 
         LocalDateTime cursorUpdatedDate = null;
@@ -255,6 +257,7 @@ public class ListService {
         );
 
         if (doesChangedAnyItemRank) {
+            list.increaseUpdateCount();
             historyService.saveHistory(list, updatedDate, true);
         }
     }

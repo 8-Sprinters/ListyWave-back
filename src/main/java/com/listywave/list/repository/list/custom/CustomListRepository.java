@@ -13,7 +13,7 @@ public interface CustomListRepository {
 
     List<ListTrandingResponse> fetchTrandingLists();
 
-    Slice<ListEntity> getRecentLists(LocalDateTime cursorUpdatedDate, Pageable pageable);
+    Slice<ListEntity> getRecentLists(LocalDateTime cursorUpdatedDate, CategoryType category, Pageable pageable);
 
     Slice<ListEntity> getRecentListsByFollowing(List<User> followingUsers, LocalDateTime cursorUpdatedDate, Pageable pageable);
 
