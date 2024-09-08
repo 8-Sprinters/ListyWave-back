@@ -2,22 +2,13 @@ package com.listywave.acceptance.user;
 
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
 import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청_API;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.닉네임_중복_체크_요청;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.비회원_회원_정보_조회_요청;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.비회원이_사용자_검색;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.추천_사용자_조회;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.프로필_수정_요청;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.프로필_수정_요청_데이터;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.회원이_사용자_검색;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.회원이_회원_정보_조회_요청;
+import static com.listywave.acceptance.user.UserAcceptanceTestHelper.*;
 import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.유진;
 import static com.listywave.user.fixture.UserFixture.정수;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.*;
 
 import com.listywave.acceptance.common.AcceptanceTest;
 import com.listywave.user.application.dto.RecommendUsersResponse;

@@ -122,15 +122,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/users/list-visibility")
-    ResponseEntity<Void> updateListVisibility(
-            @Auth Long loginUserId,
-            @RequestBody ListVisibilityUpdateRequest request
-    ) {
-        userService.updateListVisibility(loginUserId, request.listId(), request.isPublic());
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/v2/users")
     ResponseEntity<UserElasticSearchResponse> searchUserByElastic(
             @OptionalAuth Long loginUserId,
