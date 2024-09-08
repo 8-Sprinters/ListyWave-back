@@ -20,12 +20,8 @@ import static java.util.Comparator.reverseOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.OK;
 
 import com.listywave.acceptance.common.AcceptanceTest;
 import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
@@ -791,6 +787,65 @@ public class ListAcceptanceTest extends AcceptanceTest {
                     () -> assertThat(결과.resultLists()).hasSize(1),
                     () -> assertThat(결과.resultLists().get(0).id()).isEqualTo(좋아하는_라면_TOP3_생성_결과.listId())
             );
+        }
+    }
+
+    @Nested
+    class 내_리스트_공개_여부_설정 {
+
+        @Test
+        void 내_공개_리스트_비공개로_설정() {
+            // given
+            var 정수 = 회원을_저장한다(정수());
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 정수_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 정수_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+
+            // when
+            var 응답 = 리스트_공개_여부_변경_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+            var 수정_이후_리스트_공개_여부_조회_결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+
+            // then
+            HTTP_상태_코드를_검증한다(응답, NO_CONTENT);
+            assertThat(수정_이후_리스트_공개_여부_조회_결과.isPublic()).isFalse();
+        }
+
+        @Test
+        void 내_비공개_리스트_공개로_설정() {
+            // given
+            var 정수 = 회원을_저장한다(정수());
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 정수_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 정수_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+            리스트_공개_여부_변경_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+
+            // when
+            var 응답 = 리스트_공개_여부_변경_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+            var 수정_이후_리스트_공개_여부_조회_결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+
+            // then
+            HTTP_상태_코드를_검증한다(응답, NO_CONTENT);
+            assertThat(수정_이후_리스트_공개_여부_조회_결과.isPublic()).isTrue();
+        }
+
+        @Test
+        void 내_리스트가_아니면_공개_여부_설정을_할_수_없다() {
+            // given
+            var 정수 = 회원을_저장한다(정수());
+            var 동호 = 회원을_저장한다(동호());
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
+            var 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+
+            // when
+            var 응답 = 리스트_공개_여부_변경_API_호출(정수_액세스_토큰, 동호_리스트_ID);
+
+            // then
+            HTTP_상태_코드를_검증한다(응답, FORBIDDEN);
         }
     }
 }

@@ -3,6 +3,7 @@ package com.listywave.acceptance.user;
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.given;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+import com.listywave.user.presentation.dto.ListVisibilityUpdateRequest;
 import com.listywave.user.presentation.dto.UserProfileUpdateRequest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;

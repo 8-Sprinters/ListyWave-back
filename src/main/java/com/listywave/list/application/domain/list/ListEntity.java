@@ -232,8 +232,8 @@ public class ListEntity {
         }
     }
 
-    public void updateVisibility(Boolean isPublic) {
-        this.isPublic = isPublic;
+    public void updateVisibility() {
+        this.isPublic = !this.isPublic;
     }
 
     public String getRepresentImageUrl() {
