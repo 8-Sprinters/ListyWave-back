@@ -249,10 +249,7 @@ public abstract class ListAcceptanceTestHelper {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 리스트_공개_여부_변경_API_호출(
-            String accessToken,
-            Long listId
-    ) {
+    public static ExtractableResponse<Response> 리스트_공개_여부_변경_API_호출(String accessToken, Long listId) {
         return given()
                 .header(AUTHORIZATION, "Bearer " + accessToken)
                 .when().patch("/lists/{listId}/visibility", listId)

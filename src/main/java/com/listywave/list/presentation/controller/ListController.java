@@ -120,7 +120,7 @@ public class ListController {
             @RequestBody ListsDeleteRequest request
     ) {
         listService.deleteLists(userId, request.listId());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/lists/{listId}/visibility")
@@ -129,6 +129,6 @@ public class ListController {
             @PathVariable("listId") Long listId
     ) {
         listService.changeVisibility(loginUserId, listId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

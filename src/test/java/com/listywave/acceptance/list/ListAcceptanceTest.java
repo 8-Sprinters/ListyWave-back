@@ -790,10 +790,10 @@ public class ListAcceptanceTest extends AcceptanceTest {
     }
 
     @Nested
-    class 피드에서_내_리스트_공개_여부_설정 {
+    class 내_리스트_공개_여부_설정 {
 
         @Test
-        void 내_피드의_공개_리스트_비공개로_설정() {
+        void 내_공개_리스트_비공개로_설정() {
             // given
             var 정수 = 회원을_저장한다(정수());
             var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
@@ -806,12 +806,12 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 수정_이후_리스트_공개_여부_조회_결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 정수_리스트_ID);
 
             // then
-            HTTP_상태_코드를_검증한다(응답, OK);
+            HTTP_상태_코드를_검증한다(응답, NO_CONTENT);
             assertThat(수정_이후_리스트_공개_여부_조회_결과.isPublic()).isFalse();
         }
 
         @Test
-        void 내_피드의_비공개_리스트_공개로_설정() {
+        void 내_비공개_리스트_공개로_설정() {
             // given
             var 정수 = 회원을_저장한다(정수());
             var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
@@ -825,12 +825,12 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 수정_이후_리스트_공개_여부_조회_결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 정수_리스트_ID);
 
             // then
-            HTTP_상태_코드를_검증한다(응답, OK);
+            HTTP_상태_코드를_검증한다(응답, NO_CONTENT);
             assertThat(수정_이후_리스트_공개_여부_조회_결과.isPublic()).isTrue();
         }
 
         @Test
-        void 내_피드가_아닌_리스트는_공개_여부_설정을_할_수_없다() {
+        void 내_리스트가_아니면_공개_여부_설정을_할_수_없다() {
             // given
             var 정수 = 회원을_저장한다(정수());
             var 동호 = 회원을_저장한다(동호());
