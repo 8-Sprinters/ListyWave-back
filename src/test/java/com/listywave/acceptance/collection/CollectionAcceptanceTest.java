@@ -3,6 +3,8 @@ package com.listywave.acceptance.collection;
 import static com.listywave.acceptance.collection.CollectionAcceptanceTestHelper.나의_콜렉션_조회_API_호출;
 import static com.listywave.acceptance.collection.CollectionAcceptanceTestHelper.콜렉트_또는_콜렉트취소_API_호출;
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.폴더_생성_API_호출;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.폴더_생성_요청_데이터;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.가장_좋아하는_견종_TOP3_생성_요청_데이터;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_저장_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원용_리스트_상세_조회_API_호출;
@@ -36,8 +38,11 @@ public class CollectionAcceptanceTest extends AcceptanceTest {
         var 리스트_생성_요청_데이터 = 가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of());
         리스트_저장_API_호출(리스트_생성_요청_데이터, 정수_엑세스_토큰).as(ListCreateResponse.class);
 
+        var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
+        폴더_생성_API_호출(동호_엑세스_토큰, 폴더_생성_요청_데이터);
+
         // when
-        var 응답 = 콜렉트_또는_콜렉트취소_API_호출(동호_엑세스_토큰, 1L);
+        var 응답 = 콜렉트_또는_콜렉트취소_API_호출(동호_엑세스_토큰, 1L, 1L);
         var 정수_리스트_콜렉트수 = 회원용_리스트_상세_조회_API_호출(정수_엑세스_토큰, 1L).collectCount();
 
         // then
@@ -53,8 +58,11 @@ public class CollectionAcceptanceTest extends AcceptanceTest {
         var 리스트_생성_요청_데이터 = 가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of());
         리스트_저장_API_호출(리스트_생성_요청_데이터, 정수_엑세스_토큰);
 
+        var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
+        폴더_생성_API_호출(정수_엑세스_토큰, 폴더_생성_요청_데이터);
+
         // when
-        var 응답 = 콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 1L);
+        var 응답 = 콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 1L, 1L);
         var 정수_리스트_콜렉트수 = 회원용_리스트_상세_조회_API_호출(정수_엑세스_토큰, 1L).collectCount();
 
         // then
@@ -72,9 +80,12 @@ public class CollectionAcceptanceTest extends AcceptanceTest {
         var 리스트_생성_요청_데이터 = 가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of());
         리스트_저장_API_호출(리스트_생성_요청_데이터, 정수_엑세스_토큰).as(ListCreateResponse.class);
 
+        var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
+        폴더_생성_API_호출(동호_엑세스_토큰, 폴더_생성_요청_데이터);
+
         // when
-        var 콜렉트_하기_응답 = 콜렉트_또는_콜렉트취소_API_호출(동호_엑세스_토큰, 1L);
-        var 콜렉트_취소_응답 = 콜렉트_또는_콜렉트취소_API_호출(동호_엑세스_토큰, 1L);
+        var 콜렉트_하기_응답 = 콜렉트_또는_콜렉트취소_API_호출(동호_엑세스_토큰, 1L, 1L);
+        var 콜렉트_취소_응답 = 콜렉트_또는_콜렉트취소_API_호출(동호_엑세스_토큰, 1L, 1L);
         var 정수_리스트_콜렉트수 = 회원용_리스트_상세_조회_API_호출(정수_엑세스_토큰, 1L).collectCount();
 
         // then
@@ -92,11 +103,14 @@ public class CollectionAcceptanceTest extends AcceptanceTest {
         var 생성한_리스트 = 지정된_개수만큼_리스트를_생성한다(동호, 2);
         리스트를_모두_저장한다(생성한_리스트);
 
-        콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 1L);
-        콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 2L);
+        var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
+        폴더_생성_API_호출(정수_엑세스_토큰, 폴더_생성_요청_데이터);
+
+        콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 1L, 1L);
+        콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 2L, 1L);
 
         // when
-        var 결과 = 나의_콜렉션_조회_API_호출(정수_엑세스_토큰, "entire")
+        var 결과 = 나의_콜렉션_조회_API_호출(정수_엑세스_토큰, 1L)
                 .as(CollectionResponse.class)
                 .collectionLists().stream()
                 .map(CollectionListsResponse::list)
