@@ -31,11 +31,16 @@ public class Collect {
     @JoinColumn(name = "list_id")
     private ListEntity list;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "folder_id")
+    private Folder folder;
+
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    public Collect(ListEntity list, Long userId) {
+    public Collect(ListEntity list, Long userId, Folder folder) {
         this.list = list;
         this.userId = userId;
+        this.folder = folder;
     }
 }

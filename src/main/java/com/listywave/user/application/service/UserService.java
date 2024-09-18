@@ -7,8 +7,6 @@ import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 
 import com.listywave.alarm.application.domain.AlarmEvent;
 import com.listywave.common.exception.CustomException;
-import com.listywave.list.application.domain.list.ListEntity;
-import com.listywave.list.repository.list.ListRepository;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.FollowersResponse;
@@ -181,5 +179,9 @@ public class UserService {
         }
         User user = userRepository.getById(loginUserId);
         return userElasticRepository.findAll(user.getId(), keyword, pageable);
+    }
+
+    public User getById(Long userId){
+        return userRepository.getById(userId);
     }
 }

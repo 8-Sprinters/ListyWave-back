@@ -22,23 +22,24 @@ public class CollectionController {
 
     private final CollectionService collectionService;
 
-    @PostMapping("/lists/{listId}/collect")
+    @PostMapping("/lists/{listId}/collect/{folderId}")
     ResponseEntity<Void> collectOrCancel(
             @PathVariable("listId") Long listId,
+            @PathVariable("folderId") Long folderId,
             @Auth Long loginUserId
     ) {
-        collectionService.collectOrCancel(listId, loginUserId);
+        collectionService.collectOrCancel(listId, folderId, loginUserId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/lists/collect")
     ResponseEntity<CollectionResponse> getCollection(
             @Auth Long loginUserId,
-            @RequestParam(name = "category", defaultValue = "entire") CategoryType category,
+            @RequestParam(name = "folderId", required = true) Long folderId,
             @RequestParam(name = "cursorId", required = false) Long cursorId,
             @PageableDefault(size = 10) Pageable pageable
     ) {
-        CollectionResponse collection = collectionService.getCollection(loginUserId, cursorId, pageable, category);
+        CollectionResponse collection = collectionService.getCollection(loginUserId, cursorId, pageable, folderId);
         return ResponseEntity.ok(collection);
     }
 
