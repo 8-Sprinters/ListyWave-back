@@ -32,6 +32,7 @@ public record FindFeedListResponse(
             String title,
             Boolean isPublic,
             String backgroundColor,
+            String category,
             List<ListItemsResponse> listItems
     ) {
 
@@ -41,6 +42,7 @@ public record FindFeedListResponse(
                     .title(list.getTitle().getValue())
                     .isPublic(list.isPublic())
                     .backgroundColor(list.getBackgroundColor().name())
+                    .category(list.getCategory().getViewName())
                     .listItems(ListItemsResponse.toList(list.getSortedItems().getValues()))
                     .build();
         }
