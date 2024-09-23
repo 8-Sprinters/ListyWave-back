@@ -29,20 +29,24 @@ public record ListDetailResponse(
         boolean isPublic,
         String backgroundPalette,
         String backgroundColor,
-        int collectCount,
+        Integer collectCount,
         int viewCount,
+        int updateCount,
         long totalCommentCount,
-        @Nullable NewestComment newestComment
+        @Nullable NewestComment newestComment,
+        List<ReactionResponse> reactions
 ) {
 
     public static ListDetailResponse of(
             ListEntity list,
             User owner,
+            boolean isOwner,
             boolean isCollected,
             List<Collaborator> collaborators,
             long totalCommentCount,
             Comment newestComment,
-            Long totalReplyCount
+            Long totalReplyCount,
+            List<ReactionResponse> reactions
     ) {
         return ListDetailResponse.builder()
                 .categoryEngName(list.getCategory().name().toLowerCase())
@@ -61,10 +65,12 @@ public record ListDetailResponse(
                 .isPublic(list.isPublic())
                 .backgroundColor(list.getBackgroundColor().name())
                 .backgroundPalette(list.getBackgroundPalette().name())
-                .collectCount(list.getCollectCount())
+                .collectCount(isOwner ? list.getCollectCount() : null)
                 .viewCount(list.getViewCount())
+                .updateCount(list.getUpdateCount())
                 .totalCommentCount(totalCommentCount)
                 .newestComment(NewestComment.of(newestComment, totalReplyCount))
+                .reactions(reactions)
                 .build();
     }
 
