@@ -5,29 +5,21 @@ import static com.listywave.collection.application.domain.QCollect.collect;
 import static com.listywave.common.exception.ErrorCode.NOT_SUPPORT_FILTER_ARGUMENT_EXCEPTION;
 import static com.listywave.common.util.PaginationUtils.checkEndPage;
 import static com.listywave.list.application.domain.category.CategoryType.ENTIRE;
-import static com.listywave.list.application.domain.comment.QComment.comment;
 import static com.listywave.list.application.domain.item.QItem.item;
-import static com.listywave.list.application.domain.label.QLabel.label;
 import static com.listywave.list.application.domain.list.QListEntity.listEntity;
-import static com.listywave.list.application.domain.reply.QReply.reply;
+import static com.listywave.list.application.domain.reaction.QReactionStats.reactionStats;
 import static com.listywave.user.application.domain.QUser.user;
-import static com.querydsl.jpa.JPAExpressions.select;
 
 import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.ListEntity;
-import com.listywave.list.application.dto.response.ListTrandingResponse;
 import com.listywave.list.repository.list.custom.CustomListRepository;
 import com.listywave.user.application.domain.User;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -37,64 +29,39 @@ public class CustomListRepositoryImpl implements CustomListRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    @Override
-    public List<ListTrandingResponse> fetchTrandingLists() {
-        List<ListTrandingResponse> responses = getTrandingResponses();
-        return responses.stream()
-                .map(t -> t.with(getRepresentImageUrl(t.id())))
-                .collect(Collectors.toList());
+    public List<ListEntity> findRecommendedLists() {
+        List<Long> recommendedListIds = findRecommendedListIds();
+        return findRecommendedListsByIds(recommendedListIds);
     }
 
-    private List<ListTrandingResponse> getTrandingResponses() {
+    public List<Long> findRecommendedListIds() {
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
-        NumberPath<Long> trandingScoreAlias = Expressions.numberPath(Long.class, "trandingScore");
-
         return queryFactory
-                .select(Projections.constructor(ListTrandingResponse.class,
-                        listEntity.id.as("id"),
-                        listEntity.user.id.as("ownerId"),
-                        listEntity.user.nickname.value.as("ownerNickname"),
-                        listEntity.user.profileImageUrl.value.as("ownerProfileImageUrl"),
-                        listEntity.title.value.as("title"),
-                        listEntity.description.value.as("description"),
-                        listEntity.backgroundColor.as("backgroundColor"),
-                        ExpressionUtils.as(
-                                select(
-                                        listEntity.collectCount.multiply(3).add(
-                                                comment.countDistinct().add(reply.count()).multiply(2)
-                                        ).castToNum(Long.class)
-                                )
-                                        .from(comment)
-                                        .leftJoin(reply).on(reply.comment.id.eq(comment.id))
-                                        .where(comment.list.id.eq(listEntity.id)), trandingScoreAlias))
-                )
-                .from(listEntity)
+                .select(reactionStats.list.id)
+                .from(reactionStats)
+                .join(reactionStats.list, listEntity)
                 .join(listEntity.user, user)
                 .where(
-                        listEntity.updatedDate.goe(thirtyDaysAgo),
+                        reactionStats.updatedDate.goe(thirtyDaysAgo),
                         listEntity.isPublic.eq(true),
                         listEntity.user.isDelete.eq(false)
                 )
-                .distinct()
-                .orderBy(trandingScoreAlias.desc())
+                .groupBy(reactionStats.list.id)
+                .orderBy(reactionStats.count.sum().desc(), listEntity.updatedDate.desc())
                 .limit(10)
                 .fetch();
     }
 
-    private String getRepresentImageUrl(Long id) {
-        String imageUrl = queryFactory
-                .select(item.imageUrl.value)
-                .from(item)
-                .where(
-                        item.list.id.eq(id).and(
-                                item.imageUrl.value.ne("")
-                        )
-                )
-                .orderBy(item.ranking.asc())
-                .limit(1)
-                .fetchOne();
+    public List<ListEntity> findRecommendedListsByIds(List<Long> listIds) {
+        List<ListEntity> recommendedLists = queryFactory
+                .selectFrom(listEntity)
+                .join(listEntity.user, user).fetchJoin()
+                .leftJoin(item).on(listEntity.id.eq(item.list.id))
+                .where(listEntity.id.in(listIds))
+                .fetch();
 
-        return imageUrl != null ? imageUrl : "";
+        recommendedLists.sort(Comparator.comparingInt(o -> listIds.indexOf(o.getId())));
+        return recommendedLists;
     }
 
     @Override

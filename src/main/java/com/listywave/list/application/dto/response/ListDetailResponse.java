@@ -27,15 +27,19 @@ public record ListDetailResponse(
         boolean isPublic,
         String backgroundPalette,
         String backgroundColor,
-        int collectCount,
-        int viewCount
+        Integer collectCount,
+        int viewCount,
+        int updateCount,
+        List<ReactionResponse> reactions
 ) {
 
     public static ListDetailResponse of(
             ListEntity list,
             User owner,
+            boolean isOwner,
             boolean isCollected,
-            List<Collaborator> collaborators
+            List<Collaborator> collaborators,
+            List<ReactionResponse> reactions
     ) {
         return ListDetailResponse.builder()
                 .categoryEngName(list.getCategory().name().toLowerCase())
@@ -54,8 +58,10 @@ public record ListDetailResponse(
                 .isPublic(list.isPublic())
                 .backgroundColor(list.getBackgroundColor().name())
                 .backgroundPalette(list.getBackgroundPalette().name())
-                .collectCount(list.getCollectCount())
+                .collectCount(isOwner ? list.getCollectCount() : null)
                 .viewCount(list.getViewCount())
+                .updateCount(list.getUpdateCount())
+                .reactions(reactions)
                 .build();
     }
 
