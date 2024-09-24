@@ -137,7 +137,7 @@ public class ListService {
 
     public ListDetailResponse getListDetail(Long listId, Long loginUserId) {
         ListEntity list = listRepository.getById(listId);
-        list.validateOwnerIsNotDelete();
+        list.validateOwnerIsNotDeleted();
         List<Collaborator> collaborators = collaboratorService.findAllByList(list).collaborators();
 
         boolean isCollected = false;
@@ -145,7 +145,10 @@ public class ListService {
             User user = userRepository.getById(loginUserId);
             isCollected = collectionRepository.existsByListAndUserId(list, user.getId());
         }
-        return ListDetailResponse.of(list, list.getUser(), isCollected, collaborators);
+
+        long totalCommentCount = commentRepository.countCommentsByList(list);
+        Comment newestComment = commentRepository.findFirstByListOrderByCreatedDateDesc(list);
+        return ListDetailResponse.of(list, list.getUser(), isCollected, collaborators, totalCommentCount, newestComment);
     }
 
     @Transactional(readOnly = true)

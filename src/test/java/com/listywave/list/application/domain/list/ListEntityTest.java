@@ -217,10 +217,10 @@ class ListEntityTest {
 
     @Test
     void 작성자가_삭제_처리됐는지_검증한다() {
-        assertThatNoException().isThrownBy(list::validateOwnerIsNotDelete);
+        assertThatNoException().isThrownBy(list::validateOwnerIsNotDeleted);
 
         user.softDelete();
-        CustomException exception = assertThrows(CustomException.class, list::validateOwnerIsNotDelete);
+        CustomException exception = assertThrows(CustomException.class, list::validateOwnerIsNotDeleted);
         assertThat(exception.getErrorCode()).isEqualTo(DELETED_USER_EXCEPTION);
     }
 
