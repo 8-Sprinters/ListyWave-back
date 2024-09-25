@@ -3,12 +3,14 @@ package com.listywave.collection.application.domain;
 import com.listywave.common.exception.CustomException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import static com.listywave.common.exception.ErrorCode.LENGTH_EXCEEDED_EXCEPTION;
 
 @Getter
-@Builder
 @Embeddable
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)

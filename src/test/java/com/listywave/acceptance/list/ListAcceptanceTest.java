@@ -53,6 +53,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.*;
 
 import com.listywave.acceptance.common.AcceptanceTest;
 import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
@@ -196,7 +197,8 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
             var 정수_폴더_ID = 폴더_생성_API_호출(정수_액세스_토큰, 폴더_생성_요청_데이터)
                     .as(FolderCreateResponse.class).folderId();
-            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 동호_리스트_ID, 정수_폴더_ID);
+            var 폴더_선택_데이터 = 폴더_선택_요청_데이터(정수_폴더_ID);
+            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 동호_리스트_ID, 폴더_선택_데이터);
 
             // when
             var 결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 동호_리스트_ID);
@@ -223,7 +225,8 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
             var 정수_폴더_ID = 폴더_생성_API_호출(정수_액세스_토큰, 폴더_생성_요청_데이터)
                     .as(FolderCreateResponse.class).folderId();
-            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 동호_리스트_ID, 정수_폴더_ID);
+            var 폴더_선택_데이터 = 폴더_선택_요청_데이터(정수_폴더_ID);
+            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 동호_리스트_ID, 폴더_선택_데이터);
 
             // when
             var 결과 = 회원용_리스트_상세_조회_API_호출(동호_액세스_토큰, 동호_리스트_ID);
@@ -651,9 +654,10 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 정수_폴더_ID = 폴더_생성_API_호출(정수_액세스_토큰, 폴더_생성_요청_데이터)
                     .as(FolderCreateResponse.class)
                     .folderId();
-
-            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 2L, 정수_폴더_ID);
-            콜렉트_또는_콜렉트취소_API_호출(동호_액세스_토큰, 7L, 동호_폴더_ID);
+            var 정수_폴더_선택_데이터 = 폴더_선택_요청_데이터(정수_폴더_ID);
+            var 동호_폴더_선택_데이터 = 폴더_선택_요청_데이터(동호_폴더_ID);
+            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 2L, 정수_폴더_선택_데이터);
+            콜렉트_또는_콜렉트취소_API_호출(동호_액세스_토큰, 7L, 동호_폴더_선택_데이터);
 
             // when
             List<ListTrandingResponse> 결과 = 트랜딩_리스트_조회_API_호출().as(new TypeRef<>() {
@@ -855,7 +859,8 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
             var 정수_폴더_ID = 폴더_생성_API_호출(정수_액세스_토큰, 폴더_생성_요청_데이터)
                     .as(FolderCreateResponse.class).folderId();
-            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 좋아하는_라면_TOP3_생성_결과.listId(), 정수_폴더_ID);
+            var 폴더_선택_데이터 = 폴더_선택_요청_데이터(정수_폴더_ID);
+            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 좋아하는_라면_TOP3_생성_결과.listId(), 폴더_선택_데이터);
 
             // when
             var 결과 = 정렬기준을_포함한_검색_API_호출("collect").as(ListSearchResponse.class);

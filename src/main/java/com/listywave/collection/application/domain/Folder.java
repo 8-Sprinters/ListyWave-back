@@ -26,15 +26,12 @@ public class Folder extends BaseEntity {
     @Embedded
     private FolderName name;
 
-    public static Folder create(Long loginUserId, FolderName folderName) {
-        return new Folder(loginUserId, folderName);
-    }
-
-    public void update(FolderName folderName, Long userId) {
+    public void updateFolderName(Long userId, FolderName folderName) {
         validateOwner(userId);
         this.name = folderName;
     }
-    public String getFolderName(){
+
+    public String getFolderName() {
         return this.name.getValue();
     }
 

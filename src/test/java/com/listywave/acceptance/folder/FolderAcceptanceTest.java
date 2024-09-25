@@ -1,8 +1,8 @@
 package com.listywave.acceptance.folder;
 
 import com.listywave.acceptance.common.AcceptanceTest;
+import com.listywave.collection.application.dto.FindFolderResponse;
 import com.listywave.collection.application.dto.FolderCreateResponse;
-import com.listywave.collection.application.dto.FolderListResponse;
 import com.listywave.list.application.dto.response.ListCreateResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,12 +24,11 @@ import static org.springframework.http.HttpStatus.*;
 @DisplayName("폴더 관련 인수테스트")
 public class FolderAcceptanceTest extends AcceptanceTest {
 
-
     @Nested
     class 폴더_생성 {
 
         @Test
-        void 폴더를_성공적으로_생성한다(){
+        void 폴더를_성공적으로_생성한다() {
             // given
             var 정수 = 회원을_저장한다(정수());
             var 정수_엑세스_토큰 = 액세스_토큰을_발급한다(정수);
@@ -45,7 +44,7 @@ public class FolderAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 폴더_생성_시_기존에_생성한_폴더명과_중복될_수_없다(){
+        void 폴더_생성_시_기존에_생성한_폴더명과_중복될_수_없다() {
             // given
             var 정수 = 회원을_저장한다(정수());
             var 정수_엑세스_토큰 = 액세스_토큰을_발급한다(정수);
@@ -65,7 +64,7 @@ public class FolderAcceptanceTest extends AcceptanceTest {
     class 폴더_수정 {
 
         @Test
-        void 폴더를_성공적으로_수정한다(){
+        void 폴더를_성공적으로_수정한다() {
             // given
             var 정수 = 회원을_저장한다(정수());
             var 정수_엑세스_토큰 = 액세스_토큰을_발급한다(정수);
@@ -83,7 +82,7 @@ public class FolderAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 폴더_수정_시_기존에_생성한_폴더명과_중복될_수_없다(){
+        void 폴더_수정_시_기존에_생성한_폴더명과_중복될_수_없다() {
             // given
             var 정수 = 회원을_저장한다(정수());
             var 정수_엑세스_토큰 = 액세스_토큰을_발급한다(정수);
@@ -101,7 +100,7 @@ public class FolderAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 폴더_생성자만_수정할_수_있다(){
+        void 폴더_생성자만_수정할_수_있다() {
             // given
             var 정수 = 회원을_저장한다(정수());
             var 동호 = 회원을_저장한다(동호());
@@ -125,7 +124,7 @@ public class FolderAcceptanceTest extends AcceptanceTest {
     class 폴더_삭제 {
 
         @Test
-        void 폴더를_성공적으로_삭제한다(){
+        void 폴더를_성공적으로_삭제한다() {
             // given
             var 정수 = 회원을_저장한다(정수());
             var 정수_엑세스_토큰 = 액세스_토큰을_발급한다(정수);
@@ -142,7 +141,7 @@ public class FolderAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 폴더_삭제시_콜렉트한_리스트들도_삭제된다(){
+        void 폴더_삭제시_콜렉트한_리스트들도_삭제된다() {
             // given
             var 정수 = 회원을_저장한다(정수());
             var 동호 = 회원을_저장한다(동호());
@@ -156,7 +155,8 @@ public class FolderAcceptanceTest extends AcceptanceTest {
             var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
             var 정수_폴더_ID = 폴더_생성_API_호출(정수_엑세스_토큰, 폴더_생성_요청_데이터)
                     .as(FolderCreateResponse.class).folderId();
-            콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 동호_리스트_ID, 정수_폴더_ID);
+            var 폴더_선택_데이터 = 폴더_선택_요청_데이터(정수_폴더_ID);
+            콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 동호_리스트_ID, 폴더_선택_데이터);
 
             // when
             var 응답 = 폴더_삭제_API_호출(정수_엑세스_토큰, 정수_폴더_ID);
@@ -168,7 +168,7 @@ public class FolderAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 폴더_생성자만_삭제할_수_있다(){
+        void 폴더_생성자만_삭제할_수_있다() {
             // given
             var 정수 = 회원을_저장한다(정수());
             var 동호 = 회원을_저장한다(동호());
@@ -191,33 +191,28 @@ public class FolderAcceptanceTest extends AcceptanceTest {
     class 폴더_조회 {
 
         @Test
-        void 폴더_목록을_조회한다(){
+        void 폴더_목록을_조회한다() {
             // given
             var 정수 = 회원을_저장한다(정수());
             var 동호 = 회원을_저장한다(동호());
             var 정수_엑세스_토큰 = 액세스_토큰을_발급한다(정수);
-            var 동호_엑세스_토큰 = 액세스_토큰을_발급한다(동호);
-//            var 리스트_생성_요청_데이터 = 가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of());
-//            var 동호_리스트_ID = 리스트_저장_API_호출(리스트_생성_요청_데이터, 동호_엑세스_토큰)
-//                    .as(ListCreateResponse.class)
-//                    .listId();
-
             리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(동호, 3));
 
             var 폴더_생성_요청_데이터1 = 폴더_생성_요청_데이터("맛집");
             var 폴더_생성_요청_데이터2 = 폴더_생성_요청_데이터("예카");
             var 폴더_생성_요청_데이터3 = 폴더_생성_요청_데이터("비밀폴더");
+            var 폴더_선택_데이터1 = 폴더_선택_요청_데이터(1L);
+            var 폴더_선택_데이터2 = 폴더_선택_요청_데이터(2L);
             폴더_생성_API_호출(정수_엑세스_토큰, 폴더_생성_요청_데이터1);
             폴더_생성_API_호출(정수_엑세스_토큰, 폴더_생성_요청_데이터2);
             폴더_생성_API_호출(정수_엑세스_토큰, 폴더_생성_요청_데이터3);
-            콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 1L, 1L);
-            콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 2L, 2L);
-            콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 3L, 2L);
+            콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 1L, 폴더_선택_데이터1);
+            콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 2L, 폴더_선택_데이터2);
+            콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 3L, 폴더_선택_데이터2);
 
             // when
             var 응답 = 폴더_조회_API_호출(정수_엑세스_토큰);
-//            var 결과 = 응답.as(FolderListResponse.class);
-            var 결과 = 응답.as(FolderListResponse.class);
+            var 결과 = 응답.as(FindFolderResponse.class);
 
             // then
             assertAll(
@@ -228,13 +223,6 @@ public class FolderAcceptanceTest extends AcceptanceTest {
                     () -> assertThat(결과.folders().get(2).listCount()).isEqualTo(1L),
                     () -> assertThat(결과.folders().get(2).folderName()).isEqualTo("맛집")
             );
-        }
-
-        @Test
-        void 폴더_생성_시_기존에_생성한_폴더명과_중복될_수_없다(){
-            // given
-            // when
-            // then
         }
     }
 }
