@@ -30,7 +30,7 @@ class FolderTest {
     }
 
     @Test
-    void 소유자만_폴더명을_수정할_수_있다() {
+    void 소유자가_정상적으로_폴더명을_수정한다() {
         FolderName newName = new FolderName("예카");
 
         folder.updateFolderName(정수().getOauthId(), newName);

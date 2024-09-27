@@ -15,7 +15,7 @@ public abstract class FolderAcceptanceTestHelper {
         return given()
                 .header(AUTHORIZATION, "Bearer " + accessToken)
                 .body(request)
-                .when().post("/folder")
+                .when().post("/folders")
                 .then().log().all()
                 .extract();
     }
@@ -24,7 +24,7 @@ public abstract class FolderAcceptanceTestHelper {
         return given()
                 .header(AUTHORIZATION, "Bearer " + accessToken)
                 .body(request)
-                .when().put("/folder/{folderId}", folderId)
+                .when().put("/folders/{folderId}", folderId)
                 .then().log().all()
                 .extract();
     }
@@ -32,7 +32,7 @@ public abstract class FolderAcceptanceTestHelper {
     public static ExtractableResponse<Response> 폴더_삭제_API_호출(String accessToken, Long folderId) {
         return given()
                 .header(AUTHORIZATION, "Bearer " + accessToken)
-                .when().delete("/folder/{folderId}", folderId)
+                .when().delete("/folders/{folderId}", folderId)
                 .then().log().all()
                 .extract();
     }
@@ -40,7 +40,7 @@ public abstract class FolderAcceptanceTestHelper {
     public static ExtractableResponse<Response> 폴더_조회_API_호출(String accessToken) {
         return given()
                 .header(AUTHORIZATION, "Bearer " + accessToken)
-                .when().get("/folder")
+                .when().get("/folders")
                 .then().log().all()
                 .extract();
     }
