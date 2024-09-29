@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.HttpStatus.OK;
 
 import com.listywave.acceptance.common.AcceptanceTest;
 import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
@@ -30,13 +29,15 @@ import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.BackgroundColor;
 import com.listywave.list.application.domain.list.BackgroundPalette;
 import com.listywave.list.application.domain.list.ListEntity;
+import com.listywave.list.application.domain.reaction.Reaction;
 import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListRecentResponse;
 import com.listywave.list.application.dto.response.ListSearchResponse;
-import com.listywave.list.application.dto.response.ListTrandingResponse;
+import com.listywave.list.application.dto.response.RecommendedListResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
+import com.listywave.list.presentation.dto.request.ReactionRequest;
 import com.listywave.list.presentation.dto.request.ReplyCreateRequest;
 import com.listywave.user.application.dto.FindFeedListResponse;
 import com.listywave.user.application.dto.FindFeedListResponse.FeedListInfo;
@@ -143,7 +144,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
                     () -> assertThat(결과.ownerId()).isEqualTo(동호.getId()),
                     () -> assertThat(결과.title()).isEqualTo(동호_리스트.getTitle().getValue()),
                     () -> assertThat(결과.categoryKorName()).isEqualTo(동호_리스트.getCategory().getViewName()),
-                    () -> assertThat(결과.collectCount()).isZero(),
+                    () -> assertThat(결과.collectCount()).isNull(),
                     () -> assertThat(결과.collaborators()).isEmpty()
             );
         }
@@ -167,7 +168,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             assertAll(
                     () -> assertThat(결과.ownerId()).isEqualTo(동호.getId()),
                     () -> assertThat(결과.collaborators().get(0).id()).isEqualTo(정수.getId()),
-                    () -> assertThat(결과.collectCount()).isEqualTo(1)
+                    () -> assertThat(결과.collectCount()).isNull()
             );
         }
 
@@ -210,7 +211,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 결과 = 비회원_리스트_상세_조회_API_호출(동호_리스트_ID).as(ListDetailResponse.class);
 
             // then
-            var 기대값 = ListDetailResponse.of(가장_좋아하는_견종_TOP3_순위_변경(동호, List.of()), 동호, false, List.of());
+            var 기대값 = ListDetailResponse.of(가장_좋아하는_견종_TOP3_순위_변경(동호, List.of()), 동호, false, false, List.of(), List.of());
             리스트_상세_조회를_검증한다(결과, 기대값);
         }
 
@@ -253,7 +254,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             // then
             var 리스트_상세_조회_결과 = 회원용_리스트_상세_조회_API_호출(동호_액세스_토큰, 동호_리스트_ID);
             ListEntity 수정된_리스트 = 가장_좋아하는_견종_TOP3_순위_변경(동호, List.of());
-            ListDetailResponse 기대값 = ListDetailResponse.of(수정된_리스트, 동호, false, List.of(Collaborator.init(유진, 수정된_리스트)));
+            ListDetailResponse 기대값 = ListDetailResponse.of(수정된_리스트, 동호, true, false, List.of(Collaborator.init(유진, 수정된_리스트)), List.of());
             리스트_상세_조회를_검증한다(리스트_상세_조회_결과, 기대값);
         }
 
@@ -535,57 +536,51 @@ public class ListAcceptanceTest extends AcceptanceTest {
     }
 
     @Nested
-    class 리스트_팀섹 {
+    class 리스트_탐색 {
 
         @Test
-        void 트랜딩_리스트를_조회한다() {
+        void 추천_리스트를_조회한다() {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 정수 = 회원을_저장한다(정수());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
             var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
-            리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(동호, 5));
-            리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(정수, 5));
-            리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(동호, 5));
 
-            var 댓글_생성_요청들 = n개의_댓글_생성_요청(4);
-            var 댓글_생성_요청들2 = n개의_댓글_생성_요청(8);
-            댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 2L, 댓글_생성요청));
-            댓글_생성_요청들2.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 4L, 댓글_생성요청));
+            리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰);
+            리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 정수_액세스_토큰);
+            리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰);
+            리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰);
+            리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰);
+            리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰);
 
-            var 답글_생성_요청들 = Arrays.asList(new ReplyCreateRequest("답글1"), new ReplyCreateRequest("답글2"));
-            답글_생성_요청들.forEach(답글_생성요청 -> 답글_등록_API_호출(동호_액세스_토큰, 답글_생성요청, 2L, 2L));
-
-            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 2L);
-            콜렉트_또는_콜렉트취소_API_호출(동호_액세스_토큰, 7L);
+            리액션_일괄_호출(정수_액세스_토큰, 2L, 리액션_요청_데이터_리스트(Reaction.COOL, Reaction.AGREE, Reaction.THANKS));
+            리액션_일괄_호출(동호_액세스_토큰, 2L, 리액션_요청_데이터_리스트(Reaction.COOL, Reaction.THANKS));
+            리액션_일괄_호출(동호_액세스_토큰, 1L, 리액션_요청_데이터_리스트(Reaction.COOL, Reaction.THANKS));
+            리액션_일괄_호출(동호_액세스_토큰, 5L, 리액션_요청_데이터_리스트(Reaction.THANKS));
+            리액션_일괄_호출(동호_액세스_토큰, 3L, 리액션_요청_데이터_리스트(Reaction.THANKS));
 
             // when
-            List<ListTrandingResponse> 결과 = 트랜딩_리스트_조회_API_호출().as(new TypeRef<>() {
+            List<RecommendedListResponse> 결과 = 추천_리스트_조회_API_호출().as(new TypeRef<>() {
             });
 
             // then
-            var 동호_리스트 = 비회원_피드_리스트_조회_API_호출(동호).as(FindFeedListResponse.class).feedLists();
-            var 정수_리스트 = 비회원_피드_리스트_조회_API_호출(정수).as(FindFeedListResponse.class).feedLists();
-            var 모든_리스트 = new ArrayList<>(동호_리스트);
-            모든_리스트.addAll(정수_리스트);
-
-            var 대표_이미지들 = 모든_리스트.stream()
-                    .sorted(comparing(FeedListInfo::id, reverseOrder()))
-                    .map(feedListInfo -> feedListInfo.listItems().stream()
-                            .sorted(comparing(ListItemsResponse::rank))
-                            .filter(listItemsResponse -> listItemsResponse.imageUrl() != null && !listItemsResponse.imageUrl().isBlank())
-                            .map(ListItemsResponse::imageUrl)
-                            .findFirst()
-                            .orElse(""))
-                    .toList();
-
             assertAll(
-                    () -> assertThat(결과).usingRecursiveComparison()
-                            .comparingOnlyFields("itemImageUrl")
-                            .isEqualTo(대표_이미지들),
-                    () -> assertThat(결과.get(0).trandingScore()).isEqualTo(16),
-                    () -> assertThat(결과.get(1).trandingScore()).isEqualTo(15),
-                    () -> assertThat(결과.get(2).trandingScore()).isEqualTo(3)
+                    () -> assertThat(결과).hasSize(4),
+                    () -> assertThat(결과.get(0).id()).isEqualTo(2L),
+                    () -> assertThat(결과.get(1).id()).isEqualTo(1L),
+                    () -> assertThat(결과.get(2).id()).isEqualTo(5L),
+                    () -> assertThat(결과.get(3).id()).isEqualTo(3L),
+
+                    () -> assertThat(결과.get(0).ownerNickname()).isEqualTo("pparkjs"),
+                    () -> assertThat(결과.get(1).ownerNickname()).isEqualTo("kdkdhoho"),
+
+                    () -> assertThat(결과.get(0).items()).hasSize(3),
+                    () -> assertThat(결과.get(0).items().get(0).rank()).isEqualTo(1),
+                    () -> assertThat(결과.get(0).items().get(1).rank()).isEqualTo(2),
+                    () -> assertThat(결과.get(0).items().get(2).rank()).isEqualTo(3),
+
+                    () -> assertThat(결과.get(0).itemImageUrl()).isEqualTo("이미지1"),
+                    () -> assertThat(결과.get(1).itemImageUrl()).isEqualTo("이미지1")
             );
         }
 
@@ -846,6 +841,92 @@ public class ListAcceptanceTest extends AcceptanceTest {
 
             // then
             HTTP_상태_코드를_검증한다(응답, FORBIDDEN);
+        }
+    }
+
+    @Nested
+    class 리액션_테스트 {
+
+        @Test
+        void 리스트에_대한_리액션을_성공적으로_수행한다() {
+            // given
+            var 정수 = 회원을_저장한다(정수());
+            var 동호 = 회원을_저장한다(동호());
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
+            var 정수_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 정수_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+
+            // when
+            리액션_일괄_호출(정수_액세스_토큰, 정수_리스트_ID, 리액션_요청_데이터_리스트(Reaction.COOL, Reaction.AGREE));
+            리액션_일괄_호출(동호_액세스_토큰, 정수_리스트_ID, 리액션_요청_데이터_리스트(Reaction.COOL));
+            var 결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+
+            // then
+            assertAll(
+                    () -> assertThat(결과.reactions().get(0).count()).isEqualTo(2),
+                    () -> assertThat(결과.reactions().get(0).reaction()).isEqualTo("COOL"),
+                    () -> assertThat(결과.reactions().get(1).count()).isEqualTo(1),
+                    () -> assertThat(결과.reactions().get(1).reaction()).isEqualTo("AGREE"),
+                    () -> assertThat(결과.reactions().get(2).count()).isEqualTo(0),
+                    () -> assertThat(결과.reactions().get(2).reaction()).isEqualTo("THANKS")
+            );
+        }
+
+        @Test
+        void 리스트에_대한_리액션을_취소한다() {
+            // given
+            var 정수 = 회원을_저장한다(정수());
+            var 동호 = 회원을_저장한다(동호());
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
+            var 정수_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 정수_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+
+            // when
+            리액션_일괄_호출(동호_액세스_토큰, 정수_리스트_ID, 리액션_요청_데이터_리스트(Reaction.COOL, Reaction.COOL));
+
+            var 결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+
+            // then
+            assertAll(
+                    () -> assertThat(결과.reactions().get(0).count()).isEqualTo(0),
+                    () -> assertThat(결과.reactions().get(0).reaction()).isEqualTo("COOL"),
+                    () -> assertThat(결과.reactions().get(1).count()).isEqualTo(0),
+                    () -> assertThat(결과.reactions().get(1).reaction()).isEqualTo("AGREE"),
+                    () -> assertThat(결과.reactions().get(2).count()).isEqualTo(0),
+                    () -> assertThat(결과.reactions().get(2).reaction()).isEqualTo("THANKS")
+            );
+        }
+
+        @Test
+        void 리스트_생성자가_아닌_사용자_및_비회원은_리액션_수를_볼_수_없다() {
+            // given
+            var 정수 = 회원을_저장한다(정수());
+            var 동호 = 회원을_저장한다(동호());
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
+            var 정수_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 정수_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+            var 동호_리액션_요청_데이터1 = new ReactionRequest(Reaction.COOL);
+
+            // when
+            리액션_API_호출(동호_액세스_토큰, 정수_리스트_ID, 동호_리액션_요청_데이터1);
+            var 비회원_상세_결과 = 비회원_리스트_상세_조회_API_호출(정수_리스트_ID).as(ListDetailResponse.class);
+            var 비소유자_상세_결과 = 회원용_리스트_상세_조회_API_호출(동호_액세스_토큰, 정수_리스트_ID);
+
+            // then
+            assertAll(
+                    () -> assertThat(비회원_상세_결과.reactions().get(0).count()).isNull(),
+                    () -> assertThat(비회원_상세_결과.reactions().get(0).count()).isNull(),
+                    () -> assertThat(비회원_상세_결과.reactions().get(0).count()).isNull(),
+                    () -> assertThat(비소유자_상세_결과.reactions().get(0).count()).isNull(),
+                    () -> assertThat(비소유자_상세_결과.reactions().get(0).count()).isNull(),
+                    () -> assertThat(비소유자_상세_결과.reactions().get(0).count()).isNull()
+            );
         }
     }
 }

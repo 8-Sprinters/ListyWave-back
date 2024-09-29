@@ -29,11 +29,10 @@ import com.listywave.list.application.domain.list.ListEntities;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.domain.list.ListTitle;
 import com.listywave.list.application.domain.list.SortType;
-import com.listywave.list.application.dto.response.ListCreateResponse;
-import com.listywave.list.application.dto.response.ListDetailResponse;
-import com.listywave.list.application.dto.response.ListRecentResponse;
-import com.listywave.list.application.dto.response.ListSearchResponse;
-import com.listywave.list.application.dto.response.ListTrandingResponse;
+import com.listywave.list.application.domain.reaction.Reaction;
+import com.listywave.list.application.domain.reaction.ReactionStats;
+import com.listywave.list.application.domain.reaction.UserReaction;
+import com.listywave.list.application.dto.response.*;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
@@ -41,6 +40,8 @@ import com.listywave.list.repository.CommentRepository;
 import com.listywave.list.repository.ItemRepository;
 import com.listywave.list.repository.label.LabelRepository;
 import com.listywave.list.repository.list.ListRepository;
+import com.listywave.list.repository.reaction.ReactionStatsRepository;
+import com.listywave.list.repository.reaction.UserReactionRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
@@ -48,9 +49,9 @@ import com.listywave.user.application.dto.FindFeedListResponse;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
@@ -74,6 +75,8 @@ public class ListService {
     private final LabelRepository labelRepository;
     private final CollectionRepository collectionRepository;
     private final AlarmRepository alarmRepository;
+    private final UserReactionRepository userReactionRepository;
+    private final ReactionStatsRepository reactionStatsRepository;
     private final CollaboratorService collaboratorService;
     private final HistoryService historyService;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -140,17 +143,28 @@ public class ListService {
         list.validateOwnerIsNotDelete();
         List<Collaborator> collaborators = collaboratorService.findAllByList(list).collaborators();
 
-        boolean isCollected = false;
-        if (loginUserId != null) {
-            User user = userRepository.getById(loginUserId);
-            isCollected = collectionRepository.existsByListAndUserId(list, user.getId());
-        }
-        return ListDetailResponse.of(list, list.getUser(), isCollected, collaborators);
+        User user = getUserIfLoggedIn(loginUserId);
+        boolean isCollected = checkIsCollected(list, user);
+        boolean isOwner = checkIsOwner(list, user);
+
+        List<ReactionResponse> reactions = createReactionResponses(list, user, isOwner);
+
+        return ListDetailResponse.of(
+                list,
+                list.getUser(),
+                isOwner,
+                isCollected,
+                collaborators,
+                reactions
+        );
     }
 
     @Transactional(readOnly = true)
-    public List<ListTrandingResponse> fetchTrandingLists() {
-        return listRepository.fetchTrandingLists();
+    public List<RecommendedListResponse> getRecommendedLists() {
+        List<ListEntity> recommendedLists = listRepository.findRecommendedLists();
+        return recommendedLists.stream()
+                .map(RecommendedListResponse::of)
+                .toList();
     }
 
     public void deleteList(Long listId, Long loginUserId) {
@@ -313,5 +327,76 @@ public class ListService {
         ListEntity list = listRepository.getById(listId);
         list.validateOwner(user);
         list.updateVisibility();
+    }
+
+    public void handleReaction(Long loginUserId, Long listId, Reaction reaction) {
+        User user = userRepository.getById(loginUserId);
+        ListEntity list = listRepository.getById(listId);
+
+        if (userReactionRepository.existsByUserIdAndListAndReaction(user.getId(), list, reaction)) {
+            userReactionRepository.deleteByUserIdAndListAndReaction(user.getId(), list, reaction);
+            updateReactionStats(list, reaction, -1);
+        } else {
+            //TODO: 리액션할 때 알림 필요
+            UserReaction newReaction = UserReaction.create(user.getId(), list, reaction);
+            userReactionRepository.save(newReaction);
+            updateReactionStats(list, reaction, 1);
+        }
+    }
+
+    public void updateReactionStats(ListEntity list, Reaction reaction, int changeCount) {
+        ReactionStats stats = reactionStatsRepository.findByListAndReaction(list, reaction)
+                .orElseGet(() -> {
+                    ReactionStats newStats = new ReactionStats(list, reaction, 0);
+                    reactionStatsRepository.save(newStats);
+                    return newStats;
+                });
+        stats.updateCount(changeCount);
+    }
+
+    private User getUserIfLoggedIn(Long loginUserId) {
+        return (loginUserId != null) ? userRepository.getById(loginUserId) : null;
+    }
+
+    private boolean checkIsCollected(ListEntity list, User user) {
+        return (user != null) && collectionRepository.existsByListAndUserId(list, user.getId());
+    }
+
+    private boolean checkIsOwner(ListEntity list, User user) {
+        return (user != null) && list.isOwner(user);
+    }
+
+    private List<ReactionResponse> createReactionResponses(ListEntity list, User user, boolean isOwner) {
+        Map<Reaction, Integer> reactionStatsMap = toReactionStatsMap(list);
+        Set<Reaction> userReactionSet = toUserReactionSet(list, user);
+
+        return Arrays.stream(Reaction.values())
+                .map(reaction -> toReactionResponse(reaction, reactionStatsMap, userReactionSet, isOwner))
+                .collect(Collectors.toList());
+    }
+
+    private Map<Reaction, Integer> toReactionStatsMap(ListEntity list) {
+        return reactionStatsRepository.findByList(list).stream()
+                .collect(Collectors.toMap(ReactionStats::getReaction, ReactionStats::getCount));
+    }
+
+    private Set<Reaction> toUserReactionSet(ListEntity list, User user) {
+        if (user == null) {
+            return Collections.emptySet();
+        }
+        return userReactionRepository.findByUserIdAndList(user.getId(), list).stream()
+                .map(UserReaction::getReaction)
+                .collect(Collectors.toSet());
+    }
+
+    private ReactionResponse toReactionResponse(
+            Reaction reaction,
+            Map<Reaction, Integer> reactionStatsMap,
+            Set<Reaction> userReactionSet,
+            boolean isOwner
+    ) {
+        int count = reactionStatsMap.getOrDefault(reaction, 0);
+        boolean isReacted = userReactionSet.contains(reaction);
+        return ReactionResponse.of(reaction.name(), isOwner ? count : null, isReacted);
     }
 }

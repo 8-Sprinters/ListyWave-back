@@ -21,7 +21,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
     private static final UriAndMethod[] whiteList = {
-            new UriAndMethod("/lists/explore", GET),
+            new UriAndMethod("/lists/recommended", GET),
             new UriAndMethod("/lists/search", GET),
             new UriAndMethod("/lists/{listId}/comments", GET),
             new UriAndMethod("/lists/upload-url", GET),

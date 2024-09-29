@@ -266,4 +266,8 @@ public class ListEntity {
     public void increaseUpdateCount(){
         this.updateCount++;
     }
+
+    public boolean isOwner(User loginUser) {
+        return this.user.equals(loginUser);
+    }
 }
