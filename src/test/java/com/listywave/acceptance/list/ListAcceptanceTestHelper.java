@@ -3,6 +3,7 @@ package com.listywave.acceptance.list;
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.given;
 import static com.listywave.list.application.domain.category.CategoryType.ANIMAL_PLANT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import com.listywave.history.application.dto.HistorySearchResponse;
@@ -10,16 +11,21 @@ import com.listywave.history.application.dto.HistorySearchResponse.HistoryItemIn
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.BackgroundColor;
 import com.listywave.list.application.domain.list.BackgroundPalette;
+import com.listywave.list.application.domain.reaction.Reaction;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse.ItemResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
+import com.listywave.list.presentation.dto.request.ReactionRequest;
 import com.listywave.user.application.domain.User;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class ListAcceptanceTestHelper {
 
@@ -104,18 +110,21 @@ public abstract class ListAcceptanceTestHelper {
                 BackgroundPalette.PASTEL,
                 BackgroundColor.PASTEL_GREEN,
                 List.of(
-                        new ItemCreateRequest(1, "신라면", "", "", ""),
-                        new ItemCreateRequest(2, "육개장 사발면", "", "", ""),
-                        new ItemCreateRequest(3, "김치 사발면", "", "", "")
+                        new ItemCreateRequest(1, "신라면", "", "", "이미지1"),
+                        new ItemCreateRequest(2, "육개장 사발면", "", "", "이미지2"),
+                        new ItemCreateRequest(3, "김치 사발면", "", "", "이미지3")
                 )
         );
     }
 
     public static void 리스트_상세_조회를_검증한다(ListDetailResponse 결과값, ListDetailResponse 기대값) {
-        assertThat(결과값).usingRecursiveComparison()
-                .ignoringFieldsOfTypes(Long.class)
-                .ignoringFields("createdDate", "lastUpdatedDate")
-                .isEqualTo(기대값);
+        assertAll(
+                () -> assertThat(결과값).usingRecursiveComparison()
+                        .ignoringFieldsOfTypes(Long.class)
+                        .ignoringFields("createdDate", "lastUpdatedDate", "reactions", "updateCount")
+                        .isEqualTo(기대값),
+                () -> assertThat(결과값.updateCount()).isOne()
+        );
     }
 
     public static List<HistorySearchResponse> 비회원_히스토리_조회_API_호출(Long listId) {
@@ -177,9 +186,9 @@ public abstract class ListAcceptanceTestHelper {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 트랜딩_리스트_조회_API_호출() {
+    public static ExtractableResponse<Response> 추천_리스트_조회_API_호출() {
         return given()
-                .when().get("/lists/explore")
+                .when().get("/lists/recommended")
                 .then().log().all()
                 .extract();
     }
@@ -255,5 +264,24 @@ public abstract class ListAcceptanceTestHelper {
                 .when().patch("/lists/{listId}/visibility", listId)
                 .then().log().all()
                 .extract();
+    }
+
+    public static ExtractableResponse<Response> 리액션_API_호출(String accessToken, Long listId, ReactionRequest request) {
+        return given()
+                .header(AUTHORIZATION, "Bearer " + accessToken)
+                .body(request)
+                .when().post("/lists/{listId}/reaction", listId)
+                .then().log().all()
+                .extract();
+    }
+
+    public static List<ReactionRequest> 리액션_요청_데이터_리스트(Reaction... reactions) {
+        return Arrays.stream(reactions)
+                .map(ReactionRequest::new)
+                .collect(Collectors.toList());
+    }
+
+    public static void 리액션_일괄_호출(String accessToken, Long listId, List<ReactionRequest> reactionRequests) {
+        reactionRequests.forEach(reaction -> 리액션_API_호출(accessToken, listId, reaction));
     }
 }
