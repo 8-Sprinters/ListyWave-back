@@ -148,7 +148,8 @@ public class ListService {
 
         long totalCommentCount = commentRepository.countCommentsByList(list);
         Comment newestComment = commentRepository.findFirstByListOrderByCreatedDateDesc(list);
-        return ListDetailResponse.of(list, list.getUser(), isCollected, collaborators, totalCommentCount, newestComment);
+        Long totalReplyCount = replyRepository.countByComment(newestComment);
+        return ListDetailResponse.of(list, list.getUser(), isCollected, collaborators, totalCommentCount, newestComment, totalReplyCount);
     }
 
     @Transactional(readOnly = true)

@@ -60,6 +60,7 @@ import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.BackgroundColor;
 import com.listywave.list.application.domain.list.BackgroundPalette;
 import com.listywave.list.application.domain.list.ListEntity;
+import com.listywave.list.application.dto.response.CommentCreateResponse;
 import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListRecentResponse;
@@ -68,6 +69,7 @@ import com.listywave.list.application.dto.response.ListTrandingResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
 import com.listywave.list.presentation.dto.request.ReplyCreateRequest;
+import com.listywave.list.presentation.dto.request.comment.CommentCreateRequest;
 import com.listywave.user.application.dto.FindFeedListResponse;
 import com.listywave.user.application.dto.FindFeedListResponse.FeedListInfo;
 import com.listywave.user.application.dto.FindFeedListResponse.ListItemsResponse;
@@ -240,7 +242,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 결과 = 비회원_리스트_상세_조회_API_호출(동호_리스트_ID).as(ListDetailResponse.class);
 
             // then
-            var 기대값 = ListDetailResponse.of(가장_좋아하는_견종_TOP3_순위_변경(동호, List.of()), 동호, false, List.of(), 0, null);
+            var 기대값 = ListDetailResponse.of(가장_좋아하는_견종_TOP3_순위_변경(동호, List.of()), 동호, false, List.of(), 0, null, 0L);
             리스트_상세_조회를_검증한다(결과, 기대값);
         }
 
@@ -275,6 +277,37 @@ public class ListAcceptanceTest extends AcceptanceTest {
             assertThat(동호_리스트.totalCommentCount()).isZero();
             assertThat(동호_리스트.newestComment()).isNull();
         }
+
+        @Test
+        void 댓글이_있다면_가장_최신_댓글과_해당_댓글에_달린_답글_개수도_응답한다() {
+            // given
+            var 동호 = 회원을_저장한다(동호());
+            var 리스트_생성_요청_데이터 = 가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of());
+            var 리스트_ID = 리스트_저장_API_호출(리스트_생성_요청_데이터, 액세스_토큰을_발급한다(동호))
+                    .as(ListCreateResponse.class)
+                    .listId();
+
+            var 정수 = 회원을_저장한다(정수());
+            댓글_저장_API_호출(액세스_토큰을_발급한다(정수), 리스트_ID, new CommentCreateRequest("댓글 1빠!"));
+            var 댓글_ID = 댓글_저장_API_호출(액세스_토큰을_발급한다(정수), 리스트_ID, new CommentCreateRequest("댓글 2빠!"))
+                    .as(CommentCreateResponse.class)
+                    .id();
+
+            var 유진 = 회원을_저장한다(유진());
+            답글_등록_API_호출(액세스_토큰을_발급한다(유진), new ReplyCreateRequest("답글 1빠!"), 리스트_ID, 댓글_ID);
+            답글_등록_API_호출(액세스_토큰을_발급한다(유진), new ReplyCreateRequest("답글 2빠!"), 리스트_ID, 댓글_ID);
+            답글_등록_API_호출(액세스_토큰을_발급한다(유진), new ReplyCreateRequest("답글 3빠!"), 리스트_ID, 댓글_ID);
+
+            // when
+            var 동호_리스트 = 비회원_리스트_상세_조회_API_호출(1L).as(ListDetailResponse.class);
+
+            // then
+            assertAll(
+                    () -> assertThat(동호_리스트.newestComment()).isNotNull(),
+                    () -> assertThat(동호_리스트.newestComment().content()).isEqualTo("댓글 2빠!"),
+                    () -> assertThat(동호_리스트.newestComment().totalReplyCount()).isEqualTo(3)
+            );
+        }
     }
 
     @Nested
@@ -298,7 +331,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             // then
             var 리스트_상세_조회_결과 = 회원용_리스트_상세_조회_API_호출(동호_액세스_토큰, 동호_리스트_ID);
             ListEntity 수정된_리스트 = 가장_좋아하는_견종_TOP3_순위_변경(동호, List.of());
-            ListDetailResponse 기대값 = ListDetailResponse.of(수정된_리스트, 동호, false, List.of(Collaborator.init(유진, 수정된_리스트)), 0, null);
+            ListDetailResponse 기대값 = ListDetailResponse.of(수정된_리스트, 동호, false, List.of(Collaborator.init(유진, 수정된_리스트)), 0, null, 0L);
             리스트_상세_조회를_검증한다(리스트_상세_조회_결과, 기대값);
         }
 

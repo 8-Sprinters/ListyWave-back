@@ -41,7 +41,8 @@ public record ListDetailResponse(
             boolean isCollected,
             List<Collaborator> collaborators,
             long totalCommentCount,
-            Comment newestComment
+            Comment newestComment,
+            Long totalReplyCount
     ) {
         return ListDetailResponse.builder()
                 .categoryEngName(list.getCategory().name().toLowerCase())
@@ -63,7 +64,7 @@ public record ListDetailResponse(
                 .collectCount(list.getCollectCount())
                 .viewCount(list.getViewCount())
                 .totalCommentCount(totalCommentCount)
-                .newestComment(NewestComment.of(newestComment))
+                .newestComment(NewestComment.of(newestComment, totalReplyCount))
                 .build();
     }
 
@@ -138,20 +139,21 @@ public record ListDetailResponse(
             String userNickname,
             String userProfileImageUrl,
             LocalDateTime createdDate,
-            String content
+            String content,
+            Long totalReplyCount
     ) {
 
-        public static NewestComment of(@Nullable Comment comment) {
+        public static NewestComment of(@Nullable Comment comment, Long totalReplyCount) {
             if (comment == null) {
                 return null;
             }
-
             return NewestComment.builder()
                     .userId(comment.getUserId())
                     .userNickname(comment.getUserNickname())
                     .userProfileImageUrl(comment.getUserProfileImageUrl())
                     .createdDate(comment.getCreatedDate())
                     .content(comment.getCommentContent())
+                    .totalReplyCount(totalReplyCount)
                     .build();
         }
     }
