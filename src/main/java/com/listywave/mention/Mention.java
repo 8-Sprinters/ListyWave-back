@@ -13,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -42,5 +43,18 @@ public class Mention {
 
     public Mention(User user) {
         this.user = user;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Mention mention = (Mention) o;
+        return Objects.equals(getUser(), mention.getUser());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getUser());
     }
 }

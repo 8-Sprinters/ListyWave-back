@@ -36,7 +36,7 @@ class ReplyTest {
         String newContent = "수정!";
         CommentContent newCommentContent = new CommentContent(newContent);
 
-        reply.update(newCommentContent);
+        reply.update(newCommentContent, EMPTY_LIST);
 
         assertThat(reply.getCommentContent()).isEqualTo(newContent);
     }

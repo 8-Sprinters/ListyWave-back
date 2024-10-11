@@ -56,4 +56,20 @@ public class UserFixture {
                 .isDelete(false)
                 .build();
     }
+
+    public static User 서영() {
+        return User.builder()
+                .oauthId(5L)
+                .oauthEmail("seyoung@github.com")
+                .nickname(Nickname.of("seyoung"))
+                .backgroundImageUrl(new BackgroundImageUrl(DefaultBackgroundImages.getRandomImageUrl()))
+                .profileImageUrl(new ProfileImageUrl(DefaultBackgroundImages.getRandomImageUrl()))
+                .description(new Description("서영서영"))
+                .followerCount(120)
+                .followingCount(240)
+                .allPrivate(false)
+                .kakaoAccessToken("KAKAO_ACCESS_TOKEN")
+                .isDelete(false)
+                .build();
+    }
 }

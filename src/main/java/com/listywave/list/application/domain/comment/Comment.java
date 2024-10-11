@@ -15,7 +15,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -60,8 +62,19 @@ public class Comment extends BaseEntity {
         this.isDeleted = true;
     }
 
-    public void update(CommentContent content) {
+    public void update(CommentContent content, List<Mention> newMentions) {
         this.commentContent = content;
+        updateMentions(newMentions);
+    }
+
+    private void updateMentions(List<Mention> mentions) {
+        Set<Mention> removable = new LinkedHashSet<>(this.mentions);
+        mentions.forEach(removable::remove);
+        this.mentions.removeAll(removable);
+
+        Set<Mention> addable = new LinkedHashSet<>(mentions);
+        this.mentions.forEach(addable::remove);
+        this.mentions.addAll(addable);
     }
 
     public boolean isDeleted() {

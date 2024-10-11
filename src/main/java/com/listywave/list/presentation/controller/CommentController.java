@@ -58,11 +58,11 @@ public class CommentController {
     @PatchMapping("/lists/{listId}/comments/{commentId}")
     ResponseEntity<Void> update(
             @PathVariable("listId") Long listId,
-            @Auth Long loginUserId,
+            @Auth Long writerId,
             @PathVariable("commentId") Long commentId,
-            @RequestBody CommentUpdateRequest commentUpdateRequest
+            @RequestBody CommentUpdateRequest request
     ) {
-        commentService.update(listId, commentId, loginUserId, commentUpdateRequest.content());
+        commentService.update(listId, writerId, commentId, request.content(), request.mentionIds());
         return ResponseEntity.noContent().build();
     }
 }

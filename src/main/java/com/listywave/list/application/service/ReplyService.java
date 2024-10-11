@@ -43,15 +43,19 @@ public class ReplyService {
         User user = userRepository.getById(writerId);
         Comment comment = commentRepository.getById(targetCommentId);
 
-        List<Mention> mentions = mentionedIds.stream()
-                .map(mentionedId -> {
-                    User mentionedUser = userRepository.getById(mentionedId);
-                    return new Mention(mentionedUser);
-                }).toList();
+        List<Mention> mentions = toMentions(mentionedIds);
         Reply reply = replyRepository.save(new Reply(comment, user, new CommentContent(content), mentions));
 
         applicationEventPublisher.publishEvent(AlarmEvent.reply(comment, reply));
         return ReplyCreateResponse.of(reply, comment, user);
+    }
+
+    private List<Mention> toMentions(List<Long> mentionedIds) {
+        return mentionedIds.stream()
+                .map(mentionedId -> {
+                    User mentionedUser = userRepository.getById(mentionedId);
+                    return new Mention(mentionedUser);
+                }).toList();
     }
 
     public void delete(ReplyDeleteCommand command, Long loginUserId) {
@@ -70,15 +74,16 @@ public class ReplyService {
         }
     }
 
-    public void update(ReplyUpdateCommand command, Long loginUserId) {
+    public void update(ReplyUpdateCommand command, Long writerId) {
         listRepository.getById(command.listId());
-        User user = userRepository.getById(loginUserId);
+        User user = userRepository.getById(writerId);
         commentRepository.getById(command.commentId());
         Reply reply = replyRepository.getById(command.replyId());
 
         if (!reply.isOwner(user)) {
             throw new CustomException(ErrorCode.INVALID_ACCESS, "답글은 작성자만 수정할 수 있습니다.");
         }
-        reply.update(new CommentContent(command.content()));
+        List<Mention> mentions = toMentions(command.mentionIds());
+        reply.update(new CommentContent(command.content()), mentions);
     }
 }

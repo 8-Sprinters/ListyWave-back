@@ -37,19 +37,22 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public CommentCreateResponse create(Long listId, Long writerId, String content, List<Long> mentionedIds) {
+    public CommentCreateResponse create(Long listId, Long writerId, String content, List<Long> mentionIds) {
         User writer = userRepository.getById(writerId);
         ListEntity list = listRepository.getById(listId);
-
-        List<Mention> mentions = mentionedIds.stream()
-                .map(userRepository::getById)
-                .map(Mention::new)
-                .toList();
+        List<Mention> mentions = toMentions(mentionIds);
 
         Comment comment = commentRepository.save(new Comment(list, writer, new CommentContent(content), mentions));
 
         applicationEventPublisher.publishEvent(AlarmEvent.comment(list, comment));
         return CommentCreateResponse.of(comment, writer);
+    }
+
+    private List<Mention> toMentions(List<Long> mentionIds) {
+        return mentionIds.stream()
+                .map(userRepository::getById)
+                .map(Mention::new)
+                .toList();
     }
 
     public CommentFindResponse findCommentBy(Long listId, int size, Long cursorId) {
@@ -94,14 +97,16 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-    public void update(Long listId, Long commentId, Long loginUserId, String content) {
+    public void update(Long listId, Long writerId, Long commentId, String content, List<Long> mentionIds) {
         listRepository.getById(listId);
-        User user = userRepository.getById(loginUserId);
+        User writer = userRepository.getById(writerId);
         Comment comment = commentRepository.getById(commentId);
 
-        if (!comment.isOwner(user)) {
+        if (!comment.isOwner(writer)) {
             throw new CustomException(INVALID_ACCESS, "댓글은 작성자만 수정할 수 있습니다.");
         }
-        comment.update(new CommentContent(content));
+
+        List<Mention> mentions = toMentions(mentionIds);
+        comment.update(new CommentContent(content), mentions);
     }
 }

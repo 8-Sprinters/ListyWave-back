@@ -44,7 +44,7 @@ class CommentTest {
     void 댓글_내용을_수정할_수_있다() {
         CommentContent newContent = new CommentContent("댓글 수정");
 
-        comment.update(newContent);
+        comment.update(newContent, EMPTY_LIST);
 
         assertThat(comment.getCommentContent()).isEqualTo("댓글 수정");
     }

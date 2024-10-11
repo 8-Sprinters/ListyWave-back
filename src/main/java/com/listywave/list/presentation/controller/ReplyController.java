@@ -61,7 +61,7 @@ public class ReplyController {
             @Auth Long loginUserId,
             @RequestBody ReplyUpdateRequest request
     ) {
-        ReplyUpdateCommand replyUpdateCommand = new ReplyUpdateCommand(listId, commentId, replyId, request.content());
+        ReplyUpdateCommand replyUpdateCommand = new ReplyUpdateCommand(listId, commentId, replyId, request.content(), request.mentionIds());
         replyService.update(replyUpdateCommand, loginUserId);
         return ResponseEntity.noContent().build();
     }
