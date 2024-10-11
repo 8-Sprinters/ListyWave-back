@@ -9,7 +9,7 @@ import com.listywave.list.application.domain.reply.Reply;
 import com.listywave.list.application.dto.ReplyDeleteCommand;
 import com.listywave.list.application.dto.ReplyUpdateCommand;
 import com.listywave.list.application.dto.response.ReplyCreateResponse;
-import com.listywave.list.repository.CommentRepository;
+import com.listywave.list.repository.comment.CommentRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.user.application.domain.User;

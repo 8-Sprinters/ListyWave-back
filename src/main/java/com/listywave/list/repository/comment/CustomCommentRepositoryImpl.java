@@ -1,4 +1,4 @@
-package com.listywave.list.repository;
+package com.listywave.list.repository.comment;
 
 
 import static com.listywave.list.application.domain.comment.QComment.comment;

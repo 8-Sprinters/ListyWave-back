@@ -1,4 +1,4 @@
-package com.listywave.list.repository;
+package com.listywave.list.repository.comment;
 
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.list.ListEntity;
