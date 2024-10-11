@@ -4,6 +4,6 @@ import java.util.List;
 
 public record CommentCreateRequest(
         String content,
-        List<Long> mentionedIds
+        List<Long> mentionIds
 ) {
 }

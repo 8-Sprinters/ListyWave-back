@@ -4,6 +4,6 @@ import java.util.List;
 
 public record ReplyCreateRequest(
         String content,
-        List<Long> mentionedIds
+        List<Long> mentionIds
 ) {
 }

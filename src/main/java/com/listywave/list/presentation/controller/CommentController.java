@@ -31,7 +31,7 @@ public class CommentController {
             @Auth Long writerId,
             @RequestBody CommentCreateRequest request
     ) {
-        CommentCreateResponse response = commentService.create(listId, writerId, request.content(), request.mentionedIds());
+        CommentCreateResponse response = commentService.create(listId, writerId, request.content(), request.mentionIds());
         return ResponseEntity.status(CREATED).body(response);
     }
 

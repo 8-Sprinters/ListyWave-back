@@ -36,7 +36,7 @@ public class ReplyController {
                 commentId,
                 writerId,
                 request.content(),
-                request.mentionedIds()
+                request.mentionIds()
         );
         return ResponseEntity.status(CREATED).body(response);
     }
