@@ -1,23 +1,26 @@
 package com.listywave.list.application.domain.comment;
 
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.BaseEntity;
 import com.listywave.list.application.domain.list.ListEntity;
+import com.listywave.mention.Mention;
 import com.listywave.user.application.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 public class Comment extends BaseEntity {
 
@@ -32,11 +35,21 @@ public class Comment extends BaseEntity {
     @Embedded
     private CommentContent commentContent;
 
+    @OneToMany(fetch = LAZY, cascade = ALL, orphanRemoval = true, mappedBy = "comment")
+    private final List<Mention> mentions = new ArrayList<>();
+
     @Column(nullable = false, length = 5)
     private boolean isDeleted;
 
-    public static Comment create(ListEntity list, User user, CommentContent content) {
-        return new Comment(list, user, content, false);
+    public Comment(ListEntity list, User user, CommentContent content, List<Mention> mentions) {
+        this.list = list;
+        this.user = user;
+        this.commentContent = content;
+        mentions.forEach(it -> {
+            this.mentions.add(it);
+            it.setComment(this);
+        });
+        this.isDeleted = false;
     }
 
     public boolean isOwner(User user) {

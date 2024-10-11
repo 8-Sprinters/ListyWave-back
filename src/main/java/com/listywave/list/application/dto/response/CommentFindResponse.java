@@ -4,6 +4,7 @@ import static java.util.Collections.emptyList;
 
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.reply.Reply;
+import com.listywave.mention.Mention;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,7 @@ public record CommentFindResponse(
         Long totalCount,
         Long cursorId,
         boolean hasNext,
-        List<CommentResponse> comments
+        List<CommentDto> comments
 ) {
 
     public static CommentFindResponse emptyResponse() {
@@ -36,12 +37,12 @@ public record CommentFindResponse(
                 .totalCount(totalCount)
                 .cursorId(cursorId)
                 .hasNext(hasNext)
-                .comments(CommentResponse.toList(comments))
+                .comments(CommentDto.toList(comments))
                 .build();
     }
 
     @Builder
-    public record CommentResponse(
+    public record CommentDto(
             Long id,
             Long userId,
             String userNickname,
@@ -50,17 +51,18 @@ public record CommentFindResponse(
             LocalDateTime createdDate,
             LocalDateTime updatedDate,
             boolean isDeleted,
-            List<ReplyResponse> replies
+            List<ReplyDto> replies,
+            List<MentionDto> mentions
     ) {
 
-        public static List<CommentResponse> toList(Map<Comment, List<Reply>> comments) {
+        public static List<CommentDto> toList(Map<Comment, List<Reply>> comments) {
             return comments.keySet().stream()
-                    .map(comment -> CommentResponse.of(comment, comments.get(comment)))
+                    .map(comment -> CommentDto.of(comment, comments.get(comment)))
                     .toList();
         }
 
-        public static CommentResponse of(Comment comment, List<Reply> replies) {
-            return CommentResponse.builder()
+        public static CommentDto of(Comment comment, List<Reply> replies) {
+            return CommentDto.builder()
                     .id(comment.getId())
                     .userId(comment.getUserId())
                     .userNickname(comment.getUserNickname())
@@ -69,13 +71,14 @@ public record CommentFindResponse(
                     .createdDate(comment.getCreatedDate())
                     .updatedDate(comment.getUpdatedDate())
                     .isDeleted(comment.isDeleted())
-                    .replies(ReplyResponse.toList(replies))
+                    .replies(ReplyDto.toList(replies))
+                    .mentions(MentionDto.toList(comment.getMentions()))
                     .build();
         }
     }
 
     @Builder
-    public record ReplyResponse(
+    public record ReplyDto(
             Long id,
             Long commentId,
             Long userId,
@@ -83,17 +86,18 @@ public record CommentFindResponse(
             String userProfileImageUrl,
             String content,
             LocalDateTime createdDate,
-            LocalDateTime updatedDate
+            LocalDateTime updatedDate,
+            List<MentionDto> mentions
     ) {
 
-        public static List<ReplyResponse> toList(List<Reply> replies) {
+        public static List<ReplyDto> toList(List<Reply> replies) {
             return replies.stream()
-                    .map(ReplyResponse::of)
+                    .map(ReplyDto::of)
                     .toList();
         }
 
-        public static ReplyResponse of(Reply reply) {
-            return ReplyResponse.builder()
+        public static ReplyDto of(Reply reply) {
+            return ReplyDto.builder()
                     .id(reply.getId())
                     .commentId(reply.getCommentId())
                     .userId(reply.getUserId())
@@ -102,7 +106,20 @@ public record CommentFindResponse(
                     .content(reply.getCommentContent())
                     .createdDate(reply.getCreatedDate())
                     .updatedDate(reply.getUpdatedDate())
+                    .mentions(MentionDto.toList(reply.getMentions()))
                     .build();
+        }
+    }
+
+    public record MentionDto(
+            Long userId,
+            String userNickname
+    ) {
+
+        public static List<MentionDto> toList(List<Mention> mentions) {
+            return mentions.stream()
+                    .map(mention -> new MentionDto(mention.getUser().getId(), mention.getUser().getNickname()))
+                    .toList();
         }
     }
 }

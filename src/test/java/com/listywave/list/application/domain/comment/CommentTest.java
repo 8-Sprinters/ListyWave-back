@@ -3,6 +3,7 @@ package com.listywave.list.application.domain.comment;
 import static com.listywave.list.fixture.ListFixture.가장_좋아하는_견종_TOP3;
 import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.정수;
+import static java.util.Collections.EMPTY_LIST;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.listywave.list.application.domain.list.ListEntity;
@@ -17,7 +18,7 @@ class CommentTest {
     private final User user = 동호();
     private final ListEntity list = 가장_좋아하는_견종_TOP3(user, List.of());
     private final CommentContent content = new CommentContent("댓글");
-    private final Comment comment = Comment.create(list, user, content);
+    private final Comment comment = new Comment(list, user, content, EMPTY_LIST);
 
     @Test
     void 초기화하면_isDelete는_false이다() {

@@ -28,10 +28,10 @@ public class CommentController {
     @PostMapping("/lists/{listId}/comments")
     ResponseEntity<CommentCreateResponse> create(
             @PathVariable("listId") Long listId,
-            @Auth Long loginUserId,
-            @RequestBody CommentCreateRequest commentCreateRequest
+            @Auth Long writerId,
+            @RequestBody CommentCreateRequest request
     ) {
-        CommentCreateResponse response = commentService.create(listId, commentCreateRequest.content(), loginUserId);
+        CommentCreateResponse response = commentService.create(listId, writerId, request.content(), request.mentionedIds());
         return ResponseEntity.status(CREATED).body(response);
     }
 
@@ -41,7 +41,7 @@ public class CommentController {
             @RequestParam(value = "size", defaultValue = "5") int size,
             @RequestParam(value = "cursorId", required = false) Long cursorId
     ) {
-        CommentFindResponse response = commentService.getComments(listId, size, cursorId);
+        CommentFindResponse response = commentService.findCommentBy(listId, size, cursorId);
         return ResponseEntity.ok(response);
     }
 

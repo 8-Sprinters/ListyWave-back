@@ -12,8 +12,10 @@ import com.listywave.list.application.dto.response.ReplyCreateResponse;
 import com.listywave.list.repository.comment.CommentRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
+import com.listywave.mention.Mention;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -30,16 +32,26 @@ public class ReplyService {
     private final CommentRepository commentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public ReplyCreateResponse createReply(Long listId, Long commentId, String content, Long loginUserId) {
+    public ReplyCreateResponse create(
+            Long listId,
+            Long targetCommentId,
+            Long writerId,
+            String content,
+            List<Long> mentionedIds
+    ) {
         listRepository.getById(listId);
-        User user = userRepository.getById(loginUserId);
-        Comment comment = commentRepository.getById(commentId);
+        User user = userRepository.getById(writerId);
+        Comment comment = commentRepository.getById(targetCommentId);
 
-        Reply reply = new Reply(comment, user, new CommentContent(content));
-        Reply saved = replyRepository.save(reply);
+        List<Mention> mentions = mentionedIds.stream()
+                .map(mentionedId -> {
+                    User mentionedUser = userRepository.getById(mentionedId);
+                    return new Mention(mentionedUser);
+                }).toList();
+        Reply reply = replyRepository.save(new Reply(comment, user, new CommentContent(content), mentions));
 
-        applicationEventPublisher.publishEvent(AlarmEvent.reply(comment, saved));
-        return ReplyCreateResponse.of(saved, comment, user);
+        applicationEventPublisher.publishEvent(AlarmEvent.reply(comment, reply));
+        return ReplyCreateResponse.of(reply, comment, user);
     }
 
     public void delete(ReplyDeleteCommand command, Long loginUserId) {

@@ -15,6 +15,7 @@ import com.listywave.list.application.dto.response.CommentFindResponse;
 import com.listywave.list.repository.comment.CommentRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
+import com.listywave.mention.Mention;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -36,18 +37,22 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public CommentCreateResponse create(Long listId, String content, Long loginUserId) {
-        User user = userRepository.getById(loginUserId);
+    public CommentCreateResponse create(Long listId, Long writerId, String content, List<Long> mentionedIds) {
+        User writer = userRepository.getById(writerId);
         ListEntity list = listRepository.getById(listId);
 
-        Comment comment = Comment.create(list, user, new CommentContent(content));
-        Comment saved = commentRepository.save(comment);
+        List<Mention> mentions = mentionedIds.stream()
+                .map(userRepository::getById)
+                .map(Mention::new)
+                .toList();
 
-        applicationEventPublisher.publishEvent(AlarmEvent.comment(list, saved));
-        return CommentCreateResponse.of(saved, user);
+        Comment comment = commentRepository.save(new Comment(list, writer, new CommentContent(content), mentions));
+
+        applicationEventPublisher.publishEvent(AlarmEvent.comment(list, comment));
+        return CommentCreateResponse.of(comment, writer);
     }
 
-    public CommentFindResponse getComments(Long listId, int size, Long cursorId) {
+    public CommentFindResponse findCommentBy(Long listId, int size, Long cursorId) {
         ListEntity list = listRepository.getById(listId);
 
         List<Comment> comments = commentRepository.getComments(list, size, cursorId);

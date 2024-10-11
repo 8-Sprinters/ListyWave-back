@@ -171,7 +171,7 @@ public class CommentAcceptanceTest extends AcceptanceTest {
             var 댓글_생성_요청들 = n개의_댓글_생성_요청(3);
             댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 동호_리스트_ID, 댓글_생성요청));
 
-            var 답글_수정_요청 = new ReplyCreateRequest("답글 달아요! 😀 ");
+            var 답글_수정_요청 = new ReplyCreateRequest("답글 달아요! 😀 ", List.of());
             답글_등록_API_호출(동호_액세스_토큰, 답글_수정_요청, 동호_리스트_ID, 2L);
 
             // when

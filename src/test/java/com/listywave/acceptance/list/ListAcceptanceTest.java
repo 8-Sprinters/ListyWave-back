@@ -644,7 +644,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 2L, 댓글_생성요청));
             댓글_생성_요청들2.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 4L, 댓글_생성요청));
 
-            var 답글_생성_요청들 = Arrays.asList(new ReplyCreateRequest("답글1"), new ReplyCreateRequest("답글2"));
+            var 답글_생성_요청들 = Arrays.asList(new ReplyCreateRequest("답글1", List.of()), new ReplyCreateRequest("답글2", List.of()));
             답글_생성_요청들.forEach(답글_생성요청 -> 답글_등록_API_호출(동호_액세스_토큰, 답글_생성요청, 2L, 2L));
 
             var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
