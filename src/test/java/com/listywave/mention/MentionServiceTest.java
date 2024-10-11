@@ -9,6 +9,7 @@ import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.reply.Reply;
 import com.listywave.list.application.dto.response.CommentFindResponse;
 import com.listywave.list.application.dto.response.CommentFindResponse.CommentDto;
+import com.listywave.list.application.dto.response.CommentFindResponse.ReplyDto;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -84,55 +85,96 @@ public class MentionServiceTest extends IntegrationTest {
         void 멘션을_포함한_댓글을_조회한다() {
             // given
             Long savedCommentId = commentService.create(list.getId(), dh.getId(), "댓글이용", List.of(js.getId(), ej.getId())).id();
-            Comment comment = commentRepository.getById(savedCommentId);
+            commentRepository.getById(savedCommentId);
 
             // when
             CommentFindResponse response = commentService.findCommentBy(list.getId(), 5, null);
             CommentDto commentDto = response.comments().get(0);
 
             // then
-
+            assertAll(
+                    () -> assertThat(commentDto.mentions()).hasSize(2),
+                    () -> assertThat(commentDto.mentions().get(0).userId()).isEqualTo(js.getId()),
+                    () -> assertThat(commentDto.mentions().get(1).userId()).isEqualTo(ej.getId())
+            );
         }
 
         @Test
         void 멘션이_없는_댓글을_조회한다() {
             // given
+            Long savedCommentId = commentService.create(list.getId(), dh.getId(), "댓글이용", EMPTY_LIST).id();
+            commentRepository.getById(savedCommentId);
 
             // when
+            CommentFindResponse response = commentService.findCommentBy(list.getId(), 5, null);
+            CommentDto commentDto = response.comments().get(0);
 
             // then
+            assertThat(commentDto.mentions()).isEmpty();
         }
 
         @Test
-        void 멘션을_당한_사용자가_탈퇴한_사용자인_경우_조회하지_않는다() {
+        void 댓글에서_멘션을_당한_사용자가_탈퇴한_사용자인_경우_조회하지_않는다() {
+            // given
+            commentService.create(list.getId(), dh.getId(), "댓글이용", List.of(js.getId(), ej.getId()));
 
+            // when
+            authService.withdraw(js.getId());
+
+            // then
+            CommentFindResponse response = commentService.findCommentBy(list.getId(), 5, null);
+            CommentDto commentDto = response.comments().get(0);
+
+            assertThat(commentDto.mentions()).hasSize(1);
+            assertThat(commentDto.mentions().get(0).userId()).isEqualTo(ej.getId());
         }
 
         @Test
         void 멘션을_포함한_답글을_조회한다() {
             // given
+            Long commentId = commentService.create(list.getId(), dh.getId(), "댓글이용", EMPTY_LIST).id();
+            replyService.create(list.getId(), commentId, js.getId(), "답글이용", List.of(dh.getId()));
 
             // when
+            List<CommentDto> comments = commentService.findCommentBy(list.getId(), 5, null).comments();
+            ReplyDto reply = comments.get(0).replies().get(0);
 
             // then
+            assertThat(reply.mentions()).hasSize(1);
+            assertThat(reply.mentions().get(0).userId()).isEqualTo(dh.getId());
         }
 
         @Test
         void 멘션이_없는_답글을_조회한다() {
             // given
+            Long commentId = commentService.create(list.getId(), dh.getId(), "댓글이용", EMPTY_LIST).id();
+            replyService.create(list.getId(), commentId, js.getId(), "답글이용", EMPTY_LIST);
 
             // when
+            List<CommentDto> comments = commentService.findCommentBy(list.getId(), 5, null).comments();
+            ReplyDto reply = comments.get(0).replies().get(0);
 
             // then
+            assertThat(reply.mentions()).isEmpty();
         }
 
         @Test
         void 답글에서_멘션을_당한_사용자가_탈퇴한_사용자인_경우_조회하지_않는다() {
             // given
+            Long commentId = commentService.create(list.getId(), dh.getId(), "댓글이용", EMPTY_LIST).id();
+            replyService.create(list.getId(), commentId, js.getId(), "답글이용", List.of(dh.getId(), ej.getId()));
+
+            authService.withdraw(ej.getId());
 
             // when
+            List<CommentDto> comments = commentService.findCommentBy(list.getId(), 5, null).comments();
+            ReplyDto reply = comments.get(0).replies().get(0);
 
             // then
+            assertAll(
+                    () -> assertThat(reply.mentions()).hasSize(1),
+                    () -> assertThat(reply.mentions().get(0).userId()).isEqualTo(dh.getId())
+            );
         }
     }
 }

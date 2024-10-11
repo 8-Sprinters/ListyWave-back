@@ -4,6 +4,8 @@ import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.유진;
 import static com.listywave.user.fixture.UserFixture.정수;
 
+import com.listywave.auth.application.domain.kakao.KakaoOauthClient;
+import com.listywave.auth.application.service.AuthService;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.service.CommentService;
 import com.listywave.list.application.service.ReplyService;
@@ -13,17 +15,25 @@ import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.mention.MentionRepository;
 import com.listywave.user.application.domain.User;
+import com.listywave.user.application.service.UserService;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @SpringBootTest
 public abstract class IntegrationTest {
 
+    @MockBean
+    protected KakaoOauthClient kakaoOauthClient;
+    @Autowired
+    protected AuthService authService;
+    @Autowired
+    protected UserService userService;
     @Autowired
     protected UserRepository userRepository;
     @Autowired

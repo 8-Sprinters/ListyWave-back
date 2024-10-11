@@ -118,7 +118,9 @@ public record CommentFindResponse(
 
         public static List<MentionDto> toList(List<Mention> mentions) {
             return mentions.stream()
-                    .map(mention -> new MentionDto(mention.getUser().getId(), mention.getUser().getNickname()))
+                    .map(Mention::getUser)
+                    .filter(user -> !user.isDelete())
+                    .map(user -> new MentionDto(user.getId(), user.getNickname()))
                     .toList();
         }
     }
