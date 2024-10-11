@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.listywave.common.IntegrationTest;
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.reply.Reply;
+import com.listywave.list.application.dto.ReplyDeleteCommand;
 import com.listywave.list.application.dto.ReplyUpdateCommand;
 import com.listywave.list.application.dto.response.CommentFindResponse;
 import com.listywave.list.application.dto.response.CommentFindResponse.CommentDto;
@@ -249,6 +250,36 @@ public class MentionServiceTest extends IntegrationTest {
             CommentFindResponse response = commentService.findCommentBy(list.getId(), 5, null);
             List<MentionDto> result = response.comments().get(0).replies().get(0).mentions();
             assertThat(result).isEmpty();
+        }
+    }
+
+    @Nested
+    class 멘션_삭제 {
+
+        @Test
+        void 멘션을_한_댓글_삭제_시_함께_삭제한다() {
+            // given
+            Long commentId = commentService.create(list.getId(), dh.getId(), "댓글이요", List.of(js.getId())).id();
+
+            // when
+            commentService.delete(list.getId(), commentId, dh.getId());
+
+            // then
+            assertThat(mentionRepository.findAll()).isEmpty();
+        }
+
+        @Test
+        void 멘션을_한_답글_삭제_시_함께_삭제한다() {
+            // given
+            Long commentId = commentService.create(list.getId(), dh.getId(), "댓글이요", EMPTY_LIST).id();
+            Long replyId = replyService.create(list.getId(), commentId, js.getId(), "답글이요", List.of(dh.getId())).id();
+
+            // when
+            ReplyDeleteCommand command = new ReplyDeleteCommand(list.getId(), commentId, replyId);
+            replyService.delete(command, js.getId());
+
+            // then
+            assertThat(mentionRepository.findAll()).isEmpty();
         }
     }
 }

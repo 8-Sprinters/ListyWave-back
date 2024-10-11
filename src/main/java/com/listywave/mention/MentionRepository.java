@@ -10,4 +10,8 @@ public interface MentionRepository extends JpaRepository<Mention, Long> {
     List<Mention> findAllByComment(Comment comment);
 
     List<Mention> findAllByReply(Reply reply);
+
+    void deleteAllByComment(Comment comment);
+
+    void deleteAllByReply(Reply reply);
 }

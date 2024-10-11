@@ -16,6 +16,7 @@ import com.listywave.list.repository.comment.CommentRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.mention.Mention;
+import com.listywave.mention.MentionRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -34,6 +35,7 @@ public class CommentService {
     private final ListRepository listRepository;
     private final UserRepository userRepository;
     private final ReplyRepository replyRepository;
+    private final MentionRepository mentionRepository;
     private final CommentRepository commentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -81,9 +83,9 @@ public class CommentService {
         return CommentFindResponse.from(totalCount, newCursorId, hasNext, result);
     }
 
-    public void delete(Long listId, Long commentId, Long loginUserId) {
+    public void delete(Long listId, Long commentId, Long userId) {
         listRepository.getById(listId);
-        User user = userRepository.getById(loginUserId);
+        User user = userRepository.getById(userId);
         Comment comment = commentRepository.getById(commentId);
 
         if (!comment.isOwner(user)) {
@@ -95,6 +97,7 @@ public class CommentService {
             return;
         }
         commentRepository.delete(comment);
+        mentionRepository.deleteAllByComment(comment);
     }
 
     public void update(Long listId, Long writerId, Long commentId, String content, List<Long> mentionIds) {

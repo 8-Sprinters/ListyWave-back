@@ -13,6 +13,7 @@ import com.listywave.list.repository.comment.CommentRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.mention.Mention;
+import com.listywave.mention.MentionRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
@@ -29,6 +30,7 @@ public class ReplyService {
     private final ListRepository listRepository;
     private final UserRepository userRepository;
     private final ReplyRepository replyRepository;
+    private final MentionRepository mentionRepository;
     private final CommentRepository commentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -58,9 +60,9 @@ public class ReplyService {
                 }).toList();
     }
 
-    public void delete(ReplyDeleteCommand command, Long loginUserId) {
+    public void delete(ReplyDeleteCommand command, Long userId) {
         listRepository.getById(command.listId());
-        User user = userRepository.getById(loginUserId);
+        User user = userRepository.getById(userId);
         Comment comment = commentRepository.getById(command.commentId());
         Reply reply = replyRepository.getById(command.replyId());
 
@@ -69,8 +71,10 @@ public class ReplyService {
         }
 
         replyRepository.deleteById(command.replyId());
+        mentionRepository.deleteAllByReply(reply);
         if (!replyRepository.existsByComment(comment) && comment.isDeleted()) {
             commentRepository.delete(comment);
+            mentionRepository.deleteAllByComment(comment);
         }
     }
 
