@@ -1,6 +1,7 @@
 package com.listywave.list.application.dto.response;
 
 import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparingLong;
 
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.reply.Reply;
@@ -121,6 +122,7 @@ public record CommentFindResponse(
                     .map(Mention::getUser)
                     .filter(user -> !user.isDelete())
                     .map(user -> new MentionDto(user.getId(), user.getNickname()))
+                    .sorted(comparingLong(MentionDto::userId))
                     .toList();
         }
     }
