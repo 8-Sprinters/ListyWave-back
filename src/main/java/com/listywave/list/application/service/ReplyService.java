@@ -39,13 +39,13 @@ public class ReplyService {
             Long targetCommentId,
             Long writerId,
             String content,
-            List<Long> mentionedIds
+            List<Long> mentionIds
     ) {
         listRepository.getById(listId);
         User user = userRepository.getById(writerId);
         Comment comment = commentRepository.getById(targetCommentId);
 
-        List<Mention> mentions = mentionService.toMentions(mentionedIds);
+        List<Mention> mentions = mentionService.toMentions(mentionIds);
         Reply reply = replyRepository.save(new Reply(comment, user, new CommentContent(content), mentions));
 
         applicationEventPublisher.publishEvent(AlarmEvent.reply(comment, reply));

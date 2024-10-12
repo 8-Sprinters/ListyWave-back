@@ -15,8 +15,8 @@ public class MentionService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public List<Mention> toMentions(List<Long> mentionedIds) {
-        List<User> mentionedUsers = userRepository.findAllById(mentionedIds);
+    public List<Mention> toMentions(List<Long> mentionIds) {
+        List<User> mentionedUsers = userRepository.findAllById(mentionIds);
         return mentionedUsers.stream()
                 .map(Mention::new)
                 .toList();

@@ -195,12 +195,12 @@ public class MentionServiceTest extends IntegrationTest {
         @Test
         void 댓글을_수정해_새로운_멘션을_추가한다() {
             // given
-            List<Long> firstMentionedIds = List.of(js.getId());
-            Long commentId = commentService.create(list.getId(), dh.getId(), "댓글이요", firstMentionedIds).id();
+            List<Long> firstMentionIds = List.of(js.getId());
+            Long commentId = commentService.create(list.getId(), dh.getId(), "댓글이요", firstMentionIds).id();
 
             // when
-            List<Long> newMentionedIds = List.of(js.getId(), ej.getId());
-            commentService.update(list.getId(), dh.getId(), commentId, "댓글 수정이요", newMentionedIds);
+            List<Long> newMentionIds = List.of(js.getId(), ej.getId());
+            commentService.update(list.getId(), dh.getId(), commentId, "댓글 수정이요", newMentionIds);
 
             // then
             CommentFindResponse response = commentService.findCommentBy(list.getId(), 5, null);
@@ -231,12 +231,12 @@ public class MentionServiceTest extends IntegrationTest {
         void 답글을_수정해_새로운_멘션을_추가한다() {
             // given
             Long commentId = commentService.create(list.getId(), dh.getId(), "댓글이요", EMPTY_LIST).id();
-            List<Long> firstMentionedIds = List.of(dh.getId());
-            Long replyId = replyService.create(list.getId(), commentId, js.getId(), "답글이요", firstMentionedIds).id();
+            List<Long> firstMentionIds = List.of(dh.getId());
+            Long replyId = replyService.create(list.getId(), commentId, js.getId(), "답글이요", firstMentionIds).id();
 
             // when
-            List<Long> newMentionedIds = List.of(dh.getId(), ej.getId());
-            ReplyUpdateCommand replyUpdateCommand = new ReplyUpdateCommand(list.getId(), commentId, replyId, "답글 수정이요", newMentionedIds);
+            List<Long> newMentionIds = List.of(dh.getId(), ej.getId());
+            ReplyUpdateCommand replyUpdateCommand = new ReplyUpdateCommand(list.getId(), commentId, replyId, "답글 수정이요", newMentionIds);
             replyService.update(replyUpdateCommand, js.getId());
 
             // then
@@ -253,8 +253,8 @@ public class MentionServiceTest extends IntegrationTest {
         void 답글을_수정해_멘션을_제거한다() {
             // given
             Long commentId = commentService.create(list.getId(), dh.getId(), "댓글이요", EMPTY_LIST).id();
-            List<Long> firstMentionedIds = List.of(dh.getId());
-            Long replyId = replyService.create(list.getId(), commentId, js.getId(), "답글이요", firstMentionedIds).id();
+            List<Long> firstMentionIds = List.of(dh.getId());
+            Long replyId = replyService.create(list.getId(), commentId, js.getId(), "답글이요", firstMentionIds).id();
 
             // when
             ReplyUpdateCommand replyUpdateCommand = new ReplyUpdateCommand(list.getId(), commentId, replyId, "답글 수정이요", EMPTY_LIST);
