@@ -244,7 +244,7 @@ public class ListEntity {
         return user.isDelete();
     }
 
-    public void validateOwnerIsNotDelete() {
+    public void validateOwnerIsNotDeleted() {
         if (this.user.isDelete()) {
             throw new CustomException(DELETED_USER_EXCEPTION, "탈퇴한 회원의 리스트입니다.");
         }
@@ -263,7 +263,7 @@ public class ListEntity {
         throw new CustomException(INVALID_ACCESS);
     }
 
-    public void increaseUpdateCount(){
+    public void increaseUpdateCount() {
         this.updateCount++;
     }
 }

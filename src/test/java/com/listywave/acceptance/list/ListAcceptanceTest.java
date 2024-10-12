@@ -5,7 +5,33 @@ import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.n개�
 import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.댓글_저장_API_호출;
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
 import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청_API;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.*;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.가장_좋아하는_견종_TOP3_생성_요청_데이터;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.검색_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_공개_여부_변경_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_삭제_요청_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_상세_조회를_검증한다;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_수정_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_저장_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트의_아이템_순위와_히스토리의_아이템_순위를_검증한다;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_리스트_상세_조회_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_피드_리스트_조회_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_히스토리_조회_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_카테고리_콜라보레이터_필터링_요청;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_카테고리_필터링_요청;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_콜라보레이터_필터링_요청;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.아이템_순위와_라벨을_바꾼_좋아하는_견종_TOP3_요청_데이터;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.정렬기준을_포함한_검색_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.좋아하는_라면_TOP3_생성_요청_데이터;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.최신_리스트_10개_조회_카테고리_필터링_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리로_검색_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리와_키워드로_검색_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.콜렉트_요청_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.키워드로_검색_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.키워드와_정렬기준을_포함한_검색_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.트랜딩_리스트_조회_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.팔로우한_사용자의_최신_리스트_10개_조회_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원_피드_리스트_조회;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원용_리스트_상세_조회_API_호출;
 import static com.listywave.acceptance.reply.ReplyAcceptanceTestHelper.답글_등록_API_호출;
 import static com.listywave.list.fixture.ListFixture.가장_좋아하는_견종_TOP3;
 import static com.listywave.list.fixture.ListFixture.가장_좋아하는_견종_TOP3_순위_변경;
@@ -20,8 +46,12 @@ import static java.util.Comparator.reverseOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import com.listywave.acceptance.common.AcceptanceTest;
 import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
@@ -30,6 +60,7 @@ import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.BackgroundColor;
 import com.listywave.list.application.domain.list.BackgroundPalette;
 import com.listywave.list.application.domain.list.ListEntity;
+import com.listywave.list.application.dto.response.CommentCreateResponse;
 import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListRecentResponse;
@@ -38,6 +69,7 @@ import com.listywave.list.application.dto.response.ListTrandingResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
 import com.listywave.list.presentation.dto.request.ReplyCreateRequest;
+import com.listywave.list.presentation.dto.request.comment.CommentCreateRequest;
 import com.listywave.user.application.dto.FindFeedListResponse;
 import com.listywave.user.application.dto.FindFeedListResponse.FeedListInfo;
 import com.listywave.user.application.dto.FindFeedListResponse.ListItemsResponse;
@@ -210,7 +242,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 결과 = 비회원_리스트_상세_조회_API_호출(동호_리스트_ID).as(ListDetailResponse.class);
 
             // then
-            var 기대값 = ListDetailResponse.of(가장_좋아하는_견종_TOP3_순위_변경(동호, List.of()), 동호, false, List.of());
+            var 기대값 = ListDetailResponse.of(가장_좋아하는_견종_TOP3_순위_변경(동호, List.of()), 동호, false, List.of(), 0, null, 0L);
             리스트_상세_조회를_검증한다(결과, 기대값);
         }
 
@@ -229,6 +261,52 @@ public class ListAcceptanceTest extends AcceptanceTest {
 
             // then
             HTTP_상태_코드를_검증한다(응답, BAD_REQUEST);
+        }
+
+        @Test
+        void 댓글이_하나도_없는_리스트라면_가장_최신_댓글_정보에_값이_담기지_않는다() {
+            // given
+            var 동호 = 회원을_저장한다(동호());
+            var 리스트_생성_요청_데이터 = 가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of());
+            리스트_저장_API_호출(리스트_생성_요청_데이터, 액세스_토큰을_발급한다(동호));
+
+            // when
+            var 동호_리스트 = 비회원_리스트_상세_조회_API_호출(1L).as(ListDetailResponse.class);
+
+            // then
+            assertThat(동호_리스트.totalCommentCount()).isZero();
+            assertThat(동호_리스트.newestComment()).isNull();
+        }
+
+        @Test
+        void 댓글이_있다면_가장_최신_댓글과_해당_댓글에_달린_답글_개수도_응답한다() {
+            // given
+            var 동호 = 회원을_저장한다(동호());
+            var 리스트_생성_요청_데이터 = 가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of());
+            var 리스트_ID = 리스트_저장_API_호출(리스트_생성_요청_데이터, 액세스_토큰을_발급한다(동호))
+                    .as(ListCreateResponse.class)
+                    .listId();
+
+            var 정수 = 회원을_저장한다(정수());
+            댓글_저장_API_호출(액세스_토큰을_발급한다(정수), 리스트_ID, new CommentCreateRequest("댓글 1빠!"));
+            var 댓글_ID = 댓글_저장_API_호출(액세스_토큰을_발급한다(정수), 리스트_ID, new CommentCreateRequest("댓글 2빠!"))
+                    .as(CommentCreateResponse.class)
+                    .id();
+
+            var 유진 = 회원을_저장한다(유진());
+            답글_등록_API_호출(액세스_토큰을_발급한다(유진), new ReplyCreateRequest("답글 1빠!"), 리스트_ID, 댓글_ID);
+            답글_등록_API_호출(액세스_토큰을_발급한다(유진), new ReplyCreateRequest("답글 2빠!"), 리스트_ID, 댓글_ID);
+            답글_등록_API_호출(액세스_토큰을_발급한다(유진), new ReplyCreateRequest("답글 3빠!"), 리스트_ID, 댓글_ID);
+
+            // when
+            var 동호_리스트 = 비회원_리스트_상세_조회_API_호출(1L).as(ListDetailResponse.class);
+
+            // then
+            assertAll(
+                    () -> assertThat(동호_리스트.newestComment()).isNotNull(),
+                    () -> assertThat(동호_리스트.newestComment().content()).isEqualTo("댓글 2빠!"),
+                    () -> assertThat(동호_리스트.newestComment().totalReplyCount()).isEqualTo(3)
+            );
         }
     }
 
@@ -253,7 +331,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             // then
             var 리스트_상세_조회_결과 = 회원용_리스트_상세_조회_API_호출(동호_액세스_토큰, 동호_리스트_ID);
             ListEntity 수정된_리스트 = 가장_좋아하는_견종_TOP3_순위_변경(동호, List.of());
-            ListDetailResponse 기대값 = ListDetailResponse.of(수정된_리스트, 동호, false, List.of(Collaborator.init(유진, 수정된_리스트)));
+            ListDetailResponse 기대값 = ListDetailResponse.of(수정된_리스트, 동호, false, List.of(Collaborator.init(유진, 수정된_리스트)), 0, null, 0L);
             리스트_상세_조회를_검증한다(리스트_상세_조회_결과, 기대값);
         }
 
@@ -624,7 +702,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
                     .as(ListRecentResponse.class);
 
             // then
-            var 동호_리스트 = 비회원_피드_리스트_조회_API_호출(동호 ).as(FindFeedListResponse.class).feedLists();
+            var 동호_리스트 = 비회원_피드_리스트_조회_API_호출(동호).as(FindFeedListResponse.class).feedLists();
             var 정수_리스트 = 비회원_피드_리스트_조회_API_호출(정수).as(FindFeedListResponse.class).feedLists();
             var 모든_리스트 = new ArrayList<>(동호_리스트);
             모든_리스트.addAll(정수_리스트);

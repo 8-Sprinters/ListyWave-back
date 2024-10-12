@@ -24,4 +24,6 @@ public interface ReplyRepository extends JpaRepository<Reply, Long>, CustomReply
     @Modifying
     @Query("delete from Reply r where r.comment in :comments")
     void deleteAllByCommentIn(@Param("comments") List<Comment> comments);
+
+    Long countByComment(Comment comment);
 }
