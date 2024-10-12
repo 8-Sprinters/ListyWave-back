@@ -13,6 +13,7 @@ import com.listywave.list.repository.comment.CommentRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.mention.Mention;
+import com.listywave.mention.MentionService;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
@@ -28,6 +29,7 @@ public class ReplyService {
 
     private final ListRepository listRepository;
     private final UserRepository userRepository;
+    private final MentionService mentionService;
     private final ReplyRepository replyRepository;
     private final CommentRepository commentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -43,19 +45,11 @@ public class ReplyService {
         User user = userRepository.getById(writerId);
         Comment comment = commentRepository.getById(targetCommentId);
 
-        List<Mention> mentions = toMentions(mentionedIds);
+        List<Mention> mentions = mentionService.toMentions(mentionedIds);
         Reply reply = replyRepository.save(new Reply(comment, user, new CommentContent(content), mentions));
 
         applicationEventPublisher.publishEvent(AlarmEvent.reply(comment, reply));
         return ReplyCreateResponse.of(reply, comment, user);
-    }
-
-    private List<Mention> toMentions(List<Long> mentionedIds) {
-        return mentionedIds.stream()
-                .map(mentionedId -> {
-                    User mentionedUser = userRepository.getById(mentionedId);
-                    return new Mention(mentionedUser);
-                }).toList();
     }
 
     public void delete(ReplyDeleteCommand command, Long userId) {
@@ -83,7 +77,7 @@ public class ReplyService {
         if (!reply.isOwner(user)) {
             throw new CustomException(ErrorCode.INVALID_ACCESS, "답글은 작성자만 수정할 수 있습니다.");
         }
-        List<Mention> mentions = toMentions(command.mentionIds());
+        List<Mention> mentions = mentionService.toMentions(command.mentionIds());
         reply.update(new CommentContent(command.content()), mentions);
     }
 }

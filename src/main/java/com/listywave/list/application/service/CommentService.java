@@ -16,6 +16,7 @@ import com.listywave.list.repository.comment.CommentRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.mention.Mention;
+import com.listywave.mention.MentionService;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -33,6 +34,7 @@ public class CommentService {
 
     private final ListRepository listRepository;
     private final UserRepository userRepository;
+    private final MentionService mentionService;
     private final ReplyRepository replyRepository;
     private final CommentRepository commentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -40,18 +42,12 @@ public class CommentService {
     public CommentCreateResponse create(Long listId, Long writerId, String content, List<Long> mentionIds) {
         User writer = userRepository.getById(writerId);
         ListEntity list = listRepository.getById(listId);
-        List<Mention> mentions = toMentions(mentionIds);
+        List<Mention> mentions = mentionService.toMentions(mentionIds);
 
         Comment comment = commentRepository.save(new Comment(list, writer, new CommentContent(content), mentions));
 
         applicationEventPublisher.publishEvent(AlarmEvent.comment(list, comment));
         return CommentCreateResponse.of(comment, writer);
-    }
-
-    private List<Mention> toMentions(List<Long> mentionIds) {
-        return userRepository.findAllById(mentionIds).stream()
-                .map(Mention::new)
-                .toList();
     }
 
     public CommentFindResponse findCommentBy(Long listId, int size, Long cursorId) {
@@ -105,7 +101,7 @@ public class CommentService {
             throw new CustomException(INVALID_ACCESS, "댓글은 작성자만 수정할 수 있습니다.");
         }
 
-        List<Mention> mentions = toMentions(mentionIds);
+        List<Mention> mentions = mentionService.toMentions(mentionIds);
         comment.update(new CommentContent(content), mentions);
     }
 }
