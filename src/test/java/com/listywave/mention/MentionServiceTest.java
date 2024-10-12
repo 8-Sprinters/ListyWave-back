@@ -259,7 +259,7 @@ public class MentionServiceTest extends IntegrationTest {
         @Test
         void 멘션을_한_댓글_삭제_시_함께_삭제한다() {
             // given
-            Long commentId = commentService.create(list.getId(), dh.getId(), "댓글이요", List.of(js.getId())).id();
+            Long commentId = commentService.create(list.getId(), dh.getId(), "댓글이요", List.of(js.getId(), ej.getId())).id();
 
             // when
             commentService.delete(list.getId(), commentId, dh.getId());

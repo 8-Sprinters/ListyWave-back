@@ -5,6 +5,7 @@ import static jakarta.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.BaseEntity;
+import com.listywave.common.util.DataUpdateUtils;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.mention.Mention;
 import com.listywave.user.application.domain.User;
@@ -15,9 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -62,19 +61,9 @@ public class Comment extends BaseEntity {
         this.isDeleted = true;
     }
 
-    public void update(CommentContent content, List<Mention> newMentions) {
+    public void update(CommentContent content, List<Mention> mentions) {
         this.commentContent = content;
-        updateMentions(newMentions);
-    }
-
-    private void updateMentions(List<Mention> mentions) {
-        Set<Mention> removable = new LinkedHashSet<>(this.mentions);
-        mentions.forEach(removable::remove);
-        this.mentions.removeAll(removable);
-
-        Set<Mention> addable = new LinkedHashSet<>(mentions);
-        this.mentions.forEach(addable::remove);
-        this.mentions.addAll(addable);
+        DataUpdateUtils.update(this.mentions, mentions);
     }
 
     public boolean isDeleted() {

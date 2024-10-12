@@ -19,6 +19,8 @@ import com.listywave.user.application.service.UserService;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @SpringBootTest
 public abstract class IntegrationTest {
+
+    private static final Logger log = LoggerFactory.getLogger(IntegrationTest.class);
 
     @MockBean
     protected KakaoOauthClient kakaoOauthClient;
@@ -58,5 +62,6 @@ public abstract class IntegrationTest {
         js = userRepository.save(정수());
         ej = userRepository.save(유진());
         list = listRepository.save(ListFixture.가장_좋아하는_견종_TOP3(dh, List.of()));
+        log.info("=============================테스트 데이터 셋 생성=============================");
     }
 }
