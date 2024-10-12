@@ -21,7 +21,7 @@ jobs:
           distribution: 'corretto'
 
       - name: Gradle 셋업, 빌드, 캐시
-        uses: burrunan/gradle-cache-action@3bf23b8dd95e7d2bacf2470132454fe893a178a1
+        uses: burrunan/gradle-cache-action@c15634bb25b7284dc084f38dff4e838048b7feaf
         with:
           arguments: build
           properties: |
