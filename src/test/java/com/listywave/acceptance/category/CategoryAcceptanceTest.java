@@ -29,7 +29,7 @@ public class CategoryAcceptanceTest extends AcceptanceTest {
 
         // then
         var 기대값 = Arrays.stream(CategoryType.values())
-                .map(type -> new CategoryTypeResponse(type.getCode(), type.name().toLowerCase(), type.getViewName(), type.getImageUrl()))
+                .map(type -> new CategoryTypeResponse(type.getCode(), type.name().toLowerCase(), type.getViewName()))
                 .toList();
         assertThat(결과).usingRecursiveAssertion()
                 .isEqualTo(기대값);

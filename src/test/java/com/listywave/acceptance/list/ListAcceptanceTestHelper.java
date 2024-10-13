@@ -1,7 +1,7 @@
 package com.listywave.acceptance.list;
 
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.given;
-import static com.listywave.list.application.domain.category.CategoryType.ANIMAL_PLANT;
+import static com.listywave.list.application.domain.category.CategoryType.MOVIE_DRAMA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -59,7 +59,7 @@ public abstract class ListAcceptanceTestHelper {
 
     public static ListCreateRequest 가장_좋아하는_견종_TOP3_생성_요청_데이터(List<Long> collaboratorIds) {
         return new ListCreateRequest(
-                ANIMAL_PLANT,
+                MOVIE_DRAMA,
                 List.of("동물", "최애 동물", "강아지"),
                 collaboratorIds,
                 "좋아하는 견종 TOP 3",
@@ -77,7 +77,7 @@ public abstract class ListAcceptanceTestHelper {
 
     public static ListUpdateRequest 아이템_순위와_라벨을_바꾼_좋아하는_견종_TOP3_요청_데이터(List<Long> collaboratorIds) {
         return new ListUpdateRequest(
-                ANIMAL_PLANT,
+                MOVIE_DRAMA,
                 List.of("냐옹", "멍멍"),
                 collaboratorIds,
                 "좋아하는 견종 TOP 3",

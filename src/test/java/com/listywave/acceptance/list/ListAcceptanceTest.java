@@ -420,7 +420,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
 
             // when
             var 아이템을_제외한_리스트_수정_요청_데이터 = new ListUpdateRequest(
-                    CategoryType.CULTURE,
+                    CategoryType.MUSIC,
                     List.of("라벨이", "바뀌면", "갱신안됨"),
                     List.of(정수.getId()),
                     "제목 바꿨어요",
@@ -569,9 +569,9 @@ public class ListAcceptanceTest extends AcceptanceTest {
             리스트를_모두_저장한다(동호_리스트들);
 
             // when
-            var 결과 = 비회원이_피드_리스트_조회_카테고리_필터링_요청(동호, "book").as(FindFeedListResponse.class);
+            var 결과 = 비회원이_피드_리스트_조회_카테고리_필터링_요청(동호, "movie_drama").as(FindFeedListResponse.class);
 
-            var 필터링_조건 = CategoryType.nameOf("book");
+            var 필터링_조건 = CategoryType.nameOf("movie_drama");
             var 기대값 = 동호_리스트들.stream()
                     .sorted(comparing(ListEntity::getId, reverseOrder()))
                     .filter(list -> list.isCategoryType(필터링_조건))
@@ -796,7 +796,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
 
             // when
-            var 결과 = 카테고리와_키워드로_검색_API_호출("animal_plant", "견종").as(ListSearchResponse.class);
+            var 결과 = 카테고리와_키워드로_검색_API_호출("movie_drama", "견종").as(ListSearchResponse.class);
 
             // then
             assertAll(
