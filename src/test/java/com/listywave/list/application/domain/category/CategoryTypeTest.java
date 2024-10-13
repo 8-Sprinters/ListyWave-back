@@ -1,6 +1,5 @@
 package com.listywave.list.application.domain.category;
 
-import static com.listywave.list.application.domain.category.CategoryType.ANIMAL_PLANT;
 import static com.listywave.list.application.domain.category.CategoryType.MOVIE_DRAMA;
 import static java.util.Locale.ENGLISH;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,13 +14,13 @@ class CategoryTypeTest {
     @CsvSource(value = {"0, ENTIRE"})
     void 코드값으로_Enum을_가져온다() {
         // given
-        int code = 7;
+        int code = 2;
 
         // when
         CategoryType result = CategoryType.codeOf(String.valueOf(code));
 
         // then
-        assertThat(result).isEqualTo(ANIMAL_PLANT);
+        assertThat(result).isEqualTo(MOVIE_DRAMA);
     }
 
     @Test

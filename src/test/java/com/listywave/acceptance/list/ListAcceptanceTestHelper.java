@@ -1,7 +1,7 @@
 package com.listywave.acceptance.list;
 
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.given;
-import static com.listywave.list.application.domain.category.CategoryType.ANIMAL_PLANT;
+import static com.listywave.list.application.domain.category.CategoryType.MOVIE_DRAMA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -59,7 +59,7 @@ public abstract class ListAcceptanceTestHelper {
 
     public static ListCreateRequest 가장_좋아하는_견종_TOP3_생성_요청_데이터(List<Long> collaboratorIds) {
         return new ListCreateRequest(
-                ANIMAL_PLANT,
+                MOVIE_DRAMA,
                 List.of("동물", "최애 동물", "강아지"),
                 collaboratorIds,
                 "좋아하는 견종 TOP 3",
@@ -77,7 +77,7 @@ public abstract class ListAcceptanceTestHelper {
 
     public static ListUpdateRequest 아이템_순위와_라벨을_바꾼_좋아하는_견종_TOP3_요청_데이터(List<Long> collaboratorIds) {
         return new ListUpdateRequest(
-                ANIMAL_PLANT,
+                MOVIE_DRAMA,
                 List.of("냐옹", "멍멍"),
                 collaboratorIds,
                 "좋아하는 견종 TOP 3",
@@ -237,14 +237,6 @@ public abstract class ListAcceptanceTestHelper {
     public static ExtractableResponse<Response> 키워드와_정렬기준을_포함한_검색_API_호출(String keyword, String sort) {
         return given()
                 .when().get("/lists/search?keyword={keyword}&sort={sort}", keyword, sort)
-                .then().log().all()
-                .extract();
-    }
-
-    public static ExtractableResponse<Response> 콜렉트_요청_API_호출(String accessToken, Long listId) {
-        return given()
-                .header(AUTHORIZATION, "Bearer " + accessToken)
-                .when().post("/lists/{listId}/collect", listId)
                 .then().log().all()
                 .extract();
     }

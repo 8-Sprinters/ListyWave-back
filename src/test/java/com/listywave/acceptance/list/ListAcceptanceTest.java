@@ -4,6 +4,8 @@ import static com.listywave.acceptance.collection.CollectionAcceptanceTestHelper
 import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.n개의_댓글_생성_요청;
 import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.댓글_저장_API_호출;
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.폴더_생성_API_호출;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.폴더_생성_요청_데이터;
 import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청_API;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.가장_좋아하는_견종_TOP3_생성_요청_데이터;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.검색_API_호출;
@@ -25,7 +27,6 @@ import static com.listywave.acceptance.list.ListAcceptanceTestHelper.좋아하�
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.최신_리스트_10개_조회_카테고리_필터링_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리로_검색_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리와_키워드로_검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.콜렉트_요청_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.키워드로_검색_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.키워드와_정렬기준을_포함한_검색_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.트랜딩_리스트_조회_API_호출;
@@ -52,10 +53,12 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.*;
 
 import com.listywave.acceptance.common.AcceptanceTest;
 import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
 import com.listywave.collaborator.application.domain.Collaborator;
+import com.listywave.collection.application.dto.FolderCreateResponse;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.BackgroundColor;
 import com.listywave.list.application.domain.list.BackgroundPalette;
@@ -190,7 +193,12 @@ public class ListAcceptanceTest extends AcceptanceTest {
             Long 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰)
                     .as(ListCreateResponse.class)
                     .listId();
-            콜렉트_요청_API_호출(액세스_토큰을_발급한다(정수), 동호_리스트_ID);
+
+            var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
+            var 정수_폴더_ID = 폴더_생성_API_호출(정수_액세스_토큰, 폴더_생성_요청_데이터)
+                    .as(FolderCreateResponse.class).folderId();
+            var 폴더_선택_데이터 = 폴더_선택_요청_데이터(정수_폴더_ID);
+            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 동호_리스트_ID, 폴더_선택_데이터);
 
             // when
             var 결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 동호_리스트_ID);
@@ -213,7 +221,12 @@ public class ListAcceptanceTest extends AcceptanceTest {
             Long 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰)
                     .as(ListCreateResponse.class)
                     .listId();
-            콜렉트_요청_API_호출(정수_액세스_토큰, 동호_리스트_ID);
+
+            var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
+            var 정수_폴더_ID = 폴더_생성_API_호출(정수_액세스_토큰, 폴더_생성_요청_데이터)
+                    .as(FolderCreateResponse.class).folderId();
+            var 폴더_선택_데이터 = 폴더_선택_요청_데이터(정수_폴더_ID);
+            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 동호_리스트_ID, 폴더_선택_데이터);
 
             // when
             var 결과 = 회원용_리스트_상세_조회_API_호출(동호_액세스_토큰, 동호_리스트_ID);
@@ -407,7 +420,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
 
             // when
             var 아이템을_제외한_리스트_수정_요청_데이터 = new ListUpdateRequest(
-                    CategoryType.CULTURE,
+                    CategoryType.MUSIC,
                     List.of("라벨이", "바뀌면", "갱신안됨"),
                     List.of(정수.getId()),
                     "제목 바꿨어요",
@@ -556,9 +569,9 @@ public class ListAcceptanceTest extends AcceptanceTest {
             리스트를_모두_저장한다(동호_리스트들);
 
             // when
-            var 결과 = 비회원이_피드_리스트_조회_카테고리_필터링_요청(동호, "book").as(FindFeedListResponse.class);
+            var 결과 = 비회원이_피드_리스트_조회_카테고리_필터링_요청(동호, "movie_drama").as(FindFeedListResponse.class);
 
-            var 필터링_조건 = CategoryType.nameOf("book");
+            var 필터링_조건 = CategoryType.nameOf("movie_drama");
             var 기대값 = 동호_리스트들.stream()
                     .sorted(comparing(ListEntity::getId, reverseOrder()))
                     .filter(list -> list.isCategoryType(필터링_조건))
@@ -634,8 +647,17 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 답글_생성_요청들 = Arrays.asList(new ReplyCreateRequest("답글1"), new ReplyCreateRequest("답글2"));
             답글_생성_요청들.forEach(답글_생성요청 -> 답글_등록_API_호출(동호_액세스_토큰, 답글_생성요청, 2L, 2L));
 
-            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 2L);
-            콜렉트_또는_콜렉트취소_API_호출(동호_액세스_토큰, 7L);
+            var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
+            var 동호_폴더_ID = 폴더_생성_API_호출(동호_액세스_토큰, 폴더_생성_요청_데이터)
+                    .as(FolderCreateResponse.class)
+                    .folderId();
+            var 정수_폴더_ID = 폴더_생성_API_호출(정수_액세스_토큰, 폴더_생성_요청_데이터)
+                    .as(FolderCreateResponse.class)
+                    .folderId();
+            var 정수_폴더_선택_데이터 = 폴더_선택_요청_데이터(정수_폴더_ID);
+            var 동호_폴더_선택_데이터 = 폴더_선택_요청_데이터(동호_폴더_ID);
+            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 2L, 정수_폴더_선택_데이터);
+            콜렉트_또는_콜렉트취소_API_호출(동호_액세스_토큰, 7L, 동호_폴더_선택_데이터);
 
             // when
             List<ListTrandingResponse> 결과 = 트랜딩_리스트_조회_API_호출().as(new TypeRef<>() {
@@ -774,7 +796,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
 
             // when
-            var 결과 = 카테고리와_키워드로_검색_API_호출("animal_plant", "견종").as(ListSearchResponse.class);
+            var 결과 = 카테고리와_키워드로_검색_API_호출("movie_drama", "견종").as(ListSearchResponse.class);
 
             // then
             assertAll(
@@ -833,7 +855,12 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
             var 좋아하는_견종_TOP3_생성_결과 = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
             var 좋아하는_라면_TOP3_생성_결과 = 리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
-            콜렉트_요청_API_호출(정수_액세스_토큰, 좋아하는_라면_TOP3_생성_결과.listId());
+
+            var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
+            var 정수_폴더_ID = 폴더_생성_API_호출(정수_액세스_토큰, 폴더_생성_요청_데이터)
+                    .as(FolderCreateResponse.class).folderId();
+            var 폴더_선택_데이터 = 폴더_선택_요청_데이터(정수_폴더_ID);
+            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 좋아하는_라면_TOP3_생성_결과.listId(), 폴더_선택_데이터);
 
             // when
             var 결과 = 정렬기준을_포함한_검색_API_호출("collect").as(ListSearchResponse.class);

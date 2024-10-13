@@ -1,8 +1,8 @@
 package com.listywave.collaborator.application.domain;
 
 import static com.listywave.common.exception.ErrorCode.DUPLICATE_COLLABORATOR_EXCEPTION;
-import static com.listywave.list.application.domain.category.CategoryType.ANIMAL_PLANT;
 import static com.listywave.list.application.domain.category.CategoryType.ETC;
+import static com.listywave.list.application.domain.category.CategoryType.MOVIE_DRAMA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -39,7 +39,7 @@ class CollaboratorsTest {
         user = User.init(1L, "hkim4410@naver.com", "kakaoAccessToken");
         list = new ListEntity(
                 user,
-                ANIMAL_PLANT,
+                MOVIE_DRAMA,
                 new ListTitle("리스트 제목"),
                 new ListDescription("리스트 설명"),
                 true,

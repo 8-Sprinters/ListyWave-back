@@ -12,21 +12,21 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum CategoryType {
 
-    ENTIRE("0", "전체", "https://image.listywave.com/category/entire.webp"),
-    CULTURE("1", "문화", "https://image.listywave.com/category/culture.webp"),
-    LIFE("2", "일상생활", "https://image.listywave.com/category/life.webp"),
-    PLACE("3", "장소", "https://image.listywave.com/category/place.webp"),
-    MUSIC("4", "음악", "https://image.listywave.com/category/musiic.webp"),
-    MOVIE_DRAMA("5", "영화/드라마", "https://image.listywave.com/category/muvie_drama.webp"),
-    BOOK("6", "도서", "https://image.listywave.com/category/book.webp"),
-    ANIMAL_PLANT("7", "동식물", "https://image.listywave.com/category/animal_plant.webp"),
-    FOOD("9", "음식", "https://image.listywave.com/category/food.webp"),
-    ETC("8", "기타", "https://image.listywave.com/category/etc.webp"),
+    ENTIRE("0", "전체"),
+    MUSIC("1", "음악"),
+    MOVIE_DRAMA("2", "영화&드라마"),
+    ENTERTAINMENT_ARTS("3","엔터&예술"),
+    TRAVEL("4", "여행"),
+    RESTAURANT_CAFE("5", "맛집&카페"),
+    FOOD_RECIPES("6", "음식&레시피"),
+    PLACE("7", "공간"),
+    DAILYLIFE_THOUGHTS("8", "일상&생각"),
+    HOBBY_LEISURE("9", "취미&레저"),
+    ETC("10", "기타")
     ;
 
     private final String code;
     private final String viewName;
-    private final String imageUrl;
 
     public static CategoryType codeOf(String code) {
         return Arrays.stream(CategoryType.values())
