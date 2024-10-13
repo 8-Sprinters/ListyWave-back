@@ -1,4 +1,4 @@
-package com.listywave.list.repository;
+package com.listywave.list.repository.comment;
 
 
 import static com.listywave.list.application.domain.comment.QComment.comment;
@@ -18,7 +18,8 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
 
     @Override
     public List<Comment> getComments(ListEntity list, int size, Long cursorId) {
-        return queryFactory.selectFrom(comment)
+        return queryFactory
+                .selectFrom(comment)
                 .leftJoin(listEntity).on(comment.list.id.eq(listEntity.id)).fetchJoin()
                 .where(
                         comment.list.id.eq(list.getId()),

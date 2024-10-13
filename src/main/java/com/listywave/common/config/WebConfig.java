@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Value("${cors.allowedOrigins}")
     private String[] allowedOrigins;
-    
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")

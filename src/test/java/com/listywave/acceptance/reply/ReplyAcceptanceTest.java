@@ -11,6 +11,7 @@ import static com.listywave.acceptance.reply.ReplyAcceptanceTestHelper.답글_�
 import static com.listywave.list.fixture.ListFixture.가장_좋아하는_견종_TOP3;
 import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.정수;
+import static java.util.Collections.EMPTY_LIST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -38,7 +39,7 @@ public class ReplyAcceptanceTest extends AcceptanceTest {
         댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 동호_리스트.getId(), 댓글_생성요청));
 
         // when
-        var 답글_생성_요청 = new ReplyCreateRequest("답글 달아요! 😀 ");
+        var 답글_생성_요청 = new ReplyCreateRequest("답글 달아요! 😀 ", List.of());
         답글_등록_API_호출(동호_액세스_토큰, 답글_생성_요청, 동호_리스트.getId(), 2L);
 
         // then
@@ -59,11 +60,11 @@ public class ReplyAcceptanceTest extends AcceptanceTest {
             var 댓글_생성_요청들 = n개의_댓글_생성_요청(3);
             댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 동호_리스트.getId(), 댓글_생성요청));
 
-            var 답글_생성_요청_데이터 = new ReplyCreateRequest("답글 달아요! 😀 ");
+            var 답글_생성_요청_데이터 = new ReplyCreateRequest("답글 달아요! 😀 ", List.of());
             답글_등록_API_호출(동호_액세스_토큰, 답글_생성_요청_데이터, 동호_리스트.getId(), 2L);
 
             // when
-            var 답글_수정_요청_데이터 = new ReplyUpdateRequest("답글 수정입니다!~!@#!#");
+            var 답글_수정_요청_데이터 = new ReplyUpdateRequest("답글 수정입니다!~!@#!#", EMPTY_LIST);
             답글_수정_API_호출(동호_액세스_토큰, 답글_수정_요청_데이터, 동호_리스트.getId(), 2L, 1L);
 
             // then
@@ -83,7 +84,7 @@ public class ReplyAcceptanceTest extends AcceptanceTest {
             var 댓글_생성_요청들 = n개의_댓글_생성_요청(3);
             댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 동호_리스트.getId(), 댓글_생성요청));
 
-            var 답글_생성_요청_데이터 = new ReplyCreateRequest("답글 달아요! 😀 ");
+            var 답글_생성_요청_데이터 = new ReplyCreateRequest("답글 달아요! 😀 ", List.of());
             답글_등록_API_호출(정수_액세스_토큰, 답글_생성_요청_데이터, 동호_리스트.getId(), 2L);
 
             // when
@@ -107,7 +108,7 @@ public class ReplyAcceptanceTest extends AcceptanceTest {
             var 댓글_생성_요청들 = n개의_댓글_생성_요청(3);
             댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 동호_리스트.getId(), 댓글_생성요청));
 
-            var 답글_수정_요청 = new ReplyCreateRequest("답글 달아요! 😀 ");
+            var 답글_수정_요청 = new ReplyCreateRequest("답글 달아요! 😀 ", List.of());
             답글_등록_API_호출(동호_액세스_토큰, 답글_수정_요청, 동호_리스트.getId(), 2L);
 
             // when
@@ -133,7 +134,7 @@ public class ReplyAcceptanceTest extends AcceptanceTest {
             var 댓글_생성_요청들 = n개의_댓글_생성_요청(3);
             댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 동호_리스트.getId(), 댓글_생성요청));
 
-            var 답글_생성_요청_데이터 = new ReplyCreateRequest("답글 달아요! 😀 ");
+            var 답글_생성_요청_데이터 = new ReplyCreateRequest("답글 달아요! 😀 ", List.of());
             답글_등록_API_호출(정수_액세스_토큰, 답글_생성_요청_데이터, 동호_리스트.getId(), 2L);
 
             // when
@@ -153,7 +154,7 @@ public class ReplyAcceptanceTest extends AcceptanceTest {
             var 댓글_생성_요청들 = n개의_댓글_생성_요청(3);
             댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 동호_리스트.getId(), 댓글_생성요청));
 
-            var 답글_수정_요청 = new ReplyCreateRequest("답글 달아요! 😀 ");
+            var 답글_수정_요청 = new ReplyCreateRequest("답글 달아요! 😀 ", List.of());
             답글_등록_API_호출(동호_액세스_토큰, 답글_수정_요청, 동호_리스트.getId(), 2L);
 
             댓글_삭제_API_호출(동호_액세스_토큰, 동호_리스트.getId(), 2L);

@@ -11,6 +11,7 @@ import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_�
 import static com.listywave.acceptance.reply.ReplyAcceptanceTestHelper.답글_등록_API_호출;
 import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.정수;
+import static java.util.Collections.EMPTY_LIST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -64,7 +65,7 @@ public class CommentAcceptanceTest extends AcceptanceTest {
             댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 동호_리스트_ID, 댓글_생성요청));
 
             // when
-            var 댓글_수정_요청 = new CommentUpdateRequest("수정할게요!");
+            var 댓글_수정_요청 = new CommentUpdateRequest("수정할게요!", EMPTY_LIST);
             댓글_수정_API_호출(동호_액세스_토큰, 댓글_수정_요청, 동호_리스트_ID, 5L);
 
             // then
@@ -85,7 +86,7 @@ public class CommentAcceptanceTest extends AcceptanceTest {
             댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 동호_리스트_ID, 댓글_생성요청));
 
             // when
-            var 댓글_수정_요청 = new CommentUpdateRequest("수정할게요!");
+            var 댓글_수정_요청 = new CommentUpdateRequest("수정할게요!", EMPTY_LIST);
             var 댓글_수정_응답 = 댓글_수정_API_호출(동호_액세스_토큰, 댓글_수정_요청, 동호_리스트_ID, 101L);
 
             // then
@@ -107,7 +108,7 @@ public class CommentAcceptanceTest extends AcceptanceTest {
             댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(정수_액세스_토큰, 동호_리스트_ID, 댓글_생성요청));
 
             // when
-            var 댓글_수정_요청 = new CommentUpdateRequest("수정할게요!");
+            var 댓글_수정_요청 = new CommentUpdateRequest("수정할게요!", EMPTY_LIST);
             var 댓글_수정_응답 = 댓글_수정_API_호출(동호_액세스_토큰, 댓글_수정_요청, 동호_리스트_ID, 1L);
 
             // then
@@ -171,7 +172,7 @@ public class CommentAcceptanceTest extends AcceptanceTest {
             var 댓글_생성_요청들 = n개의_댓글_생성_요청(3);
             댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 동호_리스트_ID, 댓글_생성요청));
 
-            var 답글_수정_요청 = new ReplyCreateRequest("답글 달아요! 😀 ");
+            var 답글_수정_요청 = new ReplyCreateRequest("답글 달아요! 😀 ", List.of());
             답글_등록_API_호출(동호_액세스_토큰, 답글_수정_요청, 동호_리스트_ID, 2L);
 
             // when

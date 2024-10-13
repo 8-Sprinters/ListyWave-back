@@ -1,16 +1,22 @@
 package com.listywave.list.application.domain.reply;
 
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.BaseEntity;
+import com.listywave.common.util.DataUpdateUtils;
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.comment.CommentContent;
+import com.listywave.mention.Mention;
 import com.listywave.user.application.domain.User;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,12 +38,26 @@ public class Reply extends BaseEntity {
     @Embedded
     private CommentContent commentContent;
 
+    @OneToMany(fetch = LAZY, cascade = ALL, orphanRemoval = true, mappedBy = "reply")
+    private final List<Mention> mentions = new ArrayList<>();
+
+    public Reply(Comment comment, User user, CommentContent commentContent, List<Mention> mentions) {
+        this.comment = comment;
+        this.user = user;
+        this.commentContent = commentContent;
+        mentions.forEach(it -> {
+            this.mentions.add(it);
+            it.setReply(this);
+        });
+    }
+
     public boolean isOwner(User user) {
         return this.user.equals(user);
     }
 
-    public void update(CommentContent content) {
+    public void update(CommentContent content, List<Mention> mentions) {
         this.commentContent = content;
+        DataUpdateUtils.update(this.mentions, mentions);
     }
 
     public Long getCommentId() {

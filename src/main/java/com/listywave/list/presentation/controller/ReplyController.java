@@ -28,10 +28,16 @@ public class ReplyController {
     ResponseEntity<ReplyCreateResponse> create(
             @PathVariable("listId") Long listId,
             @PathVariable("commentId") Long commentId,
-            @Auth Long loginUserId,
+            @Auth Long writerId,
             @RequestBody ReplyCreateRequest request
     ) {
-        ReplyCreateResponse response = replyService.createReply(listId, commentId, request.content(), loginUserId);
+        ReplyCreateResponse response = replyService.create(
+                listId,
+                commentId,
+                writerId,
+                request.content(),
+                request.mentionIds()
+        );
         return ResponseEntity.status(CREATED).body(response);
     }
 
@@ -55,7 +61,7 @@ public class ReplyController {
             @Auth Long loginUserId,
             @RequestBody ReplyUpdateRequest request
     ) {
-        ReplyUpdateCommand replyUpdateCommand = new ReplyUpdateCommand(listId, commentId, replyId, request.content());
+        ReplyUpdateCommand replyUpdateCommand = new ReplyUpdateCommand(listId, commentId, replyId, request.content(), request.mentionIds());
         replyService.update(replyUpdateCommand, loginUserId);
         return ResponseEntity.noContent().build();
     }

@@ -12,9 +12,11 @@ import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.domain.reply.Reply;
 import com.listywave.list.application.dto.response.CommentCreateResponse;
 import com.listywave.list.application.dto.response.CommentFindResponse;
-import com.listywave.list.repository.CommentRepository;
+import com.listywave.list.repository.comment.CommentRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
+import com.listywave.mention.Mention;
+import com.listywave.mention.MentionService;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -32,22 +34,23 @@ public class CommentService {
 
     private final ListRepository listRepository;
     private final UserRepository userRepository;
+    private final MentionService mentionService;
     private final ReplyRepository replyRepository;
     private final CommentRepository commentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public CommentCreateResponse create(Long listId, String content, Long loginUserId) {
-        User user = userRepository.getById(loginUserId);
+    public CommentCreateResponse create(Long listId, Long writerId, String content, List<Long> mentionIds) {
+        User writer = userRepository.getById(writerId);
         ListEntity list = listRepository.getById(listId);
+        List<Mention> mentions = mentionService.toMentions(mentionIds);
 
-        Comment comment = Comment.create(list, user, new CommentContent(content));
-        Comment saved = commentRepository.save(comment);
+        Comment comment = commentRepository.save(new Comment(list, writer, new CommentContent(content), mentions));
 
-        applicationEventPublisher.publishEvent(AlarmEvent.comment(list, saved));
-        return CommentCreateResponse.of(saved, user);
+        applicationEventPublisher.publishEvent(AlarmEvent.comment(list, comment));
+        return CommentCreateResponse.of(comment, writer);
     }
 
-    public CommentFindResponse getComments(Long listId, int size, Long cursorId) {
+    public CommentFindResponse findCommentBy(Long listId, int size, Long cursorId) {
         ListEntity list = listRepository.getById(listId);
 
         List<Comment> comments = commentRepository.getComments(list, size, cursorId);
@@ -73,9 +76,9 @@ public class CommentService {
         return CommentFindResponse.from(totalCount, newCursorId, hasNext, result);
     }
 
-    public void delete(Long listId, Long commentId, Long loginUserId) {
+    public void delete(Long listId, Long commentId, Long userId) {
         listRepository.getById(listId);
-        User user = userRepository.getById(loginUserId);
+        User user = userRepository.getById(userId);
         Comment comment = commentRepository.getById(commentId);
 
         if (!comment.isOwner(user)) {
@@ -89,14 +92,16 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-    public void update(Long listId, Long commentId, Long loginUserId, String content) {
+    public void update(Long listId, Long writerId, Long commentId, String content, List<Long> mentionIds) {
         listRepository.getById(listId);
-        User user = userRepository.getById(loginUserId);
+        User writer = userRepository.getById(writerId);
         Comment comment = commentRepository.getById(commentId);
 
-        if (!comment.isOwner(user)) {
+        if (!comment.isOwner(writer)) {
             throw new CustomException(INVALID_ACCESS, "댓글은 작성자만 수정할 수 있습니다.");
         }
-        comment.update(new CommentContent(content));
+
+        List<Mention> mentions = mentionService.toMentions(mentionIds);
+        comment.update(new CommentContent(content), mentions);
     }
 }

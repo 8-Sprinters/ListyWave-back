@@ -1,4 +1,4 @@
-package com.listywave.list.repository;
+package com.listywave.list.repository.comment;
 
 import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 
