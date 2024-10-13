@@ -1,7 +1,7 @@
 package com.listywave.list.application.domain.category;
 
 import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
-import static com.listywave.list.application.domain.category.CategoryType.ANIMAL_PLANT;
+import static com.listywave.list.application.domain.category.CategoryType.MOVIE_DRAMA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -16,14 +16,14 @@ class CategoryTypeConverterTest {
 
     @Test
     void CategoryType을_code로_변경한다() {
-        String result = categoryTypeConverter.convertToDatabaseColumn(ANIMAL_PLANT);
+        String result = categoryTypeConverter.convertToDatabaseColumn(MOVIE_DRAMA);
 
-        assertThat(result).isEqualTo(ANIMAL_PLANT.getCode());
+        assertThat(result).isEqualTo(MOVIE_DRAMA.getCode());
     }
 
     @Test
     void DB에_저장된_code값으로_CategoryType을_변환한다() {
-        String code = ANIMAL_PLANT.getCode();
+        String code = MOVIE_DRAMA.getCode();
 
         CategoryType result = categoryTypeConverter.convertToEntityAttribute(code);
 

@@ -3,9 +3,9 @@ package com.listywave.list.application.domain.list;
 import static com.listywave.common.exception.ErrorCode.DELETED_USER_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
-import static com.listywave.list.application.domain.category.CategoryType.ANIMAL_PLANT;
 import static com.listywave.list.application.domain.category.CategoryType.ENTIRE;
-import static com.listywave.list.application.domain.category.CategoryType.FOOD;
+import static com.listywave.list.application.domain.category.CategoryType.MOVIE_DRAMA;
+import static com.listywave.list.application.domain.category.CategoryType.TRAVEL;
 import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.유진;
 import static com.listywave.user.fixture.UserFixture.정수;
@@ -38,7 +38,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 class ListEntityTest {
 
     private final User user = 동호();
-    private final CategoryType categoryType = FOOD;
+    private final CategoryType categoryType = MOVIE_DRAMA;
     private final ListTitle title = new ListTitle("칼국수 맛집 TOP 10");
     private final ListDescription description = new ListDescription("박박우기는 칼국수 맛집");
     private final boolean isPublic = true;
@@ -103,8 +103,8 @@ class ListEntityTest {
     @Test
     void 카테고리_타압이_일치하는지_여부를_반환하다() {
         assertThat(list.isCategoryType(ENTIRE)).isTrue();
-        assertThat(list.isCategoryType(FOOD)).isTrue();
-        assertThat(list.isCategoryType(ANIMAL_PLANT)).isFalse();
+        assertThat(list.isCategoryType(MOVIE_DRAMA)).isTrue();
+        assertThat(list.isCategoryType(TRAVEL)).isFalse();
     }
 
     @ParameterizedTest
