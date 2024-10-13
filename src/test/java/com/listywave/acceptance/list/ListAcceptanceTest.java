@@ -42,6 +42,7 @@ import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.유진;
 import static com.listywave.user.fixture.UserFixture.정수;
 import static java.time.temporal.ChronoUnit.MILLIS;
+import static java.util.Collections.EMPTY_LIST;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -301,15 +302,15 @@ public class ListAcceptanceTest extends AcceptanceTest {
                     .listId();
 
             var 정수 = 회원을_저장한다(정수());
-            댓글_저장_API_호출(액세스_토큰을_발급한다(정수), 리스트_ID, new CommentCreateRequest("댓글 1빠!"));
-            var 댓글_ID = 댓글_저장_API_호출(액세스_토큰을_발급한다(정수), 리스트_ID, new CommentCreateRequest("댓글 2빠!"))
+            댓글_저장_API_호출(액세스_토큰을_발급한다(정수), 리스트_ID, new CommentCreateRequest("댓글 1빠!", EMPTY_LIST));
+            var 댓글_ID = 댓글_저장_API_호출(액세스_토큰을_발급한다(정수), 리스트_ID, new CommentCreateRequest("댓글 2빠!", EMPTY_LIST))
                     .as(CommentCreateResponse.class)
                     .id();
 
             var 유진 = 회원을_저장한다(유진());
-            답글_등록_API_호출(액세스_토큰을_발급한다(유진), new ReplyCreateRequest("답글 1빠!"), 리스트_ID, 댓글_ID);
-            답글_등록_API_호출(액세스_토큰을_발급한다(유진), new ReplyCreateRequest("답글 2빠!"), 리스트_ID, 댓글_ID);
-            답글_등록_API_호출(액세스_토큰을_발급한다(유진), new ReplyCreateRequest("답글 3빠!"), 리스트_ID, 댓글_ID);
+            답글_등록_API_호출(액세스_토큰을_발급한다(유진), new ReplyCreateRequest("답글 1빠!", EMPTY_LIST), 리스트_ID, 댓글_ID);
+            답글_등록_API_호출(액세스_토큰을_발급한다(유진), new ReplyCreateRequest("답글 2빠!", EMPTY_LIST), 리스트_ID, 댓글_ID);
+            답글_등록_API_호출(액세스_토큰을_발급한다(유진), new ReplyCreateRequest("답글 3빠!", EMPTY_LIST), 리스트_ID, 댓글_ID);
 
             // when
             var 동호_리스트 = 비회원_리스트_상세_조회_API_호출(1L).as(ListDetailResponse.class);
@@ -644,7 +645,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 2L, 댓글_생성요청));
             댓글_생성_요청들2.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 4L, 댓글_생성요청));
 
-            var 답글_생성_요청들 = Arrays.asList(new ReplyCreateRequest("답글1"), new ReplyCreateRequest("답글2"));
+            var 답글_생성_요청들 = Arrays.asList(new ReplyCreateRequest("답글1", List.of()), new ReplyCreateRequest("답글2", List.of()));
             답글_생성_요청들.forEach(답글_생성요청 -> 답글_등록_API_호출(동호_액세스_토큰, 답글_생성요청, 2L, 2L));
 
             var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");

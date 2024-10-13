@@ -14,7 +14,7 @@ public abstract class CommentAcceptanceTestHelper {
 
     public static List<CommentCreateRequest> n개의_댓글_생성_요청(int size) {
         return IntStream.range(0, size)
-                .mapToObj(i -> new CommentCreateRequest((i + 1) + "번 째 댓글"))
+                .mapToObj(i -> new CommentCreateRequest((i + 1) + "번 째 댓글", List.of()))
                 .toList();
     }
 

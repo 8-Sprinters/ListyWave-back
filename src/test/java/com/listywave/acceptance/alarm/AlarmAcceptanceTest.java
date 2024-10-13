@@ -132,7 +132,7 @@ public class AlarmAcceptanceTest extends AcceptanceTest {
         var 댓글_생성_요청들 = n개의_댓글_생성_요청(1);
         댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_엑세스_토큰, 정수_리스트_ID, 댓글_생성요청));
 
-        var 답글_생성_요청_데이터 = new ReplyCreateRequest("답글 달아요! 😀 ");
+        var 답글_생성_요청_데이터 = new ReplyCreateRequest("답글 달아요! 😀 ", List.of());
         답글_등록_API_호출(유진_엑세스_토큰, 답글_생성_요청_데이터, 정수_리스트_ID, 1L);
 
         // when
