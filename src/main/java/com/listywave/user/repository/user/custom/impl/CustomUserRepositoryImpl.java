@@ -33,14 +33,22 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .from(listEntity)
                 .rightJoin(listEntity.user, user)
                 .where(
-                        user.id.ne(me.getId()),
-                        user.id.notIn(myFollowingUserIds),
+                        userIdNe(me),
+                        userIdNotIn(myFollowingUserIds),
                         user.isDelete.isFalse()
                 )
                 .groupBy(user)
                 .orderBy(listEntity.updatedDate.max().desc())
                 .limit(10)
                 .fetch();
+    }
+
+    private BooleanExpression userIdNotIn(List<Long> myFollowingUserIds) {
+        return myFollowingUserIds.isEmpty() ? null :  user.id.notIn(myFollowingUserIds);
+    }
+
+    private BooleanExpression userIdNe(User me) {
+        return me == null ? null : user.id.ne(me.getId());
     }
 
     @Override

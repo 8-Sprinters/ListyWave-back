@@ -11,7 +11,7 @@ import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.FollowersResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
-import com.listywave.user.application.dto.RecommendUsersResponse;
+import com.listywave.user.application.dto.UsersRecommendedResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.dto.UserProflieUpdateCommand;
 import com.listywave.user.application.dto.search.UserElasticSearchResponse;
@@ -121,18 +121,24 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<RecommendUsersResponse> getRecommendUsers(Long loginUserId) {
+    public List<UsersRecommendedResponse> getRecommendedUsers(Long loginUserId) {
+        if(loginUserId == null){
+            List<User> recommendUsers = userRepository.getRecommendUsers(List.of(), null);
+            return toUsersRecommendedResponse(recommendUsers);
+        }
         User user = userRepository.getById(loginUserId);
         List<Follow> follows = followRepository.getAllByFollowerUser(user);
-
         List<User> myFollowingUsers = follows.stream()
                 .map(Follow::getFollowingUser)
                 .filter(followingUser -> !followingUser.isDelete())
                 .toList();
-
         List<User> recommendUsers = userRepository.getRecommendUsers(myFollowingUsers, user);
+        return toUsersRecommendedResponse(recommendUsers);
+    }
+
+    private List<UsersRecommendedResponse> toUsersRecommendedResponse(List<User> recommendUsers) {
         return recommendUsers.stream()
-                .map(RecommendUsersResponse::of)
+                .map(UsersRecommendedResponse::of)
                 .toList();
     }
 
