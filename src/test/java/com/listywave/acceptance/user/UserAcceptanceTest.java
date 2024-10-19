@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpStatus.*;
 
 import com.listywave.acceptance.common.AcceptanceTest;
-import com.listywave.user.application.dto.RecommendUsersResponse;
+import com.listywave.user.application.dto.UsersRecommendedResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.dto.search.UserSearchResponse;
 import io.restassured.common.mapper.TypeRef;
@@ -148,12 +148,27 @@ public class UserAcceptanceTest extends AcceptanceTest {
         var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
 
         // when
-        List<RecommendUsersResponse> 결과 = 추천_사용자_조회(동호_액세스_토큰).as(new TypeRef<>() {
+        List<UsersRecommendedResponse> 결과 = 회원_추천_사용자_조회_API_요청(동호_액세스_토큰).as(new TypeRef<>() {
         });
 
         // then
         assertThat(결과).hasSize(1);
         assertThat(결과.get(0).nickname()).isEqualTo(유진.getNickname());
+    }
+
+    @Test
+    void 비회원이_추천_사용자_조회한다() {
+        // given
+        회원을_저장한다(동호());
+        회원을_저장한다(정수());
+        회원을_저장한다(유진());
+
+        // when
+        List<UsersRecommendedResponse> 결과 = 비회원_추천_사용자_조회_API_요청().as(new TypeRef<>() {
+        });
+
+        // then
+        assertThat(결과).hasSize(3);
     }
 
     @Nested
