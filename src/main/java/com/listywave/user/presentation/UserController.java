@@ -4,7 +4,7 @@ import com.listywave.common.auth.Auth;
 import com.listywave.common.auth.OptionalAuth;
 import com.listywave.user.application.dto.FollowersResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
-import com.listywave.user.application.dto.RecommendUsersResponse;
+import com.listywave.user.application.dto.UsersRecommendedResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.dto.search.UserElasticSearchResponse;
 import com.listywave.user.application.dto.search.UserSearchResponse;
@@ -87,11 +87,11 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/users/recommend")
-    ResponseEntity<List<RecommendUsersResponse>> getRecommendUsers(
-            @Auth Long loginUserId
+    @GetMapping("/users/recommended")
+    ResponseEntity<List<UsersRecommendedResponse>> getRecommendedUsers(
+            @OptionalAuth Long loginUserId
     ) {
-        List<RecommendUsersResponse> recommendUsers = userService.getRecommendUsers(loginUserId);
+        List<UsersRecommendedResponse> recommendUsers = userService.getRecommendedUsers(loginUserId);
         return ResponseEntity.ok(recommendUsers);
     }
 
