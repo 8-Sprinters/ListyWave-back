@@ -2,17 +2,17 @@ package com.listywave.acceptance.user;
 
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
 import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청_API;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.*;
 import static com.listywave.acceptance.user.UserAcceptanceTestHelper.*;
-import static com.listywave.user.fixture.UserFixture.동호;
-import static com.listywave.user.fixture.UserFixture.유진;
-import static com.listywave.user.fixture.UserFixture.정수;
+import static com.listywave.user.fixture.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpStatus.*;
 
 import com.listywave.acceptance.common.AcceptanceTest;
-import com.listywave.user.application.dto.RecommendUsersResponse;
+import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
+import com.listywave.user.application.dto.UsersRecommendedResponse;
 import com.listywave.user.application.dto.search.UserSearchResponse;
 import io.restassured.common.mapper.TypeRef;
 import java.util.List;
@@ -138,22 +138,74 @@ public class UserAcceptanceTest extends AcceptanceTest {
         ;
     }
 
-    @Test
-    void 회원이_추천_사용자_조회한다_추천_사용자는_팔로잉하지_않는_유저여야한다() {
-        // given
-        var 동호 = 회원을_저장한다(동호());
-        var 정수 = 회원을_저장한다(정수());
-        var 유진 = 회원을_저장한다(유진());
-        팔로우_요청_API(액세스_토큰을_발급한다(동호), 정수.getId());
-        var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
+    @Nested
+    class 추천_사용자 {
 
-        // when
-        List<RecommendUsersResponse> 결과 = 추천_사용자_조회(동호_액세스_토큰).as(new TypeRef<>() {
-        });
+        @Test
+        void 회원이_추천_사용자_조회한다_추천_사용자는_팔로잉하지_않는_유저여야한다() {
+            // given
+            var 동호 = 회원을_저장한다(동호());
+            var 정수 = 회원을_저장한다(정수());
+            var 유진 = 회원을_저장한다(유진());
+            팔로우_요청_API(액세스_토큰을_발급한다(동호), 정수.getId());
+            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
 
-        // then
-        assertThat(결과).hasSize(1);
-        assertThat(결과.get(0).nickname()).isEqualTo(유진.getNickname());
+            // when
+            List<UsersRecommendedResponse> 결과 = 회원_추천_API(동호_액세스_토큰).as(new TypeRef<>() {
+            });
+
+            // then
+            assertThat(결과).hasSize(1);
+            assertThat(결과.get(0).nickname()).isEqualTo(유진.getNickname());
+        }
+
+        @Test
+        void 비회원이_추천_사용자_조회한다() {
+            // given
+            회원을_저장한다(동호());
+            회원을_저장한다(정수());
+            회원을_저장한다(유진());
+
+            // when
+            List<UsersRecommendedResponse> 결과 = 비회원_추천_API().as(new TypeRef<>() {
+            });
+
+            // then
+            assertThat(결과).hasSize(3);
+        }
+
+        @Test
+        void 가장_최근에_리스트_생성_또는_수정한_사용자_순위대로_추천_사용자_조회한다() {
+            // given
+            var 동호 = 회원을_저장한다(동호());
+            var 정수 = 회원을_저장한다(정수());
+            var 유진 = 회원을_저장한다(유진());
+            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 유진_액세스_토큰 = 액세스_토큰을_발급한다(유진);
+
+            var 리스트_생성_요청_데이터 = 가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of());
+            var 동호_리스트_ID = 리스트_저장_API_호출(리스트_생성_요청_데이터, 동호_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+            리스트_저장_API_호출(리스트_생성_요청_데이터, 정수_액세스_토큰);
+            리스트_저장_API_호출(리스트_생성_요청_데이터, 유진_액세스_토큰);
+
+            var 리스트_수정_요청_데이터 = 아이템_순위와_라벨을_바꾼_좋아하는_견종_TOP3_요청_데이터(List.of(유진.getId()));
+            리스트_수정_API_호출(리스트_수정_요청_데이터, 동호_액세스_토큰, 동호_리스트_ID);
+
+            // when
+            List<UsersRecommendedResponse> 결과 = 비회원_추천_API().as(new TypeRef<>() {
+            });
+
+            // then
+            assertAll(
+                    () -> assertThat(결과).hasSize(3),
+                    () -> assertThat(결과.get(0).nickname()).isEqualTo(동호.getNickname()),
+                    () -> assertThat(결과.get(1).nickname()).isEqualTo(유진.getNickname()),
+                    () -> assertThat(결과.get(2).nickname()).isEqualTo(정수.getNickname())
+            );
+        }
     }
 
     @Nested
