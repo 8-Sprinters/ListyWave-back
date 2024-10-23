@@ -33,7 +33,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .from(listEntity)
                 .rightJoin(listEntity.user, user)
                 .where(
-                        userIdNe(me),
+                        userIdNotEqual(me),
                         userIdNotIn(myFollowingUserIds),
                         user.isDelete.isFalse()
                 )
@@ -44,10 +44,10 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     }
 
     private BooleanExpression userIdNotIn(List<Long> myFollowingUserIds) {
-        return myFollowingUserIds.isEmpty() ? null :  user.id.notIn(myFollowingUserIds);
+        return myFollowingUserIds.isEmpty() ? null : user.id.notIn(myFollowingUserIds);
     }
 
-    private BooleanExpression userIdNe(User me) {
+    private BooleanExpression userIdNotEqual(User me) {
         return me == null ? null : user.id.ne(me.getId());
     }
 
