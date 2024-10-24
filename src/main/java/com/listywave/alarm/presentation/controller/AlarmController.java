@@ -1,9 +1,10 @@
 package com.listywave.alarm.presentation.controller;
 
 import com.listywave.alarm.application.dto.AlarmCheckResponse;
-import com.listywave.alarm.application.dto.AlarmListResponse;
+import com.listywave.alarm.application.dto.AlarmFindResponse;
 import com.listywave.alarm.application.service.AlarmService;
 import com.listywave.common.auth.Auth;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,10 +19,10 @@ public class AlarmController {
     private final AlarmService alarmService;
 
     @GetMapping("/alarms")
-    ResponseEntity<AlarmListResponse> getAlarms(
+    ResponseEntity<List<AlarmFindResponse>> getAlarms(
             @Auth Long loginUserId
     ) {
-        AlarmListResponse response = alarmService.getAlarms(loginUserId);
+        List<AlarmFindResponse> response = alarmService.findAlarms(loginUserId);
         return ResponseEntity.ok(response);
     }
 

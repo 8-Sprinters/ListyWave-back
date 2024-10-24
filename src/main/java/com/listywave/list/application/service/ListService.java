@@ -3,7 +3,6 @@ package com.listywave.list.application.service;
 import static com.listywave.common.exception.ErrorCode.DUPLICATE_USER;
 import static com.listywave.common.exception.ErrorCode.RESOURCES_EMPTY;
 
-import com.listywave.alarm.application.domain.AlarmEvent;
 import com.listywave.alarm.repository.AlarmRepository;
 import com.listywave.collaborator.application.domain.Collaborator;
 import com.listywave.collaborator.application.domain.Collaborators;
@@ -104,11 +103,11 @@ public class ListService {
 
         historyService.saveHistory(savedList, LocalDateTime.now(), true);
 
-        if (hasCollaboration) {
-            Collaborators collaborators = collaboratorService.createCollaborators(collaboratorIds, savedList);
-            List<Collaborator> saved = collaboratorService.saveAll(collaborators);
-            saved.forEach(it -> applicationEventPublisher.publishEvent(AlarmEvent.collaborator(it, user)));
-        }
+//        if (hasCollaboration) {
+//            Collaborators collaborators = collaboratorService.createCollaborators(collaboratorIds, savedList);
+//            List<Collaborator> saved = collaboratorService.saveAll(collaborators);
+//            saved.forEach(it -> applicationEventPublisher.publishEvent(AlarmEvent.collaborator(it, user)));
+//        }
         return ListCreateResponse.of(savedList.getId());
     }
 
@@ -163,7 +162,7 @@ public class ListService {
         list.validateOwner(loginUser);
 
         collectionRepository.deleteAllByList(list);
-        alarmRepository.deleteAllByListId(list.getId());
+        alarmRepository.deleteAllByList(list);
         imageService.deleteAllOfListImages(listId);
         collaboratorService.deleteAllByList(list);
         List<Comment> comments = commentRepository.findAllByList(list);
@@ -275,7 +274,7 @@ public class ListService {
         lists.forEach(list -> list.validateOwner(loginUser));
 
         deleteListImages(lists);
-        alarmRepository.deleteAllByListIdIn(listIds);
+        alarmRepository.deleteAllByListsIn(lists);
         collectionRepository.deleteAllByListIn(lists);
         collaboratorService.deleteAllByListIn(lists);
         List<Comment> comments = commentRepository.findAllByListIn(lists);

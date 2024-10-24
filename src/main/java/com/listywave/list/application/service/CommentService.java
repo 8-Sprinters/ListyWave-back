@@ -46,7 +46,7 @@ public class CommentService {
 
         Comment comment = commentRepository.save(new Comment(list, writer, new CommentContent(content), mentions));
 
-        applicationEventPublisher.publishEvent(AlarmEvent.comment(list, comment));
+        applicationEventPublisher.publishEvent(AlarmEvent.comment(list, comment, mentions));
         return CommentCreateResponse.of(comment, writer);
     }
 
@@ -68,7 +68,7 @@ public class CommentService {
         Map<Comment, List<Reply>> result = comments.stream()
                 .collect(toMap(
                         identity(),
-                        replyRepository::getAllByComment,
+                        replyRepository::findAllByComment,
                         (exists, newValue) -> exists,
                         LinkedHashMap::new
                 ));

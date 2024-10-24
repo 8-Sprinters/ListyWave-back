@@ -9,6 +9,7 @@ public enum AlarmType {
     COLLECT,
     COMMENT,
     REPLY,
+    MENTION,
     COLLABORATOR,
     ;
 }

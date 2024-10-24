@@ -48,7 +48,7 @@ public class ReplyService {
         List<Mention> mentions = mentionService.toMentions(mentionIds);
         Reply reply = replyRepository.save(new Reply(comment, user, new CommentContent(content), mentions));
 
-        applicationEventPublisher.publishEvent(AlarmEvent.reply(comment, reply));
+        applicationEventPublisher.publishEvent(AlarmEvent.reply(comment, reply, mentions));
         return ReplyCreateResponse.of(reply, comment, user);
     }
 
