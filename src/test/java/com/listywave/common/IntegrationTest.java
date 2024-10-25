@@ -7,6 +7,7 @@ import static com.listywave.user.fixture.UserFixture.정수;
 
 import com.listywave.alarm.application.service.AlarmService;
 import com.listywave.alarm.repository.AlarmRepository;
+import com.listywave.auth.application.domain.kakao.KakaoOauthClient;
 import com.listywave.auth.application.service.AuthService;
 import com.listywave.collection.application.service.CollectionService;
 import com.listywave.collection.application.service.FolderService;
@@ -26,18 +27,20 @@ import com.listywave.user.application.service.UserService;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest
 public abstract class IntegrationTest {
 
     private static final Logger log = LoggerFactory.getLogger(IntegrationTest.class);
 
+    @MockBean
+    protected KakaoOauthClient kakaoOauthClient;
     @Autowired
     protected AuthService authService;
     @Autowired
@@ -78,16 +81,6 @@ public abstract class IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        dh = userRepository.save(동호());
-        js = userRepository.save(정수());
-        ej = userRepository.save(유진());
-        sy = userRepository.save(서영());
-        list = listRepository.save(ListFixture.가장_좋아하는_견종_TOP3(dh, List.of()));
-        log.info("=============================테스트 데이터 셋 생성=============================");
-    }
-
-    @AfterEach
-    void tearDown() {
         followRepository.deleteAllInBatch();
         collectionRepository.deleteAllInBatch();
         alarmRepository.deleteAllInBatch();
@@ -98,5 +91,12 @@ public abstract class IntegrationTest {
         labelRepository.deleteAllInBatch();
         listRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
+
+        dh = userRepository.save(동호());
+        js = userRepository.save(정수());
+        ej = userRepository.save(유진());
+        sy = userRepository.save(서영());
+        list = listRepository.save(ListFixture.가장_좋아하는_견종_TOP3(dh, List.of()));
+        log.info("=============================테스트 데이터 셋 생성=============================");
     }
 }
