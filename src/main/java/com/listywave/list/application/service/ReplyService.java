@@ -80,7 +80,7 @@ public class ReplyService {
         if (!reply.isOwner(user)) {
             throw new CustomException(INVALID_ACCESS, "답글은 작성자만 수정할 수 있습니다.");
         }
-        List<Mention> mentions = mentionService.toMentions(command.mentionIds());
-        reply.update(new CommentContent(command.content()), mentions);
+        List<Mention> newMentions = mentionService.toMentions(command.mentionIds());
+        reply.update(new CommentContent(command.content()), newMentions);
     }
 }

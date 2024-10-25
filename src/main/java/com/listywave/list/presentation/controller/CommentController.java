@@ -41,7 +41,7 @@ public class CommentController {
             @RequestParam(value = "size", defaultValue = "5") int size,
             @RequestParam(value = "cursorId", required = false) Long cursorId
     ) {
-        CommentFindResponse response = commentService.findCommentBy(listId, size, cursorId);
+        CommentFindResponse response = commentService.findAllBy(listId, size, cursorId);
         return ResponseEntity.ok(response);
     }
 

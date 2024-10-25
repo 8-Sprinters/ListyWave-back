@@ -51,7 +51,7 @@ public class CommentService {
         return CommentCreateResponse.of(comment, writer);
     }
 
-    public CommentFindResponse findCommentBy(Long listId, int size, Long cursorId) {
+    public CommentFindResponse findAllBy(Long listId, int size, Long cursorId) {
         ListEntity list = listRepository.getById(listId);
 
         List<Comment> comments = commentRepository.getComments(list, size, cursorId);
