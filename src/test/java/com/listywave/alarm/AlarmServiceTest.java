@@ -17,10 +17,7 @@ import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.annotation.Commit;
-import org.springframework.test.context.transaction.TestTransaction;
 
-@Commit
 public class AlarmServiceTest extends IntegrationTest {
 
     @Nested
@@ -31,11 +28,8 @@ public class AlarmServiceTest extends IntegrationTest {
 
             @Test
             void 리스트에_댓글_작성_시_작성자에게_알람이_생성된다() {
-                // given
-                Long commentId = commentService.create(list.getId(), js.getId(), "댓글", EMPTY_LIST).id();
-
                 // when
-                commit();
+                Long commentId = commentService.create(list.getId(), js.getId(), "댓글", EMPTY_LIST).id();
 
                 // then
                 List<AlarmFindResponse> result = alarmService.findAllBy(dh.getId());
@@ -50,11 +44,8 @@ public class AlarmServiceTest extends IntegrationTest {
 
             @Test
             void 본인_리스트에_댓글_작성_시_알람이_생성되지_않는다() {
-                // given
-                commentService.create(list.getId(), dh.getId(), "댓글", EMPTY_LIST);
-
                 // when
-                commit();
+                commentService.create(list.getId(), dh.getId(), "댓글", EMPTY_LIST);
 
                 // then
                 assertThat(alarmService.findAllBy(dh.getId())).isEmpty();
@@ -62,11 +53,8 @@ public class AlarmServiceTest extends IntegrationTest {
 
             @Test
             void 댓글_작성시_언급할_경우_언급_대상에게_알람이_생성된다() {
-                // given
-                commentService.create(list.getId(), js.getId(), "정수의 댓글", List.of(ej.getId(), sy.getId()));
-
                 // when
-                commit();
+                commentService.create(list.getId(), js.getId(), "정수의 댓글", List.of(ej.getId(), sy.getId()));
 
                 // then
                 List<AlarmFindResponse> ejAlarms = alarmService.findAllBy(ej.getId());
@@ -85,11 +73,8 @@ public class AlarmServiceTest extends IntegrationTest {
 
             @Test
             void 본인을_언급한_경우_알림이_생성되지_않는다() {
-                // given
-                commentService.create(list.getId(), js.getId(), "내가 쓴 댓글~", List.of(js.getId()));
-
                 // when
-                commit();
+                commentService.create(list.getId(), js.getId(), "내가 쓴 댓글~", List.of(js.getId()));
 
                 // then
                 List<AlarmFindResponse> result = alarmService.findAllBy(js.getId());
@@ -102,12 +87,9 @@ public class AlarmServiceTest extends IntegrationTest {
 
             @Test
             void 답글을_작성하면_댓글_작성자에게_알람이_생성된다() {
-                // given
+                // when
                 Long commentId = commentService.create(list.getId(), js.getId(), "댓글이용", EMPTY_LIST).id();
                 replyService.create(list.getId(), commentId, ej.getId(), "답글이용", List.of(js.getId()));
-
-                // when
-                commit();
 
                 // then
                 List<AlarmFindResponse> result = alarmService.findAllBy(js.getId());
@@ -123,12 +105,9 @@ public class AlarmServiceTest extends IntegrationTest {
 
             @Test
             void 본인_댓글에_답글을_남길_경우_알림이_생성되지_않는다() {
-                // given
+                // when
                 Long commentId = commentService.create(list.getId(), js.getId(), "정수가 남긴 댓글", EMPTY_LIST).id();
                 replyService.create(list.getId(), commentId, js.getId(), "정수가 쓴 답글", EMPTY_LIST);
-
-                // when
-                commit();
 
                 // then
                 List<AlarmFindResponse> result = alarmService.findAllBy(js.getId());
@@ -137,14 +116,11 @@ public class AlarmServiceTest extends IntegrationTest {
 
             @Test
             void 아무도_멘션을_하지_않은_채_답글을_달면_해당_댓글에_답글을_작성한_모든_사람들에게_알람이_생성된다() {
-                // given
+                // when
                 Long commentId = commentService.create(list.getId(), js.getId(), "정수의 댓글", EMPTY_LIST).id();
                 replyService.create(list.getId(), commentId, ej.getId(), "유진의 답글", List.of(js.getId()));
                 replyService.create(list.getId(), commentId, dh.getId(), "동호의 답글", List.of(js.getId()));
                 replyService.create(list.getId(), commentId, sy.getId(), "서영의 답글", EMPTY_LIST);
-
-                // when
-                commit();
 
                 // then
                 List<AlarmFindResponse> dhAlarms = alarmService.findAllBy(dh.getId());
@@ -162,12 +138,9 @@ public class AlarmServiceTest extends IntegrationTest {
 
             @Test
             void 답글_작성_시_제_3의_유저를_언급하면_대상에게_알람이_생성된다() {
-                // given
+                // when
                 Long commentId = commentService.create(list.getId(), js.getId(), "정수의 댓글", EMPTY_LIST).id();
                 replyService.create(list.getId(), commentId, ej.getId(), "이 댓글 진짜 웃기지 않나요?ㅋㅋㅋ", List.of(sy.getId()));
-
-                // when
-                commit();
 
                 // then
                 List<AlarmFindResponse> dhAlarms = alarmService.findAllBy(dh.getId());
@@ -187,12 +160,9 @@ public class AlarmServiceTest extends IntegrationTest {
 
             @Test
             void 본인을_언급했다면_알람이_생성되지_않는다() {
-                // given
+                // when
                 Long commentId = commentService.create(list.getId(), js.getId(), "정수의 댓글", EMPTY_LIST).id();
                 replyService.create(list.getId(), commentId, ej.getId(), "나중에 다시 볼 댓글~", List.of(ej.getId()));
-
-                // when
-                commit();
 
                 // then
                 List<AlarmFindResponse> result = alarmService.findAllBy(ej.getId());
@@ -205,11 +175,8 @@ public class AlarmServiceTest extends IntegrationTest {
 
             @Test
             void 댓글을_작성할_때_리스트_작성자를_멘션하면_우선순위에_의해_댓글_알람만_생성된다() {
-                // given
-                commentService.create(list.getId(), js.getId(), "이 리스트 진짜 재밌네요~!", List.of(dh.getId()));
-
                 // when
-                commit();
+                commentService.create(list.getId(), js.getId(), "이 리스트 진짜 재밌네요~!", List.of(dh.getId()));
 
                 // then
                 List<AlarmFindResponse> result = alarmService.findAllBy(dh.getId());
@@ -221,12 +188,9 @@ public class AlarmServiceTest extends IntegrationTest {
 
             @Test
             void 정수가_동호의_리스트에_작성된_유진의_댓글에_답글을_남기며_서영을_언급하는_경우() {
-                // given
+                // when
                 Long commentId = commentService.create(list.getId(), ej.getId(), "유진이 댓글 작성", EMPTY_LIST).id();
                 replyService.create(list.getId(), commentId, js.getId(), "나 정순데 서영님 언급하면서 유진님 댓글에 답글쓴다.", List.of(sy.getId()));
-
-                // when
-                commit();
 
                 // then
                 List<AlarmFindResponse> dhAlarms = alarmService.findAllBy(dh.getId());
@@ -263,12 +227,9 @@ public class AlarmServiceTest extends IntegrationTest {
 
             @Test
             void 누군가_내_리스트를_콜렉트하면_알람이_생성된다() {
-                // given
+                // when
                 Long folderId = folderService.create(js.getId(), "동호의 리스트 콜렉트용").folderId();
                 collectionService.collectOrCancel(list.getId(), folderId, js.getId());
-
-                // when
-                commit();
 
                 // then
                 List<AlarmFindResponse> result = alarmService.findAllBy(dh.getId());
@@ -283,11 +244,8 @@ public class AlarmServiceTest extends IntegrationTest {
 
             @Test
             void 누군가_나를_팔로우하면_알람이_생성된다() {
-                // given
-                userService.follow(js.getId(), dh.getId());
-
                 // when
-                commit();
+                userService.follow(js.getId(), dh.getId());
 
                 // then
                 List<AlarmFindResponse> result = alarmService.findAllBy(dh.getId());
@@ -303,13 +261,13 @@ public class AlarmServiceTest extends IntegrationTest {
 
         @Test
         void 알람은_최신순으로_정렬되어_응답한다() {
-            // given
+            // when
             commentService.create(list.getId(), js.getId(), "정수 댓글", EMPTY_LIST);
             commentService.create(list.getId(), ej.getId(), "유진 댓글", EMPTY_LIST);
             commentService.create(list.getId(), sy.getId(), "서영 댓글", EMPTY_LIST);
 
             // when
-            commit();
+            //commit();
 
             // then
             List<AlarmFindResponse> result = alarmService.findAllBy(dh.getId());
@@ -324,9 +282,9 @@ public class AlarmServiceTest extends IntegrationTest {
 
         @Test
         void 알람을_읽기_처리한다() {
-            // given
+            // when
             commentService.create(list.getId(), js.getId(), "댓글~!", EMPTY_LIST);
-            commit();
+            //commit();
 
             // when
             AlarmFindResponse alarm = alarmService.findAllBy(dh.getId()).get(0);
@@ -340,9 +298,9 @@ public class AlarmServiceTest extends IntegrationTest {
 
         @Test
         void 신규_알람_조회_시에_읽지_않은_알람이_있는_경우_true를_반환한다() {
-            // given
+            // when
             commentService.create(list.getId(), js.getId(), "댓글~!", EMPTY_LIST);
-            commit();
+            //commit();
 
             AlarmFindResponse dhAlarm = alarmService.findAllBy(dh.getId()).get(0);
             alarmService.check(dhAlarm.id());
@@ -356,9 +314,9 @@ public class AlarmServiceTest extends IntegrationTest {
 
         @Test
         void 신규_알람_조회_시에_읽지_않은_알람이_없는_경우_false를_반환한다() {
-            // given
+            // when
             commentService.create(list.getId(), js.getId(), "댓글~!", EMPTY_LIST);
-            commit();
+            //commit();
 
             // when
             AlarmCheckResponse result = alarmService.isAllChecked(dh.getId());
@@ -369,12 +327,12 @@ public class AlarmServiceTest extends IntegrationTest {
 
         @Test
         void 존재하는_모든_알람을_읽음_처리한다() {
-            // given
+            // when
             commentService.create(list.getId(), js.getId(), "정수 댓글", EMPTY_LIST);
             commentService.create(list.getId(), ej.getId(), "유진 댓글", EMPTY_LIST);
             commentService.create(list.getId(), sy.getId(), "서영 댓글", EMPTY_LIST);
 
-            commit();
+            //commit();
 
             assertThat(alarmService.isAllChecked(dh.getId()).isAllChecked()).isFalse();
 
@@ -392,7 +350,7 @@ public class AlarmServiceTest extends IntegrationTest {
         @Test
         @Disabled
         void _30일이_지난_알람은_자동_삭제된다() {
-            // given
+            // when
 
             // when
 
@@ -401,9 +359,9 @@ public class AlarmServiceTest extends IntegrationTest {
 
         @Test
         void 댓글이_삭제될_경우_관련_알람도_모두_삭제된다() {
-            // given
+            // when
             Long commentId = commentService.create(list.getId(), js.getId(), "정수 댓글!", List.of(ej.getId())).id();
-            commit();
+            //commit();
             assertThat(alarmService.findAllBy(dh.getId())).hasSize(1);
             assertThat(alarmService.findAllBy(ej.getId())).hasSize(1);
 
@@ -417,10 +375,10 @@ public class AlarmServiceTest extends IntegrationTest {
 
         @Test
         void 답글이_삭제될_경우_관련_알람도_모두_삭제된다() {
-            // given
+            // when
             Long commentId = commentService.create(list.getId(), js.getId(), "정수 댓글!", EMPTY_LIST).id();
             Long replyId = replyService.create(list.getId(), commentId, ej.getId(), "답글이용", List.of(js.getId())).id();
-            commit();
+            //commit();
 
             // when
             replyService.delete(new ReplyDeleteCommand(list.getId(), commentId, replyId), ej.getId());
@@ -434,12 +392,12 @@ public class AlarmServiceTest extends IntegrationTest {
 
         @Test
         void 댓글에서_언급되어_생성된_알람은_댓글이_삭제되면_함께_삭제된다() {
-            // given
+            // when
             Long commentId = commentService.create(list.getId(), js.getId(), "정수 댓글", List.of(ej.getId())).id();
             commentService.create(list.getId(), ej.getId(), "유진 댓글", List.of(sy.getId()));
             commentService.create(list.getId(), sy.getId(), "서영 댓글", EMPTY_LIST);
 
-            commit();
+            //commit();
             assertThat(alarmService.findAllBy(dh.getId())).hasSize(3);
             assertThat(alarmService.findAllBy(js.getId())).isEmpty();
             assertThat(alarmService.findAllBy(ej.getId())).hasSize(1);
@@ -457,14 +415,14 @@ public class AlarmServiceTest extends IntegrationTest {
 
         @Test
         void 답글에서_언급되어_생성된_알람은_답글이_삭제되면_함께_삭제된다() {
-            // given
+            // when
             commentService.create(list.getId(), js.getId(), "ㅋㅋ", EMPTY_LIST);
             Long commentId = commentService.create(list.getId(), ej.getId(), "굿", List.of(dh.getId())).id();
             replyService.create(list.getId(), commentId, js.getId(), "1", List.of(ej.getId()));
             replyService.create(list.getId(), commentId, js.getId(), "2", List.of(ej.getId()));
             Long replyId = replyService.create(list.getId(), commentId, sy.getId(), "웃겨요", List.of(ej.getId(), dh.getId())).id();
 
-            commit();
+            //commit();
 
             assertThat(alarmService.findAllBy(dh.getId())).hasSize(3);
             assertThat(alarmService.findAllBy(js.getId())).isEmpty();
@@ -482,11 +440,5 @@ public class AlarmServiceTest extends IntegrationTest {
                     () -> assertThat(alarmService.findAllBy(sy.getId())).isEmpty()
             );
         }
-    }
-
-    private void commit() {
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
-        TestTransaction.start();
     }
 }
