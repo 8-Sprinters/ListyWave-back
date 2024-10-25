@@ -14,7 +14,6 @@ import com.listywave.alarm.application.dto.AlarmFindResponse;
 import com.listywave.common.IntegrationTest;
 import com.listywave.list.application.dto.ReplyDeleteCommand;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,20 +22,6 @@ import org.springframework.test.context.transaction.TestTransaction;
 
 @Commit
 public class AlarmServiceTest extends IntegrationTest {
-
-    @AfterEach
-    void tearDown() {
-        followRepository.deleteAllInBatch();
-        collectionRepository.deleteAllInBatch();
-        alarmRepository.deleteAllInBatch();
-        mentionRepository.deleteAllInBatch();
-        replyRepository.deleteAllInBatch();
-        commentRepository.deleteAllInBatch();
-        itemRepository.deleteAllInBatch();
-        labelRepository.deleteAllInBatch();
-        listRepository.deleteAllInBatch();
-        userRepository.deleteAllInBatch();
-    }
 
     @Nested
     class 알람_생성 {

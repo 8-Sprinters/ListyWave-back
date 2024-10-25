@@ -86,6 +86,17 @@ public abstract class IntegrationTest {
 
     @BeforeEach
     void setUp() {
+        followRepository.deleteAllInBatch();
+        collectionRepository.deleteAllInBatch();
+        alarmRepository.deleteAllInBatch();
+        mentionRepository.deleteAllInBatch();
+        replyRepository.deleteAllInBatch();
+        commentRepository.deleteAllInBatch();
+        itemRepository.deleteAllInBatch();
+        labelRepository.deleteAllInBatch();
+        listRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
+
         dh = userRepository.save(동호());
         js = userRepository.save(정수());
         ej = userRepository.save(유진());
