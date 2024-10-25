@@ -180,11 +180,11 @@ public class ListEntity {
         return totalScore;
     }
 
-    public void increaseCollectCount() {
+    public synchronized void increaseCollectCount() {
         this.collectCount++;
     }
 
-    public void decreaseCollectCount() {
+    public synchronized void decreaseCollectCount() {
         if (this.collectCount > 0) {
             this.collectCount--;
         }
