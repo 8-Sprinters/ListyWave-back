@@ -1,8 +1,10 @@
 package com.listywave.list.application.service;
 
-import com.listywave.alarm.application.domain.AlarmEvent;
+import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
+
+import com.listywave.alarm.application.domain.AlarmCreateEvent;
+import com.listywave.alarm.application.domain.AlarmDeleteEvent;
 import com.listywave.common.exception.CustomException;
-import com.listywave.common.exception.ErrorCode;
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.comment.CommentContent;
 import com.listywave.list.application.domain.reply.Reply;
@@ -48,7 +50,7 @@ public class ReplyService {
         List<Mention> mentions = mentionService.toMentions(mentionIds);
         Reply reply = replyRepository.save(new Reply(comment, user, new CommentContent(content), mentions));
 
-        applicationEventPublisher.publishEvent(AlarmEvent.reply(comment, reply));
+        applicationEventPublisher.publishEvent(AlarmCreateEvent.reply(comment, reply, mentions));
         return ReplyCreateResponse.of(reply, comment, user);
     }
 
@@ -59,9 +61,10 @@ public class ReplyService {
         Reply reply = replyRepository.getById(command.replyId());
 
         if (!reply.isOwner(user)) {
-            throw new CustomException(ErrorCode.INVALID_ACCESS, "답글은 작성자만 삭제할 수 있습니다.");
+            throw new CustomException(INVALID_ACCESS, "답글은 작성자만 삭제할 수 있습니다.");
         }
 
+        applicationEventPublisher.publishEvent(AlarmDeleteEvent.reply(reply));
         replyRepository.deleteById(command.replyId());
         if (!replyRepository.existsByComment(comment) && comment.isDeleted()) {
             commentRepository.delete(comment);
@@ -75,7 +78,7 @@ public class ReplyService {
         Reply reply = replyRepository.getById(command.replyId());
 
         if (!reply.isOwner(user)) {
-            throw new CustomException(ErrorCode.INVALID_ACCESS, "답글은 작성자만 수정할 수 있습니다.");
+            throw new CustomException(INVALID_ACCESS, "답글은 작성자만 수정할 수 있습니다.");
         }
         List<Mention> mentions = mentionService.toMentions(command.mentionIds());
         reply.update(new CommentContent(command.content()), mentions);

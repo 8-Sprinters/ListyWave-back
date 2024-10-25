@@ -4,7 +4,8 @@ import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
-import com.listywave.alarm.application.domain.AlarmEvent;
+import com.listywave.alarm.application.domain.AlarmCreateEvent;
+import com.listywave.alarm.application.domain.AlarmDeleteEvent;
 import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.comment.CommentContent;
@@ -46,7 +47,7 @@ public class CommentService {
 
         Comment comment = commentRepository.save(new Comment(list, writer, new CommentContent(content), mentions));
 
-        applicationEventPublisher.publishEvent(AlarmEvent.comment(list, comment));
+        applicationEventPublisher.publishEvent(AlarmCreateEvent.comment(list, comment, mentions));
         return CommentCreateResponse.of(comment, writer);
     }
 
@@ -68,7 +69,7 @@ public class CommentService {
         Map<Comment, List<Reply>> result = comments.stream()
                 .collect(toMap(
                         identity(),
-                        replyRepository::getAllByComment,
+                        replyRepository::findAllByComment,
                         (exists, newValue) -> exists,
                         LinkedHashMap::new
                 ));
@@ -89,6 +90,7 @@ public class CommentService {
             comment.softDelete();
             return;
         }
+        applicationEventPublisher.publishEvent(AlarmDeleteEvent.comment(comment));
         commentRepository.delete(comment);
     }
 

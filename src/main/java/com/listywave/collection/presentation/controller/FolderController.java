@@ -1,5 +1,7 @@
 package com.listywave.collection.presentation.controller;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 import com.listywave.collection.application.dto.FindFolderResponse;
 import com.listywave.collection.application.dto.FolderCreateResponse;
 import com.listywave.collection.application.service.FolderService;
@@ -8,9 +10,13 @@ import com.listywave.collection.presentation.dto.FolderUpdateRequest;
 import com.listywave.common.auth.Auth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import static org.springframework.http.HttpStatus.CREATED;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +29,7 @@ public class FolderController {
             @Auth Long loginUserId,
             @RequestBody FolderCreateRequest request
     ) {
-        FolderCreateResponse response = folderService.createFolder(loginUserId, request.folderName());
+        FolderCreateResponse response = folderService.create(loginUserId, request.folderName());
         return ResponseEntity.status(CREATED).body(response);
     }
 

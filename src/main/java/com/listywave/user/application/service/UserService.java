@@ -5,7 +5,7 @@ import static com.listywave.common.exception.ErrorCode.ALREADY_NOT_FOLLOWED_EXCE
 import static com.listywave.common.exception.ErrorCode.DUPLICATE_NICKNAME_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 
-import com.listywave.alarm.application.domain.AlarmEvent;
+import com.listywave.alarm.application.domain.AlarmCreateEvent;
 import com.listywave.common.exception.CustomException;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
@@ -83,14 +83,14 @@ public class UserService {
 
         User followingUser = userRepository.getById(followingUserId);
         User followerUser = userRepository.getById(followerUserId);
-
         if (followRepository.existsByFollowerUserAndFollowingUser(followerUser, followingUser)) {
             throw new CustomException(ALREADY_FOLLOWED_EXCEPTION);
         }
 
         followRepository.save(new Follow(followingUser, followerUser));
         followerUser.follow(followingUser);
-        applicationEventPublisher.publishEvent(AlarmEvent.follow(followerUser, followingUser));
+
+        applicationEventPublisher.publishEvent(AlarmCreateEvent.follow(followingUser, followerUser));
     }
 
     public void unfollow(Long followingUserId, Long followerUserId) {
@@ -181,7 +181,7 @@ public class UserService {
         return userElasticRepository.findAll(user.getId(), keyword, pageable);
     }
 
-    public User getById(Long userId){
+    public User getById(Long userId) {
         return userRepository.getById(userId);
     }
 }
