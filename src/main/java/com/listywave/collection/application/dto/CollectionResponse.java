@@ -10,11 +10,17 @@ import lombok.Builder;
 public record CollectionResponse(
         Long cursorId,
         Boolean hasNext,
-        List<CollectionListsResponse> collectionLists
+        List<CollectionListsResponse> collectionLists,
+        String folderName
 ) {
 
-    public static CollectionResponse of(Long cursorId, Boolean hasNext, List<Collect> collects) {
-        return new CollectionResponse(cursorId, hasNext, toList(collects));
+    public static CollectionResponse of(
+            Long cursorId,
+            Boolean hasNext,
+            List<Collect> collects,
+            String folderName
+    ) {
+        return new CollectionResponse(cursorId, hasNext, toList(collects), folderName);
     }
 
     public static List<CollectionListsResponse> toList(List<Collect> collects) {

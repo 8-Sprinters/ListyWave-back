@@ -62,7 +62,7 @@ public class CollectionService {
 
     public CollectionResponse getCollection(Long loginUserId, Long cursorId, Pageable pageable, Long folderId) {
         User user = userRepository.getById(loginUserId);
-        folderRepository.getById(folderId);
+        Folder folder = folderRepository.getById(folderId);
         Slice<Collect> result = collectionRepository.getAllCollectionList(cursorId, pageable, user.getId(), folderId);
         List<Collect> collectionList = result.getContent();
 
@@ -70,7 +70,7 @@ public class CollectionService {
         if (!collectionList.isEmpty()) {
             cursorId = collectionList.get(collectionList.size() - 1).getId();
         }
-        return CollectionResponse.of(cursorId, result.hasNext(), collectionList);
+        return CollectionResponse.of(cursorId, result.hasNext(), collectionList, folder.getFolderName());
     }
 
     public List<CategoryTypeResponse> getCategoriesOfCollection(Long loginUserId) {
