@@ -1,7 +1,9 @@
 package com.listywave.list.application.domain.category;
 
 import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
+@Converter(autoApply = true)
 public class CategoryTypeConverter implements AttributeConverter<CategoryType, String> {
 
     @Override
