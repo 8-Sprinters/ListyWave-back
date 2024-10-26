@@ -96,7 +96,7 @@ public class MentionServiceTest extends IntegrationTest {
             commentRepository.getById(savedCommentId);
 
             // when
-            CommentFindResponse response = commentService.findCommentBy(list.getId(), 5, null);
+            CommentFindResponse response = commentService.findAllBy(list.getId(), 5, null);
             CommentDto commentDto = response.comments().get(0);
 
             // then
@@ -114,7 +114,7 @@ public class MentionServiceTest extends IntegrationTest {
             commentRepository.getById(savedCommentId);
 
             // when
-            CommentFindResponse response = commentService.findCommentBy(list.getId(), 5, null);
+            CommentFindResponse response = commentService.findAllBy(list.getId(), 5, null);
             CommentDto commentDto = response.comments().get(0);
 
             // then
@@ -131,7 +131,7 @@ public class MentionServiceTest extends IntegrationTest {
             authService.withdraw(js.getId());
 
             // then
-            CommentFindResponse response = commentService.findCommentBy(list.getId(), 5, null);
+            CommentFindResponse response = commentService.findAllBy(list.getId(), 5, null);
             CommentDto commentDto = response.comments().get(0);
 
             assertThat(commentDto.mentions()).hasSize(1);
@@ -146,7 +146,7 @@ public class MentionServiceTest extends IntegrationTest {
             replyService.create(list.getId(), commentId, js.getId(), "답글이용", mentionIds);
 
             // when
-            List<CommentDto> comments = commentService.findCommentBy(list.getId(), 5, null).comments();
+            List<CommentDto> comments = commentService.findAllBy(list.getId(), 5, null).comments();
             ReplyDto reply = comments.get(0).replies().get(0);
 
             // then
@@ -161,7 +161,7 @@ public class MentionServiceTest extends IntegrationTest {
             replyService.create(list.getId(), commentId, js.getId(), "답글이용", EMPTY_LIST);
 
             // when
-            List<CommentDto> comments = commentService.findCommentBy(list.getId(), 5, null).comments();
+            List<CommentDto> comments = commentService.findAllBy(list.getId(), 5, null).comments();
             ReplyDto reply = comments.get(0).replies().get(0);
 
             // then
@@ -178,7 +178,7 @@ public class MentionServiceTest extends IntegrationTest {
             authService.withdraw(ej.getId());
 
             // when
-            List<CommentDto> comments = commentService.findCommentBy(list.getId(), 5, null).comments();
+            List<CommentDto> comments = commentService.findAllBy(list.getId(), 5, null).comments();
             ReplyDto reply = comments.get(0).replies().get(0);
 
             // then
@@ -203,7 +203,7 @@ public class MentionServiceTest extends IntegrationTest {
             commentService.update(list.getId(), dh.getId(), commentId, "댓글 수정이요", newMentionIds);
 
             // then
-            CommentFindResponse response = commentService.findCommentBy(list.getId(), 5, null);
+            CommentFindResponse response = commentService.findAllBy(list.getId(), 5, null);
             List<MentionDto> result = response.comments().get(0).mentions();
             assertAll(
                     () -> assertThat(result).hasSize(2),
@@ -222,7 +222,7 @@ public class MentionServiceTest extends IntegrationTest {
             commentService.update(list.getId(), dh.getId(), commentId, "댓글 수정이요", EMPTY_LIST);
 
             // then
-            CommentFindResponse response = commentService.findCommentBy(list.getId(), 5, null);
+            CommentFindResponse response = commentService.findAllBy(list.getId(), 5, null);
             List<MentionDto> result = response.comments().get(0).mentions();
             assertThat(result).isEmpty();
         }
@@ -231,8 +231,8 @@ public class MentionServiceTest extends IntegrationTest {
         void 답글을_수정해_새로운_멘션을_추가한다() {
             // given
             Long commentId = commentService.create(list.getId(), dh.getId(), "댓글이요", EMPTY_LIST).id();
-            List<Long> firstMentionIds = List.of(dh.getId());
-            Long replyId = replyService.create(list.getId(), commentId, js.getId(), "답글이요", firstMentionIds).id();
+            List<Long> initialMentionIds = List.of(dh.getId());
+            Long replyId = replyService.create(list.getId(), commentId, js.getId(), "답글이요", initialMentionIds).id();
 
             // when
             List<Long> newMentionIds = List.of(dh.getId(), ej.getId());
@@ -240,12 +240,16 @@ public class MentionServiceTest extends IntegrationTest {
             replyService.update(replyUpdateCommand, js.getId());
 
             // then
-            CommentFindResponse response = commentService.findCommentBy(list.getId(), 5, null);
-            List<MentionDto> result = response.comments().get(0).replies().get(0).mentions();
+            CommentFindResponse response = commentService.findAllBy(list.getId(), 5, null);
+            ReplyDto result = response.comments().get(0).replies().get(0);
             assertAll(
-                    () -> assertThat(result).hasSize(2),
-                    () -> assertThat(result.get(0).userId()).isEqualTo(dh.getId()),
-                    () -> assertThat(result.get(1).userId()).isEqualTo(ej.getId())
+                    () -> assertThat(result.content()).isEqualTo("답글 수정이요"),
+                    () -> {
+                        List<MentionDto> mentions = result.mentions();
+                        assertThat(mentions).hasSize(2);
+                        assertThat(mentions.get(0).userId()).isEqualTo(dh.getId());
+                        assertThat(mentions.get(1).userId()).isEqualTo(ej.getId());
+                    }
             );
         }
 
@@ -261,7 +265,7 @@ public class MentionServiceTest extends IntegrationTest {
             replyService.update(replyUpdateCommand, js.getId());
 
             // then
-            CommentFindResponse response = commentService.findCommentBy(list.getId(), 5, null);
+            CommentFindResponse response = commentService.findAllBy(list.getId(), 5, null);
             List<MentionDto> result = response.comments().get(0).replies().get(0).mentions();
             assertThat(result).isEmpty();
         }

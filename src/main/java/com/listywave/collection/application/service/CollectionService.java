@@ -1,6 +1,6 @@
 package com.listywave.collection.application.service;
 
-import com.listywave.alarm.application.domain.AlarmEvent;
+import com.listywave.alarm.application.domain.AlarmCreateEvent;
 import com.listywave.collection.application.domain.Collect;
 import com.listywave.collection.application.domain.Folder;
 import com.listywave.collection.application.dto.CollectionResponse;
@@ -32,19 +32,24 @@ public class CollectionService {
     private final CollectionRepository collectionRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public void collectOrCancel(Long listId, Long folderId, Long loginUserId) {
-        User loginUser = userRepository.getById(loginUserId);
+    public void collectOrCancel(Long listId, Long folderId, Long userId) {
+        User user = userRepository.getById(userId);
         ListEntity list = listRepository.getById(listId);
         Folder folder = folderRepository.getById(folderId);
 
-        folder.validateOwner(loginUserId);
-        list.validateNotOwner(loginUser);
+        folder.validateOwner(userId);
+        list.validateNotOwner(user);
 
-        if (collectionRepository.existsByListAndUserId(list, loginUser.getId())) {
-            cancelCollect(list, loginUser.getId());
+        if (collectionRepository.existsByListAndUserId(list, user.getId())) {
+            cancelCollect(list, user.getId());
         } else {
-            addCollect(list, loginUser, folder);
+            addCollect(list, user, folder);
         }
+    }
+
+    private void cancelCollect(ListEntity list, Long userId) {
+        collectionRepository.deleteByListAndUserId(list, userId);
+        list.decreaseCollectCount();
     }
 
     private void addCollect(ListEntity list, User user, Folder folder) {
@@ -52,12 +57,7 @@ public class CollectionService {
         collectionRepository.save(collection);
         list.increaseCollectCount();
 
-        applicationEventPublisher.publishEvent(AlarmEvent.collect(user, list));
-    }
-
-    private void cancelCollect(ListEntity list, Long userId) {
-        collectionRepository.deleteByListAndUserId(list, userId);
-        list.decreaseCollectCount();
+        applicationEventPublisher.publishEvent(AlarmCreateEvent.collect(user, list));
     }
 
     public CollectionResponse getCollection(Long loginUserId, Long cursorId, Pageable pageable, Long folderId) {
