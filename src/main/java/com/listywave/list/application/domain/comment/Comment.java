@@ -64,6 +64,7 @@ public class Comment extends BaseEntity {
     public void update(CommentContent content, List<Mention> mentions) {
         this.commentContent = content;
         DataUpdateUtils.update(this.mentions, mentions);
+        mentions.forEach(mention -> mention.setComment(this));
     }
 
     public boolean isDeleted() {
