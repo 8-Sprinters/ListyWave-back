@@ -51,7 +51,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -75,7 +74,6 @@ public class ListService {
     private final AlarmRepository alarmRepository;
     private final CollaboratorService collaboratorService;
     private final HistoryService historyService;
-    private final ApplicationEventPublisher applicationEventPublisher;
 
     public ListCreateResponse listCreate(ListCreateRequest request, Long loginUserId) {
         User user = userRepository.getById(loginUserId);

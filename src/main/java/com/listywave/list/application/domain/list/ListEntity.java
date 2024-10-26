@@ -12,13 +12,11 @@ import static lombok.AccessLevel.PROTECTED;
 import com.listywave.collaborator.application.domain.Collaborators;
 import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.category.CategoryType;
-import com.listywave.list.application.domain.category.CategoryTypeConverter;
 import com.listywave.list.application.domain.item.Item;
 import com.listywave.list.application.domain.item.Items;
 import com.listywave.list.application.domain.label.Labels;
 import com.listywave.user.application.domain.User;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -56,7 +54,6 @@ public class ListEntity {
     private User user;
 
     @Column(name = "category_code", length = 10, nullable = false)
-    @Convert(converter = CategoryTypeConverter.class)
     private CategoryType category;
 
     @Embedded
