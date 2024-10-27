@@ -1,16 +1,23 @@
-package com.listywave.list.application.domain.reaction;
+package com.listywave.reaction.application.domain;
+
+import static jakarta.persistence.FetchType.LAZY;
+import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.BaseEntity;
 import com.listywave.list.application.domain.list.ListEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import static jakarta.persistence.FetchType.LAZY;
-import static lombok.AccessLevel.PROTECTED;
 
 @Getter
 @Entity
@@ -32,7 +39,7 @@ public class ReactionStats extends BaseEntity {
     @Column(nullable = false)
     private int count;
 
-    public void updateCount(int changeCount) {
+    public synchronized void updateCount(int changeCount) {
         this.count += changeCount;
     }
 }

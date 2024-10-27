@@ -1,4 +1,4 @@
-package com.listywave.list.application.dto.response;
+package com.listywave.reaction.application.dto.response;
 
 import lombok.Builder;
 

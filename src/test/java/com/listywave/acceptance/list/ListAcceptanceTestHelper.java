@@ -11,21 +11,16 @@ import com.listywave.history.application.dto.HistorySearchResponse.HistoryItemIn
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.BackgroundColor;
 import com.listywave.list.application.domain.list.BackgroundPalette;
-import com.listywave.list.application.domain.reaction.Reaction;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse.ItemResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
-import com.listywave.list.presentation.dto.request.ReactionRequest;
 import com.listywave.user.application.domain.User;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class ListAcceptanceTestHelper {
 
@@ -256,24 +251,5 @@ public abstract class ListAcceptanceTestHelper {
                 .when().patch("/lists/{listId}/visibility", listId)
                 .then().log().all()
                 .extract();
-    }
-
-    public static ExtractableResponse<Response> 리액션_API_호출(String accessToken, Long listId, ReactionRequest request) {
-        return given()
-                .header(AUTHORIZATION, "Bearer " + accessToken)
-                .body(request)
-                .when().post("/lists/{listId}/reaction", listId)
-                .then().log().all()
-                .extract();
-    }
-
-    public static List<ReactionRequest> 리액션_요청_데이터_리스트(Reaction... reactions) {
-        return Arrays.stream(reactions)
-                .map(ReactionRequest::new)
-                .collect(Collectors.toList());
-    }
-
-    public static void 리액션_일괄_호출(String accessToken, Long listId, List<ReactionRequest> reactionRequests) {
-        reactionRequests.forEach(reaction -> 리액션_API_호출(accessToken, listId, reaction));
     }
 }

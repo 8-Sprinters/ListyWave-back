@@ -13,7 +13,6 @@ import com.listywave.list.application.service.ListService;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
 import com.listywave.list.presentation.dto.request.ListsDeleteRequest;
-import com.listywave.list.presentation.dto.request.ReactionRequest;
 import com.listywave.user.application.dto.FindFeedListResponse;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -140,16 +139,6 @@ public class ListController {
             @PathVariable("listId") Long listId
     ) {
         listService.changeVisibility(loginUserId, listId);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/lists/{listId}/reaction")
-    public ResponseEntity<String> handleReaction(
-            @Auth Long loginUserId,
-            @PathVariable("listId") Long listId,
-            @RequestBody ReactionRequest request
-    ) {
-        listService.handleReaction(loginUserId, listId, request.reaction());
         return ResponseEntity.noContent().build();
     }
 }

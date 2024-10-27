@@ -5,6 +5,7 @@ import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.item.Item;
 import com.listywave.list.application.domain.label.Label;
 import com.listywave.list.application.domain.list.ListEntity;
+import com.listywave.reaction.application.dto.response.ReactionResponse;
 import com.listywave.user.application.domain.User;
 import jakarta.annotation.Nullable;
 import java.time.LocalDateTime;
