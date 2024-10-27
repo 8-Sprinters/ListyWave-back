@@ -43,4 +43,10 @@ public class Topic extends BaseEntity {
 
     @Column(nullable = false)
     private boolean isExposed;
+
+    public void update(boolean isExposed, CategoryType categoryType, String title) {
+        this.isExposed = isExposed;
+        this.category = categoryType;
+        this.title = new ListTitle(title);
+    }
 }
