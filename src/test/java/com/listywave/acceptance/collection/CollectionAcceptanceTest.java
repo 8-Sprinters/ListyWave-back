@@ -17,8 +17,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 import com.listywave.acceptance.common.AcceptanceTest;
-import com.listywave.collection.application.dto.CollectionResponse;
-import com.listywave.collection.application.dto.CollectionResponse.CollectionListsResponse;
+import com.listywave.collection.application.dto.CollectionFindResponse;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.dto.response.ListCreateResponse;
 import java.util.List;
@@ -115,9 +114,40 @@ public class CollectionAcceptanceTest extends AcceptanceTest {
 
         // when
         var 결과 = 나의_콜렉션_조회_API_호출(정수_엑세스_토큰, 1L)
-                .as(CollectionResponse.class)
+                .as(CollectionFindResponse.class)
                 .collectionLists().stream()
-                .map(CollectionListsResponse::list)
+                .map(CollectionFindResponse.CollectionDto::list)
+                .collect(Collectors.toList());
+
+        // then
+        assertThat(결과).usingRecursiveComparison()
+                .comparingOnlyFields("id")
+                .isEqualTo(생성한_리스트.stream().map(ListEntity::getId).toList());
+    }
+
+    @Test
+    void 나의_전체_콜렉션을_조회한다() {
+        // given
+        var 동호 = 회원을_저장한다(동호());
+        var 정수 = 회원을_저장한다(정수());
+        var 정수_엑세스_토큰 = 액세스_토큰을_발급한다(정수);
+        var 생성한_리스트 = 지정된_개수만큼_리스트를_생성한다(동호, 2);
+        리스트를_모두_저장한다(생성한_리스트);
+
+        var 폴더_생성_요청_데이터1 = 폴더_생성_요청_데이터("맛집");
+        var 폴더_생성_요청_데이터2 = 폴더_생성_요청_데이터("예카");
+        var 폴더_선택_데이터1 = 폴더_선택_요청_데이터(1L);
+        var 폴더_선택_데이터2 = 폴더_선택_요청_데이터(2L);
+        폴더_생성_API_호출(정수_엑세스_토큰, 폴더_생성_요청_데이터1);
+        폴더_생성_API_호출(정수_엑세스_토큰, 폴더_생성_요청_데이터2);
+        콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 1L, 폴더_선택_데이터1);
+        콜렉트_또는_콜렉트취소_API_호출(정수_엑세스_토큰, 2L, 폴더_선택_데이터2);
+
+        // when
+        var 결과 = 나의_콜렉션_조회_API_호출(정수_엑세스_토큰, 0L)
+                .as(CollectionFindResponse.class)
+                .collectionLists().stream()
+                .map(CollectionFindResponse.CollectionDto::list)
                 .collect(Collectors.toList());
 
         // then

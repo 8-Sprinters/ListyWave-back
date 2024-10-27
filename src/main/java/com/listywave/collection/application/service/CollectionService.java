@@ -3,7 +3,7 @@ package com.listywave.collection.application.service;
 import com.listywave.alarm.application.domain.AlarmCreateEvent;
 import com.listywave.collection.application.domain.Collect;
 import com.listywave.collection.application.domain.Folder;
-import com.listywave.collection.application.dto.CollectionResponse;
+import com.listywave.collection.application.dto.CollectionFindResponse;
 import com.listywave.collection.repository.CollectionRepository;
 import com.listywave.collection.repository.FolderRepository;
 import com.listywave.list.application.domain.category.CategoryType;
@@ -31,6 +31,8 @@ public class CollectionService {
     private final FolderRepository folderRepository;
     private final CollectionRepository collectionRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    private final static String FOLDER_ENTIRE_NAME = "전체";
 
     public void collectOrCancel(Long listId, Long folderId, Long userId) {
         User user = userRepository.getById(userId);
@@ -60,9 +62,13 @@ public class CollectionService {
         applicationEventPublisher.publishEvent(AlarmCreateEvent.collect(user, list));
     }
 
-    public CollectionResponse getCollection(Long loginUserId, Long cursorId, Pageable pageable, Long folderId) {
-        User user = userRepository.getById(loginUserId);
-        folderRepository.getById(folderId);
+    public CollectionFindResponse getCollection(Long userId, Long cursorId, Pageable pageable, Long folderId) {
+        User user = userRepository.getById(userId);
+        String folderName = FOLDER_ENTIRE_NAME;
+        if (folderId != 0L) {
+            Folder folder = folderRepository.getById(folderId);
+            folderName = folder.getFolderName();
+        }
         Slice<Collect> result = collectionRepository.getAllCollectionList(cursorId, pageable, user.getId(), folderId);
         List<Collect> collectionList = result.getContent();
 
@@ -70,7 +76,7 @@ public class CollectionService {
         if (!collectionList.isEmpty()) {
             cursorId = collectionList.get(collectionList.size() - 1).getId();
         }
-        return CollectionResponse.of(cursorId, result.hasNext(), collectionList);
+        return CollectionFindResponse.of(cursorId, result.hasNext(), collectionList, folderName);
     }
 
     public List<CategoryTypeResponse> getCategoriesOfCollection(Long loginUserId) {
