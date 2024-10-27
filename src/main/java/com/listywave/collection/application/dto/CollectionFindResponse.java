@@ -7,44 +7,44 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 
-public record CollectionResponse(
+public record CollectionFindResponse(
         Long cursorId,
         Boolean hasNext,
-        List<CollectionListsResponse> collectionLists,
+        List<CollectionDto> collectionLists,
         String folderName
 ) {
 
-    public static CollectionResponse of(
+    public static CollectionFindResponse of(
             Long cursorId,
             Boolean hasNext,
             List<Collect> collects,
             String folderName
     ) {
-        return new CollectionResponse(cursorId, hasNext, toList(collects), folderName);
+        return new CollectionFindResponse(cursorId, hasNext, toList(collects), folderName);
     }
 
-    public static List<CollectionListsResponse> toList(List<Collect> collects) {
+    public static List<CollectionDto> toList(List<Collect> collects) {
         return collects.stream()
-                .map(CollectionListsResponse::of)
+                .map(CollectionDto::of)
                 .toList();
     }
 
-    public record CollectionListsResponse(
+    public record CollectionDto(
             Long id,
-            ListsResponse list
+            ListsDto list
     ) {
 
-        public static CollectionListsResponse of(Collect collect) {
-            return new CollectionListsResponse(collect.getId(), toResponse(collect.getList()));
+        public static CollectionDto of(Collect collect) {
+            return new CollectionDto(collect.getId(), toResponse(collect.getList()));
         }
 
-        public static ListsResponse toResponse(ListEntity list) {
-            return ListsResponse.of(list);
+        public static ListsDto toResponse(ListEntity list) {
+            return ListsDto.of(list);
         }
     }
 
     @Builder
-    public record ListsResponse(
+    public record ListsDto(
             Long id,
             String backgroundColor,
             String title,
@@ -54,11 +54,11 @@ public record CollectionResponse(
             String representativeImageUrl,
             String category,
             LocalDateTime updatedDate,
-            List<ListItemsResponse> listItems
+            List<ListItemsDto> listItems
     ) {
 
-        public static ListsResponse of(ListEntity list) {
-            return ListsResponse.builder()
+        public static ListsDto of(ListEntity list) {
+            return ListsDto.builder()
                     .id(list.getId())
                     .backgroundColor(list.getBackgroundColor().name())
                     .title(list.getTitle().getValue())
@@ -72,23 +72,23 @@ public record CollectionResponse(
                     .build();
         }
 
-        public static List<ListItemsResponse> toList(List<Item> items) {
+        public static List<ListItemsDto> toList(List<Item> items) {
             return items.stream()
-                    .map(ListItemsResponse::of)
+                    .map(ListItemsDto::of)
                     .toList();
         }
     }
 
     @Builder
-    public record ListItemsResponse(
+    public record ListItemsDto(
             Long id,
             int rank,
             String title,
             String imageUrl
     ) {
 
-        public static ListItemsResponse of(Item item) {
-            return ListItemsResponse.builder()
+        public static ListItemsDto of(Item item) {
+            return ListItemsDto.builder()
                     .id(item.getId())
                     .rank(item.getRanking())
                     .title(item.getTitle().getValue())

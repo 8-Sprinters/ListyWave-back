@@ -12,10 +12,10 @@ import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.user.application.domain.User;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import java.util.List;
 
 @RequiredArgsConstructor
 public class CustomCollectionRepositoryImpl implements CustomCollectionRepository {
@@ -42,7 +42,7 @@ public class CustomCollectionRepositoryImpl implements CustomCollectionRepositor
     }
 
     private BooleanExpression folderIdEq(Long folderId) {
-        return collect.folder.id.eq(folderId);
+        return folderId == 0L ? null : collect.folder.id.eq(folderId);
     }
 
     private BooleanExpression collectIdLt(Long cursorId) {

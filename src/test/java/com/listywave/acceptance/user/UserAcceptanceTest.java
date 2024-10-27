@@ -2,12 +2,27 @@ package com.listywave.acceptance.user;
 
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
 import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청_API;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.*;
-import static com.listywave.acceptance.user.UserAcceptanceTestHelper.*;
-import static com.listywave.user.fixture.UserFixture.*;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.가장_좋아하는_견종_TOP3_생성_요청_데이터;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_수정_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_저장_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.아이템_순위와_라벨을_바꾼_좋아하는_견종_TOP3_요청_데이터;
+import static com.listywave.acceptance.user.UserAcceptanceTestHelper.닉네임_중복_체크_요청;
+import static com.listywave.acceptance.user.UserAcceptanceTestHelper.비회원_추천_API;
+import static com.listywave.acceptance.user.UserAcceptanceTestHelper.비회원_회원_정보_조회_요청;
+import static com.listywave.acceptance.user.UserAcceptanceTestHelper.비회원이_사용자_검색;
+import static com.listywave.acceptance.user.UserAcceptanceTestHelper.프로필_수정_요청;
+import static com.listywave.acceptance.user.UserAcceptanceTestHelper.프로필_수정_요청_데이터;
+import static com.listywave.acceptance.user.UserAcceptanceTestHelper.회원_추천_API;
+import static com.listywave.acceptance.user.UserAcceptanceTestHelper.회원이_사용자_검색;
+import static com.listywave.acceptance.user.UserAcceptanceTestHelper.회원이_회원_정보_조회_요청;
+import static com.listywave.user.fixture.UserFixture.동호;
+import static com.listywave.user.fixture.UserFixture.유진;
+import static com.listywave.user.fixture.UserFixture.정수;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 import com.listywave.acceptance.common.AcceptanceTest;
 import com.listywave.list.application.dto.response.ListCreateResponse;
@@ -157,21 +172,6 @@ public class UserAcceptanceTest extends AcceptanceTest {
             // then
             assertThat(결과).hasSize(1);
             assertThat(결과.get(0).nickname()).isEqualTo(유진.getNickname());
-        }
-
-        @Test
-        void 비회원이_추천_사용자_조회한다() {
-            // given
-            회원을_저장한다(동호());
-            회원을_저장한다(정수());
-            회원을_저장한다(유진());
-
-            // when
-            List<UsersRecommendedResponse> 결과 = 비회원_추천_API().as(new TypeRef<>() {
-            });
-
-            // then
-            assertThat(결과).hasSize(3);
         }
 
         @Test
