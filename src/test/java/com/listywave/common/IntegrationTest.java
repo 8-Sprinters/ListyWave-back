@@ -22,6 +22,8 @@ import com.listywave.list.repository.label.LabelRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.mention.MentionRepository;
+import com.listywave.topic.application.service.TopicService;
+import com.listywave.topic.repository.TopicRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.service.UserService;
 import com.listywave.user.repository.follow.FollowRepository;
@@ -75,12 +77,17 @@ public abstract class IntegrationTest {
     protected FolderService folderService;
     @Autowired
     protected FollowRepository followRepository;
+    @Autowired
+    protected TopicService topicService;
+    @Autowired
+    protected TopicRepository topicRepository;
 
     protected User dh, js, ej, sy;
     protected ListEntity list;
 
     @BeforeEach
     void setUp() {
+        topicRepository.deleteAllInBatch();
         followRepository.deleteAllInBatch();
         collectionRepository.deleteAllInBatch();
         alarmRepository.deleteAllInBatch();
