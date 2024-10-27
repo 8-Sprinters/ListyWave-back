@@ -8,7 +8,7 @@ import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListRecentResponse;
 import com.listywave.list.application.dto.response.ListSearchResponse;
-import com.listywave.list.application.dto.response.ListTrandingResponse;
+import com.listywave.list.application.dto.response.RecommendedListResponse;
 import com.listywave.list.application.service.ListService;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
@@ -54,10 +54,10 @@ public class ListController {
         return ResponseEntity.ok(listDetailResponse);
     }
 
-    @GetMapping("/lists/explore")
-    ResponseEntity<List<ListTrandingResponse>> fetchTrandingLists() {
-        List<ListTrandingResponse> trandingList = listService.fetchTrandingLists();
-        return ResponseEntity.ok().body(trandingList);
+    @GetMapping("/lists/recommended")
+    ResponseEntity<List<RecommendedListResponse>> getRecommendedLists() {
+        List<RecommendedListResponse> recommendedLists = listService.getRecommendedLists();
+        return ResponseEntity.ok().body(recommendedLists);
     }
 
     @DeleteMapping("/lists/{listId}")
