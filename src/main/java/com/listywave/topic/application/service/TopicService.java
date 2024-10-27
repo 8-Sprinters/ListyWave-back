@@ -3,6 +3,7 @@ package com.listywave.topic.application.service;
 import com.listywave.topic.application.domain.Topic;
 import com.listywave.topic.application.service.dto.ExposedTopicFindResponse;
 import com.listywave.topic.application.service.dto.TopicCreateRequest;
+import com.listywave.topic.application.service.dto.TopicFindResponse;
 import com.listywave.topic.repository.TopicRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
@@ -29,5 +30,11 @@ public class TopicService {
     public ExposedTopicFindResponse findAllExposed(@Nullable Long cursorId, int size) {
         List<Topic> result = topicRepository.findAllExposed(cursorId, size);
         return ExposedTopicFindResponse.of(result, size);
+    }
+
+    public TopicFindResponse findAll(@Nullable Long cursorId, int size) {
+        List<Topic> result = topicRepository.findAll(cursorId, size);
+        long totalCount = (topicRepository.count() / size) + 1;
+        return TopicFindResponse.from(result, size, totalCount);
     }
 }
