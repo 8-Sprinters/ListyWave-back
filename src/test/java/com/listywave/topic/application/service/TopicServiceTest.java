@@ -12,6 +12,7 @@ import com.listywave.topic.application.domain.Topic;
 import com.listywave.topic.application.service.dto.ExposedTopicFindResponse;
 import com.listywave.topic.application.service.dto.ExposedTopicFindResponse.TopicDto;
 import com.listywave.topic.application.service.dto.TopicCreateRequest;
+import com.listywave.topic.application.service.dto.TopicFindResponse;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ class TopicServiceTest extends IntegrationTest {
     }
 
     @Nested
-    class 토픽_조회 {
+    class 사용자용_토픽_조회 {
 
         @Test
         void 노출이_승인된_토픽만_조회한다() {
@@ -124,7 +125,7 @@ class TopicServiceTest extends IntegrationTest {
         }
 
         @Test
-        void cursorId가_5이고_size가_5일_때_노출이_승인된_토픽을_조회한다() {
+        void cursorId가_뒤에서_다섯_번째고_size가_5일_때_노출이_승인된_토픽을_조회한다() {
             // given
             List<Topic> topics = List.of(
                     new Topic(dh, MUSIC, new ListTitle("1"), new ListDescription("1"), false, true),
@@ -144,20 +145,121 @@ class TopicServiceTest extends IntegrationTest {
             topicRepository.saveAll(topics);
 
             // when
-            ExposedTopicFindResponse result = topicService.findAllExposed(5L, 5);
+            long cursorId = topics.get(8).getId();
+            ExposedTopicFindResponse result = topicService.findAllExposed(cursorId, 5);
+
+            // then
+            assertAll(
+                    () -> assertThat(result.hasNext()).isTrue(),
+                    () -> {
+                        List<TopicDto> topicDtos = result.topics();
+
+                        assertThat(result.cursorId()).isEqualTo(topics.get(3).getId());
+                        assertThat(topicDtos).extracting("title")
+                                .isEqualTo(List.of("8", "7", "6", "5", "4"));
+                    }
+            );
+
+        }
+    }
+
+    @Nested
+    class 관리자용_토픽_조회 {
+
+        @Test
+        void cursorId가_null이고_size가_10일_때_모든_토픽을_조회한다() {
+            // given
+            List<Topic> topics = List.of(
+                    new Topic(dh, MUSIC, new ListTitle("1"), new ListDescription("1"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("2"), new ListDescription("2"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("3"), new ListDescription("3"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("4"), new ListDescription("4"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("5"), new ListDescription("5"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("6"), new ListDescription("6"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("7"), new ListDescription("7"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("8"), new ListDescription("8"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("9"), new ListDescription("9"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("10"), new ListDescription("10"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("11"), new ListDescription("11"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("12"), new ListDescription("12"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("13"), new ListDescription("13"), false, true) // O
+            );
+            topicRepository.saveAll(topics);
+
+            // when
+            TopicFindResponse result = topicService.findAll(null, 10);
+
+            // then
+            assertAll(
+                    () -> assertThat(result.hasNext()).isTrue(),
+                    () -> assertThat(result.totalCount()).isEqualTo(2),
+                    () -> assertThat(result.topics()).extracting("title")
+                            .isEqualTo(List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"))
+            );
+        }
+
+        @Test
+        void cursorId가_열_번째_ID이고_size가_10일_때_모든_토픽을_조회한다() {
+            // given
+            List<Topic> topics = List.of(
+                    new Topic(dh, MUSIC, new ListTitle("1"), new ListDescription("1"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("2"), new ListDescription("2"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("3"), new ListDescription("3"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("4"), new ListDescription("4"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("5"), new ListDescription("5"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("6"), new ListDescription("6"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("7"), new ListDescription("7"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("8"), new ListDescription("8"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("9"), new ListDescription("9"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("10"), new ListDescription("10"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("11"), new ListDescription("11"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("12"), new ListDescription("12"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("13"), new ListDescription("13"), false, true) // O
+            );
+            topicRepository.saveAll(topics);
+
+            // when
+            TopicFindResponse result = topicService.findAll(topics.get(9).getId(), 10);
 
             // then
             assertAll(
                     () -> assertThat(result.hasNext()).isFalse(),
-                    () -> {
-                        List<TopicDto> topicDtos = result.topics();
-
-                        assertThat(result.cursorId()).isEqualTo(topicDtos.get(topicDtos.size() - 1).id());
-                        assertThat(topicDtos).extracting("title")
-                                .isEqualTo(List.of("4", "3", "2", "1"));
-                    }
+                    () -> assertThat(result.totalCount()).isEqualTo(2),
+                    () -> assertThat(result.topics()).extracting("title")
+                            .isEqualTo(List.of("11", "12", "13"))
             );
+        }
 
+        @Test
+        void cursorId가_다섯_번째이고_size가_5일_때_모든_토픽을_조회한다() {
+            // given
+            List<Topic> topics = List.of(
+                    new Topic(dh, MUSIC, new ListTitle("1"), new ListDescription("1"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("2"), new ListDescription("2"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("3"), new ListDescription("3"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("4"), new ListDescription("4"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("5"), new ListDescription("5"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("6"), new ListDescription("6"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("7"), new ListDescription("7"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("8"), new ListDescription("8"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("9"), new ListDescription("9"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("10"), new ListDescription("10"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("11"), new ListDescription("11"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("12"), new ListDescription("12"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("13"), new ListDescription("13"), false, true) // O
+            );
+            topicRepository.saveAll(topics);
+
+            // when
+            TopicFindResponse result = topicService.findAll(topics.get(4).getId(), 5);
+
+            // then
+            assertAll(
+                    () -> assertThat(result.hasNext()).isTrue(),
+                    () -> assertThat(result.totalCount()).isEqualTo(3),
+                    () -> assertThat(result.topics()).extracting("title")
+                            .isEqualTo(List.of("6", "7", "8", "9", "10"))
+            );
         }
     }
 }

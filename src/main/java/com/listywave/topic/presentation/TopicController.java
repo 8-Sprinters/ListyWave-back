@@ -4,6 +4,7 @@ import com.listywave.common.auth.Auth;
 import com.listywave.topic.application.service.TopicService;
 import com.listywave.topic.application.service.dto.ExposedTopicFindResponse;
 import com.listywave.topic.application.service.dto.TopicCreateRequest;
+import com.listywave.topic.application.service.dto.TopicFindResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +31,15 @@ public class TopicController {
             @RequestParam(defaultValue = "10") int size
     ) {
         ExposedTopicFindResponse result = topicService.findAllExposed(cursorId, size);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/admin/topics")
+    ResponseEntity<TopicFindResponse> findAll(
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(defaultValue = "5") int size
+    ) {
+        TopicFindResponse result = topicService.findAll(cursorId, size);
         return ResponseEntity.ok(result);
     }
 }
