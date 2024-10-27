@@ -32,7 +32,7 @@ import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListRecentResponse;
 import com.listywave.list.application.dto.response.ListSearchResponse;
-import com.listywave.list.application.dto.response.ListTrandingResponse;
+import com.listywave.list.application.dto.response.RecommendedListResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
@@ -41,6 +41,8 @@ import com.listywave.list.repository.comment.CommentRepository;
 import com.listywave.list.repository.label.LabelRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
+import com.listywave.reaction.application.dto.response.ReactionResponse;
+import com.listywave.reaction.application.service.ReactionService;
 import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.FindFeedListResponse;
@@ -75,6 +77,7 @@ public class ListService {
     private final AlarmRepository alarmRepository;
     private final CollaboratorService collaboratorService;
     private final HistoryService historyService;
+    private final ReactionService reactionService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public ListCreateResponse listCreate(ListCreateRequest request, Long loginUserId) {
@@ -134,21 +137,33 @@ public class ListService {
         list.validateOwnerIsNotDeleted();
         List<Collaborator> collaborators = collaboratorService.findAllByList(list).collaborators();
 
-        boolean isCollected = false;
-        if (loginUserId != null) {
-            User user = userRepository.getById(loginUserId);
-            isCollected = collectionRepository.existsByListAndUserId(list, user.getId());
-        }
+        User user = getUserIfLoggedIn(loginUserId);
+        boolean isCollected = checkIsCollected(list, user);
+        boolean isOwner = checkIsOwner(list, user);
 
+        List<ReactionResponse> reactions = reactionService.createReactionResponses(list, user, isOwner);
         long totalCommentCount = commentRepository.countCommentsByList(list);
         Comment newestComment = commentRepository.findFirstByListOrderByCreatedDateDesc(list);
         Long totalReplyCount = replyRepository.countByComment(newestComment);
-        return ListDetailResponse.of(list, list.getUser(), isCollected, collaborators, totalCommentCount, newestComment, totalReplyCount);
+        return ListDetailResponse.of(
+                list,
+                list.getUser(),
+                isOwner,
+                isCollected,
+                collaborators,
+                totalCommentCount,
+                newestComment,
+                totalReplyCount,
+                reactions
+        );
     }
 
     @Transactional(readOnly = true)
-    public List<ListTrandingResponse> fetchTrandingLists() {
-        return listRepository.fetchTrandingLists();
+    public List<RecommendedListResponse> getRecommendedLists() {
+        List<ListEntity> recommendedLists = listRepository.findRecommendedLists();
+        return recommendedLists.stream()
+                .map(RecommendedListResponse::of)
+                .toList();
     }
 
     public void deleteList(Long listId, Long loginUserId) {
@@ -311,5 +326,17 @@ public class ListService {
         ListEntity list = listRepository.getById(listId);
         list.validateOwner(user);
         list.updateVisibility();
+    }
+
+    private User getUserIfLoggedIn(Long loginUserId) {
+        return (loginUserId != null) ? userRepository.getById(loginUserId) : null;
+    }
+
+    private boolean checkIsCollected(ListEntity list, User user) {
+        return (user != null) && collectionRepository.existsByListAndUserId(list, user.getId());
+    }
+
+    private boolean checkIsOwner(ListEntity list, User user) {
+        return (user != null) && list.isOwner(user);
     }
 }
