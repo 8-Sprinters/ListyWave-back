@@ -1,5 +1,6 @@
 package com.listywave.common;
 
+import static com.listywave.list.fixture.ListFixture.가장_좋아하는_견종_TOP3;
 import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.서영;
 import static com.listywave.user.fixture.UserFixture.유진;
@@ -15,7 +16,6 @@ import com.listywave.collection.repository.CollectionRepository;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.service.CommentService;
 import com.listywave.list.application.service.ReplyService;
-import com.listywave.list.fixture.ListFixture;
 import com.listywave.list.repository.ItemRepository;
 import com.listywave.list.repository.comment.CommentRepository;
 import com.listywave.list.repository.label.LabelRepository;
@@ -103,7 +103,7 @@ public abstract class IntegrationTest {
         js = userRepository.save(정수());
         ej = userRepository.save(유진());
         sy = userRepository.save(서영());
-        list = listRepository.save(ListFixture.가장_좋아하는_견종_TOP3(dh, List.of()));
+        list = listRepository.save(가장_좋아하는_견종_TOP3(dh, List.of()));
         log.info("=============================테스트 데이터 셋 생성=============================");
     }
 }
