@@ -11,5 +11,5 @@ public enum Reaction {
     AGREE("공감해요"),
     THANKS("감사해요");
 
-    private final String displayName;
+    private final String viewName;
 }
