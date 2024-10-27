@@ -19,6 +19,7 @@ public record TopicCreateRequest(
                 .category(CategoryType.viewNameOf(categoryKorName))
                 .title(new ListTitle(title))
                 .description(new ListDescription(description))
+                .isExposed(true)
                 .build();
     }
 }
