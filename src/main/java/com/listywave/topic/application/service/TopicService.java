@@ -1,5 +1,6 @@
 package com.listywave.topic.application.service;
 
+import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.topic.application.domain.Topic;
 import com.listywave.topic.application.service.dto.ExposedTopicFindResponse;
 import com.listywave.topic.application.service.dto.TopicCreateRequest;
@@ -27,14 +28,21 @@ public class TopicService {
         topicRepository.save(topic);
     }
 
+    @Transactional(readOnly = true)
     public ExposedTopicFindResponse findAllExposed(@Nullable Long cursorId, int size) {
         List<Topic> result = topicRepository.findAllExposed(cursorId, size);
         return ExposedTopicFindResponse.of(result, size);
     }
 
+    @Transactional(readOnly = true)
     public TopicFindResponse findAll(@Nullable Long cursorId, int size) {
         List<Topic> result = topicRepository.findAll(cursorId, size);
         long totalCount = (topicRepository.count() / size) + 1;
         return TopicFindResponse.from(result, size, totalCount);
+    }
+
+    public void update(Long topicId, boolean isExposed, String categoryCode, String title) {
+        Topic topic = topicRepository.getById(topicId);
+        topic.update(isExposed, CategoryType.codeOf(categoryCode), title);
     }
 }
