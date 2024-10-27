@@ -1,6 +1,7 @@
 package com.listywave.topic.application.service;
 
 import static com.listywave.list.application.domain.category.CategoryType.DAILYLIFE_THOUGHTS;
+import static com.listywave.list.application.domain.category.CategoryType.MOVIE_DRAMA;
 import static com.listywave.list.application.domain.category.CategoryType.MUSIC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -261,5 +262,23 @@ class TopicServiceTest extends IntegrationTest {
                             .isEqualTo(List.of("6", "7", "8", "9", "10"))
             );
         }
+    }
+
+    @Test
+    void 노출_여부와_타이틀과_카테고리_수정() {
+        // given
+        Topic topic = new Topic(dh, MUSIC, new ListTitle("origin"), new ListDescription("origin"), true, false);
+        topicRepository.save(topic);
+
+        // when
+        topicService.update(topic.getId(), true, MOVIE_DRAMA.getCode(), "new");
+
+        // then
+        Topic result = topicRepository.getById(topic.getId());
+        assertAll(
+                () -> assertThat(result.isExposed()).isTrue(),
+                () -> assertThat(result.getCategory()).isEqualTo(MOVIE_DRAMA),
+                () -> assertThat(result.getTitle()).isEqualTo(new ListTitle("new"))
+        );
     }
 }
