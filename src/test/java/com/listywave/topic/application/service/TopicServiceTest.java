@@ -42,7 +42,7 @@ class TopicServiceTest extends IntegrationTest {
                         assertThat(topic.getTitle().getValue()).isEqualTo("제일 좋아하는 여자 아이돌 TOP3");
                         assertThat(topic.getDescription().getValue()).isEqualTo("여러분들은 어떤 여돌을 가장 좋아하나요?");
                         assertThat(topic.isAnonymous()).isFalse();
-                        assertThat(topic.isExposed()).isFalse();
+                        assertThat(topic.isExposed()).isTrue(); // TODO: 어드민 로그인 붙이기 전까지는 항상 True로 생성
                     }
             );
         }
