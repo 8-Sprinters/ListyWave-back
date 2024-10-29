@@ -13,6 +13,7 @@ import com.listywave.auth.application.service.AuthService;
 import com.listywave.collection.application.service.CollectionService;
 import com.listywave.collection.application.service.FolderService;
 import com.listywave.collection.repository.CollectionRepository;
+import com.listywave.history.repository.HistoryRepository;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.service.CommentService;
 import com.listywave.list.application.service.ReplyService;
@@ -22,6 +23,8 @@ import com.listywave.list.repository.label.LabelRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.mention.MentionRepository;
+import com.listywave.reaction.repository.ReactionStatsRepository;
+import com.listywave.reaction.repository.UserReactionRepository;
 import com.listywave.topic.application.service.TopicService;
 import com.listywave.topic.repository.TopicRepository;
 import com.listywave.user.application.domain.User;
@@ -81,12 +84,21 @@ public abstract class IntegrationTest {
     protected TopicService topicService;
     @Autowired
     protected TopicRepository topicRepository;
+    @Autowired
+    protected HistoryRepository historyRepository;
+    @Autowired
+    protected UserReactionRepository userReactionRepository;
+    @Autowired
+    protected ReactionStatsRepository reactionStatsRepository;
 
     protected User dh, js, ej, sy;
     protected ListEntity list;
 
     @BeforeEach
     void setUp() {
+        historyRepository.deleteAll();
+        userReactionRepository.deleteAllInBatch();
+        reactionStatsRepository.deleteAllInBatch();
         topicRepository.deleteAllInBatch();
         followRepository.deleteAllInBatch();
         collectionRepository.deleteAllInBatch();
