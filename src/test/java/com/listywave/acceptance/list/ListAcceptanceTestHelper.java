@@ -183,7 +183,7 @@ public abstract class ListAcceptanceTestHelper {
 
     public static ExtractableResponse<Response> 추천_리스트_조회_API_호출() {
         return given()
-                .when().get("/lists/recommended")
+                .when().get("/lists/recommend")
                 .then().log().all()
                 .extract();
     }

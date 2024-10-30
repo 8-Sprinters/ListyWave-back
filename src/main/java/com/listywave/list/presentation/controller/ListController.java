@@ -54,7 +54,7 @@ public class ListController {
         return ResponseEntity.ok(listDetailResponse);
     }
 
-    @GetMapping("/lists/recommended")
+    @GetMapping("/lists/recommend")
     ResponseEntity<List<RecommendedListResponse>> getRecommendedLists() {
         List<RecommendedListResponse> recommendedLists = listService.getRecommendedLists();
         return ResponseEntity.ok().body(recommendedLists);
