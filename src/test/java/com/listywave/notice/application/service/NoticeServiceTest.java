@@ -25,42 +25,9 @@ public class NoticeServiceTest extends IntegrationTest {
     @Test
     void 공지를_생성_후_상세_조회한다() {
         // given
-        NoticeCreateRequest request1 = new NoticeCreateRequest(
-                1,
-                "첫 번째 공지입니다",
-                "첫 번째 공지에요",
-                List.of(
-                        new ContentDto(1, "subtitle", "소제목입니다", null, null, null),
-                        new ContentDto(2, "body", "본문입니다", null, null, null),
-                        new ContentDto(3, "image", "이미지입니다", "https://image.com", null, null),
-                        new ContentDto(4, "button", "버튼입니다", null, "버튼 이름", "https://buttonLink.com"),
-                        new ContentDto(5, "note", "유의사항입니다", null, null, null)
-                )
-        );
-        NoticeCreateRequest request2 = new NoticeCreateRequest(
-                2,
-                "두 번째 공지입니다",
-                "두 번째 공지에요",
-                List.of(
-                        new ContentDto(1, "subtitle", "소제목입니다", null, null, null),
-                        new ContentDto(2, "body", "본문입니다", null, null, null),
-                        new ContentDto(3, "image", "이미지입니다", "https://image.com", null, null),
-                        new ContentDto(4, "button", "버튼입니다", null, "버튼 이름", "https://buttonLink.com"),
-                        new ContentDto(5, "note", "유의사항입니다", null, null, null)
-                )
-        );
-        NoticeCreateRequest request3 = new NoticeCreateRequest(
-                3,
-                "세 번째 공지입니다",
-                "세 번째 공지에요",
-                List.of(
-                        new ContentDto(1, "subtitle", "소제목입니다", null, null, null),
-                        new ContentDto(2, "body", "본문입니다", null, null, null),
-                        new ContentDto(3, "image", "이미지입니다", "https://image.com", null, null),
-                        new ContentDto(4, "button", "버튼입니다", null, "버튼 이름", "https://buttonLink.com"),
-                        new ContentDto(5, "note", "유의사항입니다", null, null, null)
-                )
-        );
+        NoticeCreateRequest request1 = createNoticeCreateRequest(1);
+        NoticeCreateRequest request2 = createNoticeCreateRequest(2);
+        NoticeCreateRequest request3 = createNoticeCreateRequest(3);
 
         // when
         Long id1 = noticeService.create(request1);
@@ -72,8 +39,8 @@ public class NoticeServiceTest extends IntegrationTest {
         assertAll(
                 () -> assertThat(result.id()).isEqualTo(id2),
                 () -> assertThat(result.category()).isEqualTo(EVENT.getViewName()),
-                () -> assertThat(result.title()).isEqualTo("두 번째 공지입니다"),
-                () -> assertThat(result.description()).isEqualTo("두 번째 공지에요"),
+                () -> assertThat(result.title()).isEqualTo(2 + "번 째 공지입니다"),
+                () -> assertThat(result.description()).isEqualTo(2 + "번 째 공지에요"),
                 () -> {
                     List<NoticeFindResponse.ContentDto> contents = result.contents();
                     assertThat(contents).hasSize(5);
@@ -88,10 +55,25 @@ public class NoticeServiceTest extends IntegrationTest {
         );
     }
 
+    private NoticeCreateRequest createNoticeCreateRequest(int th) {
+        return new NoticeCreateRequest(
+                th,
+                th + "번 째 공지입니다",
+                th + "번 째 공지에요",
+                List.of(
+                        new ContentDto(1, "subtitle", "소제목입니다", null, null, null),
+                        new ContentDto(2, "body", "본문입니다", null, null, null),
+                        new ContentDto(3, "image", "이미지입니다", "https://image.com", null, null),
+                        new ContentDto(4, "button", "버튼입니다", null, "버튼 이름", "https://buttonLink.com"),
+                        new ContentDto(5, "note", "유의사항입니다", null, null, null)
+                )
+        );
+    }
+
     @Test
     void 이전_혹은_다음_공지가_없으면_null이_반환된다() {
         // given
-        NoticeCreateRequest request = createNoticeCreateRequest();
+        NoticeCreateRequest request = createNoticeCreateRequest(1);
 
         // when
         Long id = noticeService.create(request);
@@ -104,28 +86,13 @@ public class NoticeServiceTest extends IntegrationTest {
         );
     }
 
-    private NoticeCreateRequest createNoticeCreateRequest() {
-        return new NoticeCreateRequest(
-                1,
-                "공지입니다",
-                "공지에요",
-                List.of(
-                        new ContentDto(1, "subtitle", "소제목입니다", null, null, null),
-                        new ContentDto(2, "body", "본문입니다", null, null, null),
-                        new ContentDto(3, "image", "이미지입니다", "https://image.com", null, null),
-                        new ContentDto(4, "button", "버튼입니다", null, "버튼 이름", "https://buttonLink.com"),
-                        new ContentDto(5, "note", "유의사항입니다", null, null, null)
-                )
-        );
-    }
-
     @Nested
     class 공지_수정 {
 
         @Test
         void 공지를_수정한다() {
             // given
-            NoticeCreateRequest createRequest = createNoticeCreateRequest();
+            NoticeCreateRequest createRequest = createNoticeCreateRequest(1);
             Long noticeId = noticeService.create(createRequest);
 
             // when
@@ -158,7 +125,7 @@ public class NoticeServiceTest extends IntegrationTest {
         @Test
         void 공지_노출_여부를_수정한다() {
             // given
-            NoticeCreateRequest createRequest = createNoticeCreateRequest();
+            NoticeCreateRequest createRequest = createNoticeCreateRequest(1);
             Long noticeId = noticeService.create(createRequest);
 
             // when
@@ -172,7 +139,7 @@ public class NoticeServiceTest extends IntegrationTest {
         @Test
         void 노출이_된_공지를_미노출로_변경한다() {
             // given
-            NoticeCreateRequest createRequest = createNoticeCreateRequest();
+            NoticeCreateRequest createRequest = createNoticeCreateRequest(1);
             Long noticeId = noticeService.create(createRequest);
             noticeService.updateExposure(noticeId);
 
@@ -188,7 +155,7 @@ public class NoticeServiceTest extends IntegrationTest {
     @Test
     void 공지_삭제() {
         // given
-        NoticeCreateRequest createRequest = createNoticeCreateRequest();
+        NoticeCreateRequest createRequest = createNoticeCreateRequest(1);
         Long noticeId = noticeService.create(createRequest);
 
         // when
