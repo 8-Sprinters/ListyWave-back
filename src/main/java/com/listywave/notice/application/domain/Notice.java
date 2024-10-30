@@ -1,0 +1,70 @@
+package com.listywave.notice.application.domain;
+
+import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.FetchType.LAZY;
+import static lombok.AccessLevel.PROTECTED;
+
+import com.listywave.common.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Getter
+@NoArgsConstructor(access = PROTECTED)
+public class Notice extends BaseEntity {
+
+    @Column(name = "code", nullable = false)
+    private NoticeType type;
+
+    @Embedded
+    private NoticeTitle title;
+
+    @Embedded
+    private NoticeDescription description;
+
+    private boolean isExposed;
+
+    private boolean didSendAlarm;
+
+    @OneToMany(mappedBy = "notice", fetch = LAZY, cascade = ALL, orphanRemoval = true)
+    private final List<NoticeContent> contents = new ArrayList<>();
+
+    public Notice(NoticeType type, NoticeTitle title, NoticeDescription description) {
+        this.type = type;
+        this.title = title;
+        this.description = description;
+    }
+
+    public void addContents(List<NoticeContent> contents) {
+        this.contents.addAll(contents);
+    }
+
+    public String getFirstImageUrl() {
+        Optional<String> result = contents.stream()
+                .sorted(Comparator.comparingInt(NoticeContent::getOrder))
+                .map(NoticeContent::getImageUrl)
+                .findFirst();
+        return result.orElse(null);
+    }
+
+    public void update(NoticeType type, NoticeTitle title, NoticeDescription description, List<NoticeContent> contents) {
+        this.type = type;
+        this.title = title;
+        this.description = description;
+
+        this.contents.clear();
+        this.contents.addAll(contents);
+    }
+
+    public void changeExposure() {
+        this.isExposed = !this.isExposed;
+    }
+}
