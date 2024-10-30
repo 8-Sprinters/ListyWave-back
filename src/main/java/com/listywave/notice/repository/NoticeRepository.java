@@ -16,8 +16,8 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
     @Query("""
             select n
             from Notice n
-            join NoticeContent nc on nc.notice = n
+            join fetch NoticeContent nc on nc.notice = n
             where n.id = :noticeId
             """)
-    Notice findOne(Long noticeId);
+    Notice findByIdWithFetch(Long noticeId);
 }

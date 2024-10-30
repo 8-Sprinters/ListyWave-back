@@ -10,10 +10,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.listywave.common.IntegrationTest;
+import com.listywave.notice.application.domain.Notice;
 import com.listywave.notice.application.service.dto.NoticeCreateRequest;
 import com.listywave.notice.application.service.dto.NoticeCreateRequest.ContentDto;
 import com.listywave.notice.application.service.dto.NoticeFindResponse;
+import com.listywave.notice.application.service.dto.NoticeUpdateRequest;
 import java.util.List;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class NoticeServiceTest extends IntegrationTest {
@@ -87,7 +90,21 @@ public class NoticeServiceTest extends IntegrationTest {
     @Test
     void 이전_혹은_다음_공지가_없으면_null이_반환된다() {
         // given
-        NoticeCreateRequest request = new NoticeCreateRequest(
+        NoticeCreateRequest request = createNoticeCreateRequest();
+
+        // when
+        Long id = noticeService.create(request);
+
+        // then
+        NoticeFindResponse result = noticeService.findOneSpecific(id);
+        assertAll(
+                () -> assertThat(result.prevNotice()).isNull(),
+                () -> assertThat(result.nextNotice()).isNull()
+        );
+    }
+
+    private NoticeCreateRequest createNoticeCreateRequest() {
+        return new NoticeCreateRequest(
                 1,
                 "공지입니다",
                 "공지에요",
@@ -99,15 +116,71 @@ public class NoticeServiceTest extends IntegrationTest {
                         new ContentDto(5, "note", "유의사항입니다", null, null, null)
                 )
         );
+    }
 
-        // when
-        Long id = noticeService.create(request);
+    @Nested
+    class 공지_수정 {
 
-        // then
-        NoticeFindResponse result = noticeService.findOneSpecific(id);
-        assertAll(
-                () -> assertThat(result.prevNotice()).isNull(),
-                () -> assertThat(result.nextNotice()).isNull()
-        );
+        @Test
+        void 공지를_수정한다() {
+            // given
+            NoticeCreateRequest createRequest = createNoticeCreateRequest();
+            Long noticeId = noticeService.create(createRequest);
+
+            // when
+            NoticeUpdateRequest updateRequest = new NoticeUpdateRequest(
+                    2,
+                    "수정했습니다",
+                    "수정했어요",
+                    List.of(
+                            new NoticeUpdateRequest.ContentDto(5, "subtitle", "소제목입니다", null, null, null),
+                            new NoticeUpdateRequest.ContentDto(4, "body", "본문입니다", null, null, null),
+                            new NoticeUpdateRequest.ContentDto(3, "image", "이미지입니다", "https://image.com", null, null),
+                            new NoticeUpdateRequest.ContentDto(2, "button", "버튼입니다", null, "버튼 이름", "https://buttonLink.com"),
+                            new NoticeUpdateRequest.ContentDto(1, "note", "유의사항입니다", null, null, null)
+                    )
+            );
+            noticeService.update(updateRequest, noticeId);
+
+            // then
+            NoticeFindResponse result = noticeService.findOneSpecific(noticeId);
+            List<NoticeFindResponse.ContentDto> contents = result.contents();
+            assertAll(
+                    () -> assertThat(contents.get(0).type()).isEqualTo(SUBTITLE.name().toLowerCase()),
+                    () -> assertThat(contents.get(1).type()).isEqualTo(BODY.name().toLowerCase()),
+                    () -> assertThat(contents.get(2).type()).isEqualTo(IMAGE.name().toLowerCase()),
+                    () -> assertThat(contents.get(3).type()).isEqualTo(BUTTON.name().toLowerCase()),
+                    () -> assertThat(contents.get(4).type()).isEqualTo(NOTE.name().toLowerCase())
+            );
+        }
+
+        @Test
+        void 공지_노출_여부를_수정한다() {
+            // given
+            NoticeCreateRequest createRequest = createNoticeCreateRequest();
+            Long noticeId = noticeService.create(createRequest);
+
+            // when
+            noticeService.updateExposure(noticeId);
+
+            // then
+            Notice result = noticeRepository.getById(noticeId);
+            assertThat(result.isExposed()).isTrue();
+        }
+
+        @Test
+        void 노출이_된_공지를_미노출로_변경한다() {
+            // given
+            NoticeCreateRequest createRequest = createNoticeCreateRequest();
+            Long noticeId = noticeService.create(createRequest);
+            noticeService.updateExposure(noticeId);
+
+            // when
+            noticeService.updateExposure(noticeId);
+
+            // then
+            Notice result = noticeRepository.getById(noticeId);
+            assertThat(result.isExposed()).isFalse();
+        }
     }
 }

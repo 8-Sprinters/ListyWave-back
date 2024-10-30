@@ -54,4 +54,17 @@ public class Notice extends BaseEntity {
                 .findFirst();
         return result.orElse(null);
     }
+
+    public void update(NoticeType type, NoticeTitle title, NoticeDescription description, List<NoticeContent> contents) {
+        this.type = type;
+        this.title = title;
+        this.description = description;
+
+        this.contents.clear();
+        this.contents.addAll(contents);
+    }
+
+    public void changeExposure() {
+        this.isExposed = !this.isExposed;
+    }
 }
