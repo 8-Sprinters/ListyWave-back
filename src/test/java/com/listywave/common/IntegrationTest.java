@@ -6,6 +6,7 @@ import static com.listywave.user.fixture.UserFixture.서영;
 import static com.listywave.user.fixture.UserFixture.유진;
 import static com.listywave.user.fixture.UserFixture.정수;
 
+import com.listywave.admin.AdminRepository;
 import com.listywave.alarm.application.service.AlarmService;
 import com.listywave.alarm.repository.AlarmRepository;
 import com.listywave.auth.application.domain.kakao.KakaoOauthClient;
@@ -23,6 +24,8 @@ import com.listywave.list.repository.label.LabelRepository;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.mention.MentionRepository;
+import com.listywave.notice.application.service.NoticeService;
+import com.listywave.notice.repository.NoticeRepository;
 import com.listywave.reaction.repository.ReactionStatsRepository;
 import com.listywave.reaction.repository.UserReactionRepository;
 import com.listywave.topic.application.service.TopicService;
@@ -90,12 +93,20 @@ public abstract class IntegrationTest {
     protected UserReactionRepository userReactionRepository;
     @Autowired
     protected ReactionStatsRepository reactionStatsRepository;
+    @Autowired
+    protected AdminRepository adminRepository;
+    @Autowired
+    protected NoticeService noticeService;
+    @Autowired
+    protected NoticeRepository noticeRepository;
 
     protected User dh, js, ej, sy;
     protected ListEntity list;
 
     @BeforeEach
     void setUp() {
+        noticeRepository.deleteAll();
+        adminRepository.deleteAllInBatch();
         historyRepository.deleteAll();
         userReactionRepository.deleteAllInBatch();
         reactionStatsRepository.deleteAllInBatch();
