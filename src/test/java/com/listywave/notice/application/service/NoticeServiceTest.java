@@ -16,6 +16,7 @@ import com.listywave.notice.application.service.dto.NoticeCreateRequest.ContentD
 import com.listywave.notice.application.service.dto.NoticeFindResponse;
 import com.listywave.notice.application.service.dto.NoticeUpdateRequest;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -182,5 +183,19 @@ public class NoticeServiceTest extends IntegrationTest {
             Notice result = noticeRepository.getById(noticeId);
             assertThat(result.isExposed()).isFalse();
         }
+    }
+
+    @Test
+    void 공지_삭제() {
+        // given
+        NoticeCreateRequest createRequest = createNoticeCreateRequest();
+        Long noticeId = noticeService.create(createRequest);
+
+        // when
+        noticeService.delete(noticeId);
+
+        // then
+        Optional<Notice> result = noticeRepository.findById(noticeId);
+        assertThat(result).isEmpty();
     }
 }

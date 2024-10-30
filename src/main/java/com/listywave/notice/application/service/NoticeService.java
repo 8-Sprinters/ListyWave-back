@@ -66,4 +66,8 @@ public class NoticeService {
         Notice notice = noticeRepository.findByIdWithFetch(id);
         notice.changeExposure();
     }
+
+    public void delete(Long id) {
+        noticeRepository.deleteById(id);
+    }
 }

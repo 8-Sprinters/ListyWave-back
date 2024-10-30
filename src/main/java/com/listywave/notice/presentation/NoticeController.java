@@ -14,6 +14,7 @@ import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -71,6 +72,12 @@ public class NoticeController {
     @PatchMapping("/admin/notices/{noticeId}")
     ResponseEntity<Void> updateExposure(@PathVariable Long noticeId) {
         noticeService.updateExposure(noticeId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/admin/notices/{noticeId}")
+    ResponseEntity<Void> delete(@PathVariable Long noticeId) {
+        noticeService.delete(noticeId);
         return ResponseEntity.noContent().build();
     }
 }
