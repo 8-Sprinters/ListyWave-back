@@ -19,7 +19,7 @@ public record NoticeFindResponse(
         BesideNoticeDto nextNotice
 ) {
 
-    public static NoticeFindResponse of(Notice notice, Notice prevNotice, Notice nextNotice) {
+    public static NoticeFindResponse of(Notice notice, @Nullable Notice prevNotice, @Nullable Notice nextNotice) {
         return NoticeFindResponse.builder()
                 .id(notice.getId())
                 .category(notice.getType().getViewName())
