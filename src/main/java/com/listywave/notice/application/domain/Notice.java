@@ -10,7 +10,9 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,6 +30,10 @@ public class Notice extends BaseEntity {
     @Embedded
     private NoticeDescription description;
 
+    private boolean isExposed;
+
+    private boolean didSendAlarm;
+
     @OneToMany(mappedBy = "notice", fetch = LAZY, cascade = ALL, orphanRemoval = true)
     private final List<NoticeContent> contents = new ArrayList<>();
 
@@ -39,5 +45,13 @@ public class Notice extends BaseEntity {
 
     public void addContents(List<NoticeContent> contents) {
         this.contents.addAll(contents);
+    }
+
+    public String getFirstImageUrl() {
+        Optional<String> result = contents.stream()
+                .sorted(Comparator.comparingInt(NoticeContent::getOrder))
+                .map(NoticeContent::getImageUrl)
+                .findFirst();
+        return result.orElse(null);
     }
 }

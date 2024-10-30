@@ -5,12 +5,16 @@ import com.listywave.common.auth.Auth;
 import com.listywave.notice.application.domain.NoticeType;
 import com.listywave.notice.application.service.NoticeService;
 import com.listywave.notice.application.service.dto.NoticeCreateRequest;
+import com.listywave.notice.application.service.dto.NoticeFindAllResponseToAdmin;
+import com.listywave.notice.application.service.dto.NoticeFindAllResponseToUser;
+import com.listywave.notice.application.service.dto.NoticeFindResponse;
 import com.listywave.notice.presentation.dto.NoticeCategoryFindResponse;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,5 +39,23 @@ public class NoticeController {
     ) {
         Long id = noticeService.create(request);
         return ResponseEntity.created(URI.create("/admin/notices/" + id)).build();
+    }
+
+    @GetMapping("/admin/notices")
+    ResponseEntity<List<NoticeFindAllResponseToAdmin>> findAllToAdmin() {
+        List<NoticeFindAllResponseToAdmin> result = noticeService.findAllToAdmin();
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/notices")
+    ResponseEntity<List<NoticeFindAllResponseToUser>> findAllToUser() {
+        List<NoticeFindAllResponseToUser> result = noticeService.findAllToUser();
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/notices/{noticeId}")
+    ResponseEntity<NoticeFindResponse> findOneSpecific(@PathVariable Long noticeId) {
+        NoticeFindResponse result = noticeService.findOneSpecific(noticeId);
+        return ResponseEntity.ok(result);
     }
 }

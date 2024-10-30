@@ -37,7 +37,7 @@ public class NoticeContent {
 
     @Column(nullable = true, length = 1000)
     private String description;
-
+    
     @Column(nullable = true, length = 2048)
     private String imageUrl;
 
