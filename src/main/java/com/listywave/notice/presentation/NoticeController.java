@@ -1,7 +1,5 @@
 package com.listywave.notice.presentation;
 
-import com.listywave.admin.AdminService;
-import com.listywave.common.auth.Auth;
 import com.listywave.notice.application.domain.NoticeType;
 import com.listywave.notice.application.service.NoticeService;
 import com.listywave.notice.application.service.dto.NoticeCreateRequest;
@@ -27,12 +25,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NoticeController {
 
-    private final AdminService adminService;
     private final NoticeService noticeService;
 
     @GetMapping("/admin/notices/categories")
-    ResponseEntity<List<NoticeCategoryFindResponse>> findNoticeCategories(@Auth Long adminId) {
-        adminService.validateExist(adminId);
+    ResponseEntity<List<NoticeCategoryFindResponse>> findNoticeCategories() {
         List<NoticeCategoryFindResponse> result = NoticeCategoryFindResponse.toList(NoticeType.values());
         return ResponseEntity.ok(result);
     }
