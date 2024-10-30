@@ -44,6 +44,8 @@ public enum ErrorCode {
     DUPLICATE_NICKNAME_EXCEPTION(BAD_REQUEST, "중복된 닉네임입니다."),
     DUPLICATE_COLLABORATOR_EXCEPTION(BAD_REQUEST, "이미 동일한 콜라보레이터가 존재합니다"),
     DUPLICATE_FOLDER_NAME_EXCEPTION(BAD_REQUEST, "중복된 폴더명입니다."),
+    NULL_OR_BLANK_EXCEPTION(BAD_REQUEST, "값이 null이거나 공백일 수 없습니다."),
+    NOT_EXIST_CODE(BAD_REQUEST, "존재하지 않는 코드입니다."),
 
     // S3
     S3_DELETE_OBJECTS_EXCEPTION(INTERNAL_SERVER_ERROR, "S3의 이미지를 삭제 요청하는 과정에서 에러가 발생했습니다."),
