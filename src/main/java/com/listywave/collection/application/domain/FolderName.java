@@ -1,5 +1,7 @@
 package com.listywave.collection.application.domain;
 
+import static com.listywave.common.exception.ErrorCode.LENGTH_EXCEEDED_EXCEPTION;
+
 import com.listywave.common.exception.CustomException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -7,8 +9,6 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import static com.listywave.common.exception.ErrorCode.LENGTH_EXCEEDED_EXCEPTION;
 
 @Getter
 @Embeddable

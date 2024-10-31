@@ -14,7 +14,7 @@ public class DatabaseCleaner {
                 SELECT Concat('TRUNCATE TABLE ', TABLE_NAME, ';') AS query
                 FROM INFORMATION_SCHEMA.TABLES
                 WHERE TABLE_SCHEMA = 'PUBLIC'
-                    """, String.class
+                """, String.class
         );
     }
 

@@ -1,8 +1,8 @@
 package com.listywave.collection.repository.custom.impl;
 
-import static com.listywave.collection.application.domain.QCollect.*;
-import static com.listywave.collection.application.domain.QFolder.*;
-import static com.querydsl.jpa.JPAExpressions.*;
+import static com.listywave.collection.application.domain.QCollect.collect;
+import static com.listywave.collection.application.domain.QFolder.folder;
+import static com.querydsl.jpa.JPAExpressions.select;
 
 import com.listywave.collection.application.dto.FolderResponse;
 import com.listywave.collection.repository.custom.CustomFolderRepository;
@@ -11,8 +11,8 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class CustomFolderRepositoryImpl implements CustomFolderRepository {
