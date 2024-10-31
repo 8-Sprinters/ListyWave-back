@@ -11,5 +11,6 @@ public enum AlarmType {
     REPLY,
     MENTION,
     COLLABORATOR,
+    NOTICE,
     ;
 }

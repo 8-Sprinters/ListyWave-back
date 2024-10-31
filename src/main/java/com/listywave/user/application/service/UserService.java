@@ -11,9 +11,9 @@ import com.listywave.user.application.domain.Follow;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.FollowersResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
-import com.listywave.user.application.dto.UsersRecommendedResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.dto.UserProflieUpdateCommand;
+import com.listywave.user.application.dto.UsersRecommendedResponse;
 import com.listywave.user.application.dto.search.UserElasticSearchResponse;
 import com.listywave.user.application.dto.search.UserSearchResponse;
 import com.listywave.user.application.dto.search.UserSearchResult;
@@ -122,7 +122,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<UsersRecommendedResponse> getRecommendedUsers(Long loginUserId) {
-        if(loginUserId == null){
+        if (loginUserId == null) {
             List<User> recommendUsers = userRepository.getRecommendUsers(List.of(), null);
             return toUsersRecommendedResponse(recommendUsers);
         }

@@ -9,6 +9,7 @@ import static lombok.AccessLevel.PROTECTED;
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.domain.reply.Reply;
+import com.listywave.notice.application.domain.Notice;
 import com.listywave.user.application.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -44,7 +45,7 @@ public class Alarm {
     @JoinColumn(name = "send_user_id", nullable = false)
     private User sendUser;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long receiveUserId;
 
     @ManyToOne(fetch = LAZY)
@@ -58,6 +59,10 @@ public class Alarm {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "reply_id", nullable = true, foreignKey = @ForeignKey(name = "alarm_reply_fk"))
     private Reply reply;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "notice_id", nullable = true, foreignKey = @ForeignKey(name = "alarm_notice_fk"))
+    private Notice notice;
 
     @Column(nullable = false)
     @Enumerated(value = STRING)

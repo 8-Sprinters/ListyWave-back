@@ -1,10 +1,12 @@
 package com.listywave.notice.application.domain;
 
+import static com.listywave.common.exception.ErrorCode.ALREADY_SENT_ALARM_NOTICE;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.BaseEntity;
+import com.listywave.common.exception.CustomException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -66,5 +68,12 @@ public class Notice extends BaseEntity {
 
     public void changeExposure() {
         this.isExposed = !this.isExposed;
+    }
+
+    public void sendAlarm() {
+        if (this.didSendAlarm) {
+            throw new CustomException(ALREADY_SENT_ALARM_NOTICE);
+        }
+        this.didSendAlarm = true;
     }
 }

@@ -105,6 +105,7 @@ public abstract class IntegrationTest {
 
     @BeforeEach
     void setUp() {
+        alarmRepository.deleteAllInBatch();
         noticeRepository.deleteAll();
         adminRepository.deleteAllInBatch();
         historyRepository.deleteAll();
@@ -113,7 +114,6 @@ public abstract class IntegrationTest {
         topicRepository.deleteAllInBatch();
         followRepository.deleteAllInBatch();
         collectionRepository.deleteAllInBatch();
-        alarmRepository.deleteAllInBatch();
         mentionRepository.deleteAllInBatch();
         replyRepository.deleteAllInBatch();
         commentRepository.deleteAllInBatch();

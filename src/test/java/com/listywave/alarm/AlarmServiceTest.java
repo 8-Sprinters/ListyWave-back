@@ -4,15 +4,23 @@ import static com.listywave.alarm.application.domain.AlarmType.COLLECT;
 import static com.listywave.alarm.application.domain.AlarmType.COMMENT;
 import static com.listywave.alarm.application.domain.AlarmType.FOLLOW;
 import static com.listywave.alarm.application.domain.AlarmType.MENTION;
+import static com.listywave.alarm.application.domain.AlarmType.NOTICE;
 import static com.listywave.alarm.application.domain.AlarmType.REPLY;
+import static com.listywave.common.exception.ErrorCode.ALREADY_SENT_ALARM_NOTICE;
 import static java.util.Collections.EMPTY_LIST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.listywave.alarm.application.domain.AlarmCreateEvent;
 import com.listywave.alarm.application.dto.AlarmCheckResponse;
 import com.listywave.alarm.application.dto.AlarmFindResponse;
 import com.listywave.common.IntegrationTest;
+import com.listywave.common.exception.CustomException;
+import com.listywave.common.exception.ErrorCode;
 import com.listywave.list.application.dto.ReplyDeleteCommand;
+import com.listywave.notice.application.domain.Notice;
+import com.listywave.notice.application.service.dto.NoticeCreateRequest;
 import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
@@ -254,6 +262,69 @@ public class AlarmServiceTest extends IntegrationTest {
                 assertThat(result.get(0).sendUser().id()).isEqualTo(js.getId());
             }
         }
+
+        @Nested
+        class 공지 {
+
+            @Test
+            void 공지_알람을_발송한다() {
+                // given
+                NoticeCreateRequest noticeCreateRequest = createNoticeCreateRequest();
+                Long noticeId = noticeService.create(noticeCreateRequest);
+                Notice notice = noticeRepository.getById(noticeId);
+
+                // when
+                AlarmCreateEvent event = AlarmCreateEvent.notice(dh, notice);
+                alarmService.save(event);
+
+                // then
+                List<AlarmFindResponse> jsAlarms = alarmService.findAllBy(js.getId());
+                List<AlarmFindResponse> ejAlarms = alarmService.findAllBy(ej.getId());
+                List<AlarmFindResponse> syAlarms = alarmService.findAllBy(sy.getId());
+                assertAll(
+                        () -> assertThat(jsAlarms.size()).isEqualTo(ejAlarms.size()).isEqualTo(syAlarms.size()).isOne(),
+                        () -> {
+                            AlarmFindResponse jsAlarm = jsAlarms.get(0);
+                            AlarmFindResponse ejAlarm = ejAlarms.get(0);
+                            AlarmFindResponse syAlarm = syAlarms.get(0);
+
+                            assertThat(jsAlarm.type()).isEqualTo(ejAlarm.type()).isEqualTo(syAlarm.type()).isEqualTo(NOTICE.name());
+                            assertThat(jsAlarm.sendUser().nickname()).isEqualTo(ejAlarm.sendUser().nickname()).isEqualTo(syAlarm.sendUser().nickname()).isEqualTo(dh.getNickname());
+                            assertThat(jsAlarm.notice().title()).isEqualTo(ejAlarm.notice().title()).isEqualTo(syAlarm.notice().title()).isEqualTo("공지입니다");
+                        }
+                );
+            }
+
+            @Test
+            void 공지는_1개당_최대_1회만_알람을_보낼_수_있다() {
+                // given
+                NoticeCreateRequest noticeCreateRequest = createNoticeCreateRequest();
+                Long noticeId = noticeService.create(noticeCreateRequest);
+                noticeService.sendAlarm(noticeId);
+
+                // when
+                ErrorCode result = assertThrows(CustomException.class, () -> noticeService.sendAlarm(noticeId))
+                        .getErrorCode();
+
+                // then
+                assertThat(result).isEqualTo(ALREADY_SENT_ALARM_NOTICE);
+            }
+
+            private NoticeCreateRequest createNoticeCreateRequest() {
+                return new NoticeCreateRequest(
+                        1,
+                        "공지입니다",
+                        "공지에요",
+                        List.of(
+                                new NoticeCreateRequest.ContentDto(1, "subtitle", "소제목입니다", null, null, null),
+                                new NoticeCreateRequest.ContentDto(2, "body", "본문입니다", null, null, null),
+                                new NoticeCreateRequest.ContentDto(3, "image", "이미지입니다", "https://image.com", null, null),
+                                new NoticeCreateRequest.ContentDto(4, "button", "버튼입니다", null, "버튼 이름", "https://buttonLink.com"),
+                                new NoticeCreateRequest.ContentDto(5, "note", "유의사항입니다", null, null, null)
+                        )
+                );
+            }
+        }
     }
 
     @Nested
@@ -265,9 +336,6 @@ public class AlarmServiceTest extends IntegrationTest {
             commentService.create(list.getId(), js.getId(), "정수 댓글", EMPTY_LIST);
             commentService.create(list.getId(), ej.getId(), "유진 댓글", EMPTY_LIST);
             commentService.create(list.getId(), sy.getId(), "서영 댓글", EMPTY_LIST);
-
-            // when
-            //commit();
 
             // then
             List<AlarmFindResponse> result = alarmService.findAllBy(dh.getId());
@@ -284,7 +352,6 @@ public class AlarmServiceTest extends IntegrationTest {
         void 알람을_읽기_처리한다() {
             // when
             commentService.create(list.getId(), js.getId(), "댓글~!", EMPTY_LIST);
-            //commit();
 
             // when
             AlarmFindResponse alarm = alarmService.findAllBy(dh.getId()).get(0);
@@ -300,7 +367,6 @@ public class AlarmServiceTest extends IntegrationTest {
         void 신규_알람_조회_시에_읽지_않은_알람이_있는_경우_true를_반환한다() {
             // when
             commentService.create(list.getId(), js.getId(), "댓글~!", EMPTY_LIST);
-            //commit();
 
             AlarmFindResponse dhAlarm = alarmService.findAllBy(dh.getId()).get(0);
             alarmService.check(dhAlarm.id());
@@ -316,7 +382,6 @@ public class AlarmServiceTest extends IntegrationTest {
         void 신규_알람_조회_시에_읽지_않은_알람이_없는_경우_false를_반환한다() {
             // when
             commentService.create(list.getId(), js.getId(), "댓글~!", EMPTY_LIST);
-            //commit();
 
             // when
             AlarmCheckResponse result = alarmService.isAllChecked(dh.getId());
@@ -331,8 +396,6 @@ public class AlarmServiceTest extends IntegrationTest {
             commentService.create(list.getId(), js.getId(), "정수 댓글", EMPTY_LIST);
             commentService.create(list.getId(), ej.getId(), "유진 댓글", EMPTY_LIST);
             commentService.create(list.getId(), sy.getId(), "서영 댓글", EMPTY_LIST);
-
-            //commit();
 
             assertThat(alarmService.isAllChecked(dh.getId()).isAllChecked()).isFalse();
 
@@ -350,11 +413,7 @@ public class AlarmServiceTest extends IntegrationTest {
         @Test
         @Disabled
         void _30일이_지난_알람은_자동_삭제된다() {
-            // when
-
-            // when
-
-            // then
+            // TODO: 테스트 작성
         }
 
         @Test
