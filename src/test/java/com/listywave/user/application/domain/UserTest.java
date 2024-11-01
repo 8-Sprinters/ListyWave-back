@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.listywave.image.application.domain.DefaultBackgroundImages;
 import com.listywave.image.application.domain.DefaultProfileImages;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.ReflectionUtils;
 
 @DisplayName("회원은 ")
 class UserTest {
@@ -321,5 +323,20 @@ class UserTest {
     @Test
     void 카카오_액세스_토큰이_존재하는지_검증한다() {
         assertThatNoException().isThrownBy(() -> user.validateHasKakaoAccessToken());
+    }
+
+    @Test
+    void ID가_같으면_동등한_객체다() {
+        // given
+        User other = User.init(312414L, "user@gmail.com", "sflkhadsfsad.asdjhfahsjdf.asdkjhfasdhjf");
+
+        Field idField = ReflectionUtils.findField(User.class, "id");
+        idField.setAccessible(true);
+        ReflectionUtils.setField(idField, user, 11L);
+        ReflectionUtils.setField(idField, other, 11L);
+
+        // expect
+        assertThat(user).isEqualTo(other);
+        assertThat(user).hasSameHashCodeAs(other);
     }
 }
