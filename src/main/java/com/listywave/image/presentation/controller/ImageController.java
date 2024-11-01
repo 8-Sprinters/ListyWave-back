@@ -10,6 +10,8 @@ import com.listywave.image.application.dto.response.UserPresignedUrlCreateRespon
 import com.listywave.image.application.service.ImageService;
 import com.listywave.image.presentation.dto.request.ListImagesCreateRequest;
 import com.listywave.image.presentation.dto.request.UserImageUpdateRequest;
+import com.listywave.notice.application.dto.NoticeImagePresignedUrlCreateResponse;
+import com.listywave.notice.application.dto.OrderAndExtensionDto;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -84,5 +86,23 @@ public class ImageController {
                 .map(DefaultBackgroundImageUrlResponse::of)
                 .toList();
         return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/admin/notices/{noticeId}/presigned-url")
+    ResponseEntity<List<NoticeImagePresignedUrlCreateResponse>> createPresignedUrlOfNoticeContent(
+            @PathVariable Long noticeId,
+            @RequestBody List<OrderAndExtensionDto> request
+    ) {
+        var result = imageService.createNoticeImagePresignedUrl(noticeId, request);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/admin/notices/{noticeId}/upload-complete")
+    ResponseEntity<Void> completeUploadNoticeImages(
+            @PathVariable Long noticeId,
+            @RequestBody List<OrderAndExtensionDto> requests
+    ) {
+        imageService.updateNoticeContentImages(noticeId, requests);
+        return ResponseEntity.noContent().build();
     }
 }

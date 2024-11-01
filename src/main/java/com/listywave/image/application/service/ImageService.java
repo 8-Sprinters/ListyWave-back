@@ -6,6 +6,7 @@ import static com.amazonaws.services.s3.model.CannedAccessControlList.PublicRead
 import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 import static com.listywave.common.exception.ErrorCode.S3_DELETE_OBJECTS_EXCEPTION;
 import static com.listywave.image.application.domain.ImageType.LISTS_ITEM;
+import static com.listywave.image.application.domain.ImageType.NOTICE;
 import static com.listywave.image.application.domain.ImageType.USER_BACKGROUND;
 import static com.listywave.image.application.domain.ImageType.USER_PROFILE;
 import static java.util.Locale.ENGLISH;
@@ -27,8 +28,15 @@ import com.listywave.list.application.domain.item.ItemImageUrl;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.repository.ItemRepository;
 import com.listywave.list.repository.list.ListRepository;
+import com.listywave.notice.application.domain.Notice;
+import com.listywave.notice.application.domain.NoticeContent;
+import com.listywave.notice.application.dto.NoticeImagePresignedUrlCreateResponse;
+import com.listywave.notice.application.dto.OrderAndExtensionDto;
+import com.listywave.notice.repository.NoticeContentRepository;
+import com.listywave.notice.repository.NoticeRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -56,6 +64,8 @@ public class ImageService {
     private final ItemRepository itemRepository;
     private final ListRepository listRepository;
     private final UserRepository userRepository;
+    private final NoticeRepository noticeRepository;
+    private final NoticeContentRepository noticeContentRepository;
 
     public List<ListItemPresignedUrlResponse> createPresignedUrlOfItem(Long userId, Long listId, List<ExtensionRanks> extensionRanks) {
         User user = userRepository.getById(userId);
@@ -274,5 +284,38 @@ public class ImageService {
 
         String fileFullName = getFileFullName(itemImageUrl.getValue());
         deleteImageFile(fileFullName);
+    }
+
+    public List<NoticeImagePresignedUrlCreateResponse> createNoticeImagePresignedUrl(
+            Long noticeId,
+            List<OrderAndExtensionDto> requests
+    ) {
+        Notice notice = noticeRepository.getById(noticeId);
+
+        return requests.stream()
+                .map(it -> {
+                    String imageKey = UUID.randomUUID().toString();
+                    NoticeContent noticeContent = noticeContentRepository.findByNoticeAndOrder(notice, it.order())
+                            .orElseThrow();
+
+                    noticeContent.updateImageUrl(imageKey);
+
+                    String fileName = createFileName(NOTICE, noticeId, imageKey, it.extension());
+                    GeneratePresignedUrlRequest request = createGeneratePreSignedUrlRequest(fileName);
+                    URL presignedUrl = amazonS3.generatePresignedUrl(request);
+
+                    return NoticeImagePresignedUrlCreateResponse.of(it.order(), presignedUrl.toString());
+                }).toList();
+    }
+
+    public void updateNoticeContentImages(Long noticeId, List<OrderAndExtensionDto> requests) {
+        Notice notice = noticeRepository.getById(noticeId);
+        requests.forEach(it -> {
+            NoticeContent noticeContent = noticeContentRepository.findByNoticeAndOrder(notice, it.order())
+                    .orElseThrow();
+
+            String imageUrl = createReadImageUrl(NOTICE, noticeId, noticeContent.getImageUrl(), it.extension());
+            noticeContent.updateImageUrl(imageUrl);
+        });
     }
 }
