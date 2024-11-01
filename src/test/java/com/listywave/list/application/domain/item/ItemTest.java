@@ -39,7 +39,7 @@ class ItemTest {
     void ItemImageUrl을_수정할_수_있다() {
         String newValue = "sfksadfhskfhjaf";
 
-        item.updateItemImageUrl(newValue);
+        item.updateItemImageUrl(new ItemImageUrl(newValue));
 
         assertThat(item.getImageUrl().getValue()).isEqualTo(newValue);
     }
