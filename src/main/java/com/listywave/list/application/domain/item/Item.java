@@ -54,8 +54,8 @@ public class Item extends BaseEntity {
         this.imageKey = imageKey;
     }
 
-    public void updateItemImageUrl(String imageUrl) {
-        this.imageUrl = new ItemImageUrl(imageUrl);
+    public void updateItemImageUrl(ItemImageUrl imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public void updateList(ListEntity list) {
