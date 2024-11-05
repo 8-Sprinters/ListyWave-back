@@ -1,32 +1,42 @@
 package com.listywave.image.application.service;
 
+import static com.amazonaws.HttpMethod.PUT;
+import static com.amazonaws.services.s3.Headers.S3_CANNED_ACL;
+import static com.amazonaws.services.s3.model.CannedAccessControlList.PublicRead;
+import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 import static com.listywave.common.exception.ErrorCode.S3_DELETE_OBJECTS_EXCEPTION;
 import static com.listywave.image.application.domain.ImageType.LISTS_ITEM;
+import static com.listywave.image.application.domain.ImageType.NOTICE;
+import static com.listywave.image.application.domain.ImageType.USER_BACKGROUND;
+import static com.listywave.image.application.domain.ImageType.USER_PROFILE;
 import static java.util.Locale.ENGLISH;
 
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.Headers;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.listywave.common.exception.CustomException;
-import com.listywave.common.exception.ErrorCode;
 import com.listywave.image.application.domain.ImageFileExtension;
 import com.listywave.image.application.domain.ImageType;
-import com.listywave.image.application.dto.ExtensionRanks;
-import com.listywave.image.application.dto.response.ItemPresignedUrlResponse;
-import com.listywave.image.application.dto.response.UserPresignedUrlResponse;
+import com.listywave.image.application.dto.response.ListItemPresignedUrlResponse;
+import com.listywave.image.application.dto.response.UserPresignedUrlCreateResponse;
+import com.listywave.image.presentation.dto.request.ListImagesCreateRequest.ExtensionRanks;
 import com.listywave.list.application.domain.item.Item;
 import com.listywave.list.application.domain.item.ItemImageUrl;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.repository.ItemRepository;
 import com.listywave.list.repository.list.ListRepository;
+import com.listywave.notice.application.domain.Notice;
+import com.listywave.notice.application.domain.NoticeContent;
+import com.listywave.notice.application.dto.NoticeImagePresignedUrlCreateResponse;
+import com.listywave.notice.application.dto.OrderAndExtensionDto;
+import com.listywave.notice.repository.NoticeContentRepository;
+import com.listywave.notice.repository.NoticeRepository;
 import com.listywave.user.application.domain.User;
 import com.listywave.user.repository.user.UserRepository;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -54,118 +64,123 @@ public class ImageService {
     private final ItemRepository itemRepository;
     private final ListRepository listRepository;
     private final UserRepository userRepository;
+    private final NoticeRepository noticeRepository;
+    private final NoticeContentRepository noticeContentRepository;
 
-    public List<ItemPresignedUrlResponse> createListsPresignedUrl(Long loginUserId, Long listId, List<ExtensionRanks> extensionRanks) {
-        User user = userRepository.getById(loginUserId);
-
-        ListEntity list = findListById(listId);
-        validateListUserMismatch(list, user);
+    public List<ListItemPresignedUrlResponse> createPresignedUrlOfItem(Long userId, Long listId, List<ExtensionRanks> extensionRanks) {
+        User user = userRepository.getById(userId);
+        ListEntity list = listRepository.getById(listId);
+        list.validateOwner(user);
 
         return extensionRanks.stream()
-                .map((extensionRank) -> {
-                            String imageKey = generatedUUID();
-                            GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                                    getGeneratePresignedUrl(LISTS_ITEM, listId, imageKey, extensionRank.extension());
-                            updateItemImageKey(listId, extensionRank, imageKey);
+                .map(it -> {
+                            Item item = itemRepository.findByListIdAndRanking(listId, it.rank())
+                                    .orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND));
+                            String imageKey = UUID.randomUUID().toString();
+                            item.updateItemImageKey(imageKey);
 
-                            return ItemPresignedUrlResponse.of(
-                                    extensionRank.rank(),
-                                    amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString());
+                            String fileName = createFileName(LISTS_ITEM, listId, imageKey, it.extension());
+                            GeneratePresignedUrlRequest request = createGeneratePreSignedUrlRequest(fileName);
+
+                            String presignedUrl = amazonS3.generatePresignedUrl(request).toString();
+                            return ListItemPresignedUrlResponse.from(it.rank(), presignedUrl);
                         }
-                )
-                .toList();
+                ).toList();
     }
 
-    public void uploadCompleteItemImages(Long loginUserId, Long listId, List<ExtensionRanks> extensionRanks) {
-        final User user = userRepository.getById(loginUserId);
+    private String createFileName(
+            ImageType imageType,
+            Long resourceId,
+            String imageKey,
+            ImageFileExtension imageFileExtension
+    ) {
+        return getCurrentProfile()
+                + "/" + imageType.name().toLowerCase(ENGLISH)
+                + "/" + resourceId
+                + "/" + imageKey
+                + "." + imageFileExtension.name().toLowerCase(ENGLISH);
+    }
 
-        ListEntity list = findListById(listId);
-        validateListUserMismatch(list, user);
+    public String getCurrentProfile() {
+        return Arrays.stream(environment.getActiveProfiles())
+                .filter(profile -> profile.equals("dev") || profile.equals("prod"))
+                .findFirst()
+                .orElse(LOCAL);
+    }
 
-        extensionRanks.forEach(
-                extensionRank -> {
-                    Item item = findItem(listId, extensionRank.rank());
-                    String imageUrl = createReadImageUrl(LISTS_ITEM, listId, item.getImageKey(), extensionRank.extension());
-                    item.updateItemImageUrl(imageUrl);
+    private GeneratePresignedUrlRequest createGeneratePreSignedUrlRequest(String fileName) {
+        var request = new GeneratePresignedUrlRequest(bucket, fileName, PUT)
+                .withExpiration(createPresignedUrlExpiration());
+        request.addRequestParameter(S3_CANNED_ACL, PublicRead.toString());
+
+        return request;
+    }
+
+    private Date createPresignedUrlExpiration() {
+        Date expiration = new Date();
+        var expTimeMillis = expiration.getTime();
+        expTimeMillis += 1000 * 60 * 30;
+        expiration.setTime(expTimeMillis);
+        return expiration;
+    }
+
+    public void updateAllItemsImageUrl(Long userId, Long listId, List<ExtensionRanks> extensionRanks) {
+        User user = userRepository.getById(userId);
+        ListEntity list = listRepository.getById(listId);
+        list.validateOwner(user);
+
+        extensionRanks.forEach(it -> {
+                    Item item = itemRepository.findByListIdAndRanking(listId, it.rank())
+                            .orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND, "해당 아이템이 존재하지 않습니다."));
+                    String imageUrl = createReadImageUrl(LISTS_ITEM, listId, item.getImageKey(), it.extension());
+                    item.updateItemImageUrl(new ItemImageUrl(imageUrl));
                 }
         );
     }
 
-    public UserPresignedUrlResponse updateUserImagePresignedUrl(
-            ImageFileExtension profileExtension,
-            ImageFileExtension backgroundExtension,
-            Long loginUserId
+    private String createReadImageUrl(
+            ImageType imageType,
+            Long resourceId,
+            String imageKey,
+            ImageFileExtension imageFileExtension
     ) {
-        User user = userRepository.getById(loginUserId);
-
-        if (isExistProfileExtension(profileExtension, backgroundExtension)) {
-            deleteCustomUserImageFile(user.getProfileImageUrl());
-            return getUserPresignedUrlResponse(
-                    ImageType.USER_PROFILE,
-                    null,
-                    profileExtension,
-                    backgroundExtension,
-                    user,
-                    false
-            );
-        }
-
-        if (isExistBackgroundExtension(backgroundExtension, profileExtension)) {
-            deleteCustomUserImageFile(user.getBackgroundImageUrl());
-            return getUserPresignedUrlResponse(
-                    null,
-                    ImageType.USER_BACKGROUND,
-                    profileExtension,
-                    backgroundExtension,
-                    user,
-                    false
-            );
-        }
-
-        deleteCustomUserImageFile(user.getProfileImageUrl());
-        deleteCustomUserImageFile(user.getBackgroundImageUrl());
-
-        return getUserPresignedUrlResponse(
-                ImageType.USER_PROFILE,
-                ImageType.USER_BACKGROUND,
-                profileExtension,
-                backgroundExtension,
-                user,
-                true
-        );
+        return IMAGE_DOMAIN_URL
+                + "/" + getCurrentProfile()
+                + "/" + imageType.name().toLowerCase(ENGLISH)
+                + "/" + resourceId
+                + "/" + imageKey
+                + "." + imageFileExtension.name().toLowerCase(ENGLISH);
     }
 
-    public void uploadCompleteUserImages(
+    public UserPresignedUrlCreateResponse createPresignedUrlOfUserImage(
             ImageFileExtension profileExtension,
             ImageFileExtension backgroundExtension,
-            Long ownerId
+            Long userId
     ) {
-        User user = userRepository.getById(ownerId);
+        User user = userRepository.getById(userId);
 
-        String profileImageUrl = "";
-        String backgroundImageUrl = "";
-        boolean isBoth = true;
+        String profileImageKey = UUID.randomUUID().toString();
+        String backgroundImageKey = UUID.randomUUID().toString();
 
-        if (isExistProfileExtension(profileExtension, backgroundExtension)) {
-            profileImageUrl = createReadImageUrl(ImageType.USER_PROFILE, user.getId(), user.getProfileImageUrl(), profileExtension);
-            user.updateUserImageUrl(profileImageUrl, backgroundImageUrl);
-            isBoth = false;
+        String profilePresignedUrl = "";
+        String backgroundPresignedUrl = "";
+
+        if (profileExtension != null) {
+            deleteUserImageFileIfCustomImage(user.getProfileImageUrl());
+
+            var presignedUrlRequest = createUserGeneratePresignedUrlRequest(USER_PROFILE, profileExtension, user, profileImageKey, "");
+            profilePresignedUrl = amazonS3.generatePresignedUrl(presignedUrlRequest).toString();
         }
+        if (backgroundExtension != null) {
+            deleteUserImageFileIfCustomImage(user.getBackgroundImageUrl());
 
-        if (isExistBackgroundExtension(backgroundExtension, profileExtension)) {
-            backgroundImageUrl = createReadImageUrl(ImageType.USER_BACKGROUND, user.getId(), user.getBackgroundImageUrl(), backgroundExtension);
-            user.updateUserImageUrl(profileImageUrl, backgroundImageUrl);
-            isBoth = false;
+            var presignedUrlRequest = createUserGeneratePresignedUrlRequest(USER_BACKGROUND, backgroundExtension, user, "", backgroundImageKey);
+            backgroundPresignedUrl = amazonS3.generatePresignedUrl(presignedUrlRequest).toString();
         }
-
-        if (isBoth) {
-            profileImageUrl = createReadImageUrl(ImageType.USER_PROFILE, user.getId(), user.getProfileImageUrl(), profileExtension);
-            backgroundImageUrl = createReadImageUrl(ImageType.USER_BACKGROUND, user.getId(), user.getBackgroundImageUrl(), backgroundExtension);
-            user.updateUserImageUrl(profileImageUrl, backgroundImageUrl);
-        }
+        return UserPresignedUrlCreateResponse.of(userId, profilePresignedUrl, backgroundPresignedUrl);
     }
 
-    private void deleteCustomUserImageFile(String imageUrl) {
+    private void deleteUserImageFileIfCustomImage(String imageUrl) {
         if (isCustomUserImage(imageUrl)) {
             String fileFullPath = getFileFullName(imageUrl);
             deleteImageFile(fileFullPath);
@@ -173,19 +188,12 @@ public class ImageService {
     }
 
     private boolean isCustomUserImage(String url) {
-        if (url.split("/").length >= 4) {
-            String type = url.split("/")[3];
+        String[] split = url.split("/");
+        if (split.length >= 4) {
+            String type = split[3];
             return !type.equals("basic");
         }
         return false;
-    }
-
-    private void deleteImageFile(String fileFullPath) {
-        try {
-            amazonS3.deleteObject(bucket, fileFullPath);
-        } catch (AmazonServiceException e) {
-            throw new CustomException(ErrorCode.S3_DELETE_OBJECTS_EXCEPTION);
-        }
     }
 
     private String getFileFullName(String url) {
@@ -200,63 +208,15 @@ public class ImageService {
         return extracted.toString();
     }
 
-    private UserPresignedUrlResponse getUserPresignedUrlResponse(
-            ImageType profileImageType,
-            ImageType backgroundImageType,
-            ImageFileExtension profileExtension,
-            ImageFileExtension backgroundExtension,
-            User user,
-            Boolean isBoth
-    ) {
-        if (!isBoth && profileImageType != null) {
-            return generateUserPresignedUrlResponse(profileImageType, profileExtension, user, generatedUUID(), "");
+    private void deleteImageFile(String filePath) {
+        try {
+            amazonS3.deleteObject(bucket, filePath);
+        } catch (AmazonServiceException e) {
+            throw new CustomException(S3_DELETE_OBJECTS_EXCEPTION);
         }
-        if (!isBoth && backgroundImageType != null) {
-            return generateUserPresignedUrlResponse(backgroundImageType, backgroundExtension, user, "", generatedUUID());
-        }
-        return generateUserPresignedUrlResponseByBoth(profileImageType, backgroundImageType, profileExtension, backgroundExtension, user);
     }
 
-    private UserPresignedUrlResponse generateUserPresignedUrlResponseByBoth(
-            ImageType profileImageType,
-            ImageType backgroundImageType,
-            ImageFileExtension profileExtension,
-            ImageFileExtension backgroundExtension,
-            User user
-    ) {
-        String profileImageKey = generatedUUID();
-        String backgroundImageKey = generatedUUID();
-
-        GeneratePresignedUrlRequest profileUrlRequest =
-                getGeneratePresignedUrl(profileImageType, user.getId(), profileImageKey, profileExtension);
-        GeneratePresignedUrlRequest backgroundUrlRequest =
-                getGeneratePresignedUrlRequest(backgroundImageType, backgroundExtension, user, profileImageKey, backgroundImageKey);
-        return UserPresignedUrlResponse.of(
-                user.getId(),
-                amazonS3.generatePresignedUrl(profileUrlRequest).toString(),
-                amazonS3.generatePresignedUrl(backgroundUrlRequest).toString()
-        );
-    }
-
-    private UserPresignedUrlResponse generateUserPresignedUrlResponse(
-            ImageType imageType,
-            ImageFileExtension extension,
-            User user,
-            String profileImageKey,
-            String backgroundImageKey
-    ) {
-        GeneratePresignedUrlRequest presignedUrlRequest =
-                getGeneratePresignedUrlRequest(imageType, extension, user, profileImageKey, backgroundImageKey);
-        return UserPresignedUrlResponse.of(
-                user.getId(),
-                imageType == ImageType.USER_PROFILE ?
-                        amazonS3.generatePresignedUrl(presignedUrlRequest).toString() : "",
-                imageType == ImageType.USER_BACKGROUND ?
-                        amazonS3.generatePresignedUrl(presignedUrlRequest).toString() : ""
-        );
-    }
-
-    private GeneratePresignedUrlRequest getGeneratePresignedUrlRequest(
+    private GeneratePresignedUrlRequest createUserGeneratePresignedUrlRequest(
             ImageType imageType,
             ImageFileExtension extension,
             User user,
@@ -264,146 +224,36 @@ public class ImageService {
             String backgroundImageKey
     ) {
         String imageKey = "";
-        if (imageType == ImageType.USER_PROFILE) {
+        if (imageType == USER_PROFILE) {
             imageKey = profileImageKey;
         }
-        if (imageType == ImageType.USER_BACKGROUND) {
+        if (imageType == USER_BACKGROUND) {
             imageKey = backgroundImageKey;
         }
-        GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                getGeneratePresignedUrl(imageType, user.getId(), imageKey, extension);
-        updateUserImageKey(user, profileImageKey, backgroundImageKey);
-        return generatePresignedUrlRequest;
-    }
-
-    private boolean isExistProfileExtension(
-            ImageFileExtension profileExtension,
-            ImageFileExtension backgroundExtension
-    ) {
-        return backgroundExtension == null &&
-                profileExtension != null &&
-                !profileExtension.getUploadExtension().isEmpty();
-    }
-
-    private boolean isExistBackgroundExtension(
-            ImageFileExtension backgroundExtension,
-            ImageFileExtension profileExtension
-    ) {
-        return profileExtension == null &&
-                backgroundExtension != null &&
-                !backgroundExtension.getUploadExtension().isEmpty();
-    }
-
-    private GeneratePresignedUrlRequest getGeneratePresignedUrl(
-            ImageType type,
-            Long targetId,
-            String imageKey,
-            ImageFileExtension extension
-    ) {
-        String fileName = createFileName(type, targetId, imageKey, extension);
-        return createGeneratePreSignedUrlRequest(bucket, fileName);
-    }
-
-
-    private String createFileName(
-            ImageType imageType,
-            Long targetId,
-            String imageKey,
-            ImageFileExtension imageFileExtension
-    ) {
-        return getCurrentProfile()
-                + "/"
-                + imageType.name().toLowerCase(ENGLISH)
-                + "/"
-                + targetId
-                + "/"
-                + imageKey
-                + "."
-                + imageFileExtension.getUploadExtension();
-    }
-
-    private String createReadImageUrl(
-            ImageType imageType,
-            Long targetId,
-            String imageKey,
-            ImageFileExtension imageFileExtension
-    ) {
-        return IMAGE_DOMAIN_URL
-                + "/"
-                + getCurrentProfile()
-                + "/"
-                + imageType.name().toLowerCase(ENGLISH)
-                + "/"
-                + targetId
-                + "/"
-                + imageKey
-                + "."
-                + imageFileExtension.getUploadExtension();
-    }
-
-    private void updateItemImageKey(Long listId, ExtensionRanks extensionRank, String imageKey) {
-        findItem(listId, extensionRank.rank())
-                .updateItemImageKey(imageKey);
-    }
-
-    private Item findItem(Long listId, int rank) {
-        return itemRepository
-                .findByListIdAndRanking(listId, rank)
-                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "해당 아이템이 존재하지 않습니다."));
-    }
-
-    private void updateUserImageKey(User user, String profileImageKey, String backgroundImageKey) {
         user.updateUserImageUrl(profileImageKey, backgroundImageKey);
+
+        String fileName = createFileName(imageType, user.getId(), imageKey, extension);
+        return createGeneratePreSignedUrlRequest(fileName);
     }
 
-    private GeneratePresignedUrlRequest createGeneratePreSignedUrlRequest(
-            String bucket,
-            String fileName
+    public void updateUserImages(
+            ImageFileExtension profileExtension,
+            ImageFileExtension backgroundExtension,
+            Long ownerId
     ) {
-        GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                new GeneratePresignedUrlRequest(bucket, fileName)
-                        .withMethod(HttpMethod.PUT)
-                        .withExpiration(getPresignedUrlExpiration());
+        User user = userRepository.getById(ownerId);
 
-        generatePresignedUrlRequest.addRequestParameter(
-                Headers.S3_CANNED_ACL, CannedAccessControlList.PublicRead.toString()
-        );
-        return generatePresignedUrlRequest;
-    }
+        String profileImageUrl = "";
+        String backgroundImageUrl = "";
 
-    private Date getPresignedUrlExpiration() {
-        Date expiration = new Date();
-        var expTimeMillis = expiration.getTime();
-        expTimeMillis += 1000 * 60 * 30;
-        expiration.setTime(expTimeMillis);
-        return expiration;
-    }
-
-    private String generatedUUID() {
-        return UUID.randomUUID().toString();
-    }
-
-    private void validateListUserMismatch(ListEntity list, User user) {
-        if (!list.getUser().getId().equals(user.getId())) {
-            throw new CustomException(ErrorCode.INVALID_ACCESS, "리스트를 생성한 유저와 로그인한 계정이 일치하지 않습니다.");
+        if (profileExtension != null) {
+            profileImageUrl = createReadImageUrl(USER_PROFILE, user.getId(), user.getProfileImageUrl(), profileExtension);
         }
-    }
+        if (backgroundExtension != null) {
+            backgroundImageUrl = createReadImageUrl(USER_BACKGROUND, user.getId(), user.getBackgroundImageUrl(), backgroundExtension);
+        }
 
-    private ListEntity findListById(Long listId) {
-        return listRepository
-                .findById(listId)
-                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "존재하지 않는 리스트입니다."));
-    }
-
-    public String getCurrentProfile() {
-        return Arrays.stream(environment.getActiveProfiles())
-                .filter(this::isActivateDev)
-                .findFirst()
-                .orElse(LOCAL);
-    }
-
-    private boolean isActivateDev(String profile) {
-        return profile.equals(DEV);
+        user.updateUserImageUrl(profileImageUrl, backgroundImageUrl);
     }
 
     @Async
@@ -434,5 +284,38 @@ public class ImageService {
 
         String fileFullName = getFileFullName(itemImageUrl.getValue());
         deleteImageFile(fileFullName);
+    }
+
+    public List<NoticeImagePresignedUrlCreateResponse> createNoticeImagePresignedUrl(
+            Long noticeId,
+            List<OrderAndExtensionDto> requests
+    ) {
+        Notice notice = noticeRepository.getById(noticeId);
+
+        return requests.stream()
+                .map(it -> {
+                    String imageKey = UUID.randomUUID().toString();
+                    NoticeContent noticeContent = noticeContentRepository.findByNoticeAndOrder(notice, it.order())
+                            .orElseThrow();
+
+                    noticeContent.updateImageUrl(imageKey);
+
+                    String fileName = createFileName(NOTICE, noticeId, imageKey, it.extension());
+                    GeneratePresignedUrlRequest request = createGeneratePreSignedUrlRequest(fileName);
+                    URL presignedUrl = amazonS3.generatePresignedUrl(request);
+
+                    return NoticeImagePresignedUrlCreateResponse.of(it.order(), presignedUrl.toString());
+                }).toList();
+    }
+
+    public void updateNoticeContentImages(Long noticeId, List<OrderAndExtensionDto> requests) {
+        Notice notice = noticeRepository.getById(noticeId);
+        requests.forEach(it -> {
+            NoticeContent noticeContent = noticeContentRepository.findByNoticeAndOrder(notice, it.order())
+                    .orElseThrow();
+
+            String imageUrl = createReadImageUrl(NOTICE, noticeId, noticeContent.getImageUrl(), it.extension());
+            noticeContent.updateImageUrl(imageUrl);
+        });
     }
 }
