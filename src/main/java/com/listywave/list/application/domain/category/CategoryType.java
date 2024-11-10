@@ -2,6 +2,7 @@ package com.listywave.list.application.domain.category;
 
 import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.listywave.common.exception.CustomException;
 import java.util.Arrays;
 import lombok.AllArgsConstructor;
@@ -36,6 +37,7 @@ public enum CategoryType {
                 .orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND, ERROR_MESSAGE + code));
     }
 
+    @JsonCreator
     public static CategoryType nameOf(String name) {
         return Arrays.stream(CategoryType.values())
                 .filter(categoryType -> categoryType.name().equalsIgnoreCase(name))
