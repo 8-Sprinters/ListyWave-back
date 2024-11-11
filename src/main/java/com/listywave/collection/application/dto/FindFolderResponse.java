@@ -6,7 +6,7 @@ public record FindFolderResponse(
         List<FolderResponse> folders
 ) {
 
-    public static FindFolderResponse of(List<FolderResponse> list){
+    public static FindFolderResponse of(List<FolderResponse> list) {
         return new FindFolderResponse(list);
     }
 }

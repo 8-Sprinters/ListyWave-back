@@ -76,4 +76,10 @@ public class NoticeController {
         noticeService.delete(noticeId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/admin/notices/{noticeId}/alarm")
+    ResponseEntity<Void> sendAlarm(@PathVariable Long noticeId) {
+        noticeService.sendAlarm(noticeId);
+        return ResponseEntity.noContent().build();
+    }
 }

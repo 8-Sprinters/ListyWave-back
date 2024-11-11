@@ -1,5 +1,8 @@
 package com.listywave.collection.application.domain;
 
+import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
+import static lombok.AccessLevel.PROTECTED;
+
 import com.listywave.common.BaseEntity;
 import com.listywave.common.exception.CustomException;
 import jakarta.persistence.Column;
@@ -9,9 +12,6 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
-import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @Getter

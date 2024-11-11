@@ -1,13 +1,13 @@
 package com.listywave.acceptance.folder;
 
+import static com.listywave.acceptance.common.CommonAcceptanceHelper.given;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 import com.listywave.collection.presentation.dto.FolderCreateRequest;
 import com.listywave.collection.presentation.dto.FolderSelectionRequest;
 import com.listywave.collection.presentation.dto.FolderUpdateRequest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-
-import static com.listywave.acceptance.common.CommonAcceptanceHelper.given;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 public abstract class FolderAcceptanceTestHelper {
 

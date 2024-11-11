@@ -2,6 +2,7 @@ package com.listywave.alarm.application.service;
 
 import static com.listywave.alarm.application.domain.AlarmType.COMMENT;
 import static com.listywave.alarm.application.domain.AlarmType.MENTION;
+import static com.listywave.alarm.application.domain.AlarmType.NOTICE;
 import static com.listywave.alarm.application.domain.AlarmType.REPLY;
 import static org.springframework.transaction.annotation.Propagation.REQUIRED;
 import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
@@ -126,7 +127,7 @@ public class AlarmService {
     @Transactional(readOnly = true)
     public List<AlarmFindResponse> findAllBy(Long userId) {
         userRepository.getById(userId);
-        List<Alarm> alarms = alarmRepository.findAllBy(userId, LocalDateTime.now().minusDays(30));
+        List<Alarm> alarms = alarmRepository.findAllBy(userId, LocalDateTime.now().minusDays(30), NOTICE);
         return AlarmFindResponse.toList(alarms);
     }
 
