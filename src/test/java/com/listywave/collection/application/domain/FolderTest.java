@@ -1,16 +1,16 @@
 package com.listywave.collection.application.domain;
 
-import com.listywave.common.exception.CustomException;
-import com.listywave.user.application.domain.User;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
 import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.정수;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import com.listywave.common.exception.CustomException;
+import com.listywave.user.application.domain.User;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Folder는 ")
 class FolderTest {

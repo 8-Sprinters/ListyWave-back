@@ -1,6 +1,7 @@
 package com.listywave.alarm.repository;
 
 import com.listywave.alarm.application.domain.Alarm;
+import com.listywave.alarm.application.domain.AlarmType;
 import com.listywave.alarm.repository.custom.CustomAlarmRepository;
 import com.listywave.common.exception.CustomException;
 import com.listywave.common.exception.ErrorCode;
@@ -49,14 +50,13 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long>, CustomAlarm
             left join ListEntity l on a.list = l
             left join Comment c on a.comment = c
             left join Reply r on a.reply = r
-            where a.receiveUserId = :receiveUserId and a.createdDate >= :thirtyDaysAgo
+            left join Notice n on a.notice = n
+            where a.createdDate >= :thirtyDaysAgo and (a.receiveUserId = :receiveUserId or a.type = :type)
             order by a.createdDate desc
             """)
-    List<Alarm> findAllBy(Long receiveUserId, LocalDateTime thirtyDaysAgo);
+    List<Alarm> findAllBy(Long receiveUserId, LocalDateTime thirtyDaysAgo, AlarmType type);
 
     List<Alarm> findAllByReply(Reply reply);
-
-    void deleteByComment(Comment comment);
 
     void deleteAllByCommentAndReceiveUserId(Comment comment, Long receiveUserId);
 }

@@ -24,7 +24,7 @@ public class Nickname {
     private static final int LENGTH_LIMIT = 10;
     private static final Set<String> BLACK_LIST = Set.of(
             "운영자", "관리자", "admin", "listy", "L1sty", "에잇", "eight", "리스티", "관리인", "운영인", "관ㄹi자", "관ㄹl자",
-            "관ㄹI자", "관리ㅈr", "운영ㅈr", "관ㄹ1자", "adm1n", "관리요원"
+            "관ㄹI자", "관리ㅈr", "운영ㅈr", "관ㄹ1자", "adm1n", "관리요원", "공식계정", "official", "Official"
     );
 
     @Column(name = "nickname", unique = true, length = LENGTH_LIMIT, nullable = false)

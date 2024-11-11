@@ -6,7 +6,9 @@ import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.domain.reply.Reply;
 import com.listywave.mention.Mention;
+import com.listywave.notice.application.domain.Notice;
 import com.listywave.user.application.domain.User;
+import jakarta.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
@@ -18,9 +20,10 @@ public record AlarmFindResponse(
         @JsonProperty("checked") boolean isChecked,
         String type,
         UserDto sendUser,
-        ListDto list,
-        CommentDto comment,
-        ReplyDto reply
+        @Nullable ListDto list,
+        @Nullable CommentDto comment,
+        @Nullable ReplyDto reply,
+        @Nullable NoticeDto notice
 ) {
 
     public static List<AlarmFindResponse> toList(List<Alarm> alarms) {
@@ -34,6 +37,7 @@ public record AlarmFindResponse(
                         .list(ListDto.of(alarm.getList()))
                         .comment(CommentDto.of(alarm.getComment()))
                         .reply(ReplyDto.of(alarm.getReply()))
+                        .notice(NoticeDto.of(alarm.getNotice()))
                         .build()
                 ).toList();
     }
@@ -54,7 +58,7 @@ public record AlarmFindResponse(
             String title
     ) {
 
-        public static ListDto of(ListEntity list) {
+        public static ListDto of(@Nullable ListEntity list) {
             if (list == null) {
                 return null;
             }
@@ -68,7 +72,7 @@ public record AlarmFindResponse(
             List<MentionDto> mentions
     ) {
 
-        public static CommentDto of(Comment comment) {
+        public static CommentDto of(@Nullable Comment comment) {
             if (comment == null) {
                 return null;
             }
@@ -82,7 +86,7 @@ public record AlarmFindResponse(
             List<MentionDto> mentions
     ) {
 
-        public static ReplyDto of(Reply reply) {
+        public static ReplyDto of(@Nullable Reply reply) {
             if (reply == null) {
                 return null;
             }
@@ -105,5 +109,28 @@ public record AlarmFindResponse(
         }
     }
 
-    // TODO: notice
+    @Builder
+    public record NoticeDto(
+            Long id,
+            String categoryCode,
+            String categoryViewName,
+            String title,
+            String description,
+            LocalDateTime createdDate
+    ) {
+
+        public static NoticeDto of(@Nullable Notice notice) {
+            if (notice == null) {
+                return null;
+            }
+            return NoticeDto.builder()
+                    .id(notice.getId())
+                    .categoryCode(String.valueOf(notice.getType().getCode()))
+                    .categoryViewName(notice.getType().getViewName())
+                    .title(notice.getTitle().getValue())
+                    .description(notice.getDescription().getValue())
+                    .createdDate(notice.getCreatedDate())
+                    .build();
+        }
+    }
 }
