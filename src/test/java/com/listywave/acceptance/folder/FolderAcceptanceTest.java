@@ -1,25 +1,35 @@
 package com.listywave.acceptance.folder;
 
-import com.listywave.acceptance.common.AcceptanceTest;
-import com.listywave.collection.application.dto.FindFolderResponse;
-import com.listywave.collection.application.dto.FolderCreateResponse;
-import com.listywave.list.application.dto.response.ListCreateResponse;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static com.listywave.acceptance.collection.CollectionAcceptanceTestHelper.콜렉트_또는_콜렉트취소_API_호출;
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
-import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.*;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.*;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.폴더_삭제_API_호출;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.폴더_생성_API_호출;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.폴더_생성_요청_데이터;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.폴더_선택_요청_데이터;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.폴더_수정_API_호출;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.폴더_수정_요청_데이터;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.폴더_조회_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.가장_좋아하는_견종_TOP3_생성_요청_데이터;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_저장_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원용_리스트_상세_조회_API_호출;
 import static com.listywave.list.fixture.ListFixture.지정된_개수만큼_리스트를_생성한다;
 import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.정수;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+
+import com.listywave.acceptance.common.AcceptanceTest;
+import com.listywave.collection.application.dto.FindFolderResponse;
+import com.listywave.collection.application.dto.FolderCreateResponse;
+import com.listywave.list.application.dto.response.ListCreateResponse;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("폴더 관련 인수테스트")
 public class FolderAcceptanceTest extends AcceptanceTest {

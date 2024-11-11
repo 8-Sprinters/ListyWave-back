@@ -3,12 +3,14 @@ package com.listywave.alarm.application.domain;
 import static com.listywave.alarm.application.domain.AlarmType.COLLECT;
 import static com.listywave.alarm.application.domain.AlarmType.COMMENT;
 import static com.listywave.alarm.application.domain.AlarmType.FOLLOW;
+import static com.listywave.alarm.application.domain.AlarmType.NOTICE;
 import static com.listywave.alarm.application.domain.AlarmType.REPLY;
 
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.domain.reply.Reply;
 import com.listywave.mention.Mention;
+import com.listywave.notice.application.domain.Notice;
 import com.listywave.user.application.domain.User;
 import java.util.List;
 import lombok.Builder;
@@ -21,6 +23,7 @@ public record AlarmCreateEvent(
         Comment comment,
         Reply reply,
         List<Mention> mentions,
+        Notice notice,
         AlarmType alarmType
 ) {
 
@@ -32,6 +35,7 @@ public record AlarmCreateEvent(
                 .comment(comment)
                 .reply(reply)
                 .type(alarmType)
+                .notice(notice)
                 .isChecked(false)
                 .build();
     }
@@ -73,6 +77,14 @@ public record AlarmCreateEvent(
                 .listenerId(list.getUser().getId())
                 .list(list)
                 .alarmType(COLLECT)
+                .build();
+    }
+
+    public static AlarmCreateEvent notice(User user, Notice notice) {
+        return AlarmCreateEvent.builder()
+                .publisher(user)
+                .notice(notice)
+                .alarmType(NOTICE)
                 .build();
     }
 

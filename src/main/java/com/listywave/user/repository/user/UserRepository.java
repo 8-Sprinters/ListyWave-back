@@ -36,4 +36,6 @@ public interface UserRepository extends JpaRepository<User, Long>, CustomUserRep
             where u.isDelete = false
             """)
     List<User> findAll();
+
+    User findByNicknameValue(String nickname);
 }

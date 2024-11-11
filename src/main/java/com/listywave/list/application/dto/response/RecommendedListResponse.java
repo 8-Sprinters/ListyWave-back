@@ -2,9 +2,8 @@ package com.listywave.list.application.dto.response;
 
 import com.listywave.list.application.domain.item.Item;
 import com.listywave.list.application.domain.list.ListEntity;
-import lombok.Builder;
-
 import java.util.List;
+import lombok.Builder;
 
 @Builder
 public record RecommendedListResponse(
