@@ -5,11 +5,13 @@ import com.listywave.image.application.domain.DefaultBackgroundImages;
 import com.listywave.image.application.domain.DefaultProfileImages;
 import com.listywave.image.application.dto.response.DefaultBackgroundImageUrlResponse;
 import com.listywave.image.application.dto.response.DefaultProfileImageUrlResponse;
-import com.listywave.image.application.dto.response.ItemPresignedUrlResponse;
-import com.listywave.image.application.dto.response.UserPresignedUrlResponse;
+import com.listywave.image.application.dto.response.ListItemPresignedUrlResponse;
+import com.listywave.image.application.dto.response.UserPresignedUrlCreateResponse;
 import com.listywave.image.application.service.ImageService;
-import com.listywave.image.presentation.dto.request.ListsImagesCreateRequest;
+import com.listywave.image.presentation.dto.request.ListImagesCreateRequest;
 import com.listywave.image.presentation.dto.request.UserImageUpdateRequest;
+import com.listywave.notice.application.dto.NoticeImagePresignedUrlCreateResponse;
+import com.listywave.notice.application.dto.OrderAndExtensionDto;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,50 +30,35 @@ public class ImageController {
     private final ImageService imageService;
 
     @PostMapping("/lists/upload-url")
-    ResponseEntity<List<ItemPresignedUrlResponse>> listItemPresignedUrlCreate(
-            @RequestBody ListsImagesCreateRequest request,
-            @Auth Long loginUserId
+    ResponseEntity<List<ListItemPresignedUrlResponse>> createPresignedUrlOfItem(
+            @RequestBody ListImagesCreateRequest request,
+            @Auth Long userId
     ) {
-        List<ItemPresignedUrlResponse> response = imageService.createListsPresignedUrl(
-                loginUserId,
-                request.listId(),
-                request.extensionRanks()
-        );
+        var response = imageService.createPresignedUrlOfItem(userId, request.listId(), request.extensionRanks());
         return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/lists/upload-complete")
-    ResponseEntity<Void> listItemImagesUpload(
-            @RequestBody ListsImagesCreateRequest request,
-            @Auth Long loginUserId
-    ) {
-        imageService.uploadCompleteItemImages(loginUserId, request.listId(), request.extensionRanks());
+    ResponseEntity<Void> completeUploadItems(@RequestBody ListImagesCreateRequest request, @Auth Long userId) {
+        imageService.updateAllItemsImageUrl(userId, request.listId(), request.extensionRanks());
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/users/upload-url")
-    ResponseEntity<UserPresignedUrlResponse> userImagePresignedUrlCreate(
+    ResponseEntity<UserPresignedUrlCreateResponse> createPresignedUrlOfUserImage(
             @RequestBody UserImageUpdateRequest request,
-            @Auth Long loginUserId
+            @Auth Long userId
     ) {
-        UserPresignedUrlResponse userPresignedUrlResponse = imageService.updateUserImagePresignedUrl(
-                request.profileExtension(),
-                request.backgroundExtension(),
-                loginUserId
-        );
+        var userPresignedUrlResponse = imageService.createPresignedUrlOfUserImage(request.profileExtension(), request.backgroundExtension(), userId);
         return ResponseEntity.ok(userPresignedUrlResponse);
     }
 
     @PostMapping("/users/upload-complete")
-    ResponseEntity<Void> userImageUpload(
+    ResponseEntity<Void> completeUploadUserImage(
             @RequestBody UserImageUpdateRequest request,
-            @Auth Long loginUserId
+            @Auth Long userId
     ) {
-        imageService.uploadCompleteUserImages(
-                request.profileExtension(),
-                request.backgroundExtension(),
-                loginUserId
-        );
+        imageService.updateUserImages(request.profileExtension(), request.backgroundExtension(), userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -101,4 +88,21 @@ public class ImageController {
         return ResponseEntity.ok().body(response);
     }
 
+    @PostMapping("/admin/notices/{noticeId}/presigned-url")
+    ResponseEntity<List<NoticeImagePresignedUrlCreateResponse>> createPresignedUrlOfNoticeContent(
+            @PathVariable Long noticeId,
+            @RequestBody List<OrderAndExtensionDto> request
+    ) {
+        var result = imageService.createNoticeImagePresignedUrl(noticeId, request);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/admin/notices/{noticeId}/upload-complete")
+    ResponseEntity<Void> completeUploadNoticeImages(
+            @PathVariable Long noticeId,
+            @RequestBody List<OrderAndExtensionDto> requests
+    ) {
+        imageService.updateNoticeContentImages(noticeId, requests);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -10,5 +10,6 @@ public enum ImageType {
     LISTS_ITEM,
     USER_PROFILE,
     USER_BACKGROUND,
+    NOTICE,
     ;
 }

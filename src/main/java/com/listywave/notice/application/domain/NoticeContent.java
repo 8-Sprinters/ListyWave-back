@@ -37,7 +37,7 @@ public class NoticeContent {
 
     @Column(nullable = true, length = 1000)
     private String description;
-    
+
     @Column(nullable = true, length = 2048)
     private String imageUrl;
 
@@ -57,5 +57,9 @@ public class NoticeContent {
             @Nullable String buttonLink
     ) {
         return new NoticeContent(null, notice, order, type, description, imageUrl, buttonName, buttonLink);
+    }
+
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

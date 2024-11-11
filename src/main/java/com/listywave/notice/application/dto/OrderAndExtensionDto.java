@@ -1,9 +1,9 @@
-package com.listywave.image.application.dto;
+package com.listywave.notice.application.dto;
 
 import com.listywave.image.application.domain.ImageFileExtension;
 
-public record ExtensionRanks(
-        int rank,
+public record OrderAndExtensionDto(
+        int order,
         ImageFileExtension extension
 ) {
 }
