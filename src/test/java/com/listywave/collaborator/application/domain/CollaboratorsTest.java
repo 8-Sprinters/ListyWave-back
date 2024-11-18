@@ -252,8 +252,8 @@ class CollaboratorsTest {
                             new ListTitle(String.valueOf(i)),
                             new ListDescription(String.valueOf(i)),
                             true,
-                            BackgroundPalette.LISTY,
-                            BackgroundColor.LISTY_BLUE,
+                            BackgroundPalette.NEON,
+                            BackgroundColor.NEON_BLUE,
                             false,
                             new Labels(List.of()),
                             new Items(
