@@ -17,6 +17,7 @@ import com.listywave.user.application.dto.UsersRecommendedResponse;
 import com.listywave.user.application.dto.search.UserElasticSearchResponse;
 import com.listywave.user.application.dto.search.UserSearchResponse;
 import com.listywave.user.application.dto.search.UserSearchResult;
+import com.listywave.user.application.vo.Nickname;
 import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import com.listywave.user.repository.user.elastic.UserElasticRepository;
@@ -189,5 +190,9 @@ public class UserService {
 
     public User getById(Long userId) {
         return userRepository.getById(userId);
+    }
+
+    public void validateNickname(String nickname) {
+        Nickname.of(nickname);
     }
 }
