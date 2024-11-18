@@ -9,6 +9,7 @@ import com.listywave.common.exception.CustomException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -69,10 +70,11 @@ public class Nickname {
 
     private static void validateRelatedWithAdmin(String value) {
         value = value.toLowerCase(Locale.ENGLISH);
-        for (String word : BLACK_LIST) {
-            if (value.contains(word)) {
-                throw new CustomException(ILLEGAL_NICKNAME_EXCEPTION);
-            }
+        Optional<String> result = BLACK_LIST.stream()
+                .filter(value::contains)
+                .findAny();
+        if (result.isPresent()) {
+            throw new CustomException(ILLEGAL_NICKNAME_EXCEPTION);
         }
     }
 }

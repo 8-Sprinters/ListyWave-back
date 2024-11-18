@@ -130,4 +130,10 @@ public class UserController {
         UserElasticSearchResponse response = userService.searchUserByElastic(loginUserId, keyword, pageable);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/users/nickname-validate")
+    ResponseEntity<Void> validateNickname(@RequestParam(value = "nickname") String nickname) {
+        userService.validateNickname(nickname);
+        return ResponseEntity.ok().build();
+    }
 }
