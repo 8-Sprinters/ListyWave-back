@@ -8,6 +8,7 @@ import com.listywave.notice.application.service.dto.NoticeFindAllResponseToUser;
 import com.listywave.notice.application.service.dto.NoticeFindResponse;
 import com.listywave.notice.application.service.dto.NoticeUpdateRequest;
 import com.listywave.notice.presentation.dto.NoticeCategoryFindResponse;
+import com.listywave.notice.presentation.dto.NoticeCreateResponse;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -34,11 +35,10 @@ public class NoticeController {
     }
 
     @PostMapping("/admin/notices")
-    ResponseEntity<Void> create(
-            @RequestBody NoticeCreateRequest request
-    ) {
+    ResponseEntity<NoticeCreateResponse> create(@RequestBody NoticeCreateRequest request) {
         Long id = noticeService.create(request);
-        return ResponseEntity.created(URI.create("/admin/notices/" + id)).build();
+        NoticeCreateResponse response = new NoticeCreateResponse(id);
+        return ResponseEntity.created(URI.create("/admin/notices/" + id)).body(response);
     }
 
     @GetMapping("/admin/notices")
