@@ -29,7 +29,8 @@ public record NoticeFindAllResponseToAdmin(
                 .title(notice.getTitle().getValue())
                 .category(notice.getType().getViewName())
                 .description(notice.getDescription().getValue())
-                .isExposed(notice.isDidSendAlarm())
+                .isExposed(notice.isExposed())
+                .didSendAlarm(notice.isDidSendAlarm())
                 .build();
     }
 }
