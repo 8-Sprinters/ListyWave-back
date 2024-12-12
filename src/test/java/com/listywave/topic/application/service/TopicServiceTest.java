@@ -12,11 +12,13 @@ import com.listywave.list.application.domain.list.ListTitle;
 import com.listywave.topic.application.domain.Topic;
 import com.listywave.topic.application.service.dto.ExposedTopicFindResponse;
 import com.listywave.topic.application.service.dto.ExposedTopicFindResponse.TopicDto;
+import com.listywave.topic.application.service.dto.RecommendTopicFindResponse;
 import com.listywave.topic.application.service.dto.TopicCreateRequest;
 import com.listywave.topic.application.service.dto.TopicFindResponse;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.Repeat;
 
 class TopicServiceTest extends IntegrationTest {
 
@@ -91,22 +93,7 @@ class TopicServiceTest extends IntegrationTest {
         @Test
         void cursorId가_null이고_size가_10일_때_노출이_승인된_토픽을_조회한다() {
             // given
-            List<Topic> topics = List.of(
-                    new Topic(dh, MUSIC, new ListTitle("1"), new ListDescription("1"), false, true),
-                    new Topic(dh, MUSIC, new ListTitle("2"), new ListDescription("2"), false, true),
-                    new Topic(dh, MUSIC, new ListTitle("3"), new ListDescription("3"), false, true),
-                    new Topic(dh, MUSIC, new ListTitle("4"), new ListDescription("4"), false, true),
-                    new Topic(dh, MUSIC, new ListTitle("5"), new ListDescription("5"), false, true),
-                    new Topic(dh, MUSIC, new ListTitle("6"), new ListDescription("6"), false, true),
-                    new Topic(dh, MUSIC, new ListTitle("7"), new ListDescription("7"), false, true),
-                    new Topic(dh, MUSIC, new ListTitle("8"), new ListDescription("8"), false, true),
-                    new Topic(dh, MUSIC, new ListTitle("9"), new ListDescription("9"), false, true),
-                    new Topic(dh, MUSIC, new ListTitle("10"), new ListDescription("10"), false, true),
-                    new Topic(dh, MUSIC, new ListTitle("11"), new ListDescription("11"), false, true),
-                    new Topic(dh, MUSIC, new ListTitle("12"), new ListDescription("12"), false, true),
-                    new Topic(dh, MUSIC, new ListTitle("13"), new ListDescription("13"), false, true)
-            );
-            topicRepository.saveAll(topics);
+            save10TopicsAllExposed();
 
             // when
             int size = 10;
@@ -125,9 +112,7 @@ class TopicServiceTest extends IntegrationTest {
             );
         }
 
-        @Test
-        void cursorId가_뒤에서_다섯_번째고_size가_5일_때_노출이_승인된_토픽을_조회한다() {
-            // given
+        private List<Topic> save10TopicsAllExposed() {
             List<Topic> topics = List.of(
                     new Topic(dh, MUSIC, new ListTitle("1"), new ListDescription("1"), false, true),
                     new Topic(dh, MUSIC, new ListTitle("2"), new ListDescription("2"), false, true),
@@ -145,6 +130,14 @@ class TopicServiceTest extends IntegrationTest {
             );
             topicRepository.saveAll(topics);
 
+            return topics;
+        }
+
+        @Test
+        void cursorId가_뒤에서_다섯_번째고_size가_5일_때_노출이_승인된_토픽을_조회한다() {
+            // given
+            List<Topic> topics = save10TopicsAllExposed();
+
             // when
             long cursorId = topics.get(8).getId();
             ExposedTopicFindResponse result = topicService.findAllExposed(cursorId, 5);
@@ -161,6 +154,44 @@ class TopicServiceTest extends IntegrationTest {
                     }
             );
 
+        }
+
+        @Test
+        @Repeat(10)
+        void 홈_화면에서_추천_토픽을_조회한다() {
+            // given
+            List<Topic> topics = List.of(
+                    new Topic(dh, MUSIC, new ListTitle("1"), new ListDescription("1"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("2"), new ListDescription("2"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("3"), new ListDescription("3"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("4"), new ListDescription("4"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("5"), new ListDescription("5"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("6"), new ListDescription("6"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("7"), new ListDescription("7"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("8"), new ListDescription("8"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("9"), new ListDescription("9"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("10"), new ListDescription("10"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("11"), new ListDescription("11"), false, true), // O
+                    new Topic(dh, MUSIC, new ListTitle("12"), new ListDescription("12"), false, false),
+                    new Topic(dh, MUSIC, new ListTitle("13"), new ListDescription("13"), false, true) // O
+            );
+            topicRepository.saveAll(topics);
+
+            // when
+            List<RecommendTopicFindResponse> result = topicService.getRecommendTopics(5);
+
+            // then
+            assertAll(
+                    () -> {
+                        List<String> titles = result.stream()
+                                .map(RecommendTopicFindResponse::title)
+                                .toList();
+
+                        assertThat(titles).hasSizeLessThanOrEqualTo(5);
+                        assertThat(titles).containsAnyOf("1", "3", "5", "7", "9", "11", "13");
+                        assertThat(titles).doesNotContainAnyElementsOf(List.of("2", "4", "6", "8", "10", "12"));
+                    }
+            );
         }
     }
 

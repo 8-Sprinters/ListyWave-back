@@ -3,9 +3,11 @@ package com.listywave.topic.presentation;
 import com.listywave.common.auth.Auth;
 import com.listywave.topic.application.service.TopicService;
 import com.listywave.topic.application.service.dto.ExposedTopicFindResponse;
+import com.listywave.topic.application.service.dto.RecommendTopicFindResponse;
 import com.listywave.topic.application.service.dto.TopicCreateRequest;
 import com.listywave.topic.application.service.dto.TopicFindResponse;
 import com.listywave.topic.presentation.dto.TopicUpdateRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +36,14 @@ public class TopicController {
             @RequestParam(defaultValue = "10") int size
     ) {
         ExposedTopicFindResponse result = topicService.findAllExposed(cursorId, size);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/topics/recommend")
+    ResponseEntity<List<RecommendTopicFindResponse>> recommendTopics(
+            @RequestParam(name = "size", required = false, defaultValue = "5") int size
+    ) {
+        List<RecommendTopicFindResponse> result = topicService.getRecommendTopics(size);
         return ResponseEntity.ok(result);
     }
 
