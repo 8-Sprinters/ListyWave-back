@@ -3,6 +3,7 @@ package com.listywave.topic.application.service;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.topic.application.domain.Topic;
 import com.listywave.topic.application.service.dto.ExposedTopicFindResponse;
+import com.listywave.topic.application.service.dto.RecommendTopicFindResponse;
 import com.listywave.topic.application.service.dto.TopicCreateRequest;
 import com.listywave.topic.application.service.dto.TopicFindResponse;
 import com.listywave.topic.repository.TopicRepository;
@@ -11,6 +12,7 @@ import com.listywave.user.repository.user.UserRepository;
 import jakarta.annotation.Nullable;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,5 +46,10 @@ public class TopicService {
     public void update(Long topicId, boolean isExposed, String categoryCode, String title) {
         Topic topic = topicRepository.getById(topicId);
         topic.update(isExposed, CategoryType.codeOf(categoryCode), title);
+    }
+
+    public List<RecommendTopicFindResponse> getRecommendTopics(int size) {
+        List<Topic> topics = topicRepository.getTopicsRandomly(Pageable.ofSize(size));
+        return RecommendTopicFindResponse.toList(topics);
     }
 }
