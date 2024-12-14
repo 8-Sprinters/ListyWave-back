@@ -6,6 +6,7 @@ import static java.util.Comparator.comparingLong;
 import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.reply.Reply;
 import com.listywave.mention.Mention;
+import com.listywave.user.application.domain.User;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -119,10 +120,14 @@ public record CommentFindResponse(
 
         public static List<MentionDto> toList(List<Mention> mentions) {
             return mentions.stream()
-                    .map(Mention::getUser)
-                    .filter(user -> !user.isDelete())
-                    .map(user -> new MentionDto(user.getId(), user.getNickname()))
-                    .sorted(comparingLong(MentionDto::userId))
+                    .sorted(comparingLong(Mention::getId))
+                    .map(mention -> {
+                        User user = mention.getUser();
+                        if (user.isDelete()) {
+                            return new MentionDto(0L, "withdrawer");
+                        }
+                        return new MentionDto(user.getId(), user.getNickname());
+                    })
                     .toList();
         }
     }
