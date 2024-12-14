@@ -122,10 +122,9 @@ public class MentionServiceTest extends IntegrationTest {
         }
 
         @Test
-        void 댓글에서_멘션을_당한_사용자가_탈퇴한_사용자인_경우_조회하지_않는다() {
+        void 댓글에서_멘션을_당한_사용자가_탈퇴한_사용자인_경우_id는_0이고_닉네임은_withdrawer로_응답한다() {
             // given
-            List<Long> mentionIds = List.of(js.getId(), ej.getId());
-            commentService.create(list.getId(), dh.getId(), "댓글이용", mentionIds);
+            commentService.create(list.getId(), dh.getId(), "댓글이용", List.of(js.getId(), ej.getId()));
 
             // when
             authService.withdraw(js.getId());
@@ -133,9 +132,21 @@ public class MentionServiceTest extends IntegrationTest {
             // then
             CommentFindResponse response = commentService.findAllBy(list.getId(), 5, null);
             CommentDto commentDto = response.comments().get(0);
+            List<MentionDto> mentions = commentDto.mentions();
 
-            assertThat(commentDto.mentions()).hasSize(1);
-            assertThat(commentDto.mentions().get(0).userId()).isEqualTo(ej.getId());
+            assertAll(
+                    () -> assertThat(mentions).hasSize(2),
+                    () -> {
+                        MentionDto mentionToJs = mentions.get(0);
+                        assertThat(mentionToJs.userId()).isEqualTo(0L);
+                        assertThat(mentionToJs.userNickname()).isEqualTo("withdrawer");
+                    },
+                    () -> {
+                        MentionDto mentionToEj = mentions.get(1);
+                        assertThat(mentionToEj.userId()).isEqualTo(ej.getId());
+                        assertThat(mentionToEj.userNickname()).isEqualTo(ej.getNickname());
+                    }
+            );
         }
 
         @Test
@@ -169,11 +180,10 @@ public class MentionServiceTest extends IntegrationTest {
         }
 
         @Test
-        void 답글에서_멘션을_당한_사용자가_탈퇴한_사용자인_경우_조회하지_않는다() {
+        void 답글에서_멘션을_당한_사용자가_탈퇴한_사용자인_경우_id는_0이고_닉네임은_withdrawer으로_응답한다() {
             // given
             Long commentId = commentService.create(list.getId(), dh.getId(), "댓글이용", EMPTY_LIST).id();
-            List<Long> mentionIds = List.of(dh.getId(), ej.getId());
-            replyService.create(list.getId(), commentId, js.getId(), "답글이용", mentionIds);
+            replyService.create(list.getId(), commentId, js.getId(), "답글이용", List.of(dh.getId(), ej.getId()));
 
             authService.withdraw(ej.getId());
 
@@ -183,8 +193,13 @@ public class MentionServiceTest extends IntegrationTest {
 
             // then
             assertAll(
-                    () -> assertThat(reply.mentions()).hasSize(1),
-                    () -> assertThat(reply.mentions().get(0).userId()).isEqualTo(dh.getId())
+                    () -> assertThat(reply.mentions()).hasSize(2),
+                    () -> assertThat(reply.mentions().get(0).userId()).isEqualTo(dh.getId()),
+                    () -> {
+                        MentionDto mentionToEj = reply.mentions().get(1);
+                        assertThat(mentionToEj.userId()).isEqualTo(0L);
+                        assertThat(mentionToEj.userNickname()).isEqualTo("withdrawer");
+                    }
             );
         }
     }
