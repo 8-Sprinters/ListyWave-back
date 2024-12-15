@@ -35,8 +35,10 @@ public record TopicFindResponse(
 
     @Builder
     public record TopicDto(
+            Long id,
             String categoryEngName,
             String categoryKorName,
+            String categoryCode,
             String title,
             String description,
             LocalDateTime createdDate,
@@ -54,8 +56,10 @@ public record TopicFindResponse(
 
         private static TopicDto of(Topic topic) {
             return TopicDto.builder()
+                    .id(topic.getId())
                     .categoryEngName(topic.getCategory().name())
                     .categoryKorName(topic.getCategory().getViewName())
+                    .categoryCode(topic.getCategory().getCode())
                     .title(topic.getTitle().getValue())
                     .description(topic.getDescription().getValue())
                     .createdDate(topic.getCreatedDate())
