@@ -18,6 +18,7 @@ public record NoticeFindAllResponseToUser(
 
     public static List<NoticeFindAllResponseToUser> toList(List<Notice> notices) {
         return notices.stream()
+                .filter(Notice::isExposed)
                 .map(NoticeFindAllResponseToUser::of)
                 .toList();
     }

@@ -3,6 +3,7 @@ package com.listywave.notice.application.domain;
 import static com.listywave.common.exception.ErrorCode.ALREADY_SENT_ALARM_NOTICE;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
+import static java.util.Comparator.comparingInt;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.BaseEntity;
@@ -12,7 +13,6 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.Getter;
@@ -51,7 +51,8 @@ public class Notice extends BaseEntity {
 
     public String getFirstImageUrl() {
         Optional<String> result = contents.stream()
-                .sorted(Comparator.comparingInt(NoticeContent::getOrder))
+                .sorted(comparingInt(NoticeContent::getOrder))
+                .filter(NoticeContent::hasImage)
                 .map(NoticeContent::getImageUrl)
                 .findFirst();
         return result.orElse(null);

@@ -11,8 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.listywave.common.IntegrationTest;
 import com.listywave.notice.application.domain.Notice;
+import com.listywave.notice.application.domain.NoticeType;
 import com.listywave.notice.application.service.dto.NoticeCreateRequest;
 import com.listywave.notice.application.service.dto.NoticeCreateRequest.ContentDto;
+import com.listywave.notice.application.service.dto.NoticeFindAllResponseToUser;
 import com.listywave.notice.application.service.dto.NoticeFindResponse;
 import com.listywave.notice.application.service.dto.NoticeUpdateRequest;
 import java.util.List;
@@ -25,17 +27,14 @@ public class NoticeServiceTest extends IntegrationTest {
     @Test
     void 공지를_생성_후_상세_조회한다() {
         // given
-        NoticeCreateRequest request1 = createNoticeCreateRequest(1);
-        NoticeCreateRequest request2 = createNoticeCreateRequest(2);
-        NoticeCreateRequest request3 = createNoticeCreateRequest(3);
+        Long id1 = noticeService.create(createNoticeCreateRequest(1));
+        Long id2 = noticeService.create(createNoticeCreateRequest(2));
+        Long id3 = noticeService.create(createNoticeCreateRequest(3));
 
         // when
-        Long id1 = noticeService.create(request1);
-        Long id2 = noticeService.create(request2);
-        Long id3 = noticeService.create(request3);
+        NoticeFindResponse result = noticeService.findOneSpecific(id2);
 
         // then
-        NoticeFindResponse result = noticeService.findOneSpecific(id2);
         assertAll(
                 () -> assertThat(result.id()).isEqualTo(id2),
                 () -> assertThat(result.category()).isEqualTo(EVENT.getViewName()),
@@ -56,8 +55,13 @@ public class NoticeServiceTest extends IntegrationTest {
     }
 
     private NoticeCreateRequest createNoticeCreateRequest(int th) {
+        int categoryCode = th % NoticeType.values().length;
+        if (categoryCode == 0) {
+            categoryCode++;
+        }
+
         return new NoticeCreateRequest(
-                th,
+                categoryCode,
                 th + "번 째 공지입니다",
                 th + "번 째 공지에요",
                 List.of(
@@ -84,6 +88,45 @@ public class NoticeServiceTest extends IntegrationTest {
                 () -> assertThat(result.prevNotice()).isNull(),
                 () -> assertThat(result.nextNotice()).isNull()
         );
+    }
+
+    @Nested
+    class 사용자용_공지_전체_조회 {
+
+        @Test
+        void 노출된_공지가_없을_때_전체_조회한다() {
+            // given
+            NoticeCreateRequest noticeCreateRequest = createNoticeCreateRequest(1);
+            noticeService.create(noticeCreateRequest);
+
+            // when
+            List<NoticeFindAllResponseToUser> result = noticeService.findAllToUser();
+
+            // then
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        void 노출_처리가_된_공지를_모두_조회한다() {
+            // given
+            Long notice1Id = noticeService.create(createNoticeCreateRequest(1));
+            noticeService.create(createNoticeCreateRequest(2));
+            Long notice3Id = noticeService.create(createNoticeCreateRequest(3));
+
+            noticeService.updateExposure(notice1Id);
+            noticeService.updateExposure(notice3Id);
+
+            // when
+            List<NoticeFindAllResponseToUser> result = noticeService.findAllToUser();
+
+            // then
+            assertAll(
+                    () -> assertThat(result).hasSize(2),
+                    () -> assertThat(result.stream()
+                            .map(NoticeFindAllResponseToUser::id)
+                            .toList()).containsExactly(notice1Id, notice3Id)
+            );
+        }
     }
 
     @Nested
