@@ -67,4 +67,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("[MalformedJwtException] : {}", e.getMessage(), e);
         return ResponseEntity.status(UNAUTHORIZED).build();
     }
+
+    @ExceptionHandler(NullPointerException.class)
+    ResponseEntity<String> handleNullPointerException(NullPointerException e) {
+        log.error("[NullPointerException] : {}", e.getMessage(), e);
+        return ResponseEntity.internalServerError().body("NullPointException이 발생했습니다. " + e.getMessage());
+    }
 }
