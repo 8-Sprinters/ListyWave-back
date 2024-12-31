@@ -1,5 +1,6 @@
 package com.listywave.reaction.application.service;
 
+import com.listywave.alarm.application.domain.AlarmCreateEvent;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.repository.list.ListRepository;
 import com.listywave.reaction.application.domain.Reaction;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,10 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReactionService {
 
+    private final UserService userService;
+    private final ListRepository listRepository;
     private final UserReactionRepository userReactionRepository;
     private final ReactionStatsRepository reactionStatsRepository;
-    private final ListRepository listRepository;
-    private final UserService userService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public void react(Long userId, Long listId, Reaction reaction) {
         User user = userService.getById(userId);
@@ -37,12 +40,13 @@ public class ReactionService {
         if (userReactionRepository.existsByUserIdAndListAndReaction(user.getId(), list, reaction)) {
             userReactionRepository.deleteByUserIdAndListAndReaction(user.getId(), list, reaction);
             updateReactionStats(list, reaction, -1);
-        } else {
-            //TODO: 리액션할 때 알림 필요
-            UserReaction newReaction = UserReaction.create(user.getId(), list, reaction);
-            userReactionRepository.save(newReaction);
-            updateReactionStats(list, reaction, 1);
+            return;
         }
+        UserReaction newReaction = UserReaction.create(user.getId(), list, reaction);
+        userReactionRepository.save(newReaction);
+        updateReactionStats(list, reaction, 1);
+
+        applicationEventPublisher.publishEvent(AlarmCreateEvent.reaction(user, list));
     }
 
     public void updateReactionStats(ListEntity list, Reaction reaction, int changeCount) {

@@ -5,8 +5,10 @@ import static com.listywave.alarm.application.domain.AlarmType.COMMENT;
 import static com.listywave.alarm.application.domain.AlarmType.FOLLOW;
 import static com.listywave.alarm.application.domain.AlarmType.MENTION;
 import static com.listywave.alarm.application.domain.AlarmType.NOTICE;
+import static com.listywave.alarm.application.domain.AlarmType.REACTION;
 import static com.listywave.alarm.application.domain.AlarmType.REPLY;
 import static com.listywave.common.exception.ErrorCode.ALREADY_SENT_ALARM_NOTICE;
+import static com.listywave.reaction.application.domain.Reaction.AGREE;
 import static java.util.Collections.EMPTY_LIST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -322,6 +324,38 @@ public class AlarmServiceTest extends IntegrationTest {
                                 new NoticeCreateRequest.ContentDto(4, "button", "버튼입니다", null, "버튼 이름", "https://buttonLink.com"),
                                 new NoticeCreateRequest.ContentDto(5, "note", "유의사항입니다", null, null, null)
                         )
+                );
+            }
+        }
+
+        @Nested
+        class 리액션 {
+
+            @Test
+            void 본인_리스트에_리액션을_남기면_알람이_생성되지_않는다() {
+                // when
+                reactionService.react(dh.getId(), list.getId(), AGREE);
+
+                // then
+                List<AlarmFindResponse> result = alarmService.findAllBy(dh.getId());
+                assertThat(result).isEmpty();
+            }
+
+            @Test
+            void 다른_유저의_리스트에_리액션을_남기면_알람이_생성된다() {
+                // when
+                reactionService.react(js.getId(), list.getId(), AGREE);
+
+                // then
+                List<AlarmFindResponse> result = alarmService.findAllBy(dh.getId());
+                assertAll(
+                        () -> assertThat(result).hasSize(1),
+                        () -> {
+                            var alarmFindResponse = result.get(0);
+                            assertThat(alarmFindResponse.list().id()).isEqualTo(list.getId());
+                            assertThat(alarmFindResponse.sendUser().id()).isEqualTo(js.getId());
+                            assertThat(alarmFindResponse.type()).isEqualTo(REACTION.name());
+                        }
                 );
             }
         }
