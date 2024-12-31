@@ -26,6 +26,7 @@ import com.listywave.list.repository.reply.ReplyRepository;
 import com.listywave.mention.MentionRepository;
 import com.listywave.notice.application.service.NoticeService;
 import com.listywave.notice.repository.NoticeRepository;
+import com.listywave.reaction.application.service.ReactionService;
 import com.listywave.reaction.repository.ReactionStatsRepository;
 import com.listywave.reaction.repository.UserReactionRepository;
 import com.listywave.topic.application.service.TopicService;
@@ -99,6 +100,8 @@ public abstract class IntegrationTest {
     protected NoticeService noticeService;
     @Autowired
     protected NoticeRepository noticeRepository;
+    @Autowired
+    protected ReactionService reactionService;
 
     protected User dh, js, ej, sy;
     protected ListEntity list;

@@ -4,6 +4,7 @@ import static com.listywave.alarm.application.domain.AlarmType.COLLECT;
 import static com.listywave.alarm.application.domain.AlarmType.COMMENT;
 import static com.listywave.alarm.application.domain.AlarmType.FOLLOW;
 import static com.listywave.alarm.application.domain.AlarmType.NOTICE;
+import static com.listywave.alarm.application.domain.AlarmType.REACTION;
 import static com.listywave.alarm.application.domain.AlarmType.REPLY;
 
 import com.listywave.list.application.domain.comment.Comment;
@@ -85,6 +86,15 @@ public record AlarmCreateEvent(
                 .publisher(user)
                 .notice(notice)
                 .alarmType(NOTICE)
+                .build();
+    }
+
+    public static AlarmCreateEvent reaction(User publisher, ListEntity list) {
+        return AlarmCreateEvent.builder()
+                .publisher(publisher)
+                .listenerId(list.getUser().getId())
+                .list(list)
+                .alarmType(REACTION)
                 .build();
     }
 
