@@ -133,19 +133,19 @@ public class User extends BaseEntity {
         }
     }
 
-    public void follow(User followingUser) {
+    public void follow(User 내가_팔로우_할_유저) {
         this.increaseFollowingCount();
-        followingUser.increaseFollowerCount();
+        내가_팔로우_할_유저.increaseFollowerCount();
     }
 
-    public void unfollow(User followingUser) {
+    public void unfollow(User 내가_팔로우_하고_있는_유저) {
         this.decreaseFollowingCount();
-        followingUser.decreaseFollowerCount();
+        내가_팔로우_하고_있는_유저.decreaseFollowerCount();
     }
 
-    public void remove(User followerUser) {
+    public void removeFollower(User 나를_팔로우_하고_있는_유저) {
         this.decreaseFollowerCount();
-        followerUser.decreaseFollowingCount();
+        나를_팔로우_하고_있는_유저.decreaseFollowingCount();
     }
 
     private void increaseFollowingCount() {
