@@ -1,20 +1,23 @@
 package com.listywave.common.exception;
 
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS_TOKEN;
-import static com.listywave.common.exception.ErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static com.listywave.common.exception.ErrorCode.METHOD_ARGUMENT_NOT_VALID_EXCEPTION;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @Slf4j
@@ -32,20 +35,30 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<String> handleException(Exception e) {
         log.error("[InternalServerError] : {}", e.getMessage(), e);
-        return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(e.getMessage());
+        return ResponseEntity.internalServerError().body(e.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
         log.error("[IllegalArgumentException] : {}", e.getMessage(), e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
-        log.error("[MethodArgumentTypeMismatchException] : {}", e.getMessage(), e);
-        CustomException customException = new CustomException(METHOD_ARGUMENT_TYPE_MISMATCH);
-        return ErrorResponse.toResponseEntity(customException);
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException e,
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request
+    ) {
+        log.error("[MethodArgumentNotValidException] : {}", e.getMessage(), e);
+        String errorMessage = e.getFieldErrors()
+                .stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.joining(", "));
+        ErrorCode errorCode = METHOD_ARGUMENT_NOT_VALID_EXCEPTION;
+        ErrorResponse errorResponse = new ErrorResponse(status.value(), errorMessage, errorCode.name(), errorCode.getDetail(), errorMessage);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler(SignatureException.class)
