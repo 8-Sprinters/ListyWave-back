@@ -3,6 +3,7 @@ package com.listywave.user.application.domain;
 import static com.listywave.common.exception.ErrorCode.ALREADY_LOGOUT_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.EXCEED_FOLLOW_COUNT_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
+import static jakarta.persistence.TemporalType.TIMESTAMP;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.listywave.common.BaseEntity;
@@ -17,6 +18,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -66,6 +69,10 @@ public class User extends BaseEntity {
     @Column(nullable = false, length = 5)
     private boolean isDelete;
 
+    @Temporal(TIMESTAMP)
+    @Column(nullable = true)
+    private LocalDateTime deleteAt;
+
     public static User init(Long oauthId, String oauthEmail, String kakaoAccessToken) {
         return new User(
                 oauthId,
@@ -78,7 +85,8 @@ public class User extends BaseEntity {
                 0,
                 false,
                 kakaoAccessToken,
-                false
+                false,
+                null
         );
     }
 
@@ -165,6 +173,7 @@ public class User extends BaseEntity {
 
     public void softDelete() {
         this.isDelete = true;
+        this.deleteAt = LocalDateTime.now();
     }
 
     public void updateKakaoAccessToken(String kakaoAccessToken) {

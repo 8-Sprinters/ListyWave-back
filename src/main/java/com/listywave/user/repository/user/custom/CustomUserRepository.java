@@ -13,4 +13,6 @@ public interface CustomUserRepository {
     Long countBySearch(String search, Long loginUserId);
 
     Slice<UserSearchResult> findAllBySearch(String search, Pageable pageable, Long loginUserId);
+
+    void deleteNDaysAgo(int n);
 }

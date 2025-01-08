@@ -11,6 +11,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -96,5 +97,14 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .offset(pageable.getOffset())
                 .fetch();
         return checkEndPage(pageable, fetch);
+    }
+
+    @Override
+    public void deleteNDaysAgo(int n) {
+        LocalDateTime nDaysAgo = LocalDateTime.now().minusDays(n);
+
+        queryFactory.delete(user)
+                .where(user.isDelete.isTrue().and(user.deleteAt.loe(nDaysAgo)))
+                .execute();
     }
 }
