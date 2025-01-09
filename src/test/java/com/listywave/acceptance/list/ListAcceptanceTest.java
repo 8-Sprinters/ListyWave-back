@@ -26,7 +26,7 @@ import static com.listywave.acceptance.list.ListAcceptanceTestHelper.정렬기�
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.좋아하는_라면_TOP3_생성_요청_데이터;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.최신_리스트_10개_조회_카테고리_필터링_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.추천_리스트_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리로_검색_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리_코드로_검색_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리와_키워드로_검색_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.키워드로_검색_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.키워드와_정렬기준을_포함한_검색_API_호출;
@@ -755,21 +755,31 @@ public class ListAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 카테고리로_필터링_할_수_있다() {
+        void 카테고리_코드로_필터링_할_수_있다() {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
             리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰);
             var 좋아하는_라면_TOP3_생성_결과 = 리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
 
+            assertThat(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()).category()).isNotEqualTo(좋아하는_라면_TOP3_생성_요청_데이터(List.of()).category());
+            CategoryType 검색하려는_카테고리 = 좋아하는_라면_TOP3_생성_요청_데이터(List.of()).category();
+
             // when
-            var result = 카테고리로_검색_API_호출("etc").as(ListSearchResponse.class);
+            var result = 카테고리_코드로_검색_API_호출(검색하려는_카테고리.getCode()).as(ListSearchResponse.class);
 
             // then
             assertAll(
                     () -> assertThat(result.totalCount()).isOne(),
-                    () -> assertThat(result.resultLists()).hasSize(1),
-                    () -> assertThat(result.resultLists().get(0).id()).isEqualTo(좋아하는_라면_TOP3_생성_결과.listId())
+                    () -> {
+                        var listResponses = result.resultLists();
+
+                        assertThat(listResponses).hasSize(1);
+                        assertThat(listResponses.get(0).id()).isEqualTo(좋아하는_라면_TOP3_생성_결과.listId());
+                        assertThat(listResponses.stream()
+                                .allMatch(listResponse -> listResponse.categoryCode().equals(검색하려는_카테고리.getCode()))
+                        ).isTrue();
+                    }
             );
         }
 

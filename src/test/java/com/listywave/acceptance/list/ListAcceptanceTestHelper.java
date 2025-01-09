@@ -96,7 +96,7 @@ public abstract class ListAcceptanceTestHelper {
 
     public static ListCreateRequest 좋아하는_라면_TOP3_생성_요청_데이터(List<Long> collaboratorIds) {
         return new ListCreateRequest(
-                CategoryType.ETC,
+                CategoryType.FOOD_RECIPES,
                 List.of("라", "면", "좋"),
                 collaboratorIds,
                 "좋아하는 라면 TOP 3",
@@ -210,9 +210,9 @@ public abstract class ListAcceptanceTestHelper {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 카테고리로_검색_API_호출(String category) {
+    public static ExtractableResponse<Response> 카테고리_코드로_검색_API_호출(String categoryCode) {
         return given()
-                .when().get("/lists/search?category={category}", category)
+                .when().get("/lists/search?categoryCode={categoryCode}", categoryCode)
                 .then().log().all()
                 .extract();
     }
