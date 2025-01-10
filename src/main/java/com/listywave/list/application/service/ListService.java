@@ -242,7 +242,7 @@ public class ListService {
         ListEntity list = listRepository.getById(listId);
 
         Collaborators beforeCollaborators = collaboratorService.findAllByList(list);
-        list.validateUpdateAuthority(loginUser, beforeCollaborators);
+        list.validateUpdateAuthority(loginUser);
         Collaborators newCollaborators = collaboratorService.createCollaborators(request.collaboratorIds(), list);
         collaboratorService.updateCollaborators(beforeCollaborators, newCollaborators);
 

@@ -174,7 +174,7 @@ public abstract class ListAcceptanceTestHelper {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 비회원이_피드_리스트_조회_카테고리_콜라보레이터_필터링_요청(User targetUser, String category) {
+    public static ExtractableResponse<Response> 비회원이_사용자_피드에서_콜라보리스트를_카테고리로_필터링하여_요청한다(User targetUser, String category) {
         return given()
                 .when().get("/users/{userId}/lists?type=collabo&category={category}", targetUser.getId(), category)
                 .then().log().all()

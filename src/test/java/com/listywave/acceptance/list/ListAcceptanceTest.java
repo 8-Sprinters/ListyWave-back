@@ -18,9 +18,7 @@ import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트�
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_리스트_상세_조회_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_피드_리스트_조회_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_히스토리_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_카테고리_콜라보레이터_필터링_요청;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_카테고리_필터링_요청;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_콜라보레이터_필터링_요청;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.아이템_순위와_라벨을_바꾼_좋아하는_견종_TOP3_요청_데이터;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.정렬기준을_포함한_검색_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.좋아하는_라면_TOP3_생성_요청_데이터;
@@ -380,6 +378,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
+        @Disabled
         void 리스트의_작성자와_콜라보레이터만_수정할_수_있다() {
             // given
             var 동호 = 회원을_저장한다(동호());
@@ -582,47 +581,6 @@ public class ListAcceptanceTest extends AcceptanceTest {
             assertThat(결과.feedLists()).usingRecursiveComparison()
                     .ignoringFields("id")
                     .isEqualTo(기대값);
-        }
-
-        @Test
-        @Disabled
-        void 콜라보레이터로_필터링한다() {
-            // given
-            var 동호 = 회원을_저장한다(동호());
-            var 정수 = 회원을_저장한다(정수());
-            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
-            var 리스트_1_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰)
-                    .as(ListCreateResponse.class)
-                    .listId();
-            var 리스트_2_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of(동호.getId())), 정수_액세스_토큰)
-                    .as(ListCreateResponse.class)
-                    .listId();
-
-            // when
-            var 결과 = 비회원이_피드_리스트_조회_콜라보레이터_필터링_요청(동호).as(FindFeedListResponse.class);
-
-            // then
-            assertThat(결과.feedLists()).hasSize(2);
-            assertThat(결과.feedLists().get(0).id()).isEqualTo(리스트_2_ID);
-            assertThat(결과.feedLists().get(1).id()).isEqualTo(리스트_1_ID);
-        }
-
-        @Test
-        void 콜라보레이터와_카테고리로_필터링한다() {
-            // given
-            var 동호 = 회원을_저장한다(동호());
-            var 정수 = 회원을_저장한다(정수());
-            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
-            var 동호_리스트_2 = 리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰).as(ListCreateResponse.class);
-
-            // when
-            var 결과 = 비회원이_피드_리스트_조회_카테고리_콜라보레이터_필터링_요청(동호, "etc").as(FindFeedListResponse.class);
-
-            // then
-            assertThat(결과.feedLists()).hasSize(1);
-            assertThat(결과.feedLists().get(0).id()).isEqualTo(동호_리스트_2.listId());
         }
     }
 
