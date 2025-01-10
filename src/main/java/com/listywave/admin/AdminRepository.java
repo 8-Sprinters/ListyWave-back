@@ -10,4 +10,6 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
     default Admin getById(Long id) {
         return findById(id).orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND));
     }
+
+    boolean existsByIp(String ip);
 }
