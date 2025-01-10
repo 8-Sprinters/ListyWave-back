@@ -11,7 +11,7 @@ public class AdminService {
 
     private final AdminRepository adminRepository;
 
-    public void validateExist(Long adminId) {
-        adminRepository.getById(adminId);
+    public boolean isValidIp(String ip) {
+        return adminRepository.existsByIp(ip);
     }
 }
