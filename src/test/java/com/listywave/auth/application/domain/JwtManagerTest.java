@@ -10,6 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.listywave.common.exception.CustomException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -52,15 +55,28 @@ class JwtManagerTest {
 
         @Test
         void userId로_액세스_토큰을_발급한다() {
+            Long userId = 312321L;
+
+            String result = jwtManager.createAccessToken(userId);
+
+            assertThat(result).isNotNull();
+            assertThat(result).isNotBlank();
+        }
+
+        @Test
+        void userId로_어드민용_토큰을_발급한다() {
             // given
             Long userId = 312321L;
 
             // when
-            String result = jwtManager.createAccessToken(userId);
+            String accessToken = jwtManager.createAdminAccessToken(userId);
 
             // then
-            assertThat(result).isNotNull();
-            assertThat(result).isNotBlank();
+            String[] splited = accessToken.split("\\.");
+            List<String> result = Arrays.stream(splited)
+                    .map(split -> new String(Base64.getUrlDecoder().decode(split))).toList();
+
+            assertThat(result.get(1)).contains("\"roles\":\"admin\"");
         }
 
         @Test

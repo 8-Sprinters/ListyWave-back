@@ -5,13 +5,18 @@ import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 import com.listywave.common.exception.CustomException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.env.Environment;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @RequiredArgsConstructor
 public class AdminController {
 
+    private final Environment environment;
     private final AdminService adminService;
 
     @GetMapping("/admin")
@@ -19,8 +24,25 @@ public class AdminController {
         String clientIp = request.getHeader("X-Forwarded-For");
 
         if (adminService.isValidIp(clientIp)) {
-            return "redirect:/admin/login";
+            String[] activeProfiles = environment.getActiveProfiles();
+
+            for (String activeProfile : activeProfiles) {
+                switch (activeProfile) {
+                    case "dev", "local" -> {
+                        return "redirect:http://localhost:3000/admin/login";
+                    }
+                    case "prod" -> {
+                        return "redirect:https://listywave.com/admin/login";
+                    }
+                }
+            }
         }
         throw new CustomException(RESOURCE_NOT_FOUND);
+    }
+
+    @PostMapping("/admin/login")
+    ResponseEntity<AdminLoginResponse> login(@RequestBody AdminLoginRequest adminLoginRequest) {
+        AdminLoginResponse result = adminService.login(adminLoginRequest.account(), adminLoginRequest.password());
+        return ResponseEntity.ok(result);
     }
 }

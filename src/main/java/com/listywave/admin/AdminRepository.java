@@ -3,6 +3,7 @@ package com.listywave.admin;
 import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 
 import com.listywave.common.exception.CustomException;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AdminRepository extends JpaRepository<Admin, Long> {
@@ -12,4 +13,6 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
     }
 
     boolean existsByIp(String ip);
+
+    Optional<Admin> findByAccount(String account);
 }

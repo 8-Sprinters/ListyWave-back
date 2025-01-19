@@ -58,6 +58,20 @@ public class JwtManager {
                 .compact();
     }
 
+    public String createAdminAccessToken(Long userId) {
+        Date now = new Date();
+        return Jwts.builder()
+                .header().type("accessToken").and()
+                .signWith(secretKey)
+                .issuer(issuer)
+                .issuedAt(now)
+                .subject(String.valueOf(userId))
+                .claim("roles", "admin")
+                .expiration(new Date(now.getTime() + convertTimeUnit(accessTokenValidTimeDuration, accessTokenValidTimeUnit, MILLISECONDS)))
+                .issuedAt(Date.from(Instant.now()))
+                .compact();
+    }
+
     public String createRefreshToken(Long userId) {
         Date now = new Date();
         return Jwts.builder()
@@ -66,6 +80,20 @@ public class JwtManager {
                 .issuer(issuer)
                 .issuedAt(now)
                 .subject(String.valueOf(userId))
+                .expiration(new Date(now.getTime() + convertTimeUnit(refreshTokenValidTimeDuration, refreshTokenValidTimeUnit, MILLISECONDS)))
+                .issuedAt(Date.from(Instant.now()))
+                .compact();
+    }
+
+    public String createAdminRefreshToken(Long userId) {
+        Date now = new Date();
+        return Jwts.builder()
+                .header().type("refreshToken").and()
+                .signWith(secretKey)
+                .issuer(issuer)
+                .issuedAt(now)
+                .subject(String.valueOf(userId))
+                .claim("roles", "admin")
                 .expiration(new Date(now.getTime() + convertTimeUnit(refreshTokenValidTimeDuration, refreshTokenValidTimeUnit, MILLISECONDS)))
                 .issuedAt(Date.from(Instant.now()))
                 .compact();
