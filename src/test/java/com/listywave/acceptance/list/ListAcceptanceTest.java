@@ -25,7 +25,7 @@ import static com.listywave.acceptance.list.ListAcceptanceTestHelper.좋아하�
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.최신_리스트_10개_조회_카테고리_필터링_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.추천_리스트_조회_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리_코드로_검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리와_키워드로_검색_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리_코드와_키워드로_검색_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.키워드로_검색_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.키워드와_정렬기준을_포함한_검색_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.팔로우한_사용자의_최신_리스트_10개_조회_API_호출;
@@ -746,17 +746,20 @@ public class ListAcceptanceTest extends AcceptanceTest {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            var 좋아하는_견종_TOP3_생성_결과 = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
+            Long 좋아하는_견종_TOP3_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class).listId();
             리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
 
+            // 정확한 테스트를 위해 두 리스트의 카테고리가 다름을 검증합니다.
+            assertThat(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()).category()).isNotEqualTo(좋아하는_라면_TOP3_생성_요청_데이터(List.of()).category());
+
             // when
-            var 결과 = 카테고리와_키워드로_검색_API_호출("movie_drama", "견종").as(ListSearchResponse.class);
+            var 결과 = 카테고리_코드와_키워드로_검색_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()).category().getCode(), "견종").as(ListSearchResponse.class);
 
             // then
             assertAll(
                     () -> assertThat(결과.totalCount()).isOne(),
                     () -> assertThat(결과.resultLists()).hasSize(1),
-                    () -> assertThat(결과.resultLists().get(0).id()).isEqualTo(좋아하는_견종_TOP3_생성_결과.listId())
+                    () -> assertThat(결과.resultLists().get(0).id()).isEqualTo(좋아하는_견종_TOP3_리스트_ID)
             );
         }
 

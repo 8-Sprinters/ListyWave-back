@@ -32,7 +32,7 @@ public enum CategoryType {
 
     public static CategoryType codeOf(String code) {
         return Arrays.stream(CategoryType.values())
-                .filter(t -> t.getCode().equals(code))
+                .filter(categoryType -> categoryType.getCode().equals(code))
                 .findAny()
                 .orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND, ERROR_MESSAGE + code));
     }

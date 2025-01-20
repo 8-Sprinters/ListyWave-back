@@ -217,9 +217,9 @@ public abstract class ListAcceptanceTestHelper {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 카테고리와_키워드로_검색_API_호출(String category, String keyword) {
+    public static ExtractableResponse<Response> 카테고리_코드와_키워드로_검색_API_호출(String categoryCode, String keyword) {
         return given()
-                .when().get("/lists/search?category={category}&keyword={keyword}", category, keyword)
+                .when().get("/lists/search?categoryCode={categoryCode}&keyword={keyword}", categoryCode, keyword)
                 .then().log().all()
                 .extract();
     }
