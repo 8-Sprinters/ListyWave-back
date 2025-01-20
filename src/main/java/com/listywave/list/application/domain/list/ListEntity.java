@@ -9,7 +9,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 import static jakarta.persistence.TemporalType.TIMESTAMP;
 import static lombok.AccessLevel.PROTECTED;
 
-import com.listywave.collaborator.application.domain.Collaborators;
 import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.item.Item;
@@ -247,14 +246,8 @@ public class ListEntity {
         }
     }
 
-    public void validateUpdateAuthority(User loginUser, Collaborators beforeCollaborators) {
+    public void validateUpdateAuthority(User loginUser) {
         if (this.user.equals(loginUser)) {
-            return;
-        }
-        if (beforeCollaborators.isEmpty()) {
-            return;
-        }
-        if (beforeCollaborators.contains(loginUser)) {
             return;
         }
         throw new CustomException(INVALID_ACCESS);

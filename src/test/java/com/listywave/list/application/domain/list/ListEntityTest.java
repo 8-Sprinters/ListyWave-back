@@ -11,11 +11,10 @@ import static com.listywave.user.fixture.UserFixture.유진;
 import static com.listywave.user.fixture.UserFixture.정수;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.listywave.collaborator.application.domain.Collaborator;
-import com.listywave.collaborator.application.domain.Collaborators;
 import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.item.Item;
@@ -29,6 +28,7 @@ import com.listywave.list.application.domain.label.LabelName;
 import com.listywave.list.application.domain.label.Labels;
 import com.listywave.user.application.domain.User;
 import java.util.List;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -225,23 +225,31 @@ class ListEntityTest {
     }
 
     @Test
+    @Disabled
     void 리스트는_작성자_또는_콜라보레이터에_포함된_유저만이_수정할_수_있다() {
         // given
         User collaboratorUser = 정수();
-        Collaborator collaborator = Collaborator.init(collaboratorUser, list);
         User notCollaborator = 유진();
-
-        Collaborators collaborators = new Collaborators(List.of(collaborator));
 
         // when
         // then
         assertAll(
-                () -> assertThatNoException().isThrownBy(() -> list.validateUpdateAuthority(user, collaborators)),
-                () -> assertThatNoException().isThrownBy(() -> list.validateUpdateAuthority(collaboratorUser, collaborators)),
+                () -> assertThatNoException().isThrownBy(() -> list.validateUpdateAuthority(user)),
+                () -> assertThatNoException().isThrownBy(() -> list.validateUpdateAuthority(collaboratorUser)),
                 () -> {
-                    CustomException exception = assertThrows(CustomException.class, () -> list.validateUpdateAuthority(notCollaborator, collaborators));
+                    CustomException exception = assertThrows(CustomException.class, () -> list.validateUpdateAuthority(notCollaborator));
                     assertThat(exception.getErrorCode()).isEqualTo(INVALID_ACCESS);
                 }
         );
+    }
+
+    @Test
+    void 리스트는_작성자만이_수정할_수_있다() {
+        // given
+        User otherUser = 정수();
+
+        // expect
+        assertThatThrownBy(() -> list.validateUpdateAuthority(otherUser));
+        assertThatNoException().isThrownBy(() -> list.validateUpdateAuthority(user));
     }
 }

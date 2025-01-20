@@ -14,6 +14,7 @@ import lombok.Builder;
 
 @Builder
 public record ListDetailResponse(
+        String categoryCode,
         String categoryEngName,
         String categoryKorName,
         List<LabelResponse> labels,
@@ -50,6 +51,7 @@ public record ListDetailResponse(
             List<ReactionResponse> reactions
     ) {
         return ListDetailResponse.builder()
+                .categoryCode(list.getCategory().getCode())
                 .categoryEngName(list.getCategory().name().toLowerCase())
                 .categoryKorName(list.getCategory().getViewName())
                 .labels(LabelResponse.toList(list.getLabels().getValues()))
@@ -74,7 +76,7 @@ public record ListDetailResponse(
                 .reactions(reactions)
                 .build();
     }
-
+    
     public record LabelResponse(
             String name
     ) {

@@ -93,11 +93,11 @@ public class ListController {
     ResponseEntity<ListSearchResponse> search(
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "sort", defaultValue = "new") SortType sort,
-            @RequestParam(value = "category", defaultValue = "entire") CategoryType category,
+            @RequestParam(value = "categoryCode", defaultValue = "0") String categoryCode,
             @RequestParam(value = "size", defaultValue = "5") int size,
             @RequestParam(value = "cursorId", defaultValue = "0") Long cursorId
     ) {
-        ListSearchResponse response = listService.search(keyword, sort, category, size, cursorId);
+        ListSearchResponse response = listService.search(keyword, sort, categoryCode, size, cursorId);
         return ResponseEntity.ok(response);
     }
 

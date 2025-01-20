@@ -212,27 +212,27 @@ public class ListService {
     }
 
     @Transactional(readOnly = true)
-    public ListSearchResponse search(String keyword, SortType sortType, CategoryType category, int size, Long cursorId) {
+    public ListSearchResponse search(String keyword, SortType sortType, String categoryCode, int size, Long cursorId) {
         List<ListEntity> lists = listRepository.findAll().stream()
                 .filter(list -> !list.isDeletedUser() && list.isPublic())
                 .toList();
-        ListEntities allList = new ListEntities(lists);
-        ListEntities filtered = allList.filterBy(category)
+        ListEntities listEntities = new ListEntities(lists);
+
+        ListEntities filteredAndSortedLists = listEntities.filterBy(CategoryType.codeOf(categoryCode))
                 .filterBy(keyword)
                 .sortBy(sortType, keyword);
-
-        long totalCount = filtered.size();
+        long totalCount = filteredAndSortedLists.size();
 
         ListEntity cursorList = (cursorId == 0L) ? null : listRepository.getById(cursorId);
-        List<ListEntity> paged = filtered.paging(cursorList, size + 1).listEntities();
+        List<ListEntity> pagedLists = filteredAndSortedLists.paging(cursorList, size + 1).listEntities();
 
-        if (paged.size() > size) {
-            return ListSearchResponse.of(paged.subList(0, size), totalCount, paged.get(size - 1).getId(), true);
+        if (pagedLists.size() > size) {
+            return ListSearchResponse.of(pagedLists.subList(0, size), totalCount, pagedLists.get(size - 1).getId(), true);
         }
-        if (paged.isEmpty()) {
-            return ListSearchResponse.of(paged, totalCount, null, false);
+        if (pagedLists.isEmpty()) {
+            return ListSearchResponse.of(pagedLists, totalCount, null, false);
         }
-        return ListSearchResponse.of(paged, totalCount, paged.get(paged.size() - 1).getId(), false);
+        return ListSearchResponse.of(pagedLists, totalCount, pagedLists.get(pagedLists.size() - 1).getId(), false);
     }
 
     public void update(Long listId, Long loginUserId, ListUpdateRequest request) {
@@ -242,7 +242,7 @@ public class ListService {
         ListEntity list = listRepository.getById(listId);
 
         Collaborators beforeCollaborators = collaboratorService.findAllByList(list);
-        list.validateUpdateAuthority(loginUser, beforeCollaborators);
+        list.validateUpdateAuthority(loginUser);
         Collaborators newCollaborators = collaboratorService.createCollaborators(request.collaboratorIds(), list);
         collaboratorService.updateCollaborators(beforeCollaborators, newCollaborators);
 
