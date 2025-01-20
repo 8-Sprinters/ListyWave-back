@@ -8,6 +8,7 @@ import com.listywave.list.application.dto.response.CommentFindResponse;
 import com.listywave.list.application.service.CommentService;
 import com.listywave.list.presentation.dto.request.comment.CommentCreateRequest;
 import com.listywave.list.presentation.dto.request.comment.CommentUpdateRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,7 +30,7 @@ public class CommentController {
     ResponseEntity<CommentCreateResponse> create(
             @PathVariable("listId") Long listId,
             @Auth Long writerId,
-            @RequestBody CommentCreateRequest request
+            @RequestBody @Valid CommentCreateRequest request
     ) {
         CommentCreateResponse response = commentService.create(listId, writerId, request.content(), request.mentionIds());
         return ResponseEntity.status(CREATED).body(response);

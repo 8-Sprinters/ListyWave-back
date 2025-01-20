@@ -13,6 +13,7 @@ import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.정수;
 import static java.util.Collections.EMPTY_LIST;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -20,6 +21,7 @@ import com.listywave.acceptance.common.AcceptanceTest;
 import com.listywave.list.application.dto.response.CommentFindResponse;
 import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.presentation.dto.request.ReplyCreateRequest;
+import com.listywave.list.presentation.dto.request.comment.CommentCreateRequest;
 import com.listywave.list.presentation.dto.request.comment.CommentUpdateRequest;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -47,6 +49,23 @@ public class CommentAcceptanceTest extends AcceptanceTest {
 
         assertThat(결과.hasNext()).isTrue();
         assertThat(결과.totalCount()).isEqualTo(11);
+    }
+
+    @Test
+    void 멘션ID를_포함하지_않고_요청을_보내면_예외가_발생한다() {
+        // given
+        var 동호 = 회원을_저장한다(동호());
+        var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
+        var 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰)
+                .as(ListCreateResponse.class)
+                .listId();
+
+        // when
+        var 멘션ID를_포함하지_않은_요청 = new CommentCreateRequest("댓글", null);
+        var response = 댓글_저장_API_호출(동호_액세스_토큰, 동호_리스트_ID, 멘션ID를_포함하지_않은_요청);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
     }
 
     @Nested
