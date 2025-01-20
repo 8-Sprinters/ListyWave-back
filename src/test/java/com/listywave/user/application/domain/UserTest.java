@@ -237,7 +237,7 @@ class UserTest {
             user.follow(other);
 
             // when
-            other.remove(user);
+            other.removeFollower(user);
 
             // then
             assertThat(user.getFollowingCount()).isZero();
@@ -300,10 +300,17 @@ class UserTest {
     }
 
     @Test
-    void 삭제_처리를_할_수_있다() {
+    void 회원_탈퇴_시_softDelete_방식으로_삭제_처리를_한다() {
+        // given
+        assertThat(user.isDelete()).isFalse();
+        assertThat(user.getDeleteAt()).isNull();
+
+        // when
         user.softDelete();
 
+        // then
         assertThat(user.isDelete()).isTrue();
+        assertThat(user.getDeleteAt()).isNotNull();
     }
 
     @Test

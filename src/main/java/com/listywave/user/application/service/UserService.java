@@ -170,13 +170,13 @@ public class UserService {
         return userRepository.existsByNicknameValueIgnoreCase(nickname);
     }
 
-    public void deleteFollower(Long followerUserId, Long followingUserId) {
-        User followerUser = userRepository.getById(followerUserId);
-        User followingUser = userRepository.getById(followingUserId);
+    public void deleteFollower(Long 팔로우_하는_유저_ID, Long 팔로우_당하는_유저_ID) {
+        User 팔로우_하는_유저 = userRepository.getById(팔로우_하는_유저_ID);
+        User 팔로우_당하는_유저 = userRepository.getById(팔로우_당하는_유저_ID);
 
-        followRepository.deleteByFollowingUserAndFollowerUser(followingUser, followerUser);
+        followRepository.deleteByFollowingUserAndFollowerUser(팔로우_당하는_유저, 팔로우_하는_유저);
 
-        followingUser.remove(followerUser);
+        팔로우_당하는_유저.removeFollower(팔로우_하는_유저);
     }
 
     @Transactional(readOnly = true)
