@@ -7,7 +7,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true
@@ -72,3 +72,9 @@ server:
 local-login:
   id:
   password:
+
+aes:
+  password: 12345
+  salt: 54321
+sha:
+  salt: 12345
