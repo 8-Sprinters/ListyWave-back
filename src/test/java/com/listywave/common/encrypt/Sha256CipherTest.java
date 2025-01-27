@@ -10,7 +10,7 @@ class Sha256CipherTest extends IntegrationTest {
     @Test
     void 암호화를_한다() {
         // given
-        String plainText = "myPassword";
+        String plainText = "1234";
 
         // when
         String encrypted1 = sha256Cipher.encrypt(plainText);

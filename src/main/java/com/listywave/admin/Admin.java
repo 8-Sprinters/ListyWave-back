@@ -38,4 +38,8 @@ public class Admin {
         }
         throw new CustomException(INVALID_ACCESS);
     }
+
+    public void update(String password) {
+        this.password = password;
+    }
 }
