@@ -4,6 +4,7 @@ import static com.listywave.common.exception.ErrorCode.ALREADY_FOLLOWED_EXCEPTIO
 import static com.listywave.common.exception.ErrorCode.ALREADY_NOT_FOLLOWED_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.DUPLICATE_NICKNAME_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
+import static java.util.stream.Collectors.toMap;
 
 import com.listywave.alarm.application.domain.AlarmCreateEvent;
 import com.listywave.common.exception.CustomException;
@@ -22,6 +23,8 @@ import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import com.listywave.user.repository.user.elastic.UserElasticRepository;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
@@ -58,17 +61,23 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserSearchResponse searchUser(Long loginUserId, String search, Pageable pageable) {
-        if (loginUserId == null) {
-            return createUserSearchResponse(null, search, pageable);
-        }
-        User user = userRepository.getById(loginUserId);
-        return createUserSearchResponse(user.getId(), search, pageable);
-    }
-
-    private UserSearchResponse createUserSearchResponse(Long loginUserId, String search, Pageable pageable) {
+        Slice<UserSearchResult> searchResult = userRepository.findAllBySearch(search, pageable, loginUserId);
         Long count = userRepository.countBySearch(search, loginUserId);
-        Slice<UserSearchResult> result = userRepository.findAllBySearch(search, pageable, loginUserId);
-        return UserSearchResponse.of(result.getContent(), count, result.hasNext());
+
+        if (loginUserId == null) {
+            return UserSearchResponse.createWithoutLogin(searchResult.getContent(), count, searchResult.hasNext());
+        }
+
+        User 검색하는_유저 = userRepository.getById(loginUserId);
+        Map<UserSearchResult, Boolean> 팔로우_유무 = searchResult.getContent().stream()
+                .collect(toMap(
+                        Function.identity(),
+                        userSearchResult -> {
+                            User 검색_대상_유저 = userRepository.getById(userSearchResult.getId());
+                            return followRepository.existsByFollowerUserAndFollowingUser(검색하는_유저, 검색_대상_유저);
+                        }
+                ));
+        return UserSearchResponse.createWithLogin(팔로우_유무, count, searchResult.hasNext());
     }
 
     public FollowingsResponse getFollowings(Long followerUserId, String search) {
