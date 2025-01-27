@@ -49,15 +49,16 @@ public class TopicController {
 
     @GetMapping("/admin/topics")
     ResponseEntity<TopicFindResponse> findAll(
+            @Auth Long adminId,
             @RequestParam(required = false) Long cursorId,
             @RequestParam(defaultValue = "5") int size
     ) {
-        TopicFindResponse result = topicService.findAll(cursorId, size);
+        TopicFindResponse result = topicService.findAll(adminId, cursorId, size);
         return ResponseEntity.ok(result);
     }
 
     @PutMapping("/admin/topics/{topicId}")
-    ResponseEntity<Void> update(@PathVariable Long topicId, @RequestBody TopicUpdateRequest request) {
+    ResponseEntity<Void> update(@Auth Long adminId, @PathVariable Long topicId, @RequestBody TopicUpdateRequest request) {
         topicService.update(topicId, request.isExposed(), request.categoryCode(), request.title());
         return ResponseEntity.noContent().build();
     }

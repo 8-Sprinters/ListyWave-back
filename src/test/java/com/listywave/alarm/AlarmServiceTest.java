@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.listywave.admin.Admin;
 import com.listywave.alarm.application.domain.AlarmCreateEvent;
 import com.listywave.alarm.application.dto.AlarmCheckResponse;
 import com.listywave.alarm.application.dto.AlarmFindResponse;
@@ -268,11 +269,13 @@ public class AlarmServiceTest extends IntegrationTest {
         @Nested
         class 공지 {
 
+            private final Admin admin = adminRepository.save(new Admin(null, "1.2.3.4", "account", "1234"));
+
             @Test
             void 공지_알람을_발송한다() {
                 // given
                 NoticeCreateRequest noticeCreateRequest = createNoticeCreateRequest();
-                Long noticeId = noticeService.create(noticeCreateRequest);
+                Long noticeId = noticeService.create(admin.getId(), noticeCreateRequest);
                 Notice notice = noticeRepository.getById(noticeId);
 
                 // when
@@ -301,11 +304,11 @@ public class AlarmServiceTest extends IntegrationTest {
             void 공지는_1개당_최대_1회만_알람을_보낼_수_있다() {
                 // given
                 NoticeCreateRequest noticeCreateRequest = createNoticeCreateRequest();
-                Long noticeId = noticeService.create(noticeCreateRequest);
-                noticeService.sendAlarm(noticeId);
+                Long noticeId = noticeService.create(admin.getId(), noticeCreateRequest);
+                noticeService.sendAlarm(admin.getId(), noticeId);
 
                 // when
-                ErrorCode result = assertThrows(CustomException.class, () -> noticeService.sendAlarm(noticeId))
+                ErrorCode result = assertThrows(CustomException.class, () -> noticeService.sendAlarm(admin.getId(), noticeId))
                         .getErrorCode();
 
                 // then

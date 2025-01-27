@@ -9,6 +9,7 @@ import static com.listywave.notice.application.domain.NoticeType.EVENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.listywave.admin.Admin;
 import com.listywave.common.IntegrationTest;
 import com.listywave.notice.application.domain.Notice;
 import com.listywave.notice.application.domain.NoticeType;
@@ -24,12 +25,14 @@ import org.junit.jupiter.api.Test;
 
 public class NoticeServiceTest extends IntegrationTest {
 
+    private final Admin admin = adminRepository.save(new Admin(null, "1.2.3.4", "account", "1234"));
+
     @Test
     void 공지를_생성_후_상세_조회한다() {
         // given
-        Long id1 = noticeService.create(createNoticeCreateRequest(1));
-        Long id2 = noticeService.create(createNoticeCreateRequest(2));
-        Long id3 = noticeService.create(createNoticeCreateRequest(3));
+        Long id1 = noticeService.create(admin.getId(), createNoticeCreateRequest(1));
+        Long id2 = noticeService.create(admin.getId(), createNoticeCreateRequest(2));
+        Long id3 = noticeService.create(admin.getId(), createNoticeCreateRequest(3));
 
         // when
         NoticeFindResponse result = noticeService.findOneSpecific(id2);
@@ -80,7 +83,7 @@ public class NoticeServiceTest extends IntegrationTest {
         NoticeCreateRequest request = createNoticeCreateRequest(1);
 
         // when
-        Long id = noticeService.create(request);
+        Long id = noticeService.create(admin.getId(), request);
 
         // then
         NoticeFindResponse result = noticeService.findOneSpecific(id);
@@ -97,7 +100,7 @@ public class NoticeServiceTest extends IntegrationTest {
         void 노출된_공지가_없을_때_전체_조회한다() {
             // given
             NoticeCreateRequest noticeCreateRequest = createNoticeCreateRequest(1);
-            noticeService.create(noticeCreateRequest);
+            noticeService.create(admin.getId(), noticeCreateRequest);
 
             // when
             List<NoticeFindAllResponseToUser> result = noticeService.findAllToUser();
@@ -109,12 +112,12 @@ public class NoticeServiceTest extends IntegrationTest {
         @Test
         void 노출_처리가_된_공지를_모두_조회한다() {
             // given
-            Long notice1Id = noticeService.create(createNoticeCreateRequest(1));
-            noticeService.create(createNoticeCreateRequest(2));
-            Long notice3Id = noticeService.create(createNoticeCreateRequest(3));
+            Long notice1Id = noticeService.create(admin.getId(), createNoticeCreateRequest(1));
+            noticeService.create(admin.getId(), createNoticeCreateRequest(2));
+            Long notice3Id = noticeService.create(admin.getId(), createNoticeCreateRequest(3));
 
-            noticeService.updateExposure(notice1Id);
-            noticeService.updateExposure(notice3Id);
+            noticeService.updateExposure(admin.getId(), notice1Id);
+            noticeService.updateExposure(admin.getId(), notice3Id);
 
             // when
             List<NoticeFindAllResponseToUser> result = noticeService.findAllToUser();
@@ -136,7 +139,7 @@ public class NoticeServiceTest extends IntegrationTest {
         void 공지를_수정한다() {
             // given
             NoticeCreateRequest createRequest = createNoticeCreateRequest(1);
-            Long noticeId = noticeService.create(createRequest);
+            Long noticeId = noticeService.create(admin.getId(), createRequest);
 
             // when
             NoticeUpdateRequest updateRequest = new NoticeUpdateRequest(
@@ -151,7 +154,7 @@ public class NoticeServiceTest extends IntegrationTest {
                             new NoticeUpdateRequest.ContentDto(1, "note", "유의사항입니다", null, null, null)
                     )
             );
-            noticeService.update(updateRequest, noticeId);
+            noticeService.update(admin.getId(), updateRequest, noticeId);
 
             // then
             NoticeFindResponse result = noticeService.findOneSpecific(noticeId);
@@ -169,10 +172,10 @@ public class NoticeServiceTest extends IntegrationTest {
         void 공지_노출_여부를_수정한다() {
             // given
             NoticeCreateRequest createRequest = createNoticeCreateRequest(1);
-            Long noticeId = noticeService.create(createRequest);
+            Long noticeId = noticeService.create(admin.getId(), createRequest);
 
             // when
-            noticeService.updateExposure(noticeId);
+            noticeService.updateExposure(admin.getId(), noticeId);
 
             // then
             Notice result = noticeRepository.getById(noticeId);
@@ -183,11 +186,11 @@ public class NoticeServiceTest extends IntegrationTest {
         void 노출이_된_공지를_미노출로_변경한다() {
             // given
             NoticeCreateRequest createRequest = createNoticeCreateRequest(1);
-            Long noticeId = noticeService.create(createRequest);
-            noticeService.updateExposure(noticeId);
+            Long noticeId = noticeService.create(admin.getId(), createRequest);
+            noticeService.updateExposure(admin.getId(), noticeId);
 
             // when
-            noticeService.updateExposure(noticeId);
+            noticeService.updateExposure(admin.getId(), noticeId);
 
             // then
             Notice result = noticeRepository.getById(noticeId);
@@ -199,10 +202,10 @@ public class NoticeServiceTest extends IntegrationTest {
     void 공지_삭제() {
         // given
         NoticeCreateRequest createRequest = createNoticeCreateRequest(1);
-        Long noticeId = noticeService.create(createRequest);
+        Long noticeId = noticeService.create(admin.getId(), createRequest);
 
         // when
-        noticeService.delete(noticeId);
+        noticeService.delete(admin.getId(), noticeId);
 
         // then
         Optional<Notice> result = noticeRepository.findById(noticeId);

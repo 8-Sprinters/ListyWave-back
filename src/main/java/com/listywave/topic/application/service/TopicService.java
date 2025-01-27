@@ -1,5 +1,6 @@
 package com.listywave.topic.application.service;
 
+import com.listywave.admin.AdminRepository;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.topic.application.domain.Topic;
 import com.listywave.topic.application.service.dto.ExposedTopicFindResponse;
@@ -23,6 +24,7 @@ public class TopicService {
 
     private final UserRepository userRepository;
     private final TopicRepository topicRepository;
+    private final AdminRepository adminRepository;
 
     public void create(TopicCreateRequest request, Long userId) {
         User user = userRepository.getById(userId);
@@ -37,7 +39,8 @@ public class TopicService {
     }
 
     @Transactional(readOnly = true)
-    public TopicFindResponse findAll(@Nullable Long cursorId, int size) {
+    public TopicFindResponse findAll(Long adminId, @Nullable Long cursorId, int size) {
+        adminRepository.getById(adminId);
         List<Topic> result = topicRepository.findAll(cursorId, size);
         long totalCount = (topicRepository.count() / size) + 1;
         return TopicFindResponse.from(result, size, totalCount);

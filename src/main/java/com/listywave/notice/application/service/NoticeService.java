@@ -1,5 +1,7 @@
 package com.listywave.notice.application.service;
 
+import com.listywave.admin.Admin;
+import com.listywave.admin.AdminRepository;
 import com.listywave.alarm.application.domain.AlarmCreateEvent;
 import com.listywave.notice.application.domain.Notice;
 import com.listywave.notice.application.domain.NoticeContent;
@@ -30,16 +32,19 @@ public class NoticeService {
     private final UserRepository userRepository;
     private final NoticeRepository noticeRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final AdminRepository adminRepository;
 
-    public Long create(NoticeCreateRequest request) {
-        Notice notice = request.toNotice();
+    public Long create(Long adminId, NoticeCreateRequest request) {
+        Admin admin = adminRepository.getById(adminId);
+        Notice notice = request.toNotice(admin);
         List<NoticeContent> noticeContents = request.toNoticeContents(notice);
         notice.addContents(noticeContents);
         return noticeRepository.save(notice).getId();
     }
 
     @Transactional(readOnly = true)
-    public List<NoticeFindAllResponseToAdmin> findAllToAdmin() {
+    public List<NoticeFindAllResponseToAdmin> findAllToAdmin(Long adminId) {
+        adminRepository.getById(adminId);
         List<Notice> notices = noticeRepository.findAll();
         return NoticeFindAllResponseToAdmin.toList(notices);
     }
@@ -58,7 +63,8 @@ public class NoticeService {
         return NoticeFindResponse.of(result, prevNotice, nextNotice);
     }
 
-    public void update(NoticeUpdateRequest request, Long noticeId) {
+    public void update(Long adminId, NoticeUpdateRequest request, Long noticeId) {
+        Admin admin = adminRepository.getById(adminId);
         Notice notice = noticeRepository.findByIdWithFetch(noticeId);
         List<NoticeContent> newNoticeContents = request.toNoticeContents(notice);
 
@@ -66,22 +72,27 @@ public class NoticeService {
                 NoticeType.codeOf(request.categoryCode()),
                 new NoticeTitle(request.title()),
                 new NoticeDescription(request.description()),
-                newNoticeContents
+                newNoticeContents,
+                admin
         );
     }
 
-    public void updateExposure(Long id) {
-        Notice notice = noticeRepository.findByIdWithFetch(id);
-        notice.changeExposure();
+    public void updateExposure(Long adminId, Long noticeId) {
+        Admin admin = adminRepository.getById(adminId);
+        Notice notice = noticeRepository.findByIdWithFetch(noticeId);
+        notice.changeExposure(admin);
     }
 
-    public void delete(Long id) {
-        noticeRepository.deleteById(id);
+    public void delete(Long adminId, Long noticeID) {
+        adminRepository.getById(adminId);
+        noticeRepository.deleteById(noticeID);
     }
 
-    public void sendAlarm(Long id) {
+    public void sendAlarm(Long adminId, Long noticeId) {
+        adminRepository.getById(adminId);
+
         User officialUser = userRepository.findByNicknameValue(OFFICIAL_USER_NICKNAME);
-        Notice notice = noticeRepository.getById(id);
+        Notice notice = noticeRepository.getById(noticeId);
         notice.sendAlarm();
 
         AlarmCreateEvent event = AlarmCreateEvent.notice(officialUser, notice);
