@@ -20,12 +20,19 @@ import com.listywave.notice.application.service.dto.NoticeFindResponse;
 import com.listywave.notice.application.service.dto.NoticeUpdateRequest;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class NoticeServiceTest extends IntegrationTest {
 
-    private final Admin admin = adminRepository.save(new Admin(null, "1.2.3.4", "account", "1234"));
+    private Admin admin;
+
+    @BeforeEach
+    protected void setUp() {
+        super.setUp();
+        admin = adminRepository.save(new Admin(null, "1.2.3.4", "account", "1234"));
+    }
 
     @Test
     void 공지를_생성_후_상세_조회한다() {

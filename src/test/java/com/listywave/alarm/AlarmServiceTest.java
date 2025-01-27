@@ -25,7 +25,7 @@ import com.listywave.list.application.dto.ReplyDeleteCommand;
 import com.listywave.notice.application.domain.Notice;
 import com.listywave.notice.application.service.dto.NoticeCreateRequest;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -269,7 +269,12 @@ public class AlarmServiceTest extends IntegrationTest {
         @Nested
         class 공지 {
 
-            private final Admin admin = adminRepository.save(new Admin(null, "1.2.3.4", "account", "1234"));
+            private Admin admin;
+
+            @BeforeEach
+            void setUp() {
+                this.admin = adminRepository.save(new Admin(null, "1.2.3.4", "account", "1234"));
+            }
 
             @Test
             void 공지_알람을_발송한다() {
@@ -446,12 +451,6 @@ public class AlarmServiceTest extends IntegrationTest {
 
     @Nested
     class 알람_삭제 {
-
-        @Test
-        @Disabled
-        void _30일이_지난_알람은_자동_삭제된다() {
-            // TODO: 테스트 작성
-        }
 
         @Test
         void 댓글이_삭제될_경우_관련_알람도_모두_삭제된다() {
