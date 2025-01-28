@@ -22,6 +22,10 @@ import com.listywave.user.repository.follow.FollowRepository;
 import com.listywave.user.repository.user.UserRepository;
 import com.listywave.user.repository.user.elastic.UserElasticRepository;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
@@ -58,17 +62,25 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserSearchResponse searchUser(Long loginUserId, String search, Pageable pageable) {
-        if (loginUserId == null) {
-            return createUserSearchResponse(null, search, pageable);
-        }
-        User user = userRepository.getById(loginUserId);
-        return createUserSearchResponse(user.getId(), search, pageable);
-    }
-
-    private UserSearchResponse createUserSearchResponse(Long loginUserId, String search, Pageable pageable) {
+        Slice<UserSearchResult> searchResult = userRepository.findAllBySearch(search, pageable, loginUserId);
         Long count = userRepository.countBySearch(search, loginUserId);
-        Slice<UserSearchResult> result = userRepository.findAllBySearch(search, pageable, loginUserId);
-        return UserSearchResponse.of(result.getContent(), count, result.hasNext());
+
+        if (loginUserId == null) {
+            return UserSearchResponse.createWithoutLogin(searchResult.getContent(), count, searchResult.hasNext());
+        }
+
+        User 검색하는_유저 = userRepository.getById(loginUserId);
+        List<Long> 검색_결과_유저_ID_리스트 = searchResult.getContent().stream()
+                .map(UserSearchResult::getId)
+                .toList();
+        Set<Long> 검색하는_유저가_팔로우하고_있는_검색_결과_유저_ID_리스트 = followRepository.검색하는_유저가_검색_결과_유저_중_팔로우하고_있는_유저만을_조회한다(검색하는_유저, 검색_결과_유저_ID_리스트);
+        Map<UserSearchResult, Boolean> 회원_검색_결과와_팔로우_여부 = searchResult.getContent().stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        userSearchResult -> 검색하는_유저가_팔로우하고_있는_검색_결과_유저_ID_리스트.contains(userSearchResult.getId())
+                ));
+
+        return UserSearchResponse.createWithLogin(회원_검색_결과와_팔로우_여부, count, searchResult.hasNext());
     }
 
     public FollowingsResponse getFollowings(Long followerUserId, String search) {

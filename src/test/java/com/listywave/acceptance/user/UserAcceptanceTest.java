@@ -26,10 +26,13 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 import com.listywave.acceptance.common.AcceptanceTest;
 import com.listywave.list.application.dto.response.ListCreateResponse;
+import com.listywave.user.application.domain.User;
 import com.listywave.user.application.dto.UserInfoResponse;
 import com.listywave.user.application.dto.UsersRecommendedResponse;
 import com.listywave.user.application.dto.search.UserSearchResponse;
 import io.restassured.common.mapper.TypeRef;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -112,11 +115,35 @@ public class UserAcceptanceTest extends AcceptanceTest {
             회원을_저장한다(유진());
 
             // when
-            var 결과 = 비회원이_사용자_검색(동호.getNickname()).as(UserSearchResponse.class);
+            UserSearchResponse 결과 = 비회원이_사용자_검색(동호.getNickname()).as(UserSearchResponse.class);
 
             // then
-            assertThat(결과.totalCount()).isOne();
-            assertThat(결과.users().get(0).getNickname()).isEqualTo(동호.getNickname());
+            assertAll(
+                    () -> assertThat(결과.totalCount()).isOne(),
+                    () -> assertThat(결과.users().get(0).nickname()).isEqualTo(동호.getNickname()),
+                    () -> assertThat(결과.users().get(0).isFollowing()).isFalse()
+            );
+        }
+
+        @Test
+        void 검색_대상_회원이_내가_현재_팔로우하고_있는_유저인_경우() {
+            // given
+            User 동호 = 회원을_저장한다(동호());
+            User 정수 = 회원을_저장한다(정수());
+            String 정수의_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+
+            팔로우_요청_API(정수의_액세스_토큰, 동호.getId());
+
+            // when
+            ExtractableResponse<Response> 응답 = 회원이_사용자_검색(정수의_액세스_토큰, "kdkdhoho");
+            UserSearchResponse 결과 = 응답.as(UserSearchResponse.class);
+
+            // then
+            assertAll(
+                    () -> assertThat(결과.totalCount()).isOne(),
+                    () -> assertThat(결과.users().get(0).id()).isEqualTo(동호.getId()),
+                    () -> assertThat(결과.users().get(0).isFollowing()).isTrue()
+            );
         }
 
         @Test

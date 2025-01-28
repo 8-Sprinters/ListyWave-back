@@ -11,6 +11,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +54,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     }
 
     @Override
-    public Long countBySearch(String search, Long loginUserId) {
+    public Long countBySearch(String search, @Nullable Long loginUserId) {
         if (search.isEmpty()) {
             return 0L;
         }
@@ -73,7 +74,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     }
 
     @Override
-    public Slice<UserSearchResult> findAllBySearch(String search, Pageable pageable, Long loginUserId) {
+    public Slice<UserSearchResult> findAllBySearch(String search, Pageable pageable, @Nullable Long loginUserId) {
         if (search.isEmpty()) {
             return new SliceImpl<>(List.of(), pageable, false);
         }
