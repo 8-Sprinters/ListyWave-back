@@ -23,6 +23,7 @@ import com.listywave.user.repository.user.UserRepository;
 import com.listywave.user.repository.user.elastic.UserElasticRepository;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -72,11 +73,7 @@ public class UserService {
         List<Long> 검색_결과_유저_ID_리스트 = searchResult.getContent().stream()
                 .map(UserSearchResult::getId)
                 .toList();
-        List<Long> 검색하는_유저가_팔로우하고_있는_검색_결과_유저_ID_리스트 = followRepository.검색하는_유저가_검색_결과_유저_중_팔로우하고_있는_유저만을_조회한다(검색하는_유저, 검색_결과_유저_ID_리스트).stream()
-                .map(Follow::getFollowingUser)
-                .map(User::getId)
-                .toList();
-
+        Set<Long> 검색하는_유저가_팔로우하고_있는_검색_결과_유저_ID_리스트 = followRepository.검색하는_유저가_검색_결과_유저_중_팔로우하고_있는_유저만을_조회한다(검색하는_유저, 검색_결과_유저_ID_리스트);
         Map<UserSearchResult, Boolean> 회원_검색_결과와_팔로우_여부 = searchResult.getContent().stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
