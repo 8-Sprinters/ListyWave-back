@@ -4,7 +4,6 @@ import static com.listywave.common.exception.ErrorCode.ALREADY_FOLLOWED_EXCEPTIO
 import static com.listywave.common.exception.ErrorCode.ALREADY_NOT_FOLLOWED_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.DUPLICATE_NICKNAME_EXCEPTION;
 import static com.listywave.common.exception.ErrorCode.INVALID_ACCESS;
-import static java.util.stream.Collectors.toMap;
 
 import com.listywave.alarm.application.domain.AlarmCreateEvent;
 import com.listywave.common.exception.CustomException;
@@ -25,6 +24,7 @@ import com.listywave.user.repository.user.elastic.UserElasticRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
@@ -69,15 +69,21 @@ public class UserService {
         }
 
         User 검색하는_유저 = userRepository.getById(loginUserId);
-        Map<UserSearchResult, Boolean> 팔로우_유무 = searchResult.getContent().stream()
-                .collect(toMap(
+        List<Long> 검색_결과_유저_ID_리스트 = searchResult.getContent().stream()
+                .map(UserSearchResult::getId)
+                .toList();
+        List<Long> 검색하는_유저가_팔로우하고_있는_검색_결과_유저_ID_리스트 = followRepository.검색하는_유저가_검색_결과_유저_중_팔로우하고_있는_유저만을_조회한다(검색하는_유저, 검색_결과_유저_ID_리스트).stream()
+                .map(Follow::getFollowingUser)
+                .map(User::getId)
+                .toList();
+
+        Map<UserSearchResult, Boolean> 회원_검색_결과와_팔로우_여부 = searchResult.getContent().stream()
+                .collect(Collectors.toMap(
                         Function.identity(),
-                        userSearchResult -> {
-                            User 검색_대상_유저 = userRepository.getById(userSearchResult.getId());
-                            return followRepository.existsByFollowerUserAndFollowingUser(검색하는_유저, 검색_대상_유저);
-                        }
+                        userSearchResult -> 검색하는_유저가_팔로우하고_있는_검색_결과_유저_ID_리스트.contains(userSearchResult.getId())
                 ));
-        return UserSearchResponse.createWithLogin(팔로우_유무, count, searchResult.hasNext());
+
+        return UserSearchResponse.createWithLogin(회원_검색_결과와_팔로우_여부, count, searchResult.hasNext());
     }
 
     public FollowingsResponse getFollowings(Long followerUserId, String search) {
