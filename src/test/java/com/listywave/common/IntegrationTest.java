@@ -113,7 +113,7 @@ public abstract class IntegrationTest {
     protected ListEntity list;
 
     @BeforeEach
-    void setUp() {
+    protected void setUp() {
         alarmRepository.deleteAllInBatch();
         noticeRepository.deleteAll();
         adminRepository.deleteAllInBatch();

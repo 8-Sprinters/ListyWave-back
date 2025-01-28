@@ -6,6 +6,7 @@ import static com.listywave.list.application.domain.category.CategoryType.MUSIC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.listywave.admin.Admin;
 import com.listywave.common.IntegrationTest;
 import com.listywave.list.application.domain.list.ListDescription;
 import com.listywave.list.application.domain.list.ListTitle;
@@ -16,6 +17,7 @@ import com.listywave.topic.application.service.dto.RecommendTopicFindResponse;
 import com.listywave.topic.application.service.dto.TopicCreateRequest;
 import com.listywave.topic.application.service.dto.TopicFindResponse;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.annotation.Repeat;
@@ -198,6 +200,13 @@ class TopicServiceTest extends IntegrationTest {
     @Nested
     class 관리자용_토픽_조회 {
 
+        private Admin admin;
+
+        @BeforeEach
+        void setUp() {
+            this.admin = adminRepository.save(new Admin(null, "1.2.3.4", "account", "1234"));
+        }
+
         @Test
         void cursorId가_null이고_size가_10일_때_모든_토픽을_조회한다() {
             // given
@@ -219,7 +228,7 @@ class TopicServiceTest extends IntegrationTest {
             topicRepository.saveAll(topics);
 
             // when
-            TopicFindResponse result = topicService.findAll(null, 10);
+            TopicFindResponse result = topicService.findAll(admin.getId(), null, 10);
 
             // then
             assertAll(
@@ -251,7 +260,7 @@ class TopicServiceTest extends IntegrationTest {
             topicRepository.saveAll(topics);
 
             // when
-            TopicFindResponse result = topicService.findAll(topics.get(9).getId(), 10);
+            TopicFindResponse result = topicService.findAll(admin.getId(), topics.get(9).getId(), 10);
 
             // then
             assertAll(
@@ -283,7 +292,7 @@ class TopicServiceTest extends IntegrationTest {
             topicRepository.saveAll(topics);
 
             // when
-            TopicFindResponse result = topicService.findAll(topics.get(4).getId(), 5);
+            TopicFindResponse result = topicService.findAll(admin.getId(), topics.get(4).getId(), 5);
 
             // then
             assertAll(

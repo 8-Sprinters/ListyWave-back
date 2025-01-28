@@ -1,5 +1,6 @@
 package com.listywave.notice.application.service.dto;
 
+import com.listywave.admin.Admin;
 import com.listywave.notice.application.domain.ContentType;
 import com.listywave.notice.application.domain.Notice;
 import com.listywave.notice.application.domain.NoticeContent;
@@ -26,8 +27,8 @@ public record NoticeCreateRequest(
     ) {
     }
 
-    public Notice toNotice() {
-        return new Notice(NoticeType.codeOf(categoryCode), new NoticeTitle(title), new NoticeDescription(description));
+    public Notice toNotice(Admin admin) {
+        return new Notice(NoticeType.codeOf(categoryCode), new NoticeTitle(title), new NoticeDescription(description), admin);
     }
 
     public List<NoticeContent> toNoticeContents(Notice notice) {

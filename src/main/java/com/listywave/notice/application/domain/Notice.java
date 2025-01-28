@@ -6,11 +6,14 @@ import static jakarta.persistence.FetchType.LAZY;
 import static java.util.Comparator.comparingInt;
 import static lombok.AccessLevel.PROTECTED;
 
+import com.listywave.admin.Admin;
 import com.listywave.common.BaseEntity;
 import com.listywave.common.exception.CustomException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,13 +39,23 @@ public class Notice extends BaseEntity {
 
     private boolean didSendAlarm;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "create_admin_id")
+    private Admin createAdmin;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "update_admin_id")
+    private Admin lastUpdateAdmin;
+
     @OneToMany(mappedBy = "notice", fetch = LAZY, cascade = ALL, orphanRemoval = true)
     private final List<NoticeContent> contents = new ArrayList<>();
 
-    public Notice(NoticeType type, NoticeTitle title, NoticeDescription description) {
+    public Notice(NoticeType type, NoticeTitle title, NoticeDescription description, Admin createAdmin) {
         this.type = type;
         this.title = title;
         this.description = description;
+        this.createAdmin = createAdmin;
+        this.lastUpdateAdmin = createAdmin;
     }
 
     public void addContents(List<NoticeContent> contents) {
@@ -58,17 +71,25 @@ public class Notice extends BaseEntity {
         return result.orElse(null);
     }
 
-    public void update(NoticeType type, NoticeTitle title, NoticeDescription description, List<NoticeContent> contents) {
+    public void update(
+            NoticeType type,
+            NoticeTitle title,
+            NoticeDescription description,
+            List<NoticeContent> contents,
+            Admin updateAdmin
+    ) {
         this.type = type;
         this.title = title;
         this.description = description;
+        this.lastUpdateAdmin = updateAdmin;
 
         this.contents.clear();
         this.contents.addAll(contents);
     }
 
-    public void changeExposure() {
+    public void changeExposure(Admin updateAdmin) {
         this.isExposed = !this.isExposed;
+        this.lastUpdateAdmin = updateAdmin;
     }
 
     public void sendAlarm() {

@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.listywave.admin.Admin;
 import com.listywave.alarm.application.domain.AlarmCreateEvent;
 import com.listywave.alarm.application.dto.AlarmCheckResponse;
 import com.listywave.alarm.application.dto.AlarmFindResponse;
@@ -24,7 +25,7 @@ import com.listywave.list.application.dto.ReplyDeleteCommand;
 import com.listywave.notice.application.domain.Notice;
 import com.listywave.notice.application.service.dto.NoticeCreateRequest;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -268,11 +269,18 @@ public class AlarmServiceTest extends IntegrationTest {
         @Nested
         class 공지 {
 
+            private Admin admin;
+
+            @BeforeEach
+            void setUp() {
+                this.admin = adminRepository.save(new Admin(null, "1.2.3.4", "account", "1234"));
+            }
+
             @Test
             void 공지_알람을_발송한다() {
                 // given
                 NoticeCreateRequest noticeCreateRequest = createNoticeCreateRequest();
-                Long noticeId = noticeService.create(noticeCreateRequest);
+                Long noticeId = noticeService.create(admin.getId(), noticeCreateRequest);
                 Notice notice = noticeRepository.getById(noticeId);
 
                 // when
@@ -301,11 +309,11 @@ public class AlarmServiceTest extends IntegrationTest {
             void 공지는_1개당_최대_1회만_알람을_보낼_수_있다() {
                 // given
                 NoticeCreateRequest noticeCreateRequest = createNoticeCreateRequest();
-                Long noticeId = noticeService.create(noticeCreateRequest);
-                noticeService.sendAlarm(noticeId);
+                Long noticeId = noticeService.create(admin.getId(), noticeCreateRequest);
+                noticeService.sendAlarm(admin.getId(), noticeId);
 
                 // when
-                ErrorCode result = assertThrows(CustomException.class, () -> noticeService.sendAlarm(noticeId))
+                ErrorCode result = assertThrows(CustomException.class, () -> noticeService.sendAlarm(admin.getId(), noticeId))
                         .getErrorCode();
 
                 // then
@@ -443,12 +451,6 @@ public class AlarmServiceTest extends IntegrationTest {
 
     @Nested
     class 알람_삭제 {
-
-        @Test
-        @Disabled
-        void _30일이_지난_알람은_자동_삭제된다() {
-            // TODO: 테스트 작성
-        }
 
         @Test
         void 댓글이_삭제될_경우_관련_알람도_모두_삭제된다() {

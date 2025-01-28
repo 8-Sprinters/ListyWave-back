@@ -1,5 +1,6 @@
 package com.listywave.notice.presentation;
 
+import com.listywave.common.auth.Auth;
 import com.listywave.notice.application.domain.NoticeType;
 import com.listywave.notice.application.service.NoticeService;
 import com.listywave.notice.application.service.dto.NoticeCreateRequest;
@@ -29,21 +30,21 @@ public class NoticeController {
     private final NoticeService noticeService;
 
     @GetMapping("/admin/notices/categories")
-    ResponseEntity<List<NoticeCategoryFindResponse>> findNoticeCategories() {
+    ResponseEntity<List<NoticeCategoryFindResponse>> findNoticeCategories(@Auth Long adminId) {
         List<NoticeCategoryFindResponse> result = NoticeCategoryFindResponse.toList(NoticeType.values());
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/admin/notices")
-    ResponseEntity<NoticeCreateResponse> create(@RequestBody NoticeCreateRequest request) {
-        Long id = noticeService.create(request);
+    ResponseEntity<NoticeCreateResponse> create(@Auth Long adminId, @RequestBody NoticeCreateRequest request) {
+        Long id = noticeService.create(adminId, request);
         NoticeCreateResponse response = new NoticeCreateResponse(id);
         return ResponseEntity.created(URI.create("/admin/notices/" + id)).body(response);
     }
 
     @GetMapping("/admin/notices")
-    ResponseEntity<List<NoticeFindAllResponseToAdmin>> findAllToAdmin() {
-        List<NoticeFindAllResponseToAdmin> result = noticeService.findAllToAdmin();
+    ResponseEntity<List<NoticeFindAllResponseToAdmin>> findAllToAdmin(@Auth Long adminId) {
+        List<NoticeFindAllResponseToAdmin> result = noticeService.findAllToAdmin(adminId);
         return ResponseEntity.ok(result);
     }
 
@@ -60,26 +61,26 @@ public class NoticeController {
     }
 
     @PutMapping("/admin/notices/{noticeId}")
-    ResponseEntity<Void> update(@RequestBody NoticeUpdateRequest request, @PathVariable Long noticeId) {
-        noticeService.update(request, noticeId);
+    ResponseEntity<Void> update(@Auth Long adminId, @RequestBody NoticeUpdateRequest request, @PathVariable Long noticeId) {
+        noticeService.update(adminId, request, noticeId);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/admin/notices/{noticeId}")
-    ResponseEntity<Void> updateExposure(@PathVariable Long noticeId) {
-        noticeService.updateExposure(noticeId);
+    ResponseEntity<Void> updateExposure(@Auth Long adminId, @PathVariable Long noticeId) {
+        noticeService.updateExposure(adminId, noticeId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/admin/notices/{noticeId}")
-    ResponseEntity<Void> delete(@PathVariable Long noticeId) {
-        noticeService.delete(noticeId);
+    ResponseEntity<Void> delete(@Auth Long adminId, @PathVariable Long noticeId) {
+        noticeService.delete(adminId, noticeId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/admin/notices/{noticeId}/alarm")
-    ResponseEntity<Void> sendAlarm(@PathVariable Long noticeId) {
-        noticeService.sendAlarm(noticeId);
+    ResponseEntity<Void> sendAlarm(@Auth Long adminId, @PathVariable Long noticeId) {
+        noticeService.sendAlarm(adminId, noticeId);
         return ResponseEntity.noContent().build();
     }
 }
