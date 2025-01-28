@@ -2,6 +2,7 @@ package com.listywave.admin;
 
 import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 
+import com.listywave.common.auth.Auth;
 import com.listywave.common.exception.CustomException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
@@ -44,5 +46,11 @@ public class AdminController {
     ResponseEntity<AdminLoginResponse> login(@RequestBody AdminLoginRequest adminLoginRequest) {
         AdminLoginResponse result = adminService.login(adminLoginRequest.account(), adminLoginRequest.password());
         return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/admin")
+    ResponseEntity<Void> updateInfo(@Auth Long adminId, @RequestBody AdminUpdateRequest request) {
+        adminService.update(adminId, request.password());
+        return ResponseEntity.ok().build();
     }
 }

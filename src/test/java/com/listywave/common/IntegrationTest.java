@@ -14,6 +14,8 @@ import com.listywave.auth.application.service.AuthService;
 import com.listywave.collection.application.service.CollectionService;
 import com.listywave.collection.application.service.FolderService;
 import com.listywave.collection.repository.CollectionRepository;
+import com.listywave.common.encrypt.Aes256Cipher;
+import com.listywave.common.encrypt.Sha256Cipher;
 import com.listywave.history.repository.HistoryRepository;
 import com.listywave.list.application.domain.list.ListEntity;
 import com.listywave.list.application.service.CommentService;
@@ -102,6 +104,10 @@ public abstract class IntegrationTest {
     protected NoticeRepository noticeRepository;
     @Autowired
     protected ReactionService reactionService;
+    @Autowired
+    protected Aes256Cipher aes256Cipher;
+    @Autowired
+    protected Sha256Cipher sha256Cipher;
 
     protected User dh, js, ej, sy;
     protected ListEntity list;
