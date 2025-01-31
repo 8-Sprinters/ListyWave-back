@@ -44,7 +44,7 @@ public class Notice extends BaseEntity {
     private Admin createAdmin;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "update_admin_id")
+    @JoinColumn(name = "last_update_admin_id")
     private Admin lastUpdateAdmin;
 
     @OneToMany(mappedBy = "notice", fetch = LAZY, cascade = ALL, orphanRemoval = true)
