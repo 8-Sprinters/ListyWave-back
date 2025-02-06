@@ -32,7 +32,7 @@ public class AdminService {
 
             // 암호화 적용으로 인해, 임시로 작성해둔 코드입니다.
             // 모든 어드민이 암호를 변경하면 if 조건식만 제거합니다.
-            if (!password.equals("12345")) {
+            if (!password.equals("1234")) {
                 admin.validatePassword(sha256Cipher.encrypt(password)); // 해당 라인은 제거하지 않습니다.
             }
 
