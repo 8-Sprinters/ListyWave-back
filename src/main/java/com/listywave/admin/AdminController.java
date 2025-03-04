@@ -1,9 +1,8 @@
 package com.listywave.admin;
 
-import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
-
 import com.listywave.common.auth.Auth;
 import com.listywave.common.exception.CustomException;
+import static com.listywave.common.exception.ErrorCode.RESOURCE_NOT_FOUND;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
@@ -30,7 +29,7 @@ public class AdminController {
 
             for (String activeProfile : activeProfiles) {
                 switch (activeProfile) {
-                    case "dev", "local" -> {
+                    case "dev", "default" -> {
                         return "redirect:http://localhost:3000/admin/login";
                     }
                     case "prod" -> {
