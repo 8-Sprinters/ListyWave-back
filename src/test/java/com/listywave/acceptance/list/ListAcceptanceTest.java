@@ -201,12 +201,15 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 폴더_선택_데이터 = 폴더_선택_요청_데이터(정수_폴더_ID);
             콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 동호_리스트_ID, 폴더_선택_데이터);
 
+            팔로우_요청_API(정수_액세스_토큰, 동호.getId());
+
             // when
             var 결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 동호_리스트_ID);
 
             // then
             assertAll(
                     () -> assertThat(결과.ownerId()).isEqualTo(동호.getId()),
+                    () -> assertThat(결과.isFollowing()).isTrue(),
                     () -> assertThat(결과.collectCount()).isNull()
             );
         }
@@ -253,7 +256,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 결과 = 비회원_리스트_상세_조회_API_호출(동호_리스트_ID).as(ListDetailResponse.class);
 
             // then
-            var 기대값 = ListDetailResponse.of(가장_좋아하는_견종_TOP3_순위_변경(동호, List.of()), 동호, false, false, List.of(), 0, null, 0L, List.of());
+            var 기대값 = ListDetailResponse.of(가장_좋아하는_견종_TOP3_순위_변경(동호, List.of()), 동호, false, false, false, List.of(), 0, null, 0L, List.of());
             리스트_상세_조회를_검증한다(결과, 기대값);
         }
 
@@ -342,7 +345,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             // then
             var 리스트_상세_조회_결과 = 회원용_리스트_상세_조회_API_호출(동호_액세스_토큰, 동호_리스트_ID);
             ListEntity 수정된_리스트 = 가장_좋아하는_견종_TOP3_순위_변경(동호, List.of());
-            ListDetailResponse 기대값 = ListDetailResponse.of(수정된_리스트, 동호, true, false, List.of(Collaborator.init(유진, 수정된_리스트)), 0, null, 0L, List.of());
+            ListDetailResponse 기대값 = ListDetailResponse.of(수정된_리스트, 동호, true, false, false, List.of(Collaborator.init(유진, 수정된_리스트)), 0, null, 0L, List.of());
             리스트_상세_조회를_검증한다(리스트_상세_조회_결과, 기대값);
         }
 

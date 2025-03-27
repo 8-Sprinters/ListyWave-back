@@ -138,6 +138,10 @@ public class ListService {
         User user = getUserIfLoggedIn(loginUserId);
         boolean isCollected = checkIsCollected(list, user);
         boolean isOwner = checkIsOwner(list, user);
+        boolean isFollowing = false;
+        if (!isOwner) {
+            isFollowing = followRepository.existsByFollowerUserAndFollowingUser(user, list.getUser());
+        }
 
         List<ReactionResponse> reactions = reactionService.createReactionResponses(list, user, isOwner);
         long totalCommentCount = commentRepository.countCommentsByList(list);
@@ -148,6 +152,7 @@ public class ListService {
                 list.getUser(),
                 isOwner,
                 isCollected,
+                isFollowing,
                 collaborators,
                 totalCommentCount,
                 newestComment,

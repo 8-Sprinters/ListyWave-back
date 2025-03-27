@@ -29,6 +29,7 @@ public record ListDetailResponse(
         List<ItemResponse> items,
         boolean isCollected,
         boolean isPublic,
+        boolean isFollowing,
         String backgroundPalette,
         String backgroundColor,
         Integer collectCount,
@@ -44,6 +45,7 @@ public record ListDetailResponse(
             User owner,
             boolean isOwner,
             boolean isCollected,
+            boolean isFollowing,
             List<Collaborator> collaborators,
             long totalCommentCount,
             Comment newestComment,
@@ -66,6 +68,7 @@ public record ListDetailResponse(
                 .items(ItemResponse.toList(list.getSortedItems().getValues()))
                 .isCollected(isCollected)
                 .isPublic(list.isPublic())
+                .isFollowing(isFollowing)
                 .backgroundColor(list.getBackgroundColor().name())
                 .backgroundPalette(list.getBackgroundPalette().name())
                 .collectCount(isOwner ? list.getCollectCount() : null)
@@ -76,7 +79,7 @@ public record ListDetailResponse(
                 .reactions(reactions)
                 .build();
     }
-    
+
     public record LabelResponse(
             String name
     ) {
