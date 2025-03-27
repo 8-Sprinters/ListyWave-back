@@ -21,10 +21,11 @@ public enum ErrorCode {
     INVALID_ACCESS_TOKEN(UNAUTHORIZED, "유효하지 않은 AccessToken 입니다. 다시 로그인해주세요."),
     INVALID_ACCESS(FORBIDDEN, "접근 권한이 존재하지 않습니다."),
     CANNOT_COLLECT_OWN_LIST(BAD_REQUEST, "리스트 작성자는 자신의 리스트에 콜렉트할 수 없습니다."),
-    CANNOT_SEND_OWN_ALARM(BAD_REQUEST, "알람을 자신에게 보낼 수 없습니다."),
+    ENCRYPT_ERROR(INTERNAL_SERVER_ERROR, "암호화 과정 중 문제가 발생했습니다."),
 
     // Http Request
     METHOD_ARGUMENT_TYPE_MISMATCH(BAD_REQUEST, "요청 한 값 타입이 잘못되어 binding에 실패하였습니다."),
+    METHOD_ARGUMENT_NOT_VALID_EXCEPTION(BAD_REQUEST, "요청에 담긴 값에 문제가 있습니다."),
     RESOURCE_NOT_FOUND(NOT_FOUND, "대상이 존재하지 않습니다."),
     RESOURCES_EMPTY(NOT_FOUND, "해당 대상들이 존재하지 않습니다."),
     ELASTICSEARCH_REQUEST_FAILED(BAD_REQUEST, "Elasticsearch 검색 요청에 실패했습니다."),
@@ -44,6 +45,10 @@ public enum ErrorCode {
     ALREADY_LOGOUT_EXCEPTION(BAD_REQUEST, "이미 로그아웃 처리가 된 상태입니다."),
     DUPLICATE_NICKNAME_EXCEPTION(BAD_REQUEST, "중복된 닉네임입니다."),
     DUPLICATE_COLLABORATOR_EXCEPTION(BAD_REQUEST, "이미 동일한 콜라보레이터가 존재합니다"),
+    DUPLICATE_FOLDER_NAME_EXCEPTION(BAD_REQUEST, "중복된 폴더명입니다."),
+    NULL_OR_BLANK_EXCEPTION(BAD_REQUEST, "값이 null이거나 공백일 수 없습니다."),
+    NOT_EXIST_CODE(BAD_REQUEST, "존재하지 않는 코드입니다."),
+    ALREADY_SENT_ALARM_NOTICE(BAD_REQUEST, "이미 발송된 공지입니다."),
 
     // S3
     S3_DELETE_OBJECTS_EXCEPTION(INTERNAL_SERVER_ERROR, "S3의 이미지를 삭제 요청하는 과정에서 에러가 발생했습니다."),

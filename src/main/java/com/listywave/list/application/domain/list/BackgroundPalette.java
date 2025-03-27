@@ -5,5 +5,5 @@ public enum BackgroundPalette {
     PASTEL,
     VIVID,
     GRAY,
-    LISTY,
+    NEON,
 }

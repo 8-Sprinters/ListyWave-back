@@ -8,7 +8,7 @@ import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListRecentResponse;
 import com.listywave.list.application.dto.response.ListSearchResponse;
-import com.listywave.list.application.dto.response.ListTrandingResponse;
+import com.listywave.list.application.dto.response.RecommendedListResponse;
 import com.listywave.list.application.service.ListService;
 import com.listywave.list.presentation.dto.request.ListCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
@@ -54,10 +54,10 @@ public class ListController {
         return ResponseEntity.ok(listDetailResponse);
     }
 
-    @GetMapping("/lists/explore")
-    ResponseEntity<List<ListTrandingResponse>> fetchTrandingLists() {
-        List<ListTrandingResponse> trandingList = listService.fetchTrandingLists();
-        return ResponseEntity.ok().body(trandingList);
+    @GetMapping("/lists/recommend")
+    ResponseEntity<List<RecommendedListResponse>> getRecommendedLists() {
+        List<RecommendedListResponse> recommendedLists = listService.getRecommendedLists();
+        return ResponseEntity.ok().body(recommendedLists);
     }
 
     @DeleteMapping("/lists/{listId}")
@@ -71,11 +71,21 @@ public class ListController {
 
     @GetMapping("/lists")
     ResponseEntity<ListRecentResponse> getRecentLists(
-            @OptionalAuth Long loginUserId,
+            @RequestParam(name = "cursorUpdatedDate", required = false) LocalDateTime cursorUpdatedDate,
+            @RequestParam(name = "category", defaultValue = "entire") CategoryType category,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        ListRecentResponse recentLists = listService.getRecentLists(cursorUpdatedDate, category, pageable);
+        return ResponseEntity.ok(recentLists);
+    }
+
+    @GetMapping("/lists/following")
+    ResponseEntity<ListRecentResponse> getRecentListsByFollowing(
+            @Auth Long loginUserId,
             @RequestParam(name = "cursorUpdatedDate", required = false) LocalDateTime cursorUpdatedDate,
             @PageableDefault(size = 10) Pageable pageable
     ) {
-        ListRecentResponse recentLists = listService.getRecentLists(loginUserId, cursorUpdatedDate, pageable);
+        ListRecentResponse recentLists = listService.getRecentListsByFollowing(loginUserId, cursorUpdatedDate, pageable);
         return ResponseEntity.ok(recentLists);
     }
 
@@ -83,11 +93,11 @@ public class ListController {
     ResponseEntity<ListSearchResponse> search(
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "sort", defaultValue = "new") SortType sort,
-            @RequestParam(value = "category", defaultValue = "entire") CategoryType category,
+            @RequestParam(value = "categoryCode", defaultValue = "0") String categoryCode,
             @RequestParam(value = "size", defaultValue = "5") int size,
             @RequestParam(value = "cursorId", defaultValue = "0") Long cursorId
     ) {
-        ListSearchResponse response = listService.search(keyword, sort, category, size, cursorId);
+        ListSearchResponse response = listService.search(keyword, sort, categoryCode, size, cursorId);
         return ResponseEntity.ok(response);
     }
 
@@ -120,6 +130,15 @@ public class ListController {
             @RequestBody ListsDeleteRequest request
     ) {
         listService.deleteLists(userId, request.listId());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/lists/{listId}/visibility")
+    ResponseEntity<Void> changeVisibility(
+            @Auth Long loginUserId,
+            @PathVariable("listId") Long listId
+    ) {
+        listService.changeVisibility(loginUserId, listId);
+        return ResponseEntity.noContent().build();
     }
 }

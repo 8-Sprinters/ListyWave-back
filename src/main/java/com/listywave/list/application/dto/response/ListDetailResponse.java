@@ -1,16 +1,20 @@
 package com.listywave.list.application.dto.response;
 
 import com.listywave.collaborator.application.domain.Collaborator;
+import com.listywave.list.application.domain.comment.Comment;
 import com.listywave.list.application.domain.item.Item;
 import com.listywave.list.application.domain.label.Label;
 import com.listywave.list.application.domain.list.ListEntity;
+import com.listywave.reaction.application.dto.response.ReactionResponse;
 import com.listywave.user.application.domain.User;
+import jakarta.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 
 @Builder
 public record ListDetailResponse(
+        String categoryCode,
         String categoryEngName,
         String categoryKorName,
         List<LabelResponse> labels,
@@ -25,19 +29,31 @@ public record ListDetailResponse(
         List<ItemResponse> items,
         boolean isCollected,
         boolean isPublic,
+        boolean isFollowing,
         String backgroundPalette,
         String backgroundColor,
-        int collectCount,
-        int viewCount
+        Integer collectCount,
+        int viewCount,
+        int updateCount,
+        long totalCommentCount,
+        @Nullable NewestComment newestComment,
+        List<ReactionResponse> reactions
 ) {
 
     public static ListDetailResponse of(
             ListEntity list,
             User owner,
+            boolean isOwner,
             boolean isCollected,
-            List<Collaborator> collaborators
+            boolean isFollowing,
+            List<Collaborator> collaborators,
+            long totalCommentCount,
+            Comment newestComment,
+            Long totalReplyCount,
+            List<ReactionResponse> reactions
     ) {
         return ListDetailResponse.builder()
+                .categoryCode(list.getCategory().getCode())
                 .categoryEngName(list.getCategory().name().toLowerCase())
                 .categoryKorName(list.getCategory().getViewName())
                 .labels(LabelResponse.toList(list.getLabels().getValues()))
@@ -52,10 +68,15 @@ public record ListDetailResponse(
                 .items(ItemResponse.toList(list.getSortedItems().getValues()))
                 .isCollected(isCollected)
                 .isPublic(list.isPublic())
+                .isFollowing(isFollowing)
                 .backgroundColor(list.getBackgroundColor().name())
                 .backgroundPalette(list.getBackgroundPalette().name())
-                .collectCount(list.getCollectCount())
+                .collectCount(isOwner ? list.getCollectCount() : null)
                 .viewCount(list.getViewCount())
+                .updateCount(list.getUpdateCount())
+                .totalCommentCount(totalCommentCount)
+                .newestComment(NewestComment.of(newestComment, totalReplyCount))
+                .reactions(reactions)
                 .build();
     }
 
@@ -120,6 +141,31 @@ public record ListDetailResponse(
                     .comment(item.getComment().getValue())
                     .link(item.getLink().getValue())
                     .imageUrl(item.getImageUrl().getValue())
+                    .build();
+        }
+    }
+
+    @Builder
+    public record NewestComment(
+            Long userId,
+            String userNickname,
+            String userProfileImageUrl,
+            LocalDateTime createdDate,
+            String content,
+            Long totalReplyCount
+    ) {
+
+        public static NewestComment of(@Nullable Comment comment, Long totalReplyCount) {
+            if (comment == null) {
+                return null;
+            }
+            return NewestComment.builder()
+                    .userId(comment.getUserId())
+                    .userNickname(comment.getUserNickname())
+                    .userProfileImageUrl(comment.getUserProfileImageUrl())
+                    .createdDate(comment.getCreatedDate())
+                    .content(comment.getCommentContent())
+                    .totalReplyCount(totalReplyCount)
                     .build();
         }
     }

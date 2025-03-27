@@ -57,9 +57,16 @@ public abstract class UserAcceptanceTestHelper {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 추천_사용자_조회(String accessToken) {
+    public static ExtractableResponse<Response> 회원_추천_API(String accessToken) {
         return given()
                 .header(AUTHORIZATION, "Bearer " + accessToken)
+                .when().get("/users/recommend")
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 비회원_추천_API() {
+        return given()
                 .when().get("/users/recommend")
                 .then().log().all()
                 .extract();

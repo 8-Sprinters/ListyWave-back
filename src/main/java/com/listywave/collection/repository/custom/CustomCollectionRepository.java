@@ -9,7 +9,7 @@ import org.springframework.data.domain.Slice;
 
 public interface CustomCollectionRepository {
 
-    Slice<Collect> getAllCollectionList(Long cursorId, Pageable pageable, Long userId, CategoryType category);
+    Slice<Collect> getAllCollectionList(Long cursorId, Pageable pageable, Long userId, Long folderId);
 
     List<CategoryType> getCategoriesByCollect(User user);
 }

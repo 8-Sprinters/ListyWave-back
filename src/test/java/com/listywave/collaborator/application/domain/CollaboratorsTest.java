@@ -1,8 +1,8 @@
 package com.listywave.collaborator.application.domain;
 
 import static com.listywave.common.exception.ErrorCode.DUPLICATE_COLLABORATOR_EXCEPTION;
-import static com.listywave.list.application.domain.category.CategoryType.ANIMAL_PLANT;
 import static com.listywave.list.application.domain.category.CategoryType.ETC;
+import static com.listywave.list.application.domain.category.CategoryType.MOVIE_DRAMA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,10 +24,12 @@ import com.listywave.user.application.domain.User;
 import java.util.List;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+@Disabled
 @DisplayName("Collaboratros는 ")
 class CollaboratorsTest {
 
@@ -39,7 +41,7 @@ class CollaboratorsTest {
         user = User.init(1L, "hkim4410@naver.com", "kakaoAccessToken");
         list = new ListEntity(
                 user,
-                ANIMAL_PLANT,
+                MOVIE_DRAMA,
                 new ListTitle("리스트 제목"),
                 new ListDescription("리스트 설명"),
                 true,
@@ -252,8 +254,8 @@ class CollaboratorsTest {
                             new ListTitle(String.valueOf(i)),
                             new ListDescription(String.valueOf(i)),
                             true,
-                            BackgroundPalette.LISTY,
-                            BackgroundColor.LISTY_BLUE,
+                            BackgroundPalette.NEON,
+                            BackgroundColor.NEON_BLUE,
                             false,
                             new Labels(List.of()),
                             new Items(

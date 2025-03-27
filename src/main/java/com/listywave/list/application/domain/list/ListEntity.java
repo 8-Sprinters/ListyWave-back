@@ -9,16 +9,13 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 import static jakarta.persistence.TemporalType.TIMESTAMP;
 import static lombok.AccessLevel.PROTECTED;
 
-import com.listywave.collaborator.application.domain.Collaborators;
 import com.listywave.common.exception.CustomException;
 import com.listywave.list.application.domain.category.CategoryType;
-import com.listywave.list.application.domain.category.CategoryTypeConverter;
 import com.listywave.list.application.domain.item.Item;
 import com.listywave.list.application.domain.item.Items;
 import com.listywave.list.application.domain.label.Labels;
 import com.listywave.user.application.domain.User;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -56,7 +53,6 @@ public class ListEntity {
     private User user;
 
     @Column(name = "category_code", length = 10, nullable = false)
-    @Convert(converter = CategoryTypeConverter.class)
     private CategoryType category;
 
     @Embedded
@@ -90,6 +86,9 @@ public class ListEntity {
 
     @Embedded
     private Items items;
+
+    @Column(nullable = false)
+    private int updateCount;
 
     @CreatedDate
     @Temporal(TIMESTAMP)
@@ -177,11 +176,11 @@ public class ListEntity {
         return totalScore;
     }
 
-    public void increaseCollectCount() {
+    public synchronized void increaseCollectCount() {
         this.collectCount++;
     }
 
-    public void decreaseCollectCount() {
+    public synchronized void decreaseCollectCount() {
         if (this.collectCount > 0) {
             this.collectCount--;
         }
@@ -229,8 +228,8 @@ public class ListEntity {
         }
     }
 
-    public void updateVisibility(Boolean isPublic) {
-        this.isPublic = isPublic;
+    public void updateVisibility() {
+        this.isPublic = !this.isPublic;
     }
 
     public String getRepresentImageUrl() {
@@ -241,22 +240,24 @@ public class ListEntity {
         return user.isDelete();
     }
 
-    public void validateOwnerIsNotDelete() {
+    public void validateOwnerIsNotDeleted() {
         if (this.user.isDelete()) {
             throw new CustomException(DELETED_USER_EXCEPTION, "탈퇴한 회원의 리스트입니다.");
         }
     }
 
-    public void validateUpdateAuthority(User loginUser, Collaborators beforeCollaborators) {
+    public void validateUpdateAuthority(User loginUser) {
         if (this.user.equals(loginUser)) {
             return;
         }
-        if (beforeCollaborators.isEmpty()) {
-            return;
-        }
-        if (beforeCollaborators.contains(loginUser)) {
-            return;
-        }
         throw new CustomException(INVALID_ACCESS);
+    }
+
+    public void increaseUpdateCount() {
+        this.updateCount++;
+    }
+
+    public boolean isOwner(User loginUser) {
+        return this.user.equals(loginUser);
     }
 }

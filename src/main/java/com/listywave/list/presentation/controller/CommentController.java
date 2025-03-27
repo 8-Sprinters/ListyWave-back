@@ -8,6 +8,7 @@ import com.listywave.list.application.dto.response.CommentFindResponse;
 import com.listywave.list.application.service.CommentService;
 import com.listywave.list.presentation.dto.request.comment.CommentCreateRequest;
 import com.listywave.list.presentation.dto.request.comment.CommentUpdateRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,10 +29,10 @@ public class CommentController {
     @PostMapping("/lists/{listId}/comments")
     ResponseEntity<CommentCreateResponse> create(
             @PathVariable("listId") Long listId,
-            @Auth Long loginUserId,
-            @RequestBody CommentCreateRequest commentCreateRequest
+            @Auth Long writerId,
+            @RequestBody @Valid CommentCreateRequest request
     ) {
-        CommentCreateResponse response = commentService.create(listId, commentCreateRequest.content(), loginUserId);
+        CommentCreateResponse response = commentService.create(listId, writerId, request.content(), request.mentionIds());
         return ResponseEntity.status(CREATED).body(response);
     }
 
@@ -41,7 +42,7 @@ public class CommentController {
             @RequestParam(value = "size", defaultValue = "5") int size,
             @RequestParam(value = "cursorId", required = false) Long cursorId
     ) {
-        CommentFindResponse response = commentService.getComments(listId, size, cursorId);
+        CommentFindResponse response = commentService.findAllBy(listId, size, cursorId);
         return ResponseEntity.ok(response);
     }
 
@@ -58,11 +59,11 @@ public class CommentController {
     @PatchMapping("/lists/{listId}/comments/{commentId}")
     ResponseEntity<Void> update(
             @PathVariable("listId") Long listId,
-            @Auth Long loginUserId,
+            @Auth Long writerId,
             @PathVariable("commentId") Long commentId,
-            @RequestBody CommentUpdateRequest commentUpdateRequest
+            @RequestBody CommentUpdateRequest request
     ) {
-        commentService.update(listId, commentId, loginUserId, commentUpdateRequest.content());
+        commentService.update(listId, writerId, commentId, request.content(), request.mentionIds());
         return ResponseEntity.noContent().build();
     }
 }

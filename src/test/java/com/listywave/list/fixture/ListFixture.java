@@ -156,6 +156,13 @@ public abstract class ListFixture {
                                         new ItemComment(String.valueOf(i + 2)),
                                         new ItemLink(String.valueOf(i + 2)),
                                         new ItemImageUrl(String.valueOf(i + 2))
+                                ),
+                                Item.init(
+                                        i + 3,
+                                        new ItemTitle(String.valueOf(i + 3)),
+                                        new ItemComment(String.valueOf(i + 3)),
+                                        new ItemLink(String.valueOf(i + 3)),
+                                        new ItemImageUrl(String.valueOf(i + 3))
                                 )
                         ))
                 )).toList();

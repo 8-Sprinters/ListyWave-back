@@ -4,12 +4,11 @@ import com.listywave.common.auth.Auth;
 import com.listywave.common.auth.OptionalAuth;
 import com.listywave.user.application.dto.FollowersResponse;
 import com.listywave.user.application.dto.FollowingsResponse;
-import com.listywave.user.application.dto.RecommendUsersResponse;
 import com.listywave.user.application.dto.UserInfoResponse;
+import com.listywave.user.application.dto.UsersRecommendedResponse;
 import com.listywave.user.application.dto.search.UserElasticSearchResponse;
 import com.listywave.user.application.dto.search.UserSearchResponse;
 import com.listywave.user.application.service.UserService;
-import com.listywave.user.presentation.dto.ListVisibilityUpdateRequest;
 import com.listywave.user.presentation.dto.UserProfileUpdateRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -89,10 +88,10 @@ public class UserController {
     }
 
     @GetMapping("/users/recommend")
-    ResponseEntity<List<RecommendUsersResponse>> getRecommendUsers(
-            @Auth Long loginUserId
+    ResponseEntity<List<UsersRecommendedResponse>> getRecommendedUsers(
+            @OptionalAuth Long loginUserId
     ) {
-        List<RecommendUsersResponse> recommendUsers = userService.getRecommendUsers(loginUserId);
+        List<UsersRecommendedResponse> recommendUsers = userService.getRecommendedUsers(loginUserId);
         return ResponseEntity.ok(recommendUsers);
     }
 
@@ -122,15 +121,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/users/list-visibility")
-    ResponseEntity<Void> updateListVisibility(
-            @Auth Long loginUserId,
-            @RequestBody ListVisibilityUpdateRequest request
-    ) {
-        userService.updateListVisibility(loginUserId, request.listId(), request.isPublic());
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/v2/users")
     ResponseEntity<UserElasticSearchResponse> searchUserByElastic(
             @OptionalAuth Long loginUserId,
@@ -139,5 +129,11 @@ public class UserController {
     ) {
         UserElasticSearchResponse response = userService.searchUserByElastic(loginUserId, keyword, pageable);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/users/nickname-validate")
+    ResponseEntity<Void> validateNickname(@RequestParam(value = "nickname") String nickname) {
+        userService.validateNickname(nickname);
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,9 +1,9 @@
 package com.listywave.collection.presentation.controller;
 
-import com.listywave.collection.application.dto.CollectionResponse;
+import com.listywave.collection.application.dto.CollectionFindResponse;
 import com.listywave.collection.application.service.CollectionService;
+import com.listywave.collection.presentation.dto.FolderSelectionRequest;
 import com.listywave.common.auth.Auth;
-import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.dto.response.CategoryTypeResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,20 +26,21 @@ public class CollectionController {
     @PostMapping("/lists/{listId}/collect")
     ResponseEntity<Void> collectOrCancel(
             @PathVariable("listId") Long listId,
+            @RequestBody FolderSelectionRequest request,
             @Auth Long loginUserId
     ) {
-        collectionService.collectOrCancel(listId, loginUserId);
+        collectionService.collectOrCancel(listId, request.folderId(), loginUserId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/lists/collect")
-    ResponseEntity<CollectionResponse> getCollection(
+    @GetMapping("/folder/{folderId}/collections")
+    ResponseEntity<CollectionFindResponse> getCollection(
             @Auth Long loginUserId,
-            @RequestParam(name = "category", defaultValue = "entire") CategoryType category,
+            @PathVariable("folderId") Long folderId,
             @RequestParam(name = "cursorId", required = false) Long cursorId,
             @PageableDefault(size = 10) Pageable pageable
     ) {
-        CollectionResponse collection = collectionService.getCollection(loginUserId, cursorId, pageable, category);
+        CollectionFindResponse collection = collectionService.getCollection(loginUserId, cursorId, pageable, folderId);
         return ResponseEntity.ok(collection);
     }
 

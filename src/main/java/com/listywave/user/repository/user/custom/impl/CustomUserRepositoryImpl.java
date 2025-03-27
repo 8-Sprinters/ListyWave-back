@@ -11,6 +11,8 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Nullable;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -33,8 +35,8 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .from(listEntity)
                 .rightJoin(listEntity.user, user)
                 .where(
-                        user.id.ne(me.getId()),
-                        user.id.notIn(myFollowingUserIds),
+                        userIdNotEqual(me),
+                        userIdNotIn(myFollowingUserIds),
                         user.isDelete.isFalse()
                 )
                 .groupBy(user)
@@ -43,8 +45,16 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .fetch();
     }
 
+    private BooleanExpression userIdNotIn(List<Long> myFollowingUserIds) {
+        return myFollowingUserIds.isEmpty() ? null : user.id.notIn(myFollowingUserIds);
+    }
+
+    private BooleanExpression userIdNotEqual(User me) {
+        return me == null ? null : user.id.ne(me.getId());
+    }
+
     @Override
-    public Long countBySearch(String search, Long loginUserId) {
+    public Long countBySearch(String search, @Nullable Long loginUserId) {
         if (search.isEmpty()) {
             return 0L;
         }
@@ -64,7 +74,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     }
 
     @Override
-    public Slice<UserSearchResult> findAllBySearch(String search, Pageable pageable, Long loginUserId) {
+    public Slice<UserSearchResult> findAllBySearch(String search, Pageable pageable, @Nullable Long loginUserId) {
         if (search.isEmpty()) {
             return new SliceImpl<>(List.of(), pageable, false);
         }
@@ -88,5 +98,14 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .offset(pageable.getOffset())
                 .fetch();
         return checkEndPage(pageable, fetch);
+    }
+
+    @Override
+    public void deleteNDaysAgo(int n) {
+        LocalDateTime nDaysAgo = LocalDateTime.now().minusDays(n);
+
+        queryFactory.delete(user)
+                .where(user.isDelete.isTrue().and(user.deleteAt.loe(nDaysAgo)))
+                .execute();
     }
 }

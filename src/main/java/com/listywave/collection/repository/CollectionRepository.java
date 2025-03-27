@@ -1,6 +1,7 @@
 package com.listywave.collection.repository;
 
 import com.listywave.collection.application.domain.Collect;
+import com.listywave.collection.application.domain.Folder;
 import com.listywave.collection.repository.custom.CustomCollectionRepository;
 import com.listywave.list.application.domain.list.ListEntity;
 import java.util.List;
@@ -20,4 +21,10 @@ public interface CollectionRepository extends JpaRepository<Collect, Long>, Cust
     @Modifying
     @Query("delete from Collect c where c.list in :lists")
     void deleteAllByListIn(@Param("lists") List<ListEntity> lists);
+
+    @Modifying
+    @Query("delete from Collect c where c.folder =:folder")
+    void deleteAllByFolder(@Param("folder") Folder folder);
+
+    List<Collect> findAllByFolder(Folder folder);
 }

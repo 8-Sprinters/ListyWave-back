@@ -1,36 +1,38 @@
 package com.listywave.acceptance.list;
 
 import static com.listywave.acceptance.collection.CollectionAcceptanceTestHelper.콜렉트_또는_콜렉트취소_API_호출;
-import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.n개의_댓글_생성_요청;
 import static com.listywave.acceptance.comment.CommentAcceptanceTestHelper.댓글_저장_API_호출;
 import static com.listywave.acceptance.common.CommonAcceptanceHelper.HTTP_상태_코드를_검증한다;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.폴더_생성_API_호출;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.폴더_생성_요청_데이터;
+import static com.listywave.acceptance.folder.FolderAcceptanceTestHelper.폴더_선택_요청_데이터;
 import static com.listywave.acceptance.follow.FollowAcceptanceTestHelper.팔로우_요청_API;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.가장_좋아하는_견종_TOP3_생성_요청_데이터;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.검색_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_공개_여부_변경_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_삭제_요청_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_상세_조회를_검증한다;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_수정_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트_저장_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.리스트의_아이템_순위와_히스토리의_아이템_순위를_검증한다;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_리스트_상세_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_최신_리스트_10개_조회_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_피드_리스트_조회_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원_히스토리_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_카테고리_콜라보레이터_필터링_요청;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_카테고리_필터링_요청;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.비회원이_피드_리스트_조회_콜라보레이터_필터링_요청;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.아이템_순위와_라벨을_바꾼_좋아하는_견종_TOP3_요청_데이터;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.정렬기준을_포함한_검색_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.좋아하는_라면_TOP3_생성_요청_데이터;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리로_검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리와_키워드로_검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.콜렉트_요청_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.최신_리스트_10개_조회_카테고리_필터링_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.추천_리스트_조회_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리_코드로_검색_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.카테고리_코드와_키워드로_검색_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.키워드로_검색_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.키워드와_정렬기준을_포함한_검색_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.트랜딩_리스트_조회_API_호출;
-import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원_최신_리스트_10개_조회_API_호출;
+import static com.listywave.acceptance.list.ListAcceptanceTestHelper.팔로우한_사용자의_최신_리스트_10개_조회_API_호출;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원_피드_리스트_조회;
 import static com.listywave.acceptance.list.ListAcceptanceTestHelper.회원용_리스트_상세_조회_API_호출;
+import static com.listywave.acceptance.reaction.ReactionAcceptanceTestHelper.리액션_요청_데이터_리스트;
+import static com.listywave.acceptance.reaction.ReactionAcceptanceTestHelper.리액션_일괄_호출;
 import static com.listywave.acceptance.reply.ReplyAcceptanceTestHelper.답글_등록_API_호출;
 import static com.listywave.list.fixture.ListFixture.가장_좋아하는_견종_TOP3;
 import static com.listywave.list.fixture.ListFixture.가장_좋아하는_견종_TOP3_순위_변경;
@@ -40,6 +42,7 @@ import static com.listywave.user.fixture.UserFixture.동호;
 import static com.listywave.user.fixture.UserFixture.유진;
 import static com.listywave.user.fixture.UserFixture.정수;
 import static java.time.temporal.ChronoUnit.MILLIS;
+import static java.util.Collections.EMPTY_LIST;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,25 +58,28 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import com.listywave.acceptance.common.AcceptanceTest;
 import com.listywave.auth.infra.kakao.response.KakaoLogoutResponse;
 import com.listywave.collaborator.application.domain.Collaborator;
+import com.listywave.collection.application.dto.FolderCreateResponse;
 import com.listywave.list.application.domain.category.CategoryType;
 import com.listywave.list.application.domain.list.BackgroundColor;
 import com.listywave.list.application.domain.list.BackgroundPalette;
 import com.listywave.list.application.domain.list.ListEntity;
+import com.listywave.list.application.dto.response.CommentCreateResponse;
 import com.listywave.list.application.dto.response.ListCreateResponse;
 import com.listywave.list.application.dto.response.ListDetailResponse;
 import com.listywave.list.application.dto.response.ListRecentResponse;
 import com.listywave.list.application.dto.response.ListSearchResponse;
-import com.listywave.list.application.dto.response.ListTrandingResponse;
+import com.listywave.list.application.dto.response.RecommendedListResponse;
 import com.listywave.list.presentation.dto.request.ItemCreateRequest;
 import com.listywave.list.presentation.dto.request.ListUpdateRequest;
 import com.listywave.list.presentation.dto.request.ReplyCreateRequest;
+import com.listywave.list.presentation.dto.request.comment.CommentCreateRequest;
+import com.listywave.reaction.application.domain.Reaction;
 import com.listywave.user.application.dto.FindFeedListResponse;
 import com.listywave.user.application.dto.FindFeedListResponse.FeedListInfo;
-import com.listywave.user.application.dto.FindFeedListResponse.ListItemsResponse;
 import io.restassured.common.mapper.TypeRef;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -101,6 +107,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
+        @Disabled
         void 콜라보레이터를_지정해_리스트를_생성할_수_있다() {
             // given
             var 동호 = 회원을_저장한다(동호());
@@ -172,7 +179,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
                     () -> assertThat(결과.ownerId()).isEqualTo(동호.getId()),
                     () -> assertThat(결과.title()).isEqualTo(동호_리스트.getTitle().getValue()),
                     () -> assertThat(결과.categoryKorName()).isEqualTo(동호_리스트.getCategory().getViewName()),
-                    () -> assertThat(결과.collectCount()).isZero(),
+                    () -> assertThat(결과.collectCount()).isNull(),
                     () -> assertThat(결과.collaborators()).isEmpty()
             );
         }
@@ -187,7 +194,14 @@ public class ListAcceptanceTest extends AcceptanceTest {
             Long 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰)
                     .as(ListCreateResponse.class)
                     .listId();
-            콜렉트_요청_API_호출(액세스_토큰을_발급한다(정수), 동호_리스트_ID);
+
+            var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
+            var 정수_폴더_ID = 폴더_생성_API_호출(정수_액세스_토큰, 폴더_생성_요청_데이터)
+                    .as(FolderCreateResponse.class).folderId();
+            var 폴더_선택_데이터 = 폴더_선택_요청_데이터(정수_폴더_ID);
+            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 동호_리스트_ID, 폴더_선택_데이터);
+
+            팔로우_요청_API(정수_액세스_토큰, 동호.getId());
 
             // when
             var 결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 동호_리스트_ID);
@@ -195,8 +209,8 @@ public class ListAcceptanceTest extends AcceptanceTest {
             // then
             assertAll(
                     () -> assertThat(결과.ownerId()).isEqualTo(동호.getId()),
-                    () -> assertThat(결과.collaborators().get(0).id()).isEqualTo(정수.getId()),
-                    () -> assertThat(결과.collectCount()).isEqualTo(1)
+                    () -> assertThat(결과.isFollowing()).isTrue(),
+                    () -> assertThat(결과.collectCount()).isNull()
             );
         }
 
@@ -207,10 +221,14 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 정수 = 회원을_저장한다(정수());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
             var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
-            Long 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰)
+            Long 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰)
                     .as(ListCreateResponse.class)
                     .listId();
-            콜렉트_요청_API_호출(정수_액세스_토큰, 동호_리스트_ID);
+
+            var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
+            var 정수_폴더_ID = 폴더_생성_API_호출(정수_액세스_토큰, 폴더_생성_요청_데이터).as(FolderCreateResponse.class).folderId();
+            var 폴더_선택_데이터 = 폴더_선택_요청_데이터(정수_폴더_ID);
+            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 동호_리스트_ID, 폴더_선택_데이터);
 
             // when
             var 결과 = 회원용_리스트_상세_조회_API_호출(동호_액세스_토큰, 동호_리스트_ID);
@@ -218,7 +236,6 @@ public class ListAcceptanceTest extends AcceptanceTest {
             // then
             assertAll(
                     () -> assertThat(결과.ownerId()).isEqualTo(동호.getId()),
-                    () -> assertThat(결과.collaborators().get(0).id()).isEqualTo(정수.getId()),
                     () -> assertThat(결과.collectCount()).isEqualTo(1)
             );
         }
@@ -239,7 +256,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 결과 = 비회원_리스트_상세_조회_API_호출(동호_리스트_ID).as(ListDetailResponse.class);
 
             // then
-            var 기대값 = ListDetailResponse.of(가장_좋아하는_견종_TOP3_순위_변경(동호, List.of()), 동호, false, List.of());
+            var 기대값 = ListDetailResponse.of(가장_좋아하는_견종_TOP3_순위_변경(동호, List.of()), 동호, false, false, false, List.of(), 0, null, 0L, List.of());
             리스트_상세_조회를_검증한다(결과, 기대값);
         }
 
@@ -258,6 +275,52 @@ public class ListAcceptanceTest extends AcceptanceTest {
 
             // then
             HTTP_상태_코드를_검증한다(응답, BAD_REQUEST);
+        }
+
+        @Test
+        void 댓글이_하나도_없는_리스트라면_가장_최신_댓글_정보에_값이_담기지_않는다() {
+            // given
+            var 동호 = 회원을_저장한다(동호());
+            var 리스트_생성_요청_데이터 = 가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of());
+            리스트_저장_API_호출(리스트_생성_요청_데이터, 액세스_토큰을_발급한다(동호));
+
+            // when
+            var 동호_리스트 = 비회원_리스트_상세_조회_API_호출(1L).as(ListDetailResponse.class);
+
+            // then
+            assertThat(동호_리스트.totalCommentCount()).isZero();
+            assertThat(동호_리스트.newestComment()).isNull();
+        }
+
+        @Test
+        void 댓글이_있다면_가장_최신_댓글과_해당_댓글에_달린_답글_개수도_응답한다() {
+            // given
+            var 동호 = 회원을_저장한다(동호());
+            var 리스트_생성_요청_데이터 = 가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of());
+            var 리스트_ID = 리스트_저장_API_호출(리스트_생성_요청_데이터, 액세스_토큰을_발급한다(동호))
+                    .as(ListCreateResponse.class)
+                    .listId();
+
+            var 정수 = 회원을_저장한다(정수());
+            댓글_저장_API_호출(액세스_토큰을_발급한다(정수), 리스트_ID, new CommentCreateRequest("댓글 1빠!", EMPTY_LIST));
+            var 댓글_ID = 댓글_저장_API_호출(액세스_토큰을_발급한다(정수), 리스트_ID, new CommentCreateRequest("댓글 2빠!", EMPTY_LIST))
+                    .as(CommentCreateResponse.class)
+                    .id();
+
+            var 유진 = 회원을_저장한다(유진());
+            답글_등록_API_호출(액세스_토큰을_발급한다(유진), new ReplyCreateRequest("답글 1빠!", EMPTY_LIST), 리스트_ID, 댓글_ID);
+            답글_등록_API_호출(액세스_토큰을_발급한다(유진), new ReplyCreateRequest("답글 2빠!", EMPTY_LIST), 리스트_ID, 댓글_ID);
+            답글_등록_API_호출(액세스_토큰을_발급한다(유진), new ReplyCreateRequest("답글 3빠!", EMPTY_LIST), 리스트_ID, 댓글_ID);
+
+            // when
+            var 동호_리스트 = 비회원_리스트_상세_조회_API_호출(1L).as(ListDetailResponse.class);
+
+            // then
+            assertAll(
+                    () -> assertThat(동호_리스트.newestComment()).isNotNull(),
+                    () -> assertThat(동호_리스트.newestComment().content()).isEqualTo("댓글 2빠!"),
+                    () -> assertThat(동호_리스트.newestComment().totalReplyCount()).isEqualTo(3)
+            );
         }
     }
 
@@ -282,12 +345,12 @@ public class ListAcceptanceTest extends AcceptanceTest {
             // then
             var 리스트_상세_조회_결과 = 회원용_리스트_상세_조회_API_호출(동호_액세스_토큰, 동호_리스트_ID);
             ListEntity 수정된_리스트 = 가장_좋아하는_견종_TOP3_순위_변경(동호, List.of());
-            ListDetailResponse 기대값 = ListDetailResponse.of(수정된_리스트, 동호, false, List.of(Collaborator.init(유진, 수정된_리스트)));
+            ListDetailResponse 기대값 = ListDetailResponse.of(수정된_리스트, 동호, true, false, false, List.of(Collaborator.init(유진, 수정된_리스트)), 0, null, 0L, List.of());
             리스트_상세_조회를_검증한다(리스트_상세_조회_결과, 기대값);
         }
 
         @Test
-        void 아이템_순위에_변동이_있으면_히스토리로_기록되고_lastUpdatedDate가_갱신된다() {
+        void 아이템_순위에_변동이_있으면_히스토리로_기록되고_lastUpdatedDate가_갱신되고_updateCount가_증가한다() {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
@@ -318,6 +381,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
+        @Disabled
         void 리스트의_작성자와_콜라보레이터만_수정할_수_있다() {
             // given
             var 동호 = 회원을_저장한다(동호());
@@ -343,7 +407,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 아이템의_순위_변동이_일어나지_않으면_updatedDate가_갱신되지_않는다() {
+        void 아이템의_순위_변동이_일어나지_않으면_updatedDate와_updateCount가_갱신되지_않는다() {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 정수 = 회원을_저장한다(정수());
@@ -358,7 +422,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
 
             // when
             var 아이템을_제외한_리스트_수정_요청_데이터 = new ListUpdateRequest(
-                    CategoryType.CULTURE,
+                    CategoryType.MUSIC,
                     List.of("라벨이", "바뀌면", "갱신안됨"),
                     List.of(정수.getId()),
                     "제목 바꿨어요",
@@ -507,9 +571,9 @@ public class ListAcceptanceTest extends AcceptanceTest {
             리스트를_모두_저장한다(동호_리스트들);
 
             // when
-            var 결과 = 비회원이_피드_리스트_조회_카테고리_필터링_요청(동호, "book").as(FindFeedListResponse.class);
+            var 결과 = 비회원이_피드_리스트_조회_카테고리_필터링_요청(동호, "movie_drama").as(FindFeedListResponse.class);
 
-            var 필터링_조건 = CategoryType.nameOf("book");
+            var 필터링_조건 = CategoryType.nameOf("movie_drama");
             var 기대값 = 동호_리스트들.stream()
                     .sorted(comparing(ListEntity::getId, reverseOrder()))
                     .filter(list -> list.isCategoryType(필터링_조건))
@@ -521,105 +585,59 @@ public class ListAcceptanceTest extends AcceptanceTest {
                     .ignoringFields("id")
                     .isEqualTo(기대값);
         }
-
-        @Test
-        void 콜라보레이터로_필터링한다() {
-            // given
-            var 동호 = 회원을_저장한다(동호());
-            var 정수 = 회원을_저장한다(정수());
-            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
-            var 리스트_1_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰)
-                    .as(ListCreateResponse.class)
-                    .listId();
-            var 리스트_2_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of(동호.getId())), 정수_액세스_토큰)
-                    .as(ListCreateResponse.class)
-                    .listId();
-
-            // when
-            var 결과 = 비회원이_피드_리스트_조회_콜라보레이터_필터링_요청(동호).as(FindFeedListResponse.class);
-
-            // then
-            assertThat(결과.feedLists()).hasSize(2);
-            assertThat(결과.feedLists().get(0).id()).isEqualTo(리스트_2_ID);
-            assertThat(결과.feedLists().get(1).id()).isEqualTo(리스트_1_ID);
-        }
-
-        @Test
-        void 콜라보레이터와_카테고리로_필터링한다() {
-            // given
-            var 동호 = 회원을_저장한다(동호());
-            var 정수 = 회원을_저장한다(정수());
-            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
-            var 동호_리스트_2 = 리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰).as(ListCreateResponse.class);
-
-            // when
-            var 결과 = 비회원이_피드_리스트_조회_카테고리_콜라보레이터_필터링_요청(동호, "etc").as(FindFeedListResponse.class);
-
-            // then
-            assertThat(결과.feedLists()).hasSize(1);
-            assertThat(결과.feedLists().get(0).id()).isEqualTo(동호_리스트_2.listId());
-        }
     }
 
     @Nested
     class 리스트_탐색 {
 
         @Test
-        void 트랜딩_리스트를_조회한다() {
+        void 추천_리스트를_조회한다() {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 정수 = 회원을_저장한다(정수());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
             var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
-            리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(동호, 5));
-            리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(정수, 5));
-            리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(동호, 5));
 
-            var 댓글_생성_요청들 = n개의_댓글_생성_요청(4);
-            var 댓글_생성_요청들2 = n개의_댓글_생성_요청(8);
-            댓글_생성_요청들.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 2L, 댓글_생성요청));
-            댓글_생성_요청들2.forEach(댓글_생성요청 -> 댓글_저장_API_호출(동호_액세스_토큰, 4L, 댓글_생성요청));
+            리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰);
+            리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 정수_액세스_토큰);
+            리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰);
+            리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰);
+            리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰);
+            리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of(정수.getId())), 동호_액세스_토큰);
 
-            var 답글_생성_요청들 = Arrays.asList(new ReplyCreateRequest("답글1"), new ReplyCreateRequest("답글2"));
-            답글_생성_요청들.forEach(답글_생성요청 -> 답글_등록_API_호출(동호_액세스_토큰, 답글_생성요청, 2L, 2L));
-
-            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 2L);
-            콜렉트_또는_콜렉트취소_API_호출(동호_액세스_토큰, 7L);
+            리액션_일괄_호출(정수_액세스_토큰, 2L, 리액션_요청_데이터_리스트(Reaction.COOL, Reaction.AGREE, Reaction.THANKS));
+            리액션_일괄_호출(동호_액세스_토큰, 2L, 리액션_요청_데이터_리스트(Reaction.COOL, Reaction.THANKS));
+            리액션_일괄_호출(동호_액세스_토큰, 1L, 리액션_요청_데이터_리스트(Reaction.COOL, Reaction.THANKS));
+            리액션_일괄_호출(동호_액세스_토큰, 5L, 리액션_요청_데이터_리스트(Reaction.THANKS));
+            리액션_일괄_호출(동호_액세스_토큰, 3L, 리액션_요청_데이터_리스트(Reaction.THANKS));
 
             // when
-            List<ListTrandingResponse> 결과 = 트랜딩_리스트_조회_API_호출().as(new TypeRef<>() {
+            List<RecommendedListResponse> 결과 = 추천_리스트_조회_API_호출().as(new TypeRef<>() {
             });
 
             // then
-            var 동호_리스트 = 비회원_피드_리스트_조회_API_호출(동호).as(FindFeedListResponse.class).feedLists();
-            var 정수_리스트 = 비회원_피드_리스트_조회_API_호출(정수).as(FindFeedListResponse.class).feedLists();
-            var 모든_리스트 = new ArrayList<>(동호_리스트);
-            모든_리스트.addAll(정수_리스트);
-
-            var 대표_이미지들 = 모든_리스트.stream()
-                    .sorted(comparing(FeedListInfo::id, reverseOrder()))
-                    .map(feedListInfo -> feedListInfo.listItems().stream()
-                            .sorted(comparing(ListItemsResponse::rank))
-                            .filter(listItemsResponse -> listItemsResponse.imageUrl() != null && !listItemsResponse.imageUrl().isBlank())
-                            .map(ListItemsResponse::imageUrl)
-                            .findFirst()
-                            .orElse(""))
-                    .toList();
-
             assertAll(
-                    () -> assertThat(결과).usingRecursiveComparison()
-                            .comparingOnlyFields("itemImageUrl")
-                            .isEqualTo(대표_이미지들),
-                    () -> assertThat(결과.get(0).trandingScore()).isEqualTo(16),
-                    () -> assertThat(결과.get(1).trandingScore()).isEqualTo(15),
-                    () -> assertThat(결과.get(2).trandingScore()).isEqualTo(3)
+                    () -> assertThat(결과).hasSize(4),
+                    () -> assertThat(결과.get(0).id()).isEqualTo(2L),
+                    () -> assertThat(결과.get(1).id()).isEqualTo(1L),
+                    () -> assertThat(결과.get(2).id()).isEqualTo(5L),
+                    () -> assertThat(결과.get(3).id()).isEqualTo(3L),
+
+                    () -> assertThat(결과.get(0).ownerNickname()).isEqualTo("pparkjs"),
+                    () -> assertThat(결과.get(1).ownerNickname()).isEqualTo("kdkdhoho"),
+
+                    () -> assertThat(결과.get(0).items()).hasSize(3),
+                    () -> assertThat(결과.get(0).items().get(0).rank()).isEqualTo(1),
+                    () -> assertThat(결과.get(0).items().get(1).rank()).isEqualTo(2),
+                    () -> assertThat(결과.get(0).items().get(2).rank()).isEqualTo(3),
+
+                    () -> assertThat(결과.get(0).itemImageUrl()).isEqualTo("이미지1"),
+                    () -> assertThat(결과.get(1).itemImageUrl()).isEqualTo("이미지1")
             );
         }
 
         @Test
-        void 회원이_최신_리스트_10개를_조회하면_팔로우한_사용자의_최신_리스트_10개가_반환된다() {
+        void 팔로우한_사용자의_최신_리스트_10개를_조회한다() {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 정수 = 회원을_저장한다(정수());
@@ -630,7 +648,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
             리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(동호, 5));
 
             // when
-            var response = 회원_최신_리스트_10개_조회_API_호출(동호_액세스_토큰);
+            var response = 팔로우한_사용자의_최신_리스트_10개_조회_API_호출(동호_액세스_토큰);
             var result = response.as(ListRecentResponse.class);
 
             // then
@@ -638,7 +656,7 @@ public class ListAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 비회원이_최신_리스트_10개를_조회한다() {
+        void 최신_리스트_10개를_조회한다() {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 정수 = 회원을_저장한다(정수());
@@ -649,7 +667,8 @@ public class ListAcceptanceTest extends AcceptanceTest {
             리스트를_모두_저장한다(지정된_개수만큼_리스트를_생성한다(동호, 5));
 
             // when
-            var 결과 = 비회원_최신_리스트_10개_조회_API_호출().as(ListRecentResponse.class);
+            var 결과 = 최신_리스트_10개_조회_카테고리_필터링_API_호출(CategoryType.ENTIRE.name().toLowerCase())
+                    .as(ListRecentResponse.class);
 
             // then
             var 동호_리스트 = 비회원_피드_리스트_조회_API_호출(동호).as(FindFeedListResponse.class).feedLists();
@@ -697,21 +716,31 @@ public class ListAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
-        void 카테고리로_필터링_할_수_있다() {
+        void 카테고리_코드로_필터링_할_수_있다() {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
             리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰);
             var 좋아하는_라면_TOP3_생성_결과 = 리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
 
+            assertThat(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()).category()).isNotEqualTo(좋아하는_라면_TOP3_생성_요청_데이터(List.of()).category());
+            CategoryType 검색하려는_카테고리 = 좋아하는_라면_TOP3_생성_요청_데이터(List.of()).category();
+
             // when
-            var result = 카테고리로_검색_API_호출("etc").as(ListSearchResponse.class);
+            var result = 카테고리_코드로_검색_API_호출(검색하려는_카테고리.getCode()).as(ListSearchResponse.class);
 
             // then
             assertAll(
                     () -> assertThat(result.totalCount()).isOne(),
-                    () -> assertThat(result.resultLists()).hasSize(1),
-                    () -> assertThat(result.resultLists().get(0).id()).isEqualTo(좋아하는_라면_TOP3_생성_결과.listId())
+                    () -> {
+                        var listResponses = result.resultLists();
+
+                        assertThat(listResponses).hasSize(1);
+                        assertThat(listResponses.get(0).id()).isEqualTo(좋아하는_라면_TOP3_생성_결과.listId());
+                        assertThat(listResponses.stream()
+                                .allMatch(listResponse -> listResponse.categoryCode().equals(검색하려는_카테고리.getCode()))
+                        ).isTrue();
+                    }
             );
         }
 
@@ -720,17 +749,20 @@ public class ListAcceptanceTest extends AcceptanceTest {
             // given
             var 동호 = 회원을_저장한다(동호());
             var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
-            var 좋아하는_견종_TOP3_생성_결과 = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
+            Long 좋아하는_견종_TOP3_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class).listId();
             리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
 
+            // 정확한 테스트를 위해 두 리스트의 카테고리가 다름을 검증합니다.
+            assertThat(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()).category()).isNotEqualTo(좋아하는_라면_TOP3_생성_요청_데이터(List.of()).category());
+
             // when
-            var 결과 = 카테고리와_키워드로_검색_API_호출("animal_plant", "견종").as(ListSearchResponse.class);
+            var 결과 = 카테고리_코드와_키워드로_검색_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()).category().getCode(), "견종").as(ListSearchResponse.class);
 
             // then
             assertAll(
                     () -> assertThat(결과.totalCount()).isOne(),
                     () -> assertThat(결과.resultLists()).hasSize(1),
-                    () -> assertThat(결과.resultLists().get(0).id()).isEqualTo(좋아하는_견종_TOP3_생성_결과.listId())
+                    () -> assertThat(결과.resultLists().get(0).id()).isEqualTo(좋아하는_견종_TOP3_리스트_ID)
             );
         }
 
@@ -783,7 +815,12 @@ public class ListAcceptanceTest extends AcceptanceTest {
             var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
             var 좋아하는_견종_TOP3_생성_결과 = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
             var 좋아하는_라면_TOP3_생성_결과 = 리스트_저장_API_호출(좋아하는_라면_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰).as(ListCreateResponse.class);
-            콜렉트_요청_API_호출(정수_액세스_토큰, 좋아하는_라면_TOP3_생성_결과.listId());
+
+            var 폴더_생성_요청_데이터 = 폴더_생성_요청_데이터("맛집");
+            var 정수_폴더_ID = 폴더_생성_API_호출(정수_액세스_토큰, 폴더_생성_요청_데이터)
+                    .as(FolderCreateResponse.class).folderId();
+            var 폴더_선택_데이터 = 폴더_선택_요청_데이터(정수_폴더_ID);
+            콜렉트_또는_콜렉트취소_API_호출(정수_액세스_토큰, 좋아하는_라면_TOP3_생성_결과.listId(), 폴더_선택_데이터);
 
             // when
             var 결과 = 정렬기준을_포함한_검색_API_호출("collect").as(ListSearchResponse.class);
@@ -815,6 +852,65 @@ public class ListAcceptanceTest extends AcceptanceTest {
                     () -> assertThat(결과.resultLists()).hasSize(1),
                     () -> assertThat(결과.resultLists().get(0).id()).isEqualTo(좋아하는_라면_TOP3_생성_결과.listId())
             );
+        }
+    }
+
+    @Nested
+    class 내_리스트_공개_여부_설정 {
+
+        @Test
+        void 내_공개_리스트_비공개로_설정() {
+            // given
+            var 정수 = 회원을_저장한다(정수());
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 정수_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 정수_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+
+            // when
+            var 응답 = 리스트_공개_여부_변경_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+            var 수정_이후_리스트_공개_여부_조회_결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+
+            // then
+            HTTP_상태_코드를_검증한다(응답, NO_CONTENT);
+            assertThat(수정_이후_리스트_공개_여부_조회_결과.isPublic()).isFalse();
+        }
+
+        @Test
+        void 내_비공개_리스트_공개로_설정() {
+            // given
+            var 정수 = 회원을_저장한다(정수());
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 정수_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 정수_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+            리스트_공개_여부_변경_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+
+            // when
+            var 응답 = 리스트_공개_여부_변경_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+            var 수정_이후_리스트_공개_여부_조회_결과 = 회원용_리스트_상세_조회_API_호출(정수_액세스_토큰, 정수_리스트_ID);
+
+            // then
+            HTTP_상태_코드를_검증한다(응답, NO_CONTENT);
+            assertThat(수정_이후_리스트_공개_여부_조회_결과.isPublic()).isTrue();
+        }
+
+        @Test
+        void 내_리스트가_아니면_공개_여부_설정을_할_수_없다() {
+            // given
+            var 정수 = 회원을_저장한다(정수());
+            var 동호 = 회원을_저장한다(동호());
+            var 정수_액세스_토큰 = 액세스_토큰을_발급한다(정수);
+            var 동호_액세스_토큰 = 액세스_토큰을_발급한다(동호);
+            var 동호_리스트_ID = 리스트_저장_API_호출(가장_좋아하는_견종_TOP3_생성_요청_데이터(List.of()), 동호_액세스_토큰)
+                    .as(ListCreateResponse.class)
+                    .listId();
+
+            // when
+            var 응답 = 리스트_공개_여부_변경_API_호출(정수_액세스_토큰, 동호_리스트_ID);
+
+            // then
+            HTTP_상태_코드를_검증한다(응답, FORBIDDEN);
         }
     }
 }

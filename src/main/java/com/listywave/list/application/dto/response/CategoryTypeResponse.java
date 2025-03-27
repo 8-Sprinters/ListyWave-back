@@ -5,16 +5,14 @@ import com.listywave.list.application.domain.category.CategoryType;
 public record CategoryTypeResponse(
         String code,
         String engName,
-        String korName,
-        String categoryImageUrl
+        String korName
 ) {
 
     public static CategoryTypeResponse of(CategoryType categoryType) {
         return new CategoryTypeResponse(
                 categoryType.getCode(),
                 categoryType.name().toLowerCase(),
-                categoryType.getViewName(),
-                categoryType.getImageUrl()
+                categoryType.getViewName()
         );
     }
 }

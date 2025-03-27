@@ -8,7 +8,7 @@ import lombok.Builder;
 
 @Builder
 public record ListSearchResponse(
-        List<ListInfo> resultLists,
+        List<ListDto> resultLists,
         Long totalCount,
         Long cursorId,
         boolean hasNext
@@ -21,7 +21,7 @@ public record ListSearchResponse(
             boolean hasNext
     ) {
         return ListSearchResponse.builder()
-                .resultLists(ListInfo.toList(lists))
+                .resultLists(ListDto.toList(lists))
                 .totalCount(totalCount)
                 .cursorId(cursorId)
                 .hasNext(hasNext)
@@ -29,7 +29,7 @@ public record ListSearchResponse(
     }
 
     @Builder
-    public record ListInfo(
+    public record ListDto(
             Long id,
             String title,
             List<ItemInfo> items,
@@ -39,17 +39,20 @@ public record ListSearchResponse(
             Long ownerId,
             String ownerNickname,
             String ownerProfileImageUrl,
-            String representImageUrl
+            String representImageUrl,
+            String categoryCode,
+            String categoryKorName,
+            String categoryEngName
     ) {
 
-        public static List<ListInfo> toList(List<ListEntity> lists) {
+        public static List<ListDto> toList(List<ListEntity> lists) {
             return lists.stream()
-                    .map(ListInfo::of)
+                    .map(ListDto::of)
                     .toList();
         }
 
-        private static ListInfo of(ListEntity list) {
-            return ListInfo.builder()
+        private static ListDto of(ListEntity list) {
+            return ListDto.builder()
                     .id(list.getId())
                     .title(list.getTitle().getValue())
                     .items(ItemInfo.toList(list.getTop3Items().getValues()))
@@ -60,6 +63,9 @@ public record ListSearchResponse(
                     .ownerNickname(list.getUser().getNickname())
                     .ownerProfileImageUrl(list.getUser().getProfileImageUrl())
                     .representImageUrl(list.getRepresentImageUrl())
+                    .categoryCode(list.getCategory().getCode())
+                    .categoryKorName(list.getCategory().getViewName())
+                    .categoryEngName(list.getCategory().name())
                     .build();
         }
     }

@@ -2,7 +2,6 @@ package com.listywave.collection.repository.custom.impl;
 
 import static com.listywave.collection.application.domain.QCollect.collect;
 import static com.listywave.common.util.PaginationUtils.checkEndPage;
-import static com.listywave.list.application.domain.category.CategoryType.ENTIRE;
 import static com.listywave.list.application.domain.item.QItem.item;
 import static com.listywave.list.application.domain.list.QListEntity.listEntity;
 import static com.listywave.user.application.domain.QUser.user;
@@ -24,7 +23,7 @@ public class CustomCollectionRepositoryImpl implements CustomCollectionRepositor
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Slice<Collect> getAllCollectionList(Long cursorId, Pageable pageable, Long userId, CategoryType category) {
+    public Slice<Collect> getAllCollectionList(Long cursorId, Pageable pageable, Long userId, Long folderId) {
         List<Collect> fetch = queryFactory
                 .selectFrom(collect)
                 .join(collect.list, listEntity).fetchJoin()
@@ -33,7 +32,7 @@ public class CustomCollectionRepositoryImpl implements CustomCollectionRepositor
                 .where(
                         collectIdLt(cursorId),
                         userIdEq(userId),
-                        categoryEq(category)
+                        folderIdEq(folderId)
                 )
                 .distinct()
                 .limit(pageable.getPageSize() + 1)
@@ -42,15 +41,12 @@ public class CustomCollectionRepositoryImpl implements CustomCollectionRepositor
         return checkEndPage(pageable, fetch);
     }
 
-    private BooleanExpression collectIdLt(Long cursorId) {
-        return cursorId == null ? null : collect.id.lt(cursorId);
+    private BooleanExpression folderIdEq(Long folderId) {
+        return folderId == 0L ? null : collect.folder.id.eq(folderId);
     }
 
-    private BooleanExpression categoryEq(CategoryType category) {
-        if (category.equals(ENTIRE)) {
-            return null;
-        }
-        return listEntity.category.eq(category);
+    private BooleanExpression collectIdLt(Long cursorId) {
+        return cursorId == null ? null : collect.id.lt(cursorId);
     }
 
     @Override

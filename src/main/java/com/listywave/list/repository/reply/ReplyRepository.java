@@ -19,9 +19,11 @@ public interface ReplyRepository extends JpaRepository<Reply, Long>, CustomReply
 
     boolean existsByComment(Comment comment);
 
-    List<Reply> getAllByComment(Comment comment);
+    List<Reply> findAllByComment(Comment comment);
 
     @Modifying
     @Query("delete from Reply r where r.comment in :comments")
     void deleteAllByCommentIn(@Param("comments") List<Comment> comments);
+
+    Long countByComment(Comment comment);
 }

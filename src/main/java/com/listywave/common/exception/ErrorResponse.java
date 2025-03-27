@@ -19,7 +19,7 @@ public record ErrorResponse(
                 errorCode.getDetail(),
                 e.getMessage()
         );
-        
+
         return ResponseEntity.status(errorCode.getStatus()).body(errorResponse);
     }
 }
